@@ -87,7 +87,6 @@ export interface CreateCellContext {
 	dragState: DragState | null;
 	holidaysData: HolidayData | null;
 	locale: string;
-	rangeStackMap: Map<string, number>;
 }
 
 export function createPlannerCell(
@@ -137,45 +136,16 @@ export function createPlannerCell(
 		day,
 	);
 
-	if (rangeFiles.length > 0 && singleFiles.length > 0) {
-		cell.dataset.hasBoth = "true";
-	}
 	if (isHoliday && ctx.holidaysData?.names.has(dateKey)) {
 		cell.dataset.hasHoliday = "true";
 	}
 
-	if (rangeFiles.length > 0) {
-		rangeFiles.forEach(({ file, runPos, isFirst }) => {
-			const barClasses = [
-				"yearly-planner-range-bar",
-				runPos.runStart && "yearly-planner-range-run-start",
-				runPos.runEnd && "yearly-planner-range-run-end",
-				!runPos.runStart &&
-					!runPos.runEnd &&
-					"yearly-planner-range-run-mid",
-			]
-				.filter(Boolean)
-				.join(" ");
-			const barEl = cell.createDiv({ cls: barClasses });
-			const stackIdx = ctx.rangeStackMap.get(file.basename) ?? 0;
-			barEl.dataset.rangeStack = String(Math.min(stackIdx, 9));
-			barEl.dataset.path = file.path;
-			const chipColor = getChipColor(ctx.app, file);
-			if (chipColor) {
-				barEl.style.setProperty("--range-color", chipColor);
-			}
-			if (isFirst) {
-				barEl.createSpan({
-					cls: "yearly-planner-range-label",
-					text: getFileTitle(ctx.app, file),
-				});
-			}
-		});
-	}
+	const startDateRangeFiles = rangeFiles.filter((r) => r.isFirst).map((r) => r.file);
+	const allFiles = [...singleFiles, ...startDateRangeFiles];
 
-	if (singleFiles.length > 0) {
+	if (allFiles.length > 0) {
 		const listEl = cell.createDiv({ cls: "yearly-planner-cell-files" });
-		for (const file of singleFiles) {
+		for (const file of allFiles) {
 			const linkEl = listEl.createEl("div", {
 				cls: "yearly-planner-cell-file",
 			});

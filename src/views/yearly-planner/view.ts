@@ -3,7 +3,6 @@ import { t } from "../../i18n";
 import DiaryObsidian from "../../main";
 import { VIEW_TYPE_YEARLY_PLANNER } from "../../constants";
 import type { YearlyPlannerState, DragState, SelectionBounds } from "./types";
-import { getRangeStackIndexMap } from "./file-utils";
 import {
 	renderYearlyPlannerHeader,
 	createPlannerCell,
@@ -75,6 +74,12 @@ export class YearlyPlannerView
 
 	render(): void {
 		const { contentEl } = this;
+		const scrollEl = contentEl.querySelector<HTMLElement>(
+			".yearly-planner-scroll",
+		);
+		const scrollTop = scrollEl?.scrollTop ?? 0;
+		const scrollLeft = scrollEl?.scrollLeft ?? 0;
+
 		contentEl.empty();
 		contentEl.addClass("yearly-planner-container");
 
@@ -98,6 +103,14 @@ export class YearlyPlannerView
 
 		this.renderHeader(contentEl);
 		this.renderTable(contentEl);
+
+		const newScrollEl = contentEl.querySelector<HTMLElement>(
+			".yearly-planner-scroll",
+		);
+		if (newScrollEl) {
+			newScrollEl.scrollTop = scrollTop;
+			newScrollEl.scrollLeft = scrollLeft;
+		}
 	}
 
 	private renderHeader(contentEl: HTMLElement): void {
@@ -183,7 +196,6 @@ export class YearlyPlannerView
 			showHolidays && holidayCountry
 				? getHolidaysForYear(holidayCountry, this.year)
 				: null;
-		const rangeStackMap = getRangeStackIndexMap(this.app, this.year);
 		const cellCtx = {
 			year: this.year,
 			app: this.app,
@@ -191,7 +203,6 @@ export class YearlyPlannerView
 			dragState: this.dragState,
 			holidaysData,
 			locale: this.plugin.settings.locale ?? "en",
-			rangeStackMap,
 		};
 
 		for (let day = 1; day <= 31; day++) {
@@ -233,8 +244,8 @@ export class YearlyPlannerView
 			defaultFolder,
 			createSingleDateFile: (folder, basename, color) =>
 				createSingleDateFileOp(this.app, folder, basename, color),
-			createRangeFile: (folder, ...args) =>
-				createRangeFileOp(this.app, folder, ...args),
+			createRangeFile: (folder, basename, color) =>
+				createRangeFileOp(this.app, folder, basename, color),
 			onCreated: () => this.render(),
 		}).open();
 	}

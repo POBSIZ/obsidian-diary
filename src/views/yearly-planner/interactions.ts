@@ -7,7 +7,6 @@ import {
 } from "./selection";
 import { HolidayInfoModal } from "./modals";
 import type { DragState, SelectionBounds } from "./types";
-import { getFilesForDate } from "./file-utils";
 
 export interface YearlyPlannerViewDelegate {
 	readonly contentEl: HTMLElement;
@@ -15,7 +14,6 @@ export interface YearlyPlannerViewDelegate {
 	readonly leaf: WorkspaceLeaf;
 	dragState: DragState | null;
 	render(): void;
-	openDateNote(year: number, month: number, day: number): Promise<void>;
 	openCreateFileModal(bounds: SelectionBounds | null): void;
 	openFileOptionsModal(file: TFile): void;
 }
@@ -52,23 +50,6 @@ export class PlannerInteractionHandler {
 			clientY,
 		);
 		if (!el || !this.view.contentEl.contains(el as Node)) return;
-
-		const rangeBar = (el as HTMLElement).closest?.(
-			".yearly-planner-range-bar[data-path]",
-		);
-		if (rangeBar) {
-			const path = (rangeBar as HTMLElement).dataset.path;
-			if (path) {
-				e.preventDefault();
-				e.stopPropagation();
-				e.stopImmediatePropagation?.();
-				const file = this.view.app.vault.getAbstractFileByPath(path);
-				if (file instanceof TFile) {
-					this.view.openFileOptionsModal(file);
-				}
-			}
-			return;
-		}
 
 		const holidayBadge = (el as HTMLElement).closest?.(
 			".yearly-planner-cell-holiday-badge",
@@ -113,7 +94,6 @@ export class PlannerInteractionHandler {
 			"td[data-year][data-month][data-day]:not(.yearly-planner-cell-invalid)",
 		);
 		if (cell) {
-			if (Platform.isMobile) return;
 			const year = parseInt((cell as HTMLElement).dataset.year ?? "", 10);
 			const month = parseInt(
 				(cell as HTMLElement).dataset.month ?? "",
@@ -124,27 +104,15 @@ export class PlannerInteractionHandler {
 			e.stopPropagation();
 			e.stopImmediatePropagation?.();
 			if (!isNaN(year) && !isNaN(month) && !isNaN(day)) {
-				const { singleFiles, rangeFiles } = getFilesForDate(
-					this.view.app,
-					year,
-					month,
-					day,
-				);
-				const isEmpty =
-					singleFiles.length === 0 && rangeFiles.length === 0;
-				if (isEmpty) {
-					const bounds: SelectionBounds = {
-						startYear: year,
-						startMonth: month,
-						startDay: day,
-						endYear: year,
-						endMonth: month,
-						endDay: day,
-					};
-					this.view.openCreateFileModal(bounds);
-				} else {
-					void this.view.openDateNote(year, month, day);
-				}
+				const bounds: SelectionBounds = {
+					startYear: year,
+					startMonth: month,
+					startDay: day,
+					endYear: year,
+					endMonth: month,
+					endDay: day,
+				};
+				this.view.openCreateFileModal(bounds);
 			}
 		}
 	}
@@ -205,7 +173,6 @@ export class PlannerInteractionHandler {
 
 		const onInteractive =
 			(el as HTMLElement).closest?.(".yearly-planner-cell-file") ||
-			(el as HTMLElement).closest?.(".yearly-planner-range-bar") ||
 			(el as HTMLElement).closest?.(".yearly-planner-cell-holiday-badge");
 		if (onInteractive) return;
 
@@ -292,23 +259,7 @@ export class PlannerInteractionHandler {
 
 		if (count <= 1 || !bounds) {
 			if (count === 1 && bounds) {
-				const { singleFiles, rangeFiles } = getFilesForDate(
-					this.view.app,
-					startYear,
-					startMonth,
-					startDay,
-				);
-				const isEmpty =
-					singleFiles.length === 0 && rangeFiles.length === 0;
-				if (isEmpty) {
-					this.view.openCreateFileModal(bounds);
-				} else {
-					void this.view.openDateNote(
-						startYear,
-						startMonth,
-						startDay,
-					);
-				}
+				this.view.openCreateFileModal(bounds);
 			}
 			return;
 		}

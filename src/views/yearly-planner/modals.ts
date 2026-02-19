@@ -1,4 +1,12 @@
-import { App, Modal, Notice, TFile, WorkspaceLeaf } from "obsidian";
+import {
+	App,
+	Component,
+	MarkdownRenderer,
+	Modal,
+	Notice,
+	TFile,
+	WorkspaceLeaf,
+} from "obsidian";
 import { getLocale, t } from "../../i18n";
 import { getAllFolderPaths, getChipColor } from "./file-utils";
 import { updateFileColor } from "./file-operations";
@@ -13,6 +21,12 @@ const CHIP_COLOR_PRESETS: readonly { hex: string }[] = [
 	{ hex: "#ec4899" },
 	{ hex: "#6b7280" },
 ];
+
+/** Max lines to show in file preview. */
+const FILE_PREVIEW_MAX_LINES = 20;
+
+/** Max chars to show in file preview (fallback). */
+const FILE_PREVIEW_MAX_CHARS = 500;
 
 /** Convert 3-digit hex to 6-digit for color picker. */
 function toHex6(hex: string): string | null {
@@ -35,12 +49,7 @@ export type CreateSingleDateFileWithFolderFn = (
 
 export type CreateRangeFileWithFolderFn = (
 	folder: string,
-	startYear: number,
-	startMonth: number,
-	startDay: number,
-	endYear: number,
-	endMonth: number,
-	endDay: number,
+	basename: string,
 	color?: string,
 ) => Promise<TFile>;
 
@@ -285,6 +294,10 @@ export class CreateFileModal extends Modal {
 		this.filenameInput.oninput = () => {
 			if (this.mode === "range") this.syncDatesFromFilename();
 		};
+		const filenameHint = filenameRow.createDiv({
+			cls: "yearly-planner-create-file-hint",
+		});
+		filenameHint.setText(t("modal.suffixAsTitle"));
 
 		const colorRow = form.createDiv({
 			cls: "yearly-planner-create-file-row",
@@ -392,16 +405,15 @@ export class CreateFileModal extends Modal {
 		const end = this.endDateInput.value;
 		if (this.mode === "single") {
 			this.filenameInput.value = start || "";
-			this.filenameInput.readOnly = false;
 		} else {
 			this.filenameInput.value = start && end ? `${start}--${end}` : "";
-			this.filenameInput.readOnly = true;
 		}
+		this.filenameInput.readOnly = false;
 	}
 
 	private syncDatesFromFilename(): void {
 		const m = this.filenameInput.value.match(
-			/^(\d{4}-\d{2}-\d{2})--(\d{4}-\d{2}-\d{2})$/,
+			/^(\d{4}-\d{2}-\d{2})--(\d{4}-\d{2}-\d{2})(?:-.+)?$/,
 		);
 		if (m) {
 			this.startDateInput.value = m[1] ?? "";
@@ -432,28 +444,11 @@ export class CreateFileModal extends Modal {
 				this.close();
 				void this.app.workspace.getLeaf().openFile(file);
 			} else {
-				if (!start || !end || start > end) return;
-				const startParts = start.split("-").map((x) => parseInt(x, 10));
-				const endParts = end.split("-").map((x) => parseInt(x, 10));
-				const [sy, sm, sd] = [
-					startParts[0] ?? 0,
-					startParts[1] ?? 0,
-					startParts[2] ?? 0,
-				];
-				const [ey, em, ed] = [
-					endParts[0] ?? 0,
-					endParts[1] ?? 0,
-					endParts[2] ?? 0,
-				];
+				if (!filename) return;
 				const color = this.colorInput.value.trim() || undefined;
 				const file = await this.options.createRangeFile(
 					folder,
-					sy,
-					sm,
-					sd,
-					ey,
-					em,
-					ed,
+					filename,
 					color,
 				);
 				this.options.onCreated();
@@ -540,6 +535,7 @@ export class FileOptionsModal extends Modal {
 	private colorInput!: HTMLInputElement;
 	private colorPickerInput!: HTMLInputElement;
 	private colorPresetBtns: HTMLButtonElement[] = [];
+	private previewComponent: Component | null = null;
 
 	constructor(
 		app: App,
@@ -559,6 +555,16 @@ export class FileOptionsModal extends Modal {
 		});
 		titleEl.createEl("strong", { text: this.file.basename });
 		titleEl.appendText(` (${this.file.path})`);
+
+		const previewWrap = this.contentEl.createDiv({
+			cls: "yearly-planner-file-preview-wrap",
+		});
+		previewWrap.createEl("label", { text: t("modal.preview") });
+		const previewEl = previewWrap.createDiv({
+			cls: "yearly-planner-file-preview",
+		});
+		previewEl.createSpan({ text: t("modal.previewLoading"), cls: "yearly-planner-file-preview-loading" });
+		void this.loadPreview(previewEl);
 
 		const colorRow = this.contentEl.createDiv({
 			cls: "yearly-planner-create-file-row",
@@ -674,5 +680,58 @@ export class FileOptionsModal extends Modal {
 				})();
 			},
 		).open();
+	}
+
+	onClose(): void {
+		this.previewComponent?.unload();
+		this.previewComponent = null;
+	}
+
+	private async loadPreview(containerEl: HTMLElement): Promise<void> {
+		try {
+			const content = await this.app.vault.read(this.file);
+			containerEl.empty();
+
+			const lines = content.split("\n");
+			const truncated =
+				lines.length > FILE_PREVIEW_MAX_LINES
+					? lines.slice(0, FILE_PREVIEW_MAX_LINES).join("\n") + "\n…"
+					: content.length > FILE_PREVIEW_MAX_CHARS
+						? content.slice(0, FILE_PREVIEW_MAX_CHARS) + "…"
+						: content;
+
+			if (!truncated.trim()) {
+				containerEl.createSpan({
+					text: t("modal.previewEmpty"),
+					cls: "yearly-planner-file-preview-empty",
+				});
+				return;
+			}
+
+			const ext = (this.file.extension ?? "").toLowerCase();
+			if (ext === "md" || ext === "markdown") {
+				this.previewComponent = new Component();
+				this.previewComponent.load();
+				const inner = containerEl.createDiv("markdown-preview-view");
+				await MarkdownRenderer.render(
+					this.app,
+					truncated,
+					inner,
+					this.file.path,
+					this.previewComponent,
+				);
+			} else {
+				const pre = containerEl.createEl("pre", {
+					cls: "yearly-planner-file-preview-plain",
+				});
+				pre.setText(truncated);
+			}
+		} catch {
+			containerEl.empty();
+			containerEl.createSpan({
+				text: t("modal.previewFailed"),
+				cls: "yearly-planner-file-preview-error",
+			});
+		}
 	}
 }

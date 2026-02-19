@@ -1,5 +1,6 @@
 import { App, TFile, WorkspaceLeaf } from "obsidian";
-import { getFilePath, getRangeFilePath } from "./file-utils";
+import { parseRangeBasename } from "../../utils/range";
+import { getFilePath } from "./file-utils";
 
 const pad = (n: number) => String(n).padStart(2, "0");
 
@@ -31,23 +32,20 @@ export async function openDateNote(
 export async function createRangeFile(
 	app: App,
 	folder: string,
-	startYear: number,
-	startMonth: number,
-	startDay: number,
-	endYear: number,
-	endMonth: number,
-	endDay: number,
+	basename: string,
 	color?: string,
 ): Promise<TFile> {
-	const path = getRangeFilePath(
-		folder,
-		startYear,
-		startMonth,
-		startDay,
-		endYear,
-		endMonth,
-		endDay,
-	);
+	const cleanBasename = basename.trim().replace(/\.md$/i, "");
+	const parsed = parseRangeBasename(cleanBasename);
+	if (!parsed) {
+		throw new Error(`Invalid range basename: ${cleanBasename}`);
+	}
+	const { start: startStr, end: endStr, suffix } = parsed;
+	const trimmed = (folder || "Planner").trim();
+	const filename = cleanBasename.endsWith(".md")
+		? cleanBasename
+		: `${cleanBasename}.md`;
+	const path = trimmed ? `${trimmed}/${filename}` : filename;
 	const existing = app.vault.getAbstractFileByPath(path);
 	if (existing instanceof TFile) {
 		throw new Error(`File already exists: ${path}`);
@@ -56,8 +54,7 @@ export async function createRangeFile(
 	if (dir && !app.vault.getAbstractFileByPath(dir)) {
 		await app.vault.createFolder(dir);
 	}
-	const startStr = `${startYear}-${pad(startMonth)}-${pad(startDay)}`;
-	const endStr = `${endYear}-${pad(endMonth)}-${pad(endDay)}`;
+	const heading = suffix !== undefined ? suffix : `${startStr} ~ ${endStr}`;
 	const colorLine = color?.trim()
 		? `color: "${color.trim().replace(/"/g, '\\"')}"\n`
 		: "";
@@ -67,16 +64,19 @@ date_end: ${endStr}
 ${colorLine}
 ---
 
-# ${startStr} ~ ${endStr}
+# ${heading}
 
 `;
 	return app.vault.create(path, content);
 }
 
-/** Extract YYYY-MM-DD from basename for heading (handles "2026-02-12" or "2026-02-12-meeting"). */
-function extractDateFromBasename(basename: string): string | null {
-	const m = basename.match(/^(\d{4}-\d{2}-\d{2})/);
-	return m?.[1] ?? null;
+/** Extract date and optional suffix from basename (e.g. "2026-02-12" or "2026-02-12-meeting"). */
+function parseSingleDateBasename(
+	basename: string,
+): { date: string; suffix?: string } | null {
+	const m = basename.match(/^(\d{4}-\d{2}-\d{2})(?:-(.+))?$/);
+	if (!m) return null;
+	return { date: m[1] ?? "", suffix: m[2] ?? undefined };
 }
 
 export async function createSingleDateFile(
@@ -99,7 +99,9 @@ export async function createSingleDateFile(
 	if (dir && !app.vault.getAbstractFileByPath(dir)) {
 		await app.vault.createFolder(dir);
 	}
-	const dateStr = extractDateFromBasename(cleanBasename) ?? cleanBasename;
+	const parsed = parseSingleDateBasename(cleanBasename);
+	const heading =
+		parsed?.suffix ?? parsed?.date ?? cleanBasename;
 	const colorBlock = color?.trim()
 		? `---
 color: "${color.trim().replace(/"/g, '\\"')}"
@@ -107,7 +109,7 @@ color: "${color.trim().replace(/"/g, '\\"')}"
 
 `
 		: "";
-	const content = `${colorBlock}## ${dateStr}\n\n`;
+	const content = `${colorBlock}# ${heading}\n\n`;
 	return app.vault.create(path, content);
 }
 
@@ -122,11 +124,14 @@ export async function updateFileColor(
 	color: string | undefined,
 ): Promise<void> {
 	const trimmed = color?.trim();
-	await app.fileManager.processFrontMatter(file, (frontmatter: Record<string, unknown>) => {
-		if (trimmed) {
-			frontmatter.color = trimmed;
-		} else {
-			delete frontmatter.color;
-		}
-	});
+	await app.fileManager.processFrontMatter(
+		file,
+		(frontmatter: Record<string, unknown>) => {
+			if (trimmed) {
+				frontmatter.color = trimmed;
+			} else {
+				delete frontmatter.color;
+			}
+		},
+	);
 }

@@ -9,7 +9,6 @@ export function getTopmostPlannerElementAt(
 		if (!contentEl.contains(el as Node)) break;
 		const he = el as HTMLElement;
 		if (
-			he.closest?.(".yearly-planner-range-bar[data-path]") ||
 			he.closest?.(".yearly-planner-cell-file[data-path]") ||
 			he.closest?.(".yearly-planner-cell-holiday-badge") ||
 			he.closest?.("td[data-year][data-month][data-day]")
