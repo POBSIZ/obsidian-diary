@@ -5,8 +5,9 @@ import {
 	DiaryObsidianSettings,
 	DiaryObsidianSettingTab,
 } from "./settings";
-import { VIEW_TYPE_YEARLY_PLANNER } from "./constants";
+import { VIEW_TYPE_YEARLY_PLANNER, VIEW_TYPE_MONTHLY_PLANNER } from "./constants";
 import { YearlyPlannerView } from "./views/yearly-planner/view";
+import { MonthlyPlannerView } from "./views/monthly-planner/view";
 
 export default class DiaryObsidian extends Plugin {
 	settings: DiaryObsidianSettings;
@@ -19,6 +20,10 @@ export default class DiaryObsidian extends Plugin {
 			VIEW_TYPE_YEARLY_PLANNER,
 			(leaf) => new YearlyPlannerView(leaf, this),
 		);
+		this.registerView(
+			VIEW_TYPE_MONTHLY_PLANNER,
+			(leaf) => new MonthlyPlannerView(leaf, this),
+		);
 
 		this.addRibbonIcon(
 			"calendar-range",
@@ -27,30 +32,43 @@ export default class DiaryObsidian extends Plugin {
 				void this.activateYearlyPlanner();
 			},
 		);
+		this.addRibbonIcon(
+			"calendar-days",
+			t("ribbon.openMonthlyPlanner"),
+			() => {
+				void this.activateMonthlyPlanner();
+			},
+		);
 
 		this.addCommand({
 			id: "open-yearly-planner",
 			name: t("command.openYearlyPlanner"),
 			callback: () => void this.activateYearlyPlanner(),
 		});
+		this.addCommand({
+			id: "open-monthly-planner",
+			name: t("command.openMonthlyPlanner"),
+			callback: () => void this.activateMonthlyPlanner(),
+		});
 
 		this.addSettingTab(new DiaryObsidianSettingTab(this.app, this));
 
-		const debouncedRefreshYearlyPlanner = this.debounce(() => {
+		const debouncedRefresh = this.debounce(() => {
 			this.refreshYearlyPlannerViews();
+			this.refreshMonthlyPlannerViews();
 		}, 150);
 
 		this.registerEvent(
-			this.app.vault.on("create", debouncedRefreshYearlyPlanner),
+			this.app.vault.on("create", debouncedRefresh),
 		);
 		this.registerEvent(
-			this.app.vault.on("delete", debouncedRefreshYearlyPlanner),
+			this.app.vault.on("delete", debouncedRefresh),
 		);
 		this.registerEvent(
-			this.app.vault.on("rename", debouncedRefreshYearlyPlanner),
+			this.app.vault.on("rename", debouncedRefresh),
 		);
 		this.registerEvent(
-			this.app.metadataCache.on("changed", debouncedRefreshYearlyPlanner),
+			this.app.metadataCache.on("changed", debouncedRefresh),
 		);
 	}
 
@@ -67,6 +85,17 @@ export default class DiaryObsidian extends Plugin {
 		await workspace.revealLeaf(leaf);
 	}
 
+	async activateMonthlyPlanner(): Promise<void> {
+		const { workspace } = this.app;
+		const now = new Date();
+		const leaf = workspace.getLeaf();
+		await leaf.setViewState({
+			type: VIEW_TYPE_MONTHLY_PLANNER,
+			state: { year: now.getFullYear(), month: now.getMonth() + 1 },
+		});
+		await workspace.revealLeaf(leaf);
+	}
+
 	async loadSettings() {
 		this.settings = Object.assign(
 			{},
@@ -79,6 +108,7 @@ export default class DiaryObsidian extends Plugin {
 		setLocale(this.settings.locale ?? "en");
 		await this.saveData(this.settings);
 		this.refreshYearlyPlannerViews();
+		this.refreshMonthlyPlannerViews();
 	}
 
 	refreshYearlyPlannerViews(): void {
@@ -88,6 +118,18 @@ export default class DiaryObsidian extends Plugin {
 		for (const leaf of leaves) {
 			const view = leaf.view;
 			if (view instanceof YearlyPlannerView) {
+				view.render();
+			}
+		}
+	}
+
+	refreshMonthlyPlannerViews(): void {
+		const leaves = this.app.workspace.getLeavesOfType(
+			VIEW_TYPE_MONTHLY_PLANNER,
+		);
+		for (const leaf of leaves) {
+			const view = leaf.view;
+			if (view instanceof MonthlyPlannerView) {
 				view.render();
 			}
 		}

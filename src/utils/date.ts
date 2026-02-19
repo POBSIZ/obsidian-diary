@@ -16,3 +16,40 @@ export function getDaysInMonth(year: number, month: number): number {
 	}
 	return 31;
 }
+
+/** Returns day of week for the 1st of the month: 0=Sunday, 6=Saturday */
+export function getFirstDayOfMonth(year: number, month: number): number {
+	return new Date(year, month - 1, 1).getDay();
+}
+
+export interface CalendarCell {
+	year: number;
+	month: number;
+	day: number;
+}
+
+/**
+ * Returns a flat array of calendar cells for the month grid.
+ * Includes leading empty slots (null) for days before the 1st.
+ * Uses 6 rows × 7 columns = 42 cells.
+ */
+export function getMonthCalendarCells(
+	year: number,
+	month: number,
+): (CalendarCell | null)[] {
+	const firstDay = getFirstDayOfMonth(year, month);
+	const daysInMonth = getDaysInMonth(year, month);
+	const totalSlots = 6 * 7;
+	const cells: (CalendarCell | null)[] = [];
+
+	for (let i = 0; i < firstDay; i++) {
+		cells.push(null);
+	}
+	for (let day = 1; day <= daysInMonth; day++) {
+		cells.push({ year, month, day });
+	}
+	while (cells.length < totalSlots) {
+		cells.push(null);
+	}
+	return cells;
+}
