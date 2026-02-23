@@ -10,7 +10,12 @@ import { getDaysInMonth, getDayOfWeek } from "../../utils/date";
 import type { DragState } from "./types";
 import type { HolidayData } from "../../utils/holidays";
 import { YearInputModal } from "./modals";
-import { getFilesForDate, getFileTitle, getChipColor } from "./file-utils";
+import {
+	getFilesForDate,
+	getFileTitle,
+	getChipColor,
+} from "./file-utils";
+import { parseRangeBasename } from "../../utils/range";
 import { isDateInSelection } from "./selection";
 
 export interface HeaderCallbacks {
@@ -87,6 +92,7 @@ export interface CreateCellContext {
 	dragState: DragState | null;
 	holidaysData: HolidayData | null;
 	locale: string;
+	rangeLaneMap: Map<string, number>;
 }
 
 export function createPlannerCell(
@@ -136,6 +142,31 @@ export function createPlannerCell(
 		day,
 	);
 
+	if (rangeFiles.length > 0) {
+		const basenames = rangeFiles.map((r) => r.file.basename);
+		cell.dataset.rangeBasenames = basenames.join(",");
+		cell.dataset.rangeLanes = rangeFiles
+			.map((r) => ctx.rangeLaneMap.get(r.file.basename) ?? 0)
+			.join(",");
+
+		const barsContainer = cell.createDiv({
+			cls: "yearly-planner-cell-range-bars",
+		});
+		for (const { file } of rangeFiles) {
+			const lane = ctx.rangeLaneMap.get(file.basename) ?? 0;
+			const bar = barsContainer.createDiv({
+				cls: "yearly-planner-cell-range-bar",
+			});
+			bar.dataset.lane = String(lane);
+			(bar as HTMLElement).style.right = `${lane * 4}px`;
+			bar.dataset.basename = file.basename;
+			const chipColor = getChipColor(ctx.app, file);
+			if (chipColor) {
+				bar.style.borderRightColor = chipColor;
+			}
+		}
+	}
+
 	if (isHoliday && ctx.holidaysData?.names.has(dateKey)) {
 		cell.dataset.hasHoliday = "true";
 	}
@@ -155,6 +186,12 @@ export function createPlannerCell(
 			const chipColor = getChipColor(ctx.app, file);
 			if (chipColor) {
 				linkEl.style.borderLeftColor = chipColor;
+			}
+			if (parseRangeBasename(file.basename)) {
+				linkEl.dataset.rangeBasename = file.basename;
+				if (chipColor) {
+					linkEl.dataset.rangeColor = chipColor;
+				}
 			}
 		}
 	}

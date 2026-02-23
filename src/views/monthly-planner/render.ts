@@ -22,6 +22,7 @@ export interface MonthlyHeaderCallbacks {
 	onToday: () => void;
 	onMonthYearClick: (year: number, month: number) => void;
 	onAddFile?: () => void;
+	onResetZoom?: () => void;
 }
 
 export function renderMonthlyPlannerHeader(
@@ -86,6 +87,15 @@ export function renderMonthlyPlannerHeader(
 		setIcon(addFileBtn, "file-plus");
 		addFileBtn.ariaLabel = t("header.addFile");
 		addFileBtn.onclick = callbacks.onAddFile;
+	}
+
+	if (callbacks.onResetZoom) {
+		const resetZoomBtn = navWrapper.createEl("button", {
+			cls: "monthly-planner-nav-btn monthly-planner-reset-zoom-btn",
+		});
+		setIcon(resetZoomBtn, "rotate-ccw");
+		resetZoomBtn.ariaLabel = t("header.resetZoom");
+		resetZoomBtn.onclick = callbacks.onResetZoom;
 	}
 }
 

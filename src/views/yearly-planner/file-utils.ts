@@ -32,8 +32,72 @@ export function getFilePath(
 	return trimmed ? `${trimmed}/${filename}` : filename;
 }
 
+export function getYearNoteFilePath(folder: string, year: number): string {
+	const trimmed = (folder || "Planner").trim();
+	const filename = `${year}.md`;
+	return trimmed ? `${trimmed}/${filename}` : filename;
+}
+
+export function getMonthNoteFilePath(
+	folder: string,
+	year: number,
+	month: number,
+): string {
+	const trimmed = (folder || "Planner").trim();
+	const filename = `${year}-${pad(month)}.md`;
+	return trimmed ? `${trimmed}/${filename}` : filename;
+}
+
+export interface RangeForYear {
+	file: TFile;
+	start: string;
+	end: string;
+}
+
+/** Returns all range files that intersect with the given year. */
+export function getRangesForYear(app: App, year: number): RangeForYear[] {
+	const yearStart = `${year}-01-01`;
+	const yearEnd = `${year}-12-31`;
+	const ranges: RangeForYear[] = [];
+	for (const file of app.vault.getMarkdownFiles()) {
+		const parsed = parseRangeBasename(file.basename);
+		if (!parsed) continue;
+		if (parsed.end < yearStart || parsed.start > yearEnd) continue;
+		ranges.push({
+			file,
+			start: parsed.start,
+			end: parsed.end,
+		});
+	}
+	ranges.sort((a, b) => a.start.localeCompare(b.start));
+	return ranges;
+}
+
+/** Returns a map from range basename to lane index (0-based). Overlapping ranges get different lanes. */
+export function getRangeLaneMap(ranges: RangeForYear[]): Map<string, number> {
+	const map = new Map<string, number>();
+	const laneEnds: string[] = []; // laneEnds[i] = latest end date of any range in lane i
+
+	for (const r of ranges) {
+		let lane = 0;
+		while (lane < laneEnds.length && (laneEnds[lane] ?? "") >= r.start) {
+			lane++;
+		}
+		if (lane === laneEnds.length) {
+			laneEnds.push(r.end);
+		} else {
+			laneEnds[lane] = r.end;
+		}
+		map.set(r.file.basename, lane);
+	}
+	return map;
+}
+
 /** Returns a stable map from range basename to stack index (0-based) for the given year. */
-export function getRangeStackIndexMap(app: App, year: number): Map<string, number> {
+export function getRangeStackIndexMap(
+	app: App,
+	year: number,
+): Map<string, number> {
 	const yearStart = `${year}-01-01`;
 	const yearEnd = `${year}-12-31`;
 	const ranges: Array<{ basename: string; start: string }> = [];
@@ -72,7 +136,11 @@ export function getFilesForDate(
 	day: number,
 ): {
 	singleFiles: TFile[];
-	rangeFiles: Array<{ file: TFile; runPos: RangeRunPosition; isFirst: boolean }>;
+	rangeFiles: Array<{
+		file: TFile;
+		runPos: RangeRunPosition;
+		isFirst: boolean;
+	}>;
 } {
 	const dateStr = `${year}-${pad(month)}-${pad(day)}`;
 
@@ -129,18 +197,10 @@ function getRangeRunPosition(
 	const nextDay = day + 1;
 	const prevInRange =
 		prevDay >= 1 &&
-		isDateInRange(
-			`${year}-${pad(month)}-${pad(prevDay)}`,
-			start,
-			end,
-		);
+		isDateInRange(`${year}-${pad(month)}-${pad(prevDay)}`, start, end);
 	const nextInRange =
 		nextDay <= daysInMonth &&
-		isDateInRange(
-			`${year}-${pad(month)}-${pad(nextDay)}`,
-			start,
-			end,
-		);
+		isDateInRange(`${year}-${pad(month)}-${pad(nextDay)}`, start, end);
 	return {
 		runStart: !prevInRange,
 		runEnd: !nextInRange,
@@ -149,8 +209,7 @@ function getRangeRunPosition(
 
 function toStringSafe(val: unknown): string | null {
 	if (typeof val === "string") return val;
-	if (typeof val === "number" || typeof val === "boolean")
-		return String(val);
+	if (typeof val === "number" || typeof val === "boolean") return String(val);
 	if (Array.isArray(val)) {
 		const first: unknown = val[0];
 		return typeof first === "string"

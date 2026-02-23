@@ -1,9 +1,13 @@
-import { ItemView, TFile, WorkspaceLeaf } from "obsidian";
+import { ItemView, Platform, TFile, WorkspaceLeaf } from "obsidian";
 import { t } from "../../i18n";
 import DiaryObsidian from "../../main";
 import { VIEW_TYPE_MONTHLY_PLANNER } from "../../constants";
 import type { MonthlyPlannerState } from "./types";
-import { getRangeStackIndexMap } from "../yearly-planner/file-utils";
+import {
+	getRangeStackIndexMap,
+	getMonthNoteFilePath,
+} from "../yearly-planner/file-utils";
+import { renderPlanNotePanel } from "../plan-note-panel";
 import {
 	renderMonthlyPlannerHeader,
 	createMonthlyCell,
@@ -23,6 +27,7 @@ import { CreateFileModal, FileOptionsModal } from "../yearly-planner/modals";
 import { getSelectionBounds } from "../yearly-planner/selection";
 import { getHolidaysForYear } from "../../utils/holidays";
 import { getMonthCalendarCells } from "../../utils/date";
+import { PinchZoomController } from "./pinch-zoom";
 
 export type { MonthlyPlannerState } from "./types";
 
@@ -34,6 +39,8 @@ export class MonthlyPlannerView
 	month: number;
 	dragState: import("../yearly-planner/types").DragState | null = null;
 	private interactionHandler: MonthlyInteractionHandler;
+	private pinchZoom: PinchZoomController | null = null;
+	private pinchZoomScale = 1;
 
 	constructor(
 		leaf: WorkspaceLeaf,
@@ -82,6 +89,8 @@ export class MonthlyPlannerView
 
 	async onClose(): Promise<void> {
 		this.interactionHandler.clearDragListeners();
+		this.pinchZoom?.detach();
+		this.pinchZoom = null;
 	}
 
 	render(): void {
@@ -91,6 +100,10 @@ export class MonthlyPlannerView
 		);
 		const scrollTop = scrollEl?.scrollTop ?? 0;
 		const scrollLeft = scrollEl?.scrollLeft ?? 0;
+
+		this.pinchZoomScale = this.pinchZoom?.getScale() ?? this.pinchZoomScale;
+		this.pinchZoom?.detach();
+		this.pinchZoom = null;
 
 		contentEl.empty();
 		contentEl.addClass("monthly-planner-container");
@@ -102,6 +115,10 @@ export class MonthlyPlannerView
 		);
 
 		this.renderHeader(contentEl);
+		const notePanelEl = contentEl.createDiv({
+			cls: "plan-note-panel-wrapper",
+		});
+		void this.renderMonthNotePanel(notePanelEl);
 		this.renderTable(contentEl);
 
 		const newScrollEl = contentEl.querySelector<HTMLElement>(
@@ -111,6 +128,54 @@ export class MonthlyPlannerView
 			newScrollEl.scrollTop = scrollTop;
 			newScrollEl.scrollLeft = scrollLeft;
 		}
+
+		if (Platform.isMobile) {
+			const zoomWrapper = contentEl.querySelector<HTMLElement>(
+				".monthly-planner-zoom-wrapper",
+			);
+			const zoomInner = contentEl.querySelector<HTMLElement>(
+				".monthly-planner-zoom-inner",
+			);
+			if (zoomWrapper && zoomInner) {
+				this.pinchZoom = new PinchZoomController({
+					scrollContainer: newScrollEl as HTMLElement,
+					zoomWrapper,
+					zoomInner,
+					initialScale: this.pinchZoomScale,
+					onScaleChange: (s) => {
+						this.pinchZoomScale = s;
+					},
+				});
+				this.pinchZoom.attach();
+				requestAnimationFrame(() => this.pinchZoom?.refresh());
+			}
+		}
+	}
+
+	private async renderMonthNotePanel(container: HTMLElement): Promise<void> {
+		const folder = this.plugin.settings.plannerFolder || "Planner";
+		const filePath = getMonthNoteFilePath(folder, this.year, this.month);
+		const locale = this.plugin.settings.locale ?? "en";
+		const monthLabel = getMonthLabel(locale, this.month);
+		const label = `${monthLabel} ${this.year}`;
+		await renderPlanNotePanel(container, this.app, filePath, this, {
+			label,
+			onCreate: async () => {
+				const dir = filePath.split("/").slice(0, -1).join("/");
+				if (dir && !this.app.vault.getAbstractFileByPath(dir)) {
+					await this.app.vault.createFolder(dir);
+				}
+				const newFile = await this.app.vault.create(
+					filePath,
+					`# ${label}\n\n`,
+				);
+				await this.leaf.openFile(newFile);
+				this.render();
+			},
+			onOpen: (file) => {
+				void this.leaf.openFile(file);
+			},
+		});
 	}
 
 	private renderHeader(contentEl: HTMLElement): void {
@@ -163,6 +228,12 @@ export class MonthlyPlannerView
 						getSelectionBounds(this.dragState),
 					);
 				},
+				onResetZoom:
+					Platform.isMobile
+						? () => {
+								this.pinchZoom?.resetScale();
+							}
+						: undefined,
 			},
 		);
 	}
@@ -207,7 +278,16 @@ export class MonthlyPlannerView
 			{ capture: true },
 		);
 
-		const table = scrollContainer.createEl("table", {
+		const tableParent = Platform.isMobile
+			? scrollContainer
+					.createDiv({ cls: "monthly-planner-zoom-wrapper" })
+					.createDiv({ cls: "monthly-planner-zoom-inner" })
+					.createDiv({ cls: "monthly-planner-table-wrapper" })
+			: scrollContainer.createDiv({
+					cls: "monthly-planner-table-wrapper",
+				});
+
+		const table = tableParent.createEl("table", {
 			cls: "monthly-planner-table",
 		});
 

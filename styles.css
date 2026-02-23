@@ -7,10 +7,27 @@ available in the app when your plugin is enabled.
 	box-sizing: border-box;
 }
 
+/* Planner shared design tokens */
+:root {
+	--planner-header-gap: 0.25rem;
+	--planner-btn-size: 2rem;
+	--planner-btn-size-mobile: 2.5rem;
+	--planner-container-padding: 1rem;
+	--planner-container-padding-mobile: 0.5rem;
+	--planner-header-margin: 1rem;
+	--planner-header-margin-mobile: 0.5rem;
+	--planner-title-size: var(--table-header-size, 1.25rem);
+	--planner-title-size-mobile: 1rem;
+	--planner-display-min-width: 4ch;
+	--planner-cell-padding: 0.25rem 0.5rem;
+	--planner-cell-padding-mobile-v: 0.15rem;
+	--planner-cell-padding-mobile-h: 0.2rem;
+}
+
 /* Yearly Planner - Obsidian design tokens */
 
 .yearly-planner-container {
-	padding: 1rem;
+	padding: var(--planner-container-padding);
 	height: 100%;
 	display: flex;
 	flex-direction: column;
@@ -21,7 +38,7 @@ available in the app when your plugin is enabled.
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
-	margin-bottom: 1rem;
+	margin-bottom: var(--planner-header-margin);
 	flex-shrink: 0;
 }
 
@@ -33,18 +50,21 @@ available in the app when your plugin is enabled.
 	margin: 0;
 }
 
-.yearly-planner-year-wrapper {
+/* Planner header nav – shared by yearly and monthly */
+.yearly-planner-year-wrapper,
+.monthly-planner-nav-wrapper {
 	display: flex;
 	align-items: center;
-	gap: 0.25rem;
+	gap: var(--planner-header-gap);
 }
 
-.yearly-planner-year-btn {
+.yearly-planner-year-btn,
+.monthly-planner-nav-btn {
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	width: 2rem;
-	height: 2rem;
+	width: var(--planner-btn-size);
+	height: var(--planner-btn-size);
 	padding: 0;
 	border: 1px solid var(--background-modifier-border);
 	border-radius: var(--input-radius, 4px);
@@ -54,12 +74,14 @@ available in the app when your plugin is enabled.
 	transition: background-color 0.15s ease;
 }
 
-.yearly-planner-year-btn:hover {
+.yearly-planner-year-btn:hover,
+.monthly-planner-nav-btn:hover {
 	background: var(--background-modifier-hover);
 }
 
-.yearly-planner-year-display {
-	min-width: 4ch;
+.yearly-planner-year-display,
+.monthly-planner-month-year-display {
+	min-width: var(--planner-display-min-width);
 	padding: 0.25rem 0.5rem;
 	font-size: 1rem;
 	font-weight: 600;
@@ -69,8 +91,13 @@ available in the app when your plugin is enabled.
 	user-select: none;
 }
 
-.yearly-planner-year-display:hover {
+.yearly-planner-year-display:hover,
+.monthly-planner-month-year-display:hover {
 	background: var(--background-modifier-hover);
+}
+
+.monthly-planner-month-year-display {
+	min-width: 8ch;
 }
 
 .yearly-planner-year-modal {
@@ -249,7 +276,15 @@ available in the app when your plugin is enabled.
 	-webkit-overflow-scrolling: touch;
 }
 
-.yearly-planner-table {
+.yearly-planner-table-wrapper,
+.monthly-planner-table-wrapper {
+	position: relative;
+	width: 100%;
+}
+
+/* Planner table – shared base styles */
+.yearly-planner-table,
+.monthly-planner-table {
 	width: 100%;
 	border-collapse: separate;
 	border-spacing: 0;
@@ -258,8 +293,11 @@ available in the app when your plugin is enabled.
 	border: 1px solid
 		var(--table-border-color, var(--background-modifier-border));
 	border-radius: var(--radius-s, 4px);
-	min-width: max-content;
 	box-sizing: border-box;
+}
+
+.yearly-planner-table {
+	min-width: min(100%, max-content);
 }
 
 .yearly-planner-table th,
@@ -343,6 +381,55 @@ available in the app when your plugin is enabled.
 .yearly-planner-table tbody td {
 	cursor: pointer;
 	transition: background-color 0.15s ease;
+	position: relative;
+}
+
+/* Range bars: lane-based right border (always visible) */
+.yearly-planner-cell-range-bars {
+	position: absolute;
+	inset: 0;
+	pointer-events: none;
+	z-index: 5;
+}
+
+.yearly-planner-cell-range-bar {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	width: 3px;
+	border-right: 3px solid var(--interactive-accent);
+	box-sizing: border-box;
+}
+
+.yearly-planner-cell-range-bar[data-lane="0"] {
+	right: 0;
+}
+.yearly-planner-cell-range-bar[data-lane="1"] {
+	right: 4px;
+}
+.yearly-planner-cell-range-bar[data-lane="2"] {
+	right: 8px;
+}
+.yearly-planner-cell-range-bar[data-lane="3"] {
+	right: 12px;
+}
+.yearly-planner-cell-range-bar[data-lane="4"] {
+	right: 16px;
+}
+
+/* Range highlight on hover (desktop) - above weekend bg, below chips. Color from chip. */
+.yearly-planner-cell-range-highlight::before {
+	content: "";
+	position: absolute;
+	inset: 0;
+	z-index: 1;
+	background: color-mix(
+		in srgb,
+		var(--yearly-planner-range-highlight-color, var(--interactive-accent))
+			22%,
+		transparent
+	);
+	pointer-events: none;
 }
 
 .yearly-planner-table tbody td:hover {
@@ -572,30 +659,6 @@ available in the app when your plugin is enabled.
 	cursor: pointer;
 }
 
-.yearly-planner-cell-file:nth-child(1) {
-	border-left-color: var(--interactive-accent);
-}
-
-.yearly-planner-cell-file:nth-child(2) {
-	border-left-color: #22c55e;
-}
-
-.yearly-planner-cell-file:nth-child(3) {
-	border-left-color: #f59e0b;
-}
-
-.yearly-planner-cell-file:nth-child(4) {
-	border-left-color: #8b5cf6;
-}
-
-.yearly-planner-cell-file:nth-child(5) {
-	border-left-color: #ec4899;
-}
-
-.yearly-planner-cell-file:nth-child(n + 6) {
-	border-left-color: var(--text-muted);
-}
-
 .yearly-planner-cell-file:hover {
 	color: var(--text-accent);
 	background: var(--background-modifier-hover);
@@ -733,7 +796,7 @@ available in the app when your plugin is enabled.
 	}
 
 	.yearly-planner-container {
-		padding: 0.5rem;
+		padding: var(--planner-container-padding-mobile);
 	}
 
 	.yearly-planner-header {
@@ -998,7 +1061,7 @@ body.-is-mobile .yearly-planner-color-picker {
 
 body.is-mobile .yearly-planner-container,
 body.-is-mobile .yearly-planner-container {
-	padding: 0.5rem;
+	padding: var(--planner-container-padding-mobile);
 }
 
 body.is-mobile .yearly-planner-table,
@@ -1167,7 +1230,7 @@ body.-is-mobile .yearly-planner-cell-file {
 /* ========== Monthly Planner ========== */
 
 .monthly-planner-container {
-	padding: 1rem;
+	padding: var(--planner-container-padding);
 	height: 100%;
 	display: flex;
 	flex-direction: column;
@@ -1178,7 +1241,7 @@ body.-is-mobile .yearly-planner-cell-file {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
-	margin-bottom: 1rem;
+	margin-bottom: var(--planner-header-margin);
 	flex-shrink: 0;
 }
 
@@ -1190,46 +1253,6 @@ body.-is-mobile .yearly-planner-cell-file {
 	margin: 0;
 }
 
-.monthly-planner-nav-wrapper {
-	display: flex;
-	align-items: center;
-	gap: 0.25rem;
-}
-
-.monthly-planner-nav-btn {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	width: 2rem;
-	height: 2rem;
-	padding: 0;
-	border: 1px solid var(--background-modifier-border);
-	border-radius: var(--input-radius, 4px);
-	background: var(--background-modifier-form-field);
-	color: var(--text-normal);
-	cursor: pointer;
-	transition: background-color 0.15s ease;
-}
-
-.monthly-planner-nav-btn:hover {
-	background: var(--background-modifier-hover);
-}
-
-.monthly-planner-month-year-display {
-	min-width: 8ch;
-	padding: 0.25rem 0.5rem;
-	font-size: 1rem;
-	font-weight: 600;
-	text-align: center;
-	cursor: pointer;
-	border-radius: var(--input-radius, 4px);
-	user-select: none;
-}
-
-.monthly-planner-month-year-display:hover {
-	background: var(--background-modifier-hover);
-}
-
 .monthly-planner-scroll {
 	flex: 1;
 	overflow-x: auto;
@@ -1238,16 +1261,14 @@ body.-is-mobile .yearly-planner-cell-file {
 	-webkit-overflow-scrolling: touch;
 }
 
-.monthly-planner-table {
-	width: 100%;
-	border-collapse: separate;
-	border-spacing: 0;
-	table-layout: fixed;
-	background: var(--table-background, var(--background-primary));
-	border: 1px solid
-		var(--table-border-color, var(--background-modifier-border));
-	border-radius: var(--radius-s, 4px);
-	box-sizing: border-box;
+/* Pinch zoom wrapper (mobile only) */
+.monthly-planner-zoom-wrapper {
+	position: relative;
+	flex-shrink: 0;
+}
+
+.monthly-planner-zoom-inner {
+	position: relative;
 }
 
 .monthly-planner-table th,
@@ -1419,6 +1440,18 @@ body.-is-mobile .yearly-planner-cell-file {
 	) !important;
 }
 
+/* Ensure drag selection highlight overrides weekend background colors */
+.monthly-planner-cell-selected.monthly-planner-cell-saturday:not(
+		.monthly-planner-cell-invalid
+	),
+.monthly-planner-cell-selected.monthly-planner-cell-sunday:not(
+		.monthly-planner-cell-invalid
+	) {
+	background: var(--interactive-accent) !important;
+	color: var(--text-on-accent, var(--text-normal)) !important;
+	opacity: 0.4;
+}
+
 /* Single-date files always on top when overlapping with range bars (match yearly) */
 .monthly-planner-cell-files {
 	display: flex;
@@ -1449,30 +1482,6 @@ body.-is-mobile .yearly-planner-cell-file {
 	border-radius: 2px;
 	border-left: 3px solid var(--interactive-accent);
 	cursor: pointer;
-}
-
-.monthly-planner-cell-file:nth-child(1) {
-	border-left-color: var(--interactive-accent);
-}
-
-.monthly-planner-cell-file:nth-child(2) {
-	border-left-color: #22c55e;
-}
-
-.monthly-planner-cell-file:nth-child(3) {
-	border-left-color: #f59e0b;
-}
-
-.monthly-planner-cell-file:nth-child(4) {
-	border-left-color: #8b5cf6;
-}
-
-.monthly-planner-cell-file:nth-child(5) {
-	border-left-color: #ec4899;
-}
-
-.monthly-planner-cell-file:nth-child(n + 6) {
-	border-left-color: var(--text-muted);
 }
 
 .monthly-planner-cell-file:hover {
@@ -1667,11 +1676,267 @@ body.-is-mobile .yearly-planner-cell-file {
 	color: var(--text-muted);
 }
 
-/* Monthly planner mobile */
+/* Monthly planner mobile – compact layout for one-screen view */
+body.is-mobile .monthly-planner-container,
+body.-is-mobile .monthly-planner-container {
+	padding: var(--planner-container-padding-mobile);
+}
+
+body.is-mobile .yearly-planner-header,
+body.-is-mobile .yearly-planner-header,
+body.is-mobile .monthly-planner-header,
+body.-is-mobile .monthly-planner-header {
+	margin-bottom: var(--planner-header-margin-mobile);
+	flex-wrap: wrap;
+	gap: 0.5rem;
+}
+
+body.is-mobile .monthly-planner-title,
+body.-is-mobile .monthly-planner-title {
+	font-size: 1rem;
+}
+
+body.is-mobile .monthly-planner-nav-wrapper,
+body.-is-mobile .monthly-planner-nav-wrapper {
+	flex-wrap: wrap;
+	gap: 0.25rem;
+}
+
+body.is-mobile .yearly-planner-year-btn,
+body.-is-mobile .yearly-planner-year-btn,
+body.is-mobile .monthly-planner-nav-btn,
+body.-is-mobile .monthly-planner-nav-btn {
+	width: var(--planner-btn-size-mobile);
+	height: var(--planner-btn-size-mobile);
+	min-width: var(--planner-btn-size-mobile);
+	min-height: var(--planner-btn-size-mobile);
+}
+
+body.is-mobile .monthly-planner-month-year-display,
+body.-is-mobile .monthly-planner-month-year-display {
+	font-size: 0.85rem;
+	padding: 0.2rem 0.4rem;
+	min-width: 5.5ch;
+}
+
 body.is-mobile .monthly-planner-scroll,
 body.-is-mobile .monthly-planner-scroll {
 	padding-bottom: var(
 		--monthly-planner-mobile-bottom-padding,
 		max(3.5rem, env(safe-area-inset-bottom, 0px))
 	);
+}
+
+body.is-mobile .monthly-planner-table,
+body.-is-mobile .monthly-planner-table {
+	border-width: 0.5px;
+}
+
+body.is-mobile .monthly-planner-table th,
+body.is-mobile .monthly-planner-table td,
+body.-is-mobile .monthly-planner-table th,
+body.-is-mobile .monthly-planner-table td {
+	--monthly-cell-padding-v: 0.15rem;
+	--monthly-cell-padding-h: 0.2rem;
+	font-size: 0.75em;
+	border-width: 0.5px;
+}
+
+body.is-mobile .monthly-planner-table th,
+body.-is-mobile .monthly-planner-table th {
+	font-size: 0.65em;
+}
+
+body.is-mobile .monthly-planner-cell-inner,
+body.-is-mobile .monthly-planner-cell-inner {
+	--monthly-planner-cell-min-height: 2.5rem;
+	min-height: var(--monthly-planner-cell-min-height, 2.5rem);
+	gap: 0.1rem;
+}
+
+body.is-mobile .monthly-planner-cell-day,
+body.-is-mobile .monthly-planner-cell-day {
+	font-size: 0.75em;
+	margin-bottom: 0.1rem;
+}
+
+body.is-mobile .monthly-planner-range-bars,
+body.-is-mobile .monthly-planner-range-bars {
+	--monthly-range-bar-height: 0.9rem;
+	--monthly-range-bar-gap: 0.08rem;
+	--monthly-range-bars-max-visible: 2;
+}
+
+body.is-mobile .monthly-planner-range-bar,
+body.-is-mobile .monthly-planner-range-bar {
+	border-left-width: 2px;
+}
+
+body.is-mobile .monthly-planner-range-label,
+body.-is-mobile .monthly-planner-range-label {
+	font-size: 0.55em;
+	padding: 0.08rem 0.15rem;
+}
+
+body.is-mobile .monthly-planner-cell-file,
+body.-is-mobile .monthly-planner-cell-file {
+	font-size: 0.6em;
+	padding: 0.1rem 0.2rem 0.1rem 0.3rem;
+	border-left-width: 2px;
+}
+
+body.is-mobile .monthly-planner-cell-holiday-badge,
+body.-is-mobile .monthly-planner-cell-holiday-badge {
+	font-size: 0.6em;
+	padding: 0.1rem 0.2rem 0.1rem 0.3rem;
+	border-left-width: 2px;
+}
+
+body.is-mobile .monthly-planner-cell-holiday,
+body.-is-mobile .monthly-planner-cell-holiday {
+	border-left-width: 2px !important;
+}
+
+body.is-mobile .monthly-planner-weekend-label,
+body.-is-mobile .monthly-planner-weekend-label {
+	font-size: 0.5em;
+	top: 0.05rem;
+	right: 0.15rem;
+}
+
+/* Plan note panel – compact on mobile */
+body.is-mobile .plan-note-panel,
+body.-is-mobile .plan-note-panel {
+	margin-bottom: 0.5rem;
+}
+
+body.is-mobile .plan-note-panel-header,
+body.-is-mobile .plan-note-panel-header {
+	padding: 0.25rem 0.5rem 0.25rem 0.6rem;
+}
+
+body.is-mobile .plan-note-panel-title,
+body.-is-mobile .plan-note-panel-title {
+	font-size: 0.75rem;
+}
+
+body.is-mobile .plan-note-panel-body,
+body.-is-mobile .plan-note-panel-body {
+	padding: 0.5rem 0.65rem;
+	max-height: 10rem;
+}
+
+/* ── Plan note panel ─────────────────────────────────────────── */
+
+.plan-note-panel {
+	border: 1px solid var(--background-modifier-border);
+	border-radius: var(--radius-m);
+	margin-bottom: 0.75rem;
+	overflow: hidden;
+	background: var(--background-secondary);
+}
+
+.plan-note-panel-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 0.35rem 0.6rem 0.35rem 0.75rem;
+	background: var(--background-secondary-alt);
+	border-bottom: 1px solid var(--background-modifier-border);
+	gap: 0.5rem;
+}
+
+.plan-note-panel-title {
+	font-size: 0.8rem;
+	font-weight: 600;
+	color: var(--text-muted);
+	letter-spacing: 0.02em;
+	flex: 1;
+	min-width: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.plan-note-panel-open-btn {
+	flex-shrink: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 1.5rem;
+	height: 1.5rem;
+	padding: 0;
+	background: transparent;
+	border: none;
+	border-radius: var(--radius-s);
+	color: var(--text-muted);
+	cursor: pointer;
+	opacity: 0.6;
+	transition:
+		opacity 0.15s,
+		background 0.15s;
+}
+
+.plan-note-panel-open-btn:hover {
+	opacity: 1;
+	background: var(--background-modifier-hover);
+	color: var(--text-normal);
+}
+
+.plan-note-panel-body {
+	padding: 0.6rem 0.85rem;
+	max-height: 14rem;
+	overflow-y: auto;
+	cursor: pointer;
+}
+
+.plan-note-panel-body:hover {
+	background: var(--background-modifier-hover);
+}
+
+.plan-note-panel-body > *:first-child {
+	margin-top: 0;
+}
+
+.plan-note-panel-body > *:last-child {
+	margin-bottom: 0;
+}
+
+.plan-note-panel-empty-content {
+	font-size: 0.85rem;
+	color: var(--text-faint);
+	font-style: italic;
+	margin: 0;
+}
+
+.plan-note-panel-empty {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	padding: 0.6rem 0.75rem;
+	flex-wrap: wrap;
+}
+
+.plan-note-panel-empty-hint {
+	font-size: 0.8rem;
+	color: var(--text-faint);
+	flex: 1;
+	min-width: 0;
+}
+
+.plan-note-panel-create-btn {
+	font-size: 0.78rem;
+	padding: 0.2rem 0.6rem;
+	background: var(--interactive-normal);
+	border: 1px solid var(--background-modifier-border);
+	border-radius: var(--radius-s);
+	color: var(--text-normal);
+	cursor: pointer;
+	white-space: nowrap;
+	flex-shrink: 0;
+	transition: background 0.15s;
+}
+
+.plan-note-panel-create-btn:hover {
+	background: var(--interactive-hover);
 }

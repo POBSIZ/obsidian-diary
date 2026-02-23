@@ -20,6 +20,12 @@ import {
 import { CreateFileModal, FileOptionsModal } from "./modals";
 import { getSelectionBounds } from "./selection";
 import { getHolidaysForYear } from "../../utils/holidays";
+import {
+	getRangesForYear,
+	getRangeLaneMap,
+	getYearNoteFilePath,
+} from "./file-utils";
+import { renderPlanNotePanel } from "../plan-note-panel";
 
 export type { YearlyPlannerState } from "./types";
 
@@ -102,6 +108,10 @@ export class YearlyPlannerView
 		}
 
 		this.renderHeader(contentEl);
+		const notePanelEl = contentEl.createDiv({
+			cls: "plan-note-panel-wrapper",
+		});
+		void this.renderYearNotePanel(notePanelEl);
 		this.renderTable(contentEl);
 
 		const newScrollEl = contentEl.querySelector<HTMLElement>(
@@ -111,6 +121,29 @@ export class YearlyPlannerView
 			newScrollEl.scrollTop = scrollTop;
 			newScrollEl.scrollLeft = scrollLeft;
 		}
+	}
+
+	private async renderYearNotePanel(container: HTMLElement): Promise<void> {
+		const folder = this.plugin.settings.plannerFolder || "Planner";
+		const filePath = getYearNoteFilePath(folder, this.year);
+		await renderPlanNotePanel(container, this.app, filePath, this, {
+			label: String(this.year),
+			onCreate: async () => {
+				const dir = filePath.split("/").slice(0, -1).join("/");
+				if (dir && !this.app.vault.getAbstractFileByPath(dir)) {
+					await this.app.vault.createFolder(dir);
+				}
+				const newFile = await this.app.vault.create(
+					filePath,
+					`# ${this.year}\n\n`,
+				);
+				await this.leaf.openFile(newFile);
+				this.render();
+			},
+			onOpen: (file) => {
+				void this.leaf.openFile(file);
+			},
+		});
 	}
 
 	private renderHeader(contentEl: HTMLElement): void {
@@ -177,7 +210,12 @@ export class YearlyPlannerView
 			),
 			{ capture: true },
 		);
-		const table = scrollContainer.createEl("table", {
+
+		const tableParent = scrollContainer.createDiv({
+			cls: "yearly-planner-table-wrapper",
+		});
+
+		const table = tableParent.createEl("table", {
 			cls: "yearly-planner-table",
 		});
 
@@ -196,6 +234,8 @@ export class YearlyPlannerView
 			showHolidays && holidayCountry
 				? getHolidaysForYear(holidayCountry, this.year)
 				: null;
+		const ranges = getRangesForYear(this.app, this.year);
+		const rangeLaneMap = getRangeLaneMap(ranges);
 		const cellCtx = {
 			year: this.year,
 			app: this.app,
@@ -203,6 +243,7 @@ export class YearlyPlannerView
 			dragState: this.dragState,
 			holidaysData,
 			locale: this.plugin.settings.locale ?? "en",
+			rangeLaneMap,
 		};
 
 		for (let day = 1; day <= 31; day++) {
@@ -226,6 +267,8 @@ export class YearlyPlannerView
 			),
 			{ capture: true, passive: false },
 		);
+
+		this.interactionHandler.registerRangeHoverListeners(scrollContainer);
 	}
 
 	async openDateNote(

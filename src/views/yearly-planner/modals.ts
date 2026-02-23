@@ -423,8 +423,6 @@ export class CreateFileModal extends Modal {
 
 	private async handleCreate(): Promise<void> {
 		const folder = this.getFolderValue();
-		const start = this.startDateInput.value;
-		const end = this.endDateInput.value;
 		const filename = this.filenameInput.value.trim().replace(/\.md$/i, "");
 
 		try {

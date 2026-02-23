@@ -141,6 +141,10 @@ export class MonthlyInteractionHandler {
 	}
 
 	handlePlannerTouchStart(e: TouchEvent): void {
+		if (e.touches.length >= 2) {
+			this.touchStartPos = null;
+			return;
+		}
 		const t = e.touches[0];
 		if (e.touches.length === 1 && t) {
 			if (Platform.isMobile) {
@@ -160,7 +164,8 @@ export class MonthlyInteractionHandler {
 		const t = e.changedTouches[0];
 		if (!t) return;
 
-		if (Platform.isMobile && this.touchStartPos) {
+		if (Platform.isMobile) {
+			if (!this.touchStartPos) return; /* Pinch or multi-touch: no tap */
 			const dx = t.clientX - this.touchStartPos.x;
 			const dy = t.clientY - this.touchStartPos.y;
 			const dist = Math.sqrt(dx * dx + dy * dy);
@@ -271,7 +276,6 @@ export class MonthlyInteractionHandler {
 
 		const bounds = getSelectionBounds(this.view.dragState);
 		const count = countSelectionCells(bounds);
-		const { startYear, startMonth, startDay } = this.view.dragState;
 		this.view.dragState = null;
 		this.view.render();
 
