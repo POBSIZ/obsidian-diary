@@ -2,8 +2,6 @@
 
 A **diary plugin** for Obsidian. Provides yearly and monthly planners.
 
-📖 [English](docs/en/README.md) | [한국어](docs/ko/README.md)
-
 ## Features
 
 - **Yearly planner**: 12-month × 31-day grid calendar

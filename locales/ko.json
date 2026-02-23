@@ -14,6 +14,7 @@
 	"header.nextMonth": "다음 달",
 	"header.goToCurrentMonth": "현재 달로 이동",
 	"header.addFile": "파일 추가",
+	"header.resetZoom": "확대 비율 초기화",
 	"header.clickToEnterYear": "클릭하여 연도 입력",
 	"header.clickToEnterMonthYear": "클릭하여 월·연도 입력",
 	"modal.createRangeNote": "범위 노트 만들기",
@@ -82,5 +83,9 @@
 	"country.FR": "프랑스",
 	"country.AU": "호주",
 	"country.CA": "캐나다",
-	"country.TW": "대만"
+	"country.TW": "대만",
+	"planNote.createButton": "플랜 노트 만들기",
+	"planNote.openButton": "플랜 노트 열기",
+	"planNote.emptyHint": "{label} 플랜 노트가 없습니다.",
+	"planNote.emptyContent": "빈 파일 — 클릭하여 편집"
 }

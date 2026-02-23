@@ -14,6 +14,7 @@
 	"header.nextMonth": "Next month",
 	"header.goToCurrentMonth": "Go to current month",
 	"header.addFile": "Add file",
+	"header.resetZoom": "Reset zoom",
 	"header.clickToEnterYear": "Click to enter year",
 	"header.clickToEnterMonthYear": "Click to enter month and year",
 	"modal.createRangeNote": "Create range note",
@@ -82,5 +83,9 @@
 	"country.FR": "France",
 	"country.AU": "Australia",
 	"country.CA": "Canada",
-	"country.TW": "Taiwan"
+	"country.TW": "Taiwan",
+	"planNote.createButton": "Create plan note",
+	"planNote.openButton": "Open plan note",
+	"planNote.emptyHint": "No plan note for {label} yet.",
+	"planNote.emptyContent": "Empty file — click to edit"
 }
