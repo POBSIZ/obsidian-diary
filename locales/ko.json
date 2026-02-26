@@ -49,6 +49,10 @@
 	"modal.previewFailed": "미리보기를 불러올 수 없습니다",
 	"modal.openFile": "파일 열기",
 	"modal.applyColor": "색상 적용",
+	"modal.applyChange": "변경 적용",
+	"modal.changeDate": "날짜 변경",
+	"modal.applyDate": "날짜 적용",
+	"modal.dateChangeConflict": "해당 날짜에 이미 파일이 있습니다.",
 	"modal.delete": "삭제",
 	"modal.deleteConfirm": "이 파일을 삭제하시겠습니까?",
 	"modal.deleteConfirmDesc": "{path}가 휴지통으로 이동합니다.",
@@ -87,5 +91,6 @@
 	"planNote.createButton": "플랜 노트 만들기",
 	"planNote.openButton": "플랜 노트 열기",
 	"planNote.emptyHint": "{label} 플랜 노트가 없습니다.",
-	"planNote.emptyContent": "빈 파일 — 클릭하여 편집"
+	"planNote.emptyContent": "빈 파일 — 클릭하여 편집",
+	"chipDrag.targetExists": "해당 날짜에 이미 파일이 있습니다."
 }
