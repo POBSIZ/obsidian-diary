@@ -1,21 +1,44 @@
-import { App, Platform, TFile, WorkspaceLeaf } from "obsidian";
-import { getTopmostMonthlyElementAt, getMonthlyCellAtClientPos } from "./dom";
+import { App, Notice, Platform, TFile, WorkspaceLeaf } from "obsidian";
+import {
+	getTopmostMonthlyElementAt,
+	getMonthlyCellAtClientPos,
+	getChipOrBarAt,
+} from "./dom";
 import {
 	getSelectionBounds,
 	countSelectionCells,
 	isDateInSelection,
 } from "../yearly-planner/selection";
 import { HolidayInfoModal } from "../yearly-planner/modals";
-import type { DragState, SelectionBounds } from "../yearly-planner/types";
+import { moveFileToDate } from "../yearly-planner/file-operations";
+import { t } from "../../i18n";
+import type {
+	ChipDragState,
+	DragState,
+	SelectionBounds,
+} from "../yearly-planner/types";
+
+const DRAG_THRESHOLD = 8;
 
 export interface MonthlyPlannerViewDelegate {
 	readonly contentEl: HTMLElement;
 	readonly app: App;
 	readonly leaf: WorkspaceLeaf;
 	dragState: DragState | null;
+	chipDragState: ChipDragState | null;
 	render(): void;
+	updateChipDragDropTarget(): void;
 	openCreateFileModal(bounds: SelectionBounds | null): void;
 	openFileOptionsModal(file: TFile): void;
+}
+
+interface ChipDragPending {
+	file: TFile;
+	startYear: number;
+	startMonth: number;
+	startDay: number;
+	startX: number;
+	startY: number;
 }
 
 export class MonthlyInteractionHandler {
@@ -24,7 +47,11 @@ export class MonthlyInteractionHandler {
 	private boundHandleMouseUp: () => void;
 	private boundHandleTouchMove: (e: TouchEvent) => void;
 	private boundHandleTouchEnd: () => void;
+	private boundHandleChipMouseMove: (e: MouseEvent) => void;
+	private boundHandleChipMouseUp: (e: MouseEvent) => void;
 	private touchStartPos: { x: number; y: number } | null = null;
+	private chipDragPending: ChipDragPending | null = null;
+	private chipDragJustEnded = false;
 
 	constructor(view: MonthlyPlannerViewDelegate) {
 		this.view = view;
@@ -32,6 +59,8 @@ export class MonthlyInteractionHandler {
 		this.boundHandleMouseUp = this.handleMouseUp.bind(this);
 		this.boundHandleTouchMove = this.handleTouchMove.bind(this);
 		this.boundHandleTouchEnd = this.handleTouchEnd.bind(this);
+		this.boundHandleChipMouseMove = this.handleChipMouseMove.bind(this);
+		this.boundHandleChipMouseUp = this.handleChipMouseUp.bind(this);
 	}
 
 	handlePlannerClick(e: MouseEvent): void {
@@ -44,6 +73,12 @@ export class MonthlyInteractionHandler {
 		clientY: number,
 		e: MouseEvent,
 	): void {
+		if (this.chipDragJustEnded) {
+			this.chipDragJustEnded = false;
+			e.preventDefault();
+			e.stopPropagation();
+			return;
+		}
 		const el = getTopmostMonthlyElementAt(
 			this.view.contentEl,
 			clientX,
@@ -160,7 +195,7 @@ export class MonthlyInteractionHandler {
 	}
 
 	handlePlannerTouchEnd(e: TouchEvent): void {
-		if (this.view.dragState) return;
+		if (this.view.dragState || this.view.chipDragState) return;
 		const t = e.changedTouches[0];
 		if (!t) return;
 
@@ -193,11 +228,50 @@ export class MonthlyInteractionHandler {
 		);
 		if (!el || !this.view.contentEl.contains(el as Node)) return;
 
-		const onInteractive =
-			(el as HTMLElement).closest?.(".monthly-planner-cell-file") ||
-			(el as HTMLElement).closest?.(".monthly-planner-range-bar") ||
-			(el as HTMLElement).closest?.(".monthly-planner-cell-holiday-badge");
-		if (onInteractive) return;
+		const onHoliday = (el as HTMLElement).closest?.(
+			".monthly-planner-cell-holiday-badge",
+		);
+		if (onHoliday) return;
+
+		const chipOrBar = getChipOrBarAt(this.view.contentEl, clientX, clientY);
+		if (chipOrBar && Platform.isDesktop) {
+			const path = chipOrBar.dataset.path;
+			if (path) {
+				const file = this.view.app.vault.getAbstractFileByPath(path);
+				if (file instanceof TFile) {
+					const cell = chipOrBar.closest?.(
+						"td[data-year][data-month][data-day]:not(.monthly-planner-cell-invalid)",
+					);
+					if (cell) {
+						const year = parseInt(
+							(cell as HTMLElement).dataset.year ?? "",
+							10,
+						);
+						const month = parseInt(
+							(cell as HTMLElement).dataset.month ?? "",
+							10,
+						);
+						const day = parseInt(
+							(cell as HTMLElement).dataset.day ?? "",
+							10,
+						);
+						if (!isNaN(year) && !isNaN(month) && !isNaN(day)) {
+							e.preventDefault();
+							this.maybeStartChipDrag(
+								file,
+								year,
+								month,
+								day,
+								clientX,
+								clientY,
+							);
+						}
+					}
+				}
+			}
+			return;
+		}
+		if (chipOrBar) return;
 
 		const cell = (el as HTMLElement).closest?.(
 			"td[data-year][data-month][data-day]:not(.monthly-planner-cell-invalid)",
@@ -214,6 +288,131 @@ export class MonthlyInteractionHandler {
 				this.handleDragStart(e, year, month, day);
 			}
 		}
+	}
+
+	private maybeStartChipDrag(
+		file: TFile,
+		startYear: number,
+		startMonth: number,
+		startDay: number,
+		startX: number,
+		startY: number,
+	): void {
+		this.chipDragPending = {
+			file,
+			startYear,
+			startMonth,
+			startDay,
+			startX,
+			startY,
+		};
+		document.addEventListener("mousemove", this.boundHandleChipMouseMove);
+		document.addEventListener("mouseup", this.boundHandleChipMouseUp);
+	}
+
+	private handleChipMouseMove(e: MouseEvent): void {
+		const pending = this.chipDragPending;
+		if (!pending && !this.view.chipDragState) return;
+
+		const dx = pending ? e.clientX - pending.startX : 0;
+		const dy = pending ? e.clientY - pending.startY : 0;
+		const dist = Math.sqrt(dx * dx + dy * dy);
+
+		if (!this.view.chipDragState && pending && dist >= DRAG_THRESHOLD) {
+			this.view.chipDragState = {
+				file: pending.file,
+				startYear: pending.startYear,
+				startMonth: pending.startMonth,
+				startDay: pending.startDay,
+				currentYear: pending.startYear,
+				currentMonth: pending.startMonth,
+				currentDay: pending.startDay,
+			};
+			this.chipDragPending = null;
+			this.view.updateChipDragDropTarget();
+		}
+
+		if (this.view.chipDragState) {
+			const cell = getMonthlyCellAtClientPos(e.clientX, e.clientY);
+			if (cell) {
+				const s = this.view.chipDragState;
+				const changed =
+					s.currentYear !== cell.year ||
+					s.currentMonth !== cell.month ||
+					s.currentDay !== cell.day;
+				s.currentYear = cell.year;
+				s.currentMonth = cell.month;
+				s.currentDay = cell.day;
+				if (changed) this.view.updateChipDragDropTarget();
+			}
+		}
+	}
+
+	private handleChipMouseUp(e: MouseEvent): void {
+		const pending = this.chipDragPending;
+		this.chipDragPending = null;
+		this.clearChipDragListeners();
+
+		if (this.view.chipDragState || pending) {
+			this.chipDragJustEnded = true;
+			e.preventDefault();
+			e.stopPropagation();
+		}
+
+		if (this.view.chipDragState) {
+			void this.handleChipDragEnd(e.clientX, e.clientY);
+			return;
+		}
+
+		if (pending) {
+			this.view.openFileOptionsModal(pending.file);
+		}
+	}
+
+	private async handleChipDragEnd(
+		_clientX: number,
+		_clientY: number,
+	): Promise<void> {
+		const state = this.view.chipDragState;
+		if (!state) return;
+
+		this.view.chipDragState = null;
+		this.view.updateChipDragDropTarget();
+
+		// Use last tracked cell during drag (more reliable than mouseup position)
+		const cell = {
+			year: state.currentYear,
+			month: state.currentMonth,
+			day: state.currentDay,
+		};
+		if (
+			cell.year === state.startYear &&
+			cell.month === state.startMonth &&
+			cell.day === state.startDay
+		) {
+			return;
+		}
+
+		const result = await moveFileToDate(
+			this.view.app,
+			state.file,
+			cell.year,
+			cell.month,
+			cell.day,
+		);
+		if (result) {
+			this.view.render();
+		} else {
+			new Notice(t("chipDrag.targetExists"));
+		}
+	}
+
+	clearChipDragListeners(): void {
+		document.removeEventListener(
+			"mousemove",
+			this.boundHandleChipMouseMove,
+		);
+		document.removeEventListener("mouseup", this.boundHandleChipMouseUp);
 	}
 
 	private handleDragStart(
@@ -311,6 +510,7 @@ export class MonthlyInteractionHandler {
 		document.removeEventListener("touchmove", this.boundHandleTouchMove);
 		document.removeEventListener("touchend", this.boundHandleTouchEnd);
 		document.removeEventListener("touchcancel", this.boundHandleTouchEnd);
+		this.clearChipDragListeners();
 	}
 
 	handleRangeBarMouseOver(e: MouseEvent): void {

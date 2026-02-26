@@ -4,6 +4,131 @@ import { getFilePath } from "./file-utils";
 
 const pad = (n: number) => String(n).padStart(2, "0");
 
+/** Parse YYYY-MM-DD from string. */
+function parseDateParts(dateStr: string): {
+	year: number;
+	month: number;
+	day: number;
+} | null {
+	const m = dateStr.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+	if (!m) return null;
+	const year = parseInt(m[1] ?? "", 10);
+	const month = parseInt(m[2] ?? "", 10);
+	const day = parseInt(m[3] ?? "", 10);
+	if (isNaN(year) || isNaN(month) || isNaN(day)) return null;
+	return { year, month, day };
+}
+
+/** Compute days between two dates (inclusive). */
+function daysBetween(start: string, end: string): number {
+	const s = parseDateParts(start);
+	const e = parseDateParts(end);
+	if (!s || !e) return 0;
+	const startMs = new Date(s.year, s.month - 1, s.day).getTime();
+	const endMs = new Date(e.year, e.month - 1, e.day).getTime();
+	return Math.round((endMs - startMs) / 86400000) + 1;
+}
+
+/**
+ * Move a date file to a new date. Single-date files move to the target date;
+ * range files move so the start date is the target, preserving duration.
+ * @returns The renamed TFile, or null if target path already exists (conflict).
+ */
+export async function moveFileToDate(
+	app: App,
+	file: TFile,
+	targetYear: number,
+	targetMonth: number,
+	targetDay: number,
+): Promise<TFile | null> {
+	const folder = file.parent?.path ?? "";
+	const targetDateStr = `${targetYear}-${pad(targetMonth)}-${pad(targetDay)}`;
+
+	const rangeParsed = parseRangeBasename(file.basename);
+	if (rangeParsed) {
+		const duration = daysBetween(rangeParsed.start, rangeParsed.end);
+		if (duration <= 0) return null;
+
+		const endDate = new Date(targetYear, targetMonth - 1, targetDay);
+		endDate.setDate(endDate.getDate() + duration - 1);
+		const endYear = endDate.getFullYear();
+		const endMonth = endDate.getMonth() + 1;
+		const endDay = endDate.getDate();
+
+		const newBasename = `${targetDateStr}--${endYear}-${pad(endMonth)}-${pad(endDay)}${rangeParsed.suffix ? `-${rangeParsed.suffix}` : ""}.md`;
+		const fullNewPath = folder ? `${folder}/${newBasename}` : newBasename;
+
+		if (fullNewPath === file.path) return file;
+		if (app.vault.getAbstractFileByPath(fullNewPath)) return null;
+
+		await app.vault.rename(file, fullNewPath);
+		const renamed = app.vault.getAbstractFileByPath(fullNewPath);
+		if (!(renamed instanceof TFile)) return null;
+		await app.fileManager.processFrontMatter(
+			renamed,
+			(fm: Record<string, unknown>) => {
+				fm.date_start = targetDateStr;
+				fm.date_end = `${endYear}-${pad(endMonth)}-${pad(endDay)}`;
+			},
+		);
+		return renamed;
+	}
+
+	const singleParsed = parseSingleDateBasename(file.basename.replace(/\.md$/i, ""));
+	if (!singleParsed) return null;
+
+	const newBasename = `${targetDateStr}${singleParsed.suffix ? `-${singleParsed.suffix}` : ""}.md`;
+	const fullNewPath = folder ? `${folder}/${newBasename}` : newBasename;
+
+	if (fullNewPath === file.path) return file;
+	if (app.vault.getAbstractFileByPath(fullNewPath)) return null;
+
+	await app.vault.rename(file, fullNewPath);
+	const renamed = app.vault.getAbstractFileByPath(fullNewPath);
+	return renamed instanceof TFile ? renamed : null;
+}
+
+/**
+ * Move a range file to new start and end dates.
+ * @returns The renamed TFile, or null if target path already exists or start > end.
+ */
+export async function moveRangeFileToNewDates(
+	app: App,
+	file: TFile,
+	startYear: number,
+	startMonth: number,
+	startDay: number,
+	endYear: number,
+	endMonth: number,
+	endDay: number,
+): Promise<TFile | null> {
+	const rangeParsed = parseRangeBasename(file.basename);
+	if (!rangeParsed) return null;
+
+	const startStr = `${startYear}-${pad(startMonth)}-${pad(startDay)}`;
+	const endStr = `${endYear}-${pad(endMonth)}-${pad(endDay)}`;
+	if (startStr > endStr) return null;
+
+	const folder = file.parent?.path ?? "";
+	const newBasename = `${startStr}--${endStr}${rangeParsed.suffix ? `-${rangeParsed.suffix}` : ""}.md`;
+	const fullNewPath = folder ? `${folder}/${newBasename}` : newBasename;
+
+	if (fullNewPath === file.path) return file;
+	if (app.vault.getAbstractFileByPath(fullNewPath)) return null;
+
+	await app.vault.rename(file, fullNewPath);
+	const renamed = app.vault.getAbstractFileByPath(fullNewPath);
+	if (!(renamed instanceof TFile)) return null;
+	await app.fileManager.processFrontMatter(
+		renamed,
+		(fm: Record<string, unknown>) => {
+			fm.date_start = startStr;
+			fm.date_end = endStr;
+		},
+	);
+	return renamed;
+}
+
 export async function openDateNote(
 	app: App,
 	leaf: WorkspaceLeaf,
@@ -71,7 +196,7 @@ ${colorLine}
 }
 
 /** Extract date and optional suffix from basename (e.g. "2026-02-12" or "2026-02-12-meeting"). */
-function parseSingleDateBasename(
+export function parseSingleDateBasename(
 	basename: string,
 ): { date: string; suffix?: string } | null {
 	const m = basename.match(/^(\d{4}-\d{2}-\d{2})(?:-(.+))?$/);

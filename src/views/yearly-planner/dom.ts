@@ -10,11 +10,29 @@ export function getTopmostPlannerElementAt(
 		const he = el as HTMLElement;
 		if (
 			he.closest?.(".yearly-planner-cell-file[data-path]") ||
+			he.closest?.(".yearly-planner-cell-range-bar[data-path]") ||
 			he.closest?.(".yearly-planner-cell-holiday-badge") ||
 			he.closest?.("td[data-year][data-month][data-day]")
 		) {
 			return el;
 		}
+	}
+	return null;
+}
+
+/** Get chip or range bar element at coords that has data-path (for chip drag). */
+export function getChipOrBarAt(
+	contentEl: HTMLElement,
+	clientX: number,
+	clientY: number,
+): HTMLElement | null {
+	const elements = document.elementsFromPoint(clientX, clientY);
+	for (const el of elements) {
+		if (!contentEl.contains(el as Node)) break;
+		const chip = (el as HTMLElement).closest?.(
+			".yearly-planner-cell-file[data-path], .yearly-planner-cell-range-bar[data-path]",
+		);
+		if (chip && (chip as HTMLElement).dataset.path) return chip as HTMLElement;
 	}
 	return null;
 }

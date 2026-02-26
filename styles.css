@@ -117,7 +117,7 @@ available in the app when your plugin is enabled.
 	display: flex;
 	flex-direction: column;
 	gap: 0.75rem;
-	margin-top: 1rem;
+	margin-bottom: 1rem;
 }
 
 .yearly-planner-create-file-row {
@@ -399,6 +399,8 @@ available in the app when your plugin is enabled.
 	width: 3px;
 	border-right: 3px solid var(--interactive-accent);
 	box-sizing: border-box;
+	pointer-events: auto;
+	cursor: pointer;
 }
 
 .yearly-planner-cell-range-bar[data-lane="0"] {
@@ -662,6 +664,31 @@ available in the app when your plugin is enabled.
 .yearly-planner-cell-file:hover {
 	color: var(--text-accent);
 	background: var(--background-modifier-hover);
+}
+
+/* During chip drag: make chips/containers ignore pointer so getCellAtClientPos hits the td */
+.yearly-planner-chip-dragging .yearly-planner-cell-files,
+.yearly-planner-chip-dragging .yearly-planner-cell-file,
+.yearly-planner-chip-dragging .yearly-planner-cell-range-bars,
+.yearly-planner-chip-dragging .yearly-planner-cell-range-bar {
+	pointer-events: none !important;
+}
+
+.monthly-planner-chip-dragging .monthly-planner-cell-files,
+.monthly-planner-chip-dragging .monthly-planner-cell-file,
+.monthly-planner-chip-dragging .monthly-planner-range-bars,
+.monthly-planner-chip-dragging .monthly-planner-range-bar {
+	pointer-events: none !important;
+}
+
+/* Chip drag drop target */
+.yearly-planner-cell-drop-target {
+	background: color-mix(
+		in srgb,
+		var(--interactive-accent) 25%,
+		var(--table-background, var(--background-primary))
+	) !important;
+	box-shadow: inset 0 0 0 2px var(--interactive-accent);
 }
 
 /* Drag selection highlight */
@@ -1059,6 +1086,12 @@ body.-is-mobile .yearly-planner-color-picker {
 	height: 2.5rem;
 }
 
+body.is-mobile .yearly-planner-file-options-buttons button,
+body.-is-mobile .yearly-planner-file-options-buttons button {
+	min-height: 2.5rem;
+	line-height: 1;
+}
+
 body.is-mobile .yearly-planner-container,
 body.-is-mobile .yearly-planner-container {
 	padding: var(--planner-container-padding-mobile);
@@ -1422,6 +1455,16 @@ body.-is-mobile .yearly-planner-cell-file {
 	background: var(--interactive-accent) !important;
 	color: var(--text-on-accent, var(--text-normal)) !important;
 	opacity: 0.4;
+}
+
+/* Chip drag drop target */
+.monthly-planner-cell-drop-target {
+	background: color-mix(
+		in srgb,
+		var(--interactive-accent) 25%,
+		var(--table-background, var(--background-primary))
+	) !important;
+	box-shadow: inset 0 0 0 2px var(--interactive-accent);
 }
 
 .monthly-planner-cell-saturday:not(.monthly-planner-cell-invalid) {

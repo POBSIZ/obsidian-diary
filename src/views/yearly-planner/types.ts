@@ -1,8 +1,20 @@
+import type { TFile } from "obsidian";
+
 export interface YearlyPlannerState extends Record<string, unknown> {
 	year: number;
 }
 
 export interface DragState {
+	startYear: number;
+	startMonth: number;
+	startDay: number;
+	currentYear: number;
+	currentMonth: number;
+	currentDay: number;
+}
+
+export interface ChipDragState {
+	file: TFile;
 	startYear: number;
 	startMonth: number;
 	startDay: number;

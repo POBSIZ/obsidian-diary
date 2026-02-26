@@ -9,7 +9,13 @@ import {
 } from "obsidian";
 import { getLocale, t } from "../../i18n";
 import { getAllFolderPaths, getChipColor } from "./file-utils";
-import { updateFileColor } from "./file-operations";
+import {
+	moveFileToDate,
+	moveRangeFileToNewDates,
+	parseSingleDateBasename,
+	updateFileColor,
+} from "./file-operations";
+import { parseRangeBasename } from "../../utils/range";
 import type { SelectionBounds } from "./types";
 
 /** Chip color presets for CreateFileModal. */
@@ -534,6 +540,9 @@ export class FileOptionsModal extends Modal {
 	private colorPickerInput!: HTMLInputElement;
 	private colorPresetBtns: HTMLButtonElement[] = [];
 	private previewComponent: Component | null = null;
+	private startDateInput?: HTMLInputElement;
+	private endDateInput?: HTMLInputElement;
+	private singleDateInput?: HTMLInputElement;
 
 	constructor(
 		app: App,
@@ -563,6 +572,46 @@ export class FileOptionsModal extends Modal {
 		});
 		previewEl.createSpan({ text: t("modal.previewLoading"), cls: "yearly-planner-file-preview-loading" });
 		void this.loadPreview(previewEl);
+
+		const rangeParsed = parseRangeBasename(this.file.basename);
+		const singleParsed =
+			!rangeParsed &&
+			parseSingleDateBasename(this.file.basename.replace(/\.md$/i, ""));
+		if (rangeParsed || singleParsed) {
+			const dateSection = this.contentEl.createDiv({
+				cls: "yearly-planner-create-file-modal",
+			});
+			if (rangeParsed) {
+				const startRow = dateSection.createDiv({
+					cls: "yearly-planner-create-file-row",
+				});
+				startRow.createEl("label", { text: t("modal.startDate") });
+				this.startDateInput = startRow.createEl("input", {
+					type: "date",
+					cls: "yearly-planner-date-input",
+				});
+				this.startDateInput.value = rangeParsed.start;
+				const endRow = dateSection.createDiv({
+					cls: "yearly-planner-create-file-row",
+				});
+				endRow.createEl("label", { text: t("modal.endDate") });
+				this.endDateInput = endRow.createEl("input", {
+					type: "date",
+					cls: "yearly-planner-date-input",
+				});
+				this.endDateInput.value = rangeParsed.end;
+			} else if (singleParsed) {
+				const dateRow = dateSection.createDiv({
+					cls: "yearly-planner-create-file-row",
+				});
+				dateRow.createEl("label", { text: t("modal.changeDate") });
+				this.singleDateInput = dateRow.createEl("input", {
+					type: "date",
+					cls: "yearly-planner-date-input",
+				});
+				this.singleDateInput.value = singleParsed.date;
+			}
+		}
 
 		const colorRow = this.contentEl.createDiv({
 			cls: "yearly-planner-create-file-row",
@@ -620,9 +669,9 @@ export class FileOptionsModal extends Modal {
 			this.close();
 		};
 		const applyBtn = btnRow.createEl("button", {
-			text: t("modal.applyColor"),
+			text: t("modal.applyChange"),
 		});
-		applyBtn.onclick = () => void this.handleApplyColor();
+		applyBtn.onclick = () => void this.handleApplyChange();
 		const deleteBtn = btnRow.createEl("button", {
 			text: t("modal.delete"),
 			cls: "mod-danger",
@@ -652,10 +701,54 @@ export class FileOptionsModal extends Modal {
 		});
 	}
 
-	private async handleApplyColor(): Promise<void> {
+	private async handleApplyChange(): Promise<void> {
+		let fileToUpdate: TFile = this.file;
+
+		if (this.singleDateInput) {
+			const dateStr = this.singleDateInput.value;
+			const m = dateStr.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+			if (!m) return;
+			const year = parseInt(m[1] ?? "", 10);
+			const month = parseInt(m[2] ?? "", 10);
+			const day = parseInt(m[3] ?? "", 10);
+			const result = await moveFileToDate(this.app, this.file, year, month, day);
+			if (result === null) {
+				new Notice(t("modal.dateChangeConflict"));
+				return;
+			}
+			fileToUpdate = result;
+		} else if (this.startDateInput && this.endDateInput) {
+			const startStr = this.startDateInput.value;
+			const endStr = this.endDateInput.value;
+			const startM = startStr.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+			const endM = endStr.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+			if (!startM || !endM || startStr > endStr) return;
+			const startYear = parseInt(startM[1] ?? "", 10);
+			const startMonth = parseInt(startM[2] ?? "", 10);
+			const startDay = parseInt(startM[3] ?? "", 10);
+			const endYear = parseInt(endM[1] ?? "", 10);
+			const endMonth = parseInt(endM[2] ?? "", 10);
+			const endDay = parseInt(endM[3] ?? "", 10);
+			const result = await moveRangeFileToNewDates(
+				this.app,
+				this.file,
+				startYear,
+				startMonth,
+				startDay,
+				endYear,
+				endMonth,
+				endDay,
+			);
+			if (result === null) {
+				new Notice(t("modal.dateChangeConflict"));
+				return;
+			}
+			fileToUpdate = result;
+		}
+
 		const color = this.colorInput.value.trim() || undefined;
 		try {
-			await updateFileColor(this.app, this.file, color);
+			await updateFileColor(this.app, fileToUpdate, color);
 			this.onClosed();
 			this.close();
 		} catch (err) {

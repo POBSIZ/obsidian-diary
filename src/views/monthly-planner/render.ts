@@ -9,7 +9,7 @@ import {
 	WEEKEND_LABELS_EN,
 } from "../../constants";
 import { getDayOfWeek } from "../../utils/date";
-import type { DragState } from "../yearly-planner/types";
+import type { ChipDragState, DragState } from "../yearly-planner/types";
 import type { HolidayData } from "../../utils/holidays";
 import { getFilesForDate, getFileTitle, getChipColor } from "../yearly-planner/file-utils";
 import { isDateInSelection } from "../yearly-planner/selection";
@@ -103,6 +103,7 @@ export interface CreateMonthlyCellContext {
 	app: App;
 	folder: string;
 	dragState: DragState | null;
+	chipDragState: ChipDragState | null;
 	holidaysData: HolidayData | null;
 	locale: string;
 	rangeStackMap: Map<string, number>;
@@ -122,6 +123,11 @@ export function createMonthlyCell(
 
 	const { year, month, day } = cellData;
 	const isSelected = isDateInSelection(year, month, day, ctx.dragState);
+	const isDropTarget =
+		ctx.chipDragState &&
+		ctx.chipDragState.currentYear === year &&
+		ctx.chipDragState.currentMonth === month &&
+		ctx.chipDragState.currentDay === day;
 	const dateKey = `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
 	const isHoliday = ctx.holidaysData?.dates.has(dateKey) ?? false;
 	const dayOfWeek = getDayOfWeek(year, month, day);
@@ -136,6 +142,7 @@ export function createMonthlyCell(
 	cell.className = [
 		"monthly-planner-cell",
 		isSelected && "monthly-planner-cell-selected",
+		isDropTarget && "monthly-planner-cell-drop-target",
 		isHoliday && "monthly-planner-cell-holiday",
 		isSaturday && "monthly-planner-cell-saturday",
 		isSunday && "monthly-planner-cell-sunday",

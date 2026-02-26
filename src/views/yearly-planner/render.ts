@@ -7,7 +7,7 @@ import {
 	WEEKEND_LABELS_EN,
 } from "../../constants";
 import { getDaysInMonth, getDayOfWeek } from "../../utils/date";
-import type { DragState } from "./types";
+import type { ChipDragState, DragState } from "./types";
 import type { HolidayData } from "../../utils/holidays";
 import { YearInputModal } from "./modals";
 import {
@@ -90,6 +90,7 @@ export interface CreateCellContext {
 	app: App;
 	folder: string;
 	dragState: DragState | null;
+	chipDragState: ChipDragState | null;
 	holidaysData: HolidayData | null;
 	locale: string;
 	rangeLaneMap: Map<string, number>;
@@ -104,6 +105,11 @@ export function createPlannerCell(
 	const daysInMonth = getDaysInMonth(ctx.year, month);
 	const isValid = day <= daysInMonth;
 	const isSelected = isDateInSelection(ctx.year, month, day, ctx.dragState);
+	const isDropTarget =
+		ctx.chipDragState &&
+		ctx.chipDragState.currentYear === ctx.year &&
+		ctx.chipDragState.currentMonth === month &&
+		ctx.chipDragState.currentDay === day;
 	const dateKey = `${ctx.year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
 	const isHoliday = ctx.holidaysData?.dates.has(dateKey) ?? false;
 	const dayOfWeek = getDayOfWeek(ctx.year, month, day);
@@ -120,6 +126,7 @@ export function createPlannerCell(
 		cls: [
 			isValid ? "" : "yearly-planner-cell-invalid",
 			isSelected && "yearly-planner-cell-selected",
+			isDropTarget && "yearly-planner-cell-drop-target",
 			isHoliday && "yearly-planner-cell-holiday",
 			isSaturday && "yearly-planner-cell-saturday",
 			isSunday && "yearly-planner-cell-sunday",
@@ -158,6 +165,7 @@ export function createPlannerCell(
 				cls: "yearly-planner-cell-range-bar",
 			});
 			bar.dataset.lane = String(lane);
+			bar.dataset.path = file.path;
 			(bar as HTMLElement).style.right = `${lane * 4}px`;
 			bar.dataset.basename = file.basename;
 			const chipColor = getChipColor(ctx.app, file);

@@ -2,6 +2,7 @@ import { ItemView, Platform, TFile, WorkspaceLeaf } from "obsidian";
 import { t } from "../../i18n";
 import DiaryObsidian from "../../main";
 import { VIEW_TYPE_MONTHLY_PLANNER } from "../../constants";
+import type { ChipDragState } from "../yearly-planner/types";
 import type { MonthlyPlannerState } from "./types";
 import {
 	getRangeStackIndexMap,
@@ -38,6 +39,7 @@ export class MonthlyPlannerView
 	year: number;
 	month: number;
 	dragState: import("../yearly-planner/types").DragState | null = null;
+	chipDragState: ChipDragState | null = null;
 	private interactionHandler: MonthlyInteractionHandler;
 	private pinchZoom: PinchZoomController | null = null;
 	private pinchZoomScale = 1;
@@ -93,6 +95,33 @@ export class MonthlyPlannerView
 		this.pinchZoom = null;
 	}
 
+	/** Update chip-drag state without full render: add chip-dragging class and drop-target. */
+	updateChipDragDropTarget(): void {
+		if (this.chipDragState) {
+			this.contentEl.addClass("monthly-planner-chip-dragging");
+			const { currentYear, currentMonth, currentDay } = this.chipDragState;
+			const cells = this.contentEl.querySelectorAll(
+				"td[data-year][data-month][data-day]:not(.monthly-planner-cell-invalid)",
+			);
+			for (const cell of Array.from(cells)) {
+				const y = parseInt(cell.getAttribute("data-year") ?? "", 10);
+				const m = parseInt(cell.getAttribute("data-month") ?? "", 10);
+				const d = parseInt(cell.getAttribute("data-day") ?? "", 10);
+				(cell as HTMLElement).toggleClass(
+					"monthly-planner-cell-drop-target",
+					y === currentYear && m === currentMonth && d === currentDay,
+				);
+			}
+		} else {
+			this.contentEl.removeClass("monthly-planner-chip-dragging");
+			this.contentEl
+				.querySelectorAll(".monthly-planner-cell-drop-target")
+				.forEach((el) =>
+					(el as HTMLElement).removeClass("monthly-planner-cell-drop-target"),
+				);
+		}
+	}
+
 	render(): void {
 		const { contentEl } = this;
 		const scrollEl = contentEl.querySelector<HTMLElement>(
@@ -105,8 +134,23 @@ export class MonthlyPlannerView
 		this.pinchZoom?.detach();
 		this.pinchZoom = null;
 
+		const planNoteWrapper = contentEl.querySelector<HTMLElement>(
+			".plan-note-panel-wrapper",
+		);
+		const preservePlanNote =
+			planNoteWrapper &&
+			planNoteWrapper.hasChildNodes() &&
+			planNoteWrapper.dataset.year === String(this.year) &&
+			planNoteWrapper.dataset.month === String(this.month);
+		if (preservePlanNote) planNoteWrapper.remove();
+
 		contentEl.empty();
 		contentEl.addClass("monthly-planner-container");
+		if (this.chipDragState) {
+			contentEl.addClass("monthly-planner-chip-dragging");
+		} else {
+			contentEl.removeClass("monthly-planner-chip-dragging");
+		}
 
 		const pad = this.plugin.settings.mobileBottomPadding ?? 3.5;
 		contentEl.style.setProperty(
@@ -115,10 +159,16 @@ export class MonthlyPlannerView
 		);
 
 		this.renderHeader(contentEl);
-		const notePanelEl = contentEl.createDiv({
-			cls: "plan-note-panel-wrapper",
-		});
-		void this.renderMonthNotePanel(notePanelEl);
+		if (preservePlanNote && planNoteWrapper) {
+			contentEl.appendChild(planNoteWrapper);
+		} else {
+			const notePanelEl = contentEl.createDiv({
+				cls: "plan-note-panel-wrapper",
+			});
+			notePanelEl.dataset.year = String(this.year);
+			notePanelEl.dataset.month = String(this.month);
+			void this.renderMonthNotePanel(notePanelEl);
+		}
 		this.renderTable(contentEl);
 
 		const newScrollEl = contentEl.querySelector<HTMLElement>(
@@ -127,6 +177,12 @@ export class MonthlyPlannerView
 		if (newScrollEl) {
 			newScrollEl.scrollTop = scrollTop;
 			newScrollEl.scrollLeft = scrollLeft;
+			requestAnimationFrame(() => {
+				requestAnimationFrame(() => {
+					newScrollEl.scrollTop = scrollTop;
+					newScrollEl.scrollLeft = scrollLeft;
+				});
+			});
 		}
 
 		if (Platform.isMobile) {
@@ -312,6 +368,7 @@ export class MonthlyPlannerView
 			app: this.app,
 			folder,
 			dragState: this.dragState,
+			chipDragState: this.chipDragState,
 			holidaysData,
 			locale,
 			rangeStackMap,

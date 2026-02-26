@@ -2,7 +2,12 @@ import { ItemView, TFile, WorkspaceLeaf } from "obsidian";
 import { t } from "../../i18n";
 import DiaryObsidian from "../../main";
 import { VIEW_TYPE_YEARLY_PLANNER } from "../../constants";
-import type { YearlyPlannerState, DragState, SelectionBounds } from "./types";
+import type {
+	ChipDragState,
+	YearlyPlannerState,
+	DragState,
+	SelectionBounds,
+} from "./types";
 import {
 	renderYearlyPlannerHeader,
 	createPlannerCell,
@@ -35,6 +40,7 @@ export class YearlyPlannerView
 {
 	year: number;
 	dragState: DragState | null = null;
+	chipDragState: ChipDragState | null = null;
 	private interactionHandler: PlannerInteractionHandler;
 
 	constructor(
@@ -78,6 +84,33 @@ export class YearlyPlannerView
 		this.interactionHandler.clearDragListeners();
 	}
 
+	/** Update chip-drag state without full render: add chip-dragging class and drop-target. */
+	updateChipDragDropTarget(): void {
+		if (this.chipDragState) {
+			this.contentEl.addClass("yearly-planner-chip-dragging");
+			const { currentYear, currentMonth, currentDay } = this.chipDragState;
+			const cells = this.contentEl.querySelectorAll(
+				"td[data-year][data-month][data-day]:not(.yearly-planner-cell-invalid)",
+			);
+			for (const cell of Array.from(cells)) {
+				const y = parseInt(cell.getAttribute("data-year") ?? "", 10);
+				const m = parseInt(cell.getAttribute("data-month") ?? "", 10);
+				const d = parseInt(cell.getAttribute("data-day") ?? "", 10);
+				(cell as HTMLElement).toggleClass(
+					"yearly-planner-cell-drop-target",
+					y === currentYear && m === currentMonth && d === currentDay,
+				);
+			}
+		} else {
+			this.contentEl.removeClass("yearly-planner-chip-dragging");
+			this.contentEl
+				.querySelectorAll(".yearly-planner-cell-drop-target")
+				.forEach((el) =>
+					(el as HTMLElement).removeClass("yearly-planner-cell-drop-target"),
+				);
+		}
+	}
+
 	render(): void {
 		const { contentEl } = this;
 		const scrollEl = contentEl.querySelector<HTMLElement>(
@@ -86,8 +119,22 @@ export class YearlyPlannerView
 		const scrollTop = scrollEl?.scrollTop ?? 0;
 		const scrollLeft = scrollEl?.scrollLeft ?? 0;
 
+		const planNoteWrapper = contentEl.querySelector<HTMLElement>(
+			".plan-note-panel-wrapper",
+		);
+		const preservePlanNote =
+			planNoteWrapper &&
+			planNoteWrapper.hasChildNodes() &&
+			planNoteWrapper.dataset.year === String(this.year);
+		if (preservePlanNote) planNoteWrapper.remove();
+
 		contentEl.empty();
 		contentEl.addClass("yearly-planner-container");
+		if (this.chipDragState) {
+			contentEl.addClass("yearly-planner-chip-dragging");
+		} else {
+			contentEl.removeClass("yearly-planner-chip-dragging");
+		}
 
 		const pad = this.plugin.settings.mobileBottomPadding ?? 3.5;
 		contentEl.style.setProperty(
@@ -108,10 +155,15 @@ export class YearlyPlannerView
 		}
 
 		this.renderHeader(contentEl);
-		const notePanelEl = contentEl.createDiv({
-			cls: "plan-note-panel-wrapper",
-		});
-		void this.renderYearNotePanel(notePanelEl);
+		if (preservePlanNote && planNoteWrapper) {
+			contentEl.appendChild(planNoteWrapper);
+		} else {
+			const notePanelEl = contentEl.createDiv({
+				cls: "plan-note-panel-wrapper",
+			});
+			notePanelEl.dataset.year = String(this.year);
+			void this.renderYearNotePanel(notePanelEl);
+		}
 		this.renderTable(contentEl);
 
 		const newScrollEl = contentEl.querySelector<HTMLElement>(
@@ -120,6 +172,12 @@ export class YearlyPlannerView
 		if (newScrollEl) {
 			newScrollEl.scrollTop = scrollTop;
 			newScrollEl.scrollLeft = scrollLeft;
+			requestAnimationFrame(() => {
+				requestAnimationFrame(() => {
+					newScrollEl.scrollTop = scrollTop;
+					newScrollEl.scrollLeft = scrollLeft;
+				});
+			});
 		}
 	}
 
@@ -241,6 +299,7 @@ export class YearlyPlannerView
 			app: this.app,
 			folder,
 			dragState: this.dragState,
+			chipDragState: this.chipDragState,
 			holidaysData,
 			locale: this.plugin.settings.locale ?? "en",
 			rangeLaneMap,
