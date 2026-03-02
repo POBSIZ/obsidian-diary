@@ -76,12 +76,14 @@ export class YearlyPlannerView
 		await super.setState(state, result);
 	}
 
-	async onOpen(): Promise<void> {
+	onOpen(): Promise<void> {
 		this.render();
+		return Promise.resolve();
 	}
 
-	async onClose(): Promise<void> {
+	onClose(): Promise<void> {
 		this.interactionHandler.clearDragListeners();
+		return Promise.resolve();
 	}
 
 	/** Update chip-drag state without full render: add chip-dragging class and drop-target. */
