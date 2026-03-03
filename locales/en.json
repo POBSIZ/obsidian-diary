@@ -91,6 +91,8 @@
 	"country.TW": "Taiwan",
 	"planNote.createButton": "Create plan note",
 	"planNote.openButton": "Open plan note",
+	"planNote.collapse": "Collapse preview",
+	"planNote.expand": "Expand preview",
 	"planNote.emptyHint": "No plan note for {label} yet.",
 	"planNote.emptyContent": "Empty file — click to edit",
 	"chipDrag.targetExists": "A file already exists for that date."

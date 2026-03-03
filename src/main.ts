@@ -111,6 +111,13 @@ export default class DiaryObsidian extends Plugin {
 		this.refreshMonthlyPlannerViews();
 	}
 
+	/** Toggle plan note panel expanded state and persist. */
+	async togglePlanNotePanelExpanded(): Promise<void> {
+		this.settings.planNotePanelExpanded =
+			!(this.settings.planNotePanelExpanded ?? true);
+		await this.saveSettings();
+	}
+
 	refreshYearlyPlannerViews(): void {
 		const leaves = this.app.workspace.getLeavesOfType(
 			VIEW_TYPE_YEARLY_PLANNER,

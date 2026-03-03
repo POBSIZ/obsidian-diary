@@ -12,6 +12,8 @@ export interface DiaryObsidianSettings {
 	mobileBottomPadding: number;
 	/** Mobile only: month cell width (rem). 0 = use default. */
 	mobileCellWidth: number;
+	/** Whether the plan note panel (document preview) is expanded. Persists across devices via vault sync. */
+	planNotePanelExpanded: boolean;
 }
 
 export const DEFAULT_SETTINGS: DiaryObsidianSettings = {
@@ -22,6 +24,7 @@ export const DEFAULT_SETTINGS: DiaryObsidianSettings = {
 	holidayCountry: "KR",
 	mobileBottomPadding: 3.5,
 	mobileCellWidth: 4.5,
+	planNotePanelExpanded: true,
 };
 
 export class DiaryObsidianSettingTab extends PluginSettingTab {

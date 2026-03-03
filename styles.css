@@ -1933,6 +1933,39 @@ body.-is-mobile .plan-note-panel-body {
 	cursor: pointer;
 }
 
+.plan-note-panel-body.is-collapsed {
+	display: none;
+}
+
+.plan-note-panel:has(.plan-note-panel-body.is-collapsed) .plan-note-panel-header {
+	border-bottom: none;
+}
+
+.plan-note-panel-toggle-btn {
+	flex-shrink: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 1.5rem;
+	height: 1.5rem;
+	padding: 0;
+	background: transparent;
+	border: none;
+	border-radius: var(--radius-s);
+	color: var(--text-muted);
+	cursor: pointer;
+	opacity: 0.6;
+	transition:
+		opacity 0.15s,
+		background 0.15s;
+}
+
+.plan-note-panel-toggle-btn:hover {
+	opacity: 1;
+	background: var(--background-modifier-hover);
+	color: var(--text-normal);
+}
+
 .plan-note-panel-body:hover {
 	background: var(--background-modifier-hover);
 }

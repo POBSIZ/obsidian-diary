@@ -91,6 +91,8 @@
 	"country.TW": "대만",
 	"planNote.createButton": "플랜 노트 만들기",
 	"planNote.openButton": "플랜 노트 열기",
+	"planNote.collapse": "미리보기 접기",
+	"planNote.expand": "미리보기 펼치기",
 	"planNote.emptyHint": "{label} 플랜 노트가 없습니다.",
 	"planNote.emptyContent": "빈 파일 — 클릭하여 편집",
 	"chipDrag.targetExists": "해당 날짜에 이미 파일이 있습니다."

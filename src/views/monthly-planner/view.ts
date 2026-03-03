@@ -218,6 +218,8 @@ export class MonthlyPlannerView
 		const label = `${monthLabel} ${this.year}`;
 		await renderPlanNotePanel(container, this.app, filePath, this, {
 			label,
+			expanded: this.plugin.settings.planNotePanelExpanded ?? true,
+			onToggle: () => void this.plugin.togglePlanNotePanelExpanded(),
 			onCreate: async () => {
 				const dir = filePath.split("/").slice(0, -1).join("/");
 				if (dir && !this.app.vault.getAbstractFileByPath(dir)) {

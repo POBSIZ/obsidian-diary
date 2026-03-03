@@ -1,9 +1,13 @@
-import { App, Component, MarkdownRenderer, TFile } from "obsidian";
+import { App, Component, MarkdownRenderer, setIcon, TFile } from "obsidian";
 import { t } from "../i18n";
 
 export interface PlanNotePanelOptions {
 	/** Human-readable label shown in the header (e.g. "2026" or "February 2026"). */
 	label: string;
+	/** Whether the panel body is expanded. Required when file exists. */
+	expanded?: boolean;
+	/** Called when the user toggles expand/collapse. Required when file exists. */
+	onToggle?: () => void;
 	onCreate: () => Promise<void>;
 	onOpen: (file: TFile) => void;
 }
@@ -25,6 +29,22 @@ export async function renderPlanNotePanel(
 
 	if (file instanceof TFile) {
 		const header = panel.createDiv({ cls: "plan-note-panel-header" });
+		const expanded = opts.expanded ?? true;
+		if (opts.onToggle) {
+			const toggleBtn = header.createEl("button", {
+				cls: "plan-note-panel-toggle-btn clickable-icon",
+				attr: {
+					"aria-label": expanded
+						? t("planNote.collapse")
+						: t("planNote.expand"),
+				},
+			});
+			setIcon(toggleBtn, expanded ? "chevron-down" : "chevron-right");
+			toggleBtn.addEventListener("click", (e) => {
+				e.stopPropagation();
+				opts.onToggle!();
+			});
+		}
 		header.createEl("span", {
 			cls: "plan-note-panel-title",
 			text: opts.label,
@@ -73,7 +93,11 @@ export async function renderPlanNotePanel(
 			opts.onOpen(file);
 		});
 
-		const body = panel.createDiv({ cls: "plan-note-panel-body" });
+		const body = panel.createDiv({
+			cls: expanded
+				? "plan-note-panel-body"
+				: "plan-note-panel-body is-collapsed",
+		});
 		const content = await app.vault.read(file);
 		if (content.trim()) {
 			await MarkdownRenderer.render(
