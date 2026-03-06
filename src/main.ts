@@ -70,6 +70,18 @@ export default class DiaryObsidian extends Plugin {
 		this.registerEvent(
 			this.app.metadataCache.on("changed", debouncedRefresh),
 		);
+
+		let lastCheckedDate = new Date().toDateString();
+		this.registerInterval(
+			window.setInterval(() => {
+				const today = new Date().toDateString();
+				if (today !== lastCheckedDate) {
+					lastCheckedDate = today;
+					this.refreshYearlyPlannerViews();
+					this.refreshMonthlyPlannerViews();
+				}
+			}, 60_000),
+		);
 	}
 
 	onunload() {}
