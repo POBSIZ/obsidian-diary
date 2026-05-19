@@ -1,101 +1,71 @@
 # Diary
 
-A **diary plugin** for Obsidian. Provides yearly and monthly planners with date notes, range notes, and holiday support.
+Diary is an Obsidian planner plugin with three calendar views:
 
-📖 [English](docs/en/README.md) | [한국어](docs/ko/README.md)
+- Yearly planner (`12 months x 31 days`)
+- Monthly grid planner
+- Monthly list planner
 
-## Features
+It supports date notes, range notes, plan notes, holiday overlays, and reminder notices.
 
-### Planners
+📖 Documentation: [English](docs/en/README.md) | [한국어](docs/ko/README.md)
 
-- **Yearly planner**: 12-month × 31-day grid calendar. See the whole year at a glance.
-- **Monthly planner**: Single-month view with week rows. Pinch zoom on mobile for comfortable reading.
+## Current project status
 
-### Notes
+- Plugin ID: `diary`
+- Version: `1.0.9`
+- Minimum Obsidian version: `1.7.2`
+- Mobile support: enabled (`isDesktopOnly: false`)
 
-- **Date notes**: Click a cell to open or create that date's note. Files are created on demand.
-- **Range notes**: Drag across date cells to select a range, then release to open the create modal. Range notes span multiple days and appear as bars in the grid.
-- **Plan notes**: Yearly (`{year}.md`) and monthly (`{year}-{month}.md`) summary panels. Create or open period notes from the planner sidebar.
+## What this repository contains
 
-### Visual & interaction
+- `src/main.ts`: plugin lifecycle, view registration, commands, refresh wiring
+- `src/settings.ts`: settings schema/defaults + settings tab UI
+- `src/views/yearly-planner/*`: yearly calendar UI, interactions, modals, file operations
+- `src/views/monthly-planner/*`: monthly grid UI, mobile pinch zoom, interactions
+- `src/views/monthly-list-planner/*`: monthly list UI and interactions
+- `src/views/planner-clipboard.ts`: multi-select copy/paste/delete/undo flow
+- `src/planner-reminders.ts`: runtime reminders based on `notify_minutes`
+- `src/i18n.ts`, `locales/*`: localization
+- `styles.css`: shared styling tokens and per-view UI styles
 
-- **Color chips**: Assign colors to notes via frontmatter `color`. Presets and custom hex/rgb in create modal.
-- **Chip drag-and-drop** (desktop): Drag a date or range chip to another cell to move it. Duration is preserved for range notes.
-- **Range highlight**: Hover over a range bar to highlight all cells it spans.
-- **Holidays**: Public holidays for selected countries. Click a holiday badge to see its name(s).
+## Quick start (development)
 
-### Other
+```bash
+npm install
+npm run dev
+```
 
-- **i18n**: English and Korean UI.
-- **Mobile support**: Touch drag for range selection, pinch zoom (monthly), bottom padding and cell width settings.
+For production build:
 
-## Usage
+```bash
+npm run build
+```
 
-### Opening planners
+Lint:
 
-- **Sidebar**: **calendar-range** icon → yearly planner, **calendar-days** icon → monthly planner
-- **Command palette**: "Open yearly planner" / "Open monthly planner"
-
-### Date and range notes
-
-- **Date note**: Click a date cell to open that date's note (creates it if missing).
-- **Range note**: Drag across date cells to select a range, then release to open the create range note modal.
-- **Add file** button: Open the create modal directly (single date or range).
-
-### File options (click a chip or bar)
-
-- **Open**: Open the note in the editor.
-- **Change date**: Edit start/end dates (range) or move a single-date note.
-- **Color**: Change chip color via presets or color picker.
-- **Delete**: Move the file to trash.
-
-### Navigation
-
-- **Yearly**: ◀/▶ previous/next year, "Today" for current year, click year to enter a specific year.
-- **Monthly**: ◀/▶ previous/next month, "Today" for current month, click month/year to jump.
-
-## Settings
-
-| Setting | Description |
-|---------|-------------|
-| **Language** | UI language (English / 한국어) |
-| **Planner folder** | Folder for date and range notes (default: `Planner`) |
-| **Date format** | Filename date format (default: `YYYY-MM-DD`) |
-| **Show holidays** | Show public holidays in the planner |
-| **Holiday country** | Country for holidays (South Korea, US, Japan, China, UK, Germany, France, Australia, Canada, Taiwan) |
-| **Mobile bottom padding** | Bottom padding (rem) on mobile so the table is not covered by the tools tab |
-| **Mobile cell width** | Width (rem) of month cells on mobile |
-
-## File formats
-
-- **Single date**: `{Planner folder}/2026-02-12.md` or `2026-02-12-meeting.md` (suffix becomes title)
-- **Range note**: `{Planner folder}/2026-02-01--2026-02-07.md` or `2026-02-01--2026-02-07-vacation.md` (frontmatter: `date_start`, `date_end`, optional `color`)
-- **Plan notes**: Yearly `{Planner folder}/{year}.md`, monthly `{Planner folder}/{year}-{month}.md` (summary notes for the period)
-
-## Beta testing
-
-- **Option A (manual)**: Download a Pre-release or Draft from [Releases](https://github.com/POBSIZ/obsidian-diary/releases) and install manually
-- **Option B (BRAT)**: Install [BRAT plugin](https://obsidian.md/plugins?id=obsidian42-brat) → **Add beta plugin** → add `POBSIZ/obsidian-diary` repo URL
+```bash
+npm run lint
+```
 
 ## Manual installation
 
 1. Download the latest release from [Releases](https://github.com/POBSIZ/obsidian-diary/releases)
-2. Copy `main.js`, `styles.css`, and `manifest.json` to `Vault/.obsidian/plugins/diary/`
-3. Enable "Diary" in **Settings → Community plugins**
+2. Copy `main.js`, `manifest.json`, `styles.css` to `Vault/.obsidian/plugins/diary/`
+3. Enable **Diary** in **Settings -> Community plugins**
 
-## Development
+## Release notes
 
-- Node.js 18+ (LTS recommended)
-- `npm install` → `npm run dev` (watch build)
-- `npm run build` (production build)
-- `npm run lint` (ESLint)
+- Releases are published from GitHub Actions (`.github/workflows/release.yml`)
+- Only these assets are shipped: `main.js`, `manifest.json`, `styles.css`
+- Build provenance attestation is generated during release workflow
 
-## PR guide
+## Contributing
 
-- PR 작성 시 `.github/pull_request_template.md` 체크리스트를 사용하세요.
-- UI 변경은 `design.md` 원칙(테마 우선, 기능 우선)과 `styles.css` 공통 토큰을 우선 적용하세요.
-- Planner 관련 UI 변경은 Yearly/Monthly/Monthly List, 드래그/선택/클립보드 상호작용까지 확인 후 PR을 여세요.
+- Use `.github/pull_request_template.md` when opening PRs
+- Follow `design.md` for UI/UX consistency
+- For planner UI changes, verify Yearly/Monthly/Monthly List and mobile behavior
 
 ## License
 
-See LICENSE file.
+See `LICENSE`.

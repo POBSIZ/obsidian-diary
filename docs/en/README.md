@@ -1,93 +1,112 @@
-# Diary
+# Diary (English)
 
-A **diary plugin** for Obsidian. Provides yearly and monthly planners with date notes, range notes, and holiday support.
+Diary is an Obsidian planner plugin for year/month planning and date-based notes.
 
-## Features
+## Snapshot
 
-### Planners
+- Plugin ID: `diary`
+- Current version: `1.0.9`
+- Min Obsidian version: `1.7.2`
+- Platforms: desktop and mobile
 
-- **Yearly planner**: 12-month × 31-day grid calendar. See the whole year at a glance.
-- **Monthly planner**: Single-month view with week rows. Pinch zoom on mobile for comfortable reading.
+## Core views
 
-### Notes
+- **Yearly planner**: 12-month x 31-day grid for annual overview
+- **Monthly planner**: calendar grid for one month (supports mobile pinch zoom)
+- **Monthly list planner**: day-by-day list layout for dense monthly review
 
-- **Date notes**: Click a cell to open or create that date's note. Files are created on demand.
-- **Range notes**: Drag across date cells to select a range, then release to open the create modal. Range notes span multiple days and appear as bars in the grid.
-- **Plan notes**: Yearly (`{year}.md`) and monthly (`{year}-{month}.md`) summary panels. Create or open period notes from the planner sidebar.
+You can cycle views in-place: `Yearly -> Monthly Grid -> Monthly List -> Yearly`.
 
-### Visual & interaction
+## Key capabilities
 
-- **Color chips**: Assign colors to notes via frontmatter `color`. Presets and custom hex/rgb in create modal.
-- **Chip drag-and-drop** (desktop): Drag a date or range chip to another cell to move it. Duration is preserved for range notes.
-- **Range highlight**: Hover over a range bar to highlight all cells it spans.
-- **Holidays**: Public holidays for selected countries. Click a holiday badge to see its name(s).
+- **Date notes**: open/create notes by day cell
+- **Range notes**: drag-select date ranges and create `YYYY-MM-DD--YYYY-MM-DD` notes
+- **Plan notes**:
+  - yearly note: `{plannerFolder}/{year}.md`
+  - monthly note: `{plannerFolder}/{year}-{month}.md`
+- **Holiday overlays**: selectable holiday country and clickable holiday badges
+- **Chip coloring**: `color` frontmatter with presets and custom color input
+- **Todo chips**: `todo` and `completed` frontmatter reflected in chip labels
+- **Clipboard workflow** (planner selections):
+  - multi-select with modifier click (desktop)
+  - copy / paste rebasing
+  - delete selection
+  - undo last paste batch (`Cmd/Ctrl+Z`)
+- **Reminder notices**:
+  - based on `notify_minutes` frontmatter
+  - checks while Obsidian is open and shows local-time notice on event date
+- **i18n**: English + Korean
 
-### Other
+## Commands and entry points
 
-- **i18n**: English and Korean UI.
-- **Mobile support**: Touch drag for range selection, pinch zoom (monthly), bottom padding and cell width settings.
-
-## Usage
-
-### Opening planners
-
-- **Sidebar**: **calendar-range** icon → yearly planner, **calendar-days** icon → monthly planner
-- **Command palette**: "Open yearly planner" / "Open monthly planner"
-
-### Date and range notes
-
-- **Date note**: Click a date cell to open that date's note (creates it if missing).
-- **Range note**: Drag across date cells to select a range, then release to open the create range note modal.
-- **Add file** button: Open the create modal directly (single date or range).
-
-### File options (click a chip or bar)
-
-- **Open**: Open the note in the editor.
-- **Change date**: Edit start/end dates (range) or move a single-date note.
-- **Color**: Change chip color via presets or color picker.
-- **Delete**: Move the file to trash.
-
-### Navigation
-
-- **Yearly**: ◀/▶ previous/next year, "Today" for current year, click year to enter a specific year.
-- **Monthly**: ◀/▶ previous/next month, "Today" for current month, click month/year to jump.
+- Ribbon icons:
+  - `calendar-range`: open yearly planner
+  - `calendar-days`: open monthly planner
+  - `list-ordered`: open monthly list planner
+- Command palette:
+  - `Open yearly planner`
+  - `Open monthly planner`
+  - `Open monthly list planner`
 
 ## Settings
 
 | Setting | Description |
-|---------|-------------|
-| **Language** | UI language (English / 한국어) |
-| **Planner folder** | Folder for date and range notes (default: `Planner`) |
-| **Date format** | Filename date format (default: `YYYY-MM-DD`) |
-| **Show holidays** | Show public holidays in the planner |
-| **Holiday country** | Country for holidays (South Korea, US, Japan, China, UK, Germany, France, Australia, Canada, Taiwan) |
-| **Mobile bottom padding** | Bottom padding (rem) on mobile so the table is not covered by the tools tab |
-| **Mobile cell width** | Width (rem) of month cells on mobile |
+| --- | --- |
+| Language | UI language (`en` / `ko`) |
+| Planner folder | Base folder for planner files (default: `Planner`) |
+| Date format | Stored setting for date format (`YYYY-MM-DD`) |
+| Show holidays | Toggle holiday rendering |
+| Holiday country | `KR`, `US`, `JP`, `CN`, `GB`, `DE`, `FR`, `AU`, `CA`, `TW` |
+| Mobile bottom padding | Bottom spacing for mobile planner container |
+| Mobile cell width | Month cell width on mobile |
 
-## File formats
+## Frontmatter reference
 
-- **Single date**: `{Planner folder}/2026-02-12.md` or `2026-02-12-meeting.md` (suffix becomes title)
-- **Range note**: `{Planner folder}/2026-02-01--2026-02-07.md` or `2026-02-01--2026-02-07-vacation.md` (frontmatter: `date_start`, `date_end`, optional `color`)
-- **Plan notes**: Yearly `{Planner folder}/{year}.md`, monthly `{Planner folder}/{year}-{month}.md` (summary notes for the period)
+- `color`: chip color (CSS color string)
+- `todo`: `true/false`
+- `completed`: `true/false` (used when `todo: true`)
+- `notify_minutes`: minutes from local midnight (`0-1439`)
+- `date_start`, `date_end`: set automatically for range notes
+- `title`: fallback title for non-standard filenames
 
-## Beta testing
+## File naming
 
-- **Option A (manual)**: Download a Pre-release or Draft from [Releases](https://github.com/POBSIZ/obsidian-diary/releases) and install manually
-- **Option B (BRAT)**: Install [BRAT plugin](https://obsidian.md/plugins?id=obsidian42-brat) → **Add beta plugin** → add `POBSIZ/obsidian-diary` repo URL
+- Single date:
+  - `2026-02-12.md`
+  - `2026-02-12-meeting.md` (suffix shown as title)
+- Range:
+  - `2026-02-01--2026-02-07.md`
+  - `2026-02-01--2026-02-07-vacation.md`
+- Plan notes:
+  - yearly: `2026.md`
+  - monthly: `2026-02.md`
 
-## Manual installation
+## Install
 
-1. Download the latest release from [Releases](https://github.com/POBSIZ/obsidian-diary/releases)
-2. Copy `main.js`, `styles.css`, and `manifest.json` to `Vault/.obsidian/plugins/diary/`
-3. Enable "Diary" in **Settings → Community plugins**
+1. Download latest release from [Releases](https://github.com/POBSIZ/obsidian-diary/releases)
+2. Copy `main.js`, `manifest.json`, `styles.css` to `Vault/.obsidian/plugins/diary/`
+3. Enable **Diary** in **Settings -> Community plugins**
 
 ## Development
 
-- Node.js 18+ (LTS recommended)
-- `npm install` → `npm run dev` (watch build)
-- `npm run build` (production build)
-- `npm run lint` (ESLint)
+```bash
+npm install
+npm run dev
+```
+
+Build and lint:
+
+```bash
+npm run build
+npm run lint
+```
+
+## Release process (current)
+
+- Release workflow: `.github/workflows/release.yml`
+- Release assets: `main.js`, `manifest.json`, `styles.css` only
+- Build provenance attestation generated in CI
 
 ## License
 
-See LICENSE file.
+See `LICENSE`.
