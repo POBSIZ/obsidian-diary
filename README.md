@@ -4,7 +4,7 @@ Diary is an Obsidian community plugin for date-based planning in Markdown.
 
 Diary는 Obsidian vault 안의 Markdown 파일을 날짜 기반 플래너로 보여주는 커뮤니티 플러그인입니다.
 
-📖 Full documentation: [English](docs/en/README.md) | [한국어](docs/ko/README.md)
+📖 Full documentation: [English](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/en/README.md) | [한국어](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/ko/README.md)
 
 ## Snapshot
 
@@ -21,15 +21,15 @@ Diary는 Obsidian vault 안의 Markdown 파일을 날짜 기반 플래너로 보
 
 Captured from a fresh demo vault with sample planner notes.
 
-![Monthly grid planner](docs/assets/screenshots/monthly-grid.png)
+![Monthly grid planner](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/assets/screenshots/monthly-grid.png)
 
 | Yearly planner | Monthly list |
 | --- | --- |
-| ![Yearly planner](docs/assets/screenshots/yearly-planner.png) | ![Monthly list planner](docs/assets/screenshots/monthly-list.png) |
+| ![Yearly planner](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/assets/screenshots/yearly-planner.png) | ![Monthly list planner](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/assets/screenshots/monthly-list.png) |
 
 | Mobile monthly grid | Mobile monthly list |
 | --- | --- |
-| ![Mobile monthly grid](docs/assets/screenshots/mobile-monthly-grid.png) | ![Mobile monthly list planner](docs/assets/screenshots/mobile-monthly-list.png) |
+| ![Mobile monthly grid](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/assets/screenshots/mobile-monthly-grid.png) | ![Mobile monthly list planner](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/assets/screenshots/mobile-monthly-list.png) |
 
 ## What It Does
 

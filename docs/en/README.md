@@ -2,7 +2,7 @@
 
 Diary is an Obsidian community plugin that turns Markdown files in your vault into date-based planner views. It helps you move between a yearly overview, a monthly grid, and a monthly list while managing single-date notes, range notes, monthly/yearly plan notes, holidays, todo state, and local reminders.
 
-한국어 문서: [docs/ko/README.md](../ko/README.md)
+한국어 문서: [docs/ko/README.md](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/ko/README.md)
 
 ## Current Info
 
@@ -21,17 +21,17 @@ The images below were captured from a fresh demo vault with sample planner notes
 
 ### Desktop
 
-![Yearly planner](../assets/screenshots/yearly-planner.png)
+![Yearly planner](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/assets/screenshots/yearly-planner.png)
 
-![Monthly grid planner](../assets/screenshots/monthly-grid.png)
+![Monthly grid planner](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/assets/screenshots/monthly-grid.png)
 
-![Monthly list planner](../assets/screenshots/monthly-list.png)
+![Monthly list planner](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/assets/screenshots/monthly-list.png)
 
 ### Mobile
 
 | Monthly grid and day summary | Monthly list |
 | --- | --- |
-| ![Mobile monthly grid](../assets/screenshots/mobile-monthly-grid.png) | ![Mobile monthly list](../assets/screenshots/mobile-monthly-list.png) |
+| ![Mobile monthly grid](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/assets/screenshots/mobile-monthly-grid.png) | ![Mobile monthly list](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/assets/screenshots/mobile-monthly-list.png) |
 
 ## Key Features
 

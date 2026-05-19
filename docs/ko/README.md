@@ -2,7 +2,7 @@
 
 Diary는 Obsidian vault 안의 Markdown 파일을 날짜 기반 플래너로 보여주는 커뮤니티 플러그인입니다. 연간 개요, 월간 그리드, 월간 목록을 오가며 단일 날짜 노트, 기간 노트, 월/연 플랜 노트, 공휴일, todo 상태, 로컬 알림을 한 곳에서 관리할 수 있습니다.
 
-English documentation: [docs/en/README.md](../en/README.md)
+English documentation: [docs/en/README.md](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/en/README.md)
 
 ## 현재 정보
 
@@ -21,17 +21,17 @@ English documentation: [docs/en/README.md](../en/README.md)
 
 ### 데스크톱
 
-![연간 플래너](../assets/screenshots/yearly-planner.png)
+![연간 플래너](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/assets/screenshots/yearly-planner.png)
 
-![월간 그리드 플래너](../assets/screenshots/monthly-grid.png)
+![월간 그리드 플래너](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/assets/screenshots/monthly-grid.png)
 
-![월간 목록 플래너](../assets/screenshots/monthly-list.png)
+![월간 목록 플래너](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/assets/screenshots/monthly-list.png)
 
 ### 모바일
 
 | 월간 그리드와 일자 요약 | 월간 목록 |
 | --- | --- |
-| ![모바일 월간 그리드](../assets/screenshots/mobile-monthly-grid.png) | ![모바일 월간 목록](../assets/screenshots/mobile-monthly-list.png) |
+| ![모바일 월간 그리드](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/assets/screenshots/mobile-monthly-grid.png) | ![모바일 월간 목록](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/assets/screenshots/mobile-monthly-list.png) |
 
 ## 주요 기능
 
