@@ -36,10 +36,10 @@ Captured from a fresh demo vault with sample planner notes.
 - Yearly planner: `12 months x 31 days` overview.
 - Monthly grid planner: one-month calendar view with date chips, range bars, holidays, and mobile pinch zoom.
 - Monthly list planner: day-by-day list for dense monthly review.
-- Date notes and range notes: recognized by `YYYY-MM-DD` and `YYYY-MM-DD--YYYY-MM-DD` filenames.
+- Date notes and range notes: recognized by `YYYY-MM-DD` and `YYYY-MM-DD--YYYY-MM-DD` filenames. By default Diary scans the entire vault, with an optional planner-folder-only scope.
 - Plan notes: yearly `{plannerFolder}/{year}.md` and monthly `{plannerFolder}/{year}-{month}.md` notes.
 - Chip metadata: `color`, `todo`, `completed`, `notify_minutes`, `title`, `date_start`, and `date_end` frontmatter.
-- Desktop workflows: drag range selection, chip drag-to-move, planner copy/paste/delete/undo.
+- Desktop workflows: drag range selection, chip drag-to-move, internal planner copy/paste/delete/undo.
 - Mobile workflows: tap a day to open the day summary sheet, create notes from the sheet, and adjust mobile spacing in settings.
 
 ## Quick Usage

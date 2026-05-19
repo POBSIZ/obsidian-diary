@@ -1,10 +1,12 @@
 import { App, PluginSettingTab, Setting } from "obsidian";
 import { setLocale, t } from "./i18n";
 import DiaryObsidian from "./main";
+import type { PlannerFileScope } from "./views/yearly-planner/file-utils";
 
 export interface DiaryObsidianSettings {
 	locale: "en" | "ko";
 	plannerFolder: string;
+	plannerFileScope: PlannerFileScope;
 	dateFormat: string;
 	showHolidays: boolean;
 	holidayCountry: string;
@@ -19,6 +21,7 @@ export interface DiaryObsidianSettings {
 export const DEFAULT_SETTINGS: DiaryObsidianSettings = {
 	locale: "en",
 	plannerFolder: "Planner",
+	plannerFileScope: "vault",
 	dateFormat: "YYYY-MM-DD",
 	showHolidays: true,
 	holidayCountry: "KR",
@@ -66,6 +69,24 @@ export class DiaryObsidianSettingTab extends PluginSettingTab {
 					.setValue(this.plugin.settings.plannerFolder)
 					.onChange(async (value) => {
 						this.plugin.settings.plannerFolder = value || "Planner";
+						await this.plugin.saveSettings();
+					}),
+			);
+
+		new Setting(containerEl)
+			.setName(t("settings.plannerFileScope"))
+			.setDesc(t("settings.plannerFileScopeDesc"))
+			.addDropdown((dropdown) =>
+				dropdown
+					.addOption("vault", t("settings.plannerFileScopeVault"))
+					.addOption(
+						"plannerFolder",
+						t("settings.plannerFileScopeFolder"),
+					)
+					.setValue(this.plugin.settings.plannerFileScope ?? "vault")
+					.onChange(async (value) => {
+						this.plugin.settings.plannerFileScope =
+							value === "plannerFolder" ? "plannerFolder" : "vault";
 						await this.plugin.saveSettings();
 					}),
 			);

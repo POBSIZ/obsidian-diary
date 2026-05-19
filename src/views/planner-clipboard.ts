@@ -3,14 +3,14 @@ import { Platform } from "obsidian";
 import { t } from "../i18n";
 import { DeleteConfirmModal } from "./yearly-planner/modals";
 import { parseRangeBasename } from "../utils/range";
-import { getFilesForDate } from "./yearly-planner/file-utils";
+import {
+	getFilesForDate,
+	type PlannerFileScope,
+} from "./yearly-planner/file-utils";
 import {
 	getPlannerEventDateString,
 	parseSingleDateBasename,
 } from "./yearly-planner/file-operations";
-
-const CLIP_START = "---BEGIN_DIARY_OBSIDIAN_PLANNER---";
-const CLIP_END = "---END_DIARY_OBSIDIAN_PLANNER---";
 
 /** Obsidian Notice duration for copy/paste success feedback */
 export const PLANNER_CLIPBOARD_SUCCESS_NOTICE_MS = 5600;
@@ -73,6 +73,8 @@ export function parseSelectionKey(
 /** All TFiles to copy for the current clipboard selection keys (deduped by path). */
 export function resolveClipboardSelectionToFiles(
 	app: App,
+	folder: string,
+	scope: PlannerFileScope,
 	selection: Set<string>,
 ): TFile[] {
 	const byPath = new Map<string, TFile>();
@@ -91,7 +93,14 @@ export function resolveClipboardSelectionToFiles(
 		const m = parseInt(parts[1] ?? "", 10);
 		const d = parseInt(parts[2] ?? "", 10);
 		if (isNaN(y) || isNaN(m) || isNaN(d)) continue;
-		const { singleFiles, rangeFiles } = getFilesForDate(app, y, m, d);
+		const { singleFiles, rangeFiles } = getFilesForDate(
+			app,
+			folder,
+			y,
+			m,
+			d,
+			scope,
+		);
 		const startRangeFiles = rangeFiles.filter((r) => r.isFirst).map((r) => r.file);
 		for (const f of [...singleFiles, ...startRangeFiles]) {
 			byPath.set(f.path, f);
@@ -128,41 +137,15 @@ export interface PlannerClipboardItem {
 	content: string;
 }
 
-export function serializePlannerClipboardItems(
-	items: PlannerClipboardItem[],
-): string {
-	const payload = JSON.stringify({ v: 1, items });
-	return `${CLIP_START}\n${payload}\n${CLIP_END}`;
-}
+let internalPlannerClipboard: PlannerClipboardItem[] = [];
 
-export function parsePlannerClipboard(
-	text: string,
-): { v: number; items: PlannerClipboardItem[] } | null {
-	const start = text.indexOf(CLIP_START);
-	const end = text.indexOf(CLIP_END);
-	if (start === -1 || end === -1 || end <= start) return null;
-	const jsonSlice = text
-		.slice(start + CLIP_START.length, end)
-		.trim()
-		.replace(/^\uFEFF/, "");
-	try {
-		const data = JSON.parse(jsonSlice) as {
-			v?: number;
-			items?: PlannerClipboardItem[];
-		};
-		if (!data || !Array.isArray(data.items) || data.items.length === 0)
-			return null;
-		const items = data.items.filter(
-			(i) =>
-				i &&
-				typeof i.path === "string" &&
-				typeof i.content === "string",
-		);
-		if (items.length === 0) return null;
-		return { v: typeof data.v === "number" ? data.v : 1, items };
-	} catch {
-		return null;
-	}
+function clonePlannerClipboardItems(
+	items: PlannerClipboardItem[],
+): PlannerClipboardItem[] {
+	return items.map((item) => ({
+		path: item.path,
+		content: item.content,
+	}));
 }
 
 function daysInclusive(start: string, end: string): number {
@@ -238,11 +221,12 @@ export type PastePlannerResult =
 export async function pastePlannerClipboard(
 	app: App,
 	folder: string,
-	clipboardText: string,
 	selection: Set<string>,
 ): Promise<PastePlannerResult> {
-	const parsed = parsePlannerClipboard(clipboardText);
-	if (!parsed) return { ok: false, errorKey: "plannerClipboard.pasteInvalid" };
+	const items = clonePlannerClipboardItems(internalPlannerClipboard);
+	if (items.length === 0) {
+		return { ok: false, errorKey: "plannerClipboard.pasteInvalid" };
+	}
 
 	const targetDates = getTargetDatesFromClipboardSelection(app, selection);
 	if (targetDates.length === 0) {
@@ -250,7 +234,6 @@ export async function pastePlannerClipboard(
 	}
 
 	const trimmed = (folder || "Planner").trim();
-	const items = parsed.items;
 
 	if (items.length === 1) {
 		const srcPath = items[0]!.path;
@@ -393,8 +376,7 @@ export async function copyPlannerSelectionToClipboard(
 		for (const f of files) {
 			items.push({ path: f.path, content: await app.vault.read(f) });
 		}
-		const text = serializePlannerClipboardItems(items);
-		await navigator.clipboard.writeText(text);
+		internalPlannerClipboard = clonePlannerClipboardItems(items);
 		return { ok: true, noteCount: items.length };
 	} catch {
 		return { ok: false, errorKey: "plannerClipboard.copyFailed" };

@@ -15,6 +15,7 @@ import {
 	getNotifyMinutes,
 	isTodoCompleted,
 	isTodoFile,
+	type PlannerFileScope,
 } from "./file-utils";
 import {
 	moveFileToDate,
@@ -268,6 +269,7 @@ function parseDateStr(str: string): {
 export interface CreateFileModalOptions {
 	bounds: SelectionBounds | null;
 	defaultFolder: string;
+	plannerFileScope: PlannerFileScope;
 	createSingleDateFile: CreateSingleDateFileWithFolderFn;
 	createRangeFile: CreateRangeFileWithFolderFn;
 	onCreated: () => void;
@@ -361,7 +363,11 @@ export class CreateFileModal extends Modal {
 			cls: "yearly-planner-create-file-row",
 		});
 		folderRow.createEl("label", { text: t("modal.folder") });
-		const folderPaths = getAllFolderPaths(this.app);
+		const folderPaths = getAllFolderPaths(
+			this.app,
+			defaultFolder || "Planner",
+			this.options.plannerFileScope,
+		);
 		const hasDefault =
 			defaultFolder && folderPaths.includes(defaultFolder.trim());
 		if (defaultFolder && !hasDefault) {

@@ -28,6 +28,7 @@ import { getHolidaysForYear } from "../../utils/holidays";
 import {
 	getRangesForYear,
 	getRangeLaneMap,
+	getPlannerMarkdownFiles,
 	getYearNoteFilePath,
 } from "./file-utils";
 import {
@@ -333,12 +334,26 @@ export class YearlyPlannerView
 			showHolidays && holidayCountry
 				? getHolidaysForYear(holidayCountry, this.year)
 				: null;
-		const ranges = getRangesForYear(this.app, this.year);
+		const plannerFileScope = this.plugin.settings.plannerFileScope ?? "vault";
+		const plannerFiles = getPlannerMarkdownFiles(
+			this.app,
+			folder,
+			plannerFileScope,
+		);
+		const ranges = getRangesForYear(
+			this.app,
+			this.year,
+			folder,
+			plannerFileScope,
+			plannerFiles,
+		);
 		const rangeLaneMap = getRangeLaneMap(ranges);
 		const cellCtx = {
 			year: this.year,
 			app: this.app,
 			folder,
+			plannerFileScope,
+			plannerFiles,
 			dragState: this.dragState,
 			chipDragState: this.chipDragState,
 			clipboardSelection: this.clipboardSelection,
@@ -386,6 +401,7 @@ export class YearlyPlannerView
 		new CreateFileModal(this.app, {
 			bounds,
 			defaultFolder,
+			plannerFileScope: this.plugin.settings.plannerFileScope ?? "vault",
 			createSingleDateFile: (folder, basename, color, todo, notifyMinutes) =>
 				createSingleDateFileOp(
 					this.app,
@@ -427,7 +443,12 @@ export class YearlyPlannerView
 			e.preventDefault();
 			openPlannerClipboardSelectionTrashModal(
 				this.app,
-				resolveClipboardSelectionToFiles(this.app, this.clipboardSelection),
+				resolveClipboardSelectionToFiles(
+					this.app,
+					this.plugin.settings.plannerFolder || "Planner",
+					this.plugin.settings.plannerFileScope ?? "vault",
+					this.clipboardSelection,
+				),
 				this.clipboardSelection,
 				() => this.render(),
 			);
@@ -478,6 +499,8 @@ export class YearlyPlannerView
 		if (k === "c") {
 			const files = resolveClipboardSelectionToFiles(
 				this.app,
+				this.plugin.settings.plannerFolder || "Planner",
+				this.plugin.settings.plannerFileScope ?? "vault",
 				this.clipboardSelection,
 			);
 			if (files.length === 0) {
@@ -518,11 +541,9 @@ export class YearlyPlannerView
 		this.contentEl.addClass(PLANNER_CLIPBOARD_BUSY_CLASS);
 		void (async () => {
 			try {
-				const text = await navigator.clipboard.readText();
 				const r = await pastePlannerClipboard(
 					this.app,
 					this.plugin.settings.plannerFolder || "Planner",
-					text,
 					this.clipboardSelection,
 				);
 				if (r.ok) {
@@ -539,7 +560,7 @@ export class YearlyPlannerView
 				}
 			} catch {
 				new Notice(
-					t("plannerClipboard.pasteReadFailed"),
+					t("plannerClipboard.pasteFailed"),
 					PLANNER_CLIPBOARD_ERROR_NOTICE_MS,
 				);
 			} finally {

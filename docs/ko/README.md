@@ -39,7 +39,7 @@ English documentation: [docs/en/README.md](../en/README.md)
 - **월간 그리드 플래너**: 한 달 달력을 크게 보고 날짜별 칩, 기간 막대, 공휴일을 확인합니다.
 - **월간 목록 플래너**: 하루씩 세로로 훑으며 일정이 많은 달을 검토합니다.
 - **플랜 노트 패널**: 연간 노트(`YYYY.md`)와 월간 노트(`YYYY-MM.md`)를 플래너 상단에서 만들고 미리 봅니다.
-- **날짜/기간 노트**: 날짜 파일명과 기간 파일명을 기준으로 노트를 플래너 칩으로 표시합니다.
+- **날짜/기간 노트**: 날짜 파일명과 기간 파일명을 기준으로 노트를 플래너 칩으로 표시합니다. 기본값은 vault 전체 스캔이며, 설정에서 플래너 폴더 안으로만 제한할 수 있습니다.
 - **색상, todo, 완료 상태**: frontmatter의 `color`, `todo`, `completed` 값을 칩 스타일과 라벨에 반영합니다.
 - **공휴일 오버레이**: 국가별 공휴일을 표시하고 공휴일 배지를 선택해 이름을 확인합니다.
 - **로컬 알림**: `notify_minutes`가 있는 날짜 노트는 Obsidian이 열려 있을 때 해당 날짜와 시간에 Notice를 표시합니다.
@@ -136,9 +136,11 @@ Yearly -> Monthly Grid -> Monthly List -> Yearly
 
 플래너 영역에서 `Cmd`(macOS) 또는 `Ctrl`(Windows/Linux)을 누른 채 날짜나 칩을 선택합니다.
 
+Diary는 복사한 플래너 노트를 현재 Obsidian 세션의 내부 메모리 클립보드에 보관합니다. 시스템 클립보드를 읽거나 쓰지 않습니다.
+
 - `Cmd/Ctrl + click`: 선택을 새로 지정합니다.
 - `Cmd/Ctrl + Shift + click`: 기존 선택에 추가하거나 제거합니다.
-- `Cmd/Ctrl + C`: 선택한 날짜/노트를 Diary 전용 클립보드 형식으로 복사합니다.
+- `Cmd/Ctrl + C`: 선택한 날짜/노트를 Diary 내부 클립보드에 복사합니다.
 - `Cmd/Ctrl + V`: 선택한 대상 날짜에 붙여넣습니다.
 - `Cmd/Ctrl + Delete` 또는 `Cmd/Ctrl + Backspace`: 선택한 플래너 노트를 휴지통으로 보냅니다.
 - `Cmd/Ctrl + Z`: 마지막 붙여넣기 배치를 휴지통으로 보내 되돌립니다.
@@ -164,7 +166,8 @@ Yearly -> Monthly Grid -> Monthly List -> Yearly
 | 설정 | 설명 |
 | --- | --- |
 | Language | 플러그인 UI 언어입니다. 기본값은 `en`이며, `en`, `ko`를 지원합니다. |
-| Planner folder | 새 플래너 노트와 플랜 노트를 만들 기본 폴더입니다. 기본값은 `Planner`입니다. |
+| Planner folder | 새 플래너 노트와 플랜 노트를 만들 기본 폴더입니다. 스캔 범위를 플래너 폴더로 제한할 때도 사용합니다. 기본값은 `Planner`입니다. |
+| Planner note scan scope | Diary가 플래너 노트를 vault 전체에서 찾을지, **Planner folder**와 그 하위 폴더에서만 찾을지 정합니다. 기본값은 `Entire vault`입니다. |
 | Date format | 날짜 형식 저장값입니다. 현재 플래너 파일명은 `YYYY-MM-DD` 규칙을 사용합니다. |
 | Show holidays | 공휴일 표시를 켜거나 끕니다. |
 | Holiday country | 공휴일 국가입니다. `KR`, `US`, `JP`, `CN`, `GB`, `DE`, `FR`, `AU`, `CA`, `TW`, `None`을 지원합니다. |
@@ -187,7 +190,7 @@ Yearly -> Monthly Grid -> Monthly List -> Yearly
 
 ## 파일명 규칙
 
-Diary는 vault 전체의 Markdown 파일을 스캔해 아래 파일명 규칙과 맞는 노트를 플래너에 표시합니다. 새로 만드는 노트는 기본적으로 **Planner folder**에 생성됩니다.
+Diary는 기본적으로 vault 전체의 Markdown 파일을 스캔해 아래 파일명 규칙과 맞는 노트를 플래너에 표시합니다. 설정에서 스캔 범위를 **Planner folder**와 그 하위 폴더로 제한할 수 있습니다. 새로 만드는 노트는 기본적으로 **Planner folder**에 생성됩니다.
 
 단일 날짜:
 

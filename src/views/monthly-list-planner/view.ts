@@ -4,7 +4,10 @@ import DiaryObsidian from "../../main";
 import { VIEW_TYPE_MONTHLY_LIST_PLANNER } from "../../constants";
 import type { MonthlyPlannerState } from "../monthly-planner/types";
 import { getMonthLabel, renderMonthlyPlannerHeader } from "../monthly-planner/render";
-import { getMonthNoteFilePath } from "../yearly-planner/file-utils";
+import {
+	getMonthNoteFilePath,
+	getPlannerMarkdownFiles,
+} from "../yearly-planner/file-utils";
 import {
 	renderPlanNotePanel,
 	syncPlanNotePanelExpandedState,
@@ -391,6 +394,7 @@ export class MonthlyListPlannerView extends ItemView {
 		new CreateFileModal(this.app, {
 			bounds,
 			defaultFolder,
+			plannerFileScope: this.plugin.settings.plannerFileScope ?? "vault",
 			createSingleDateFile: (folder, basename, color, todo, notifyMinutes) =>
 				createSingleDateFileOp(
 					this.app,
@@ -476,10 +480,19 @@ export class MonthlyListPlannerView extends ItemView {
 			showHolidays && holidayCountry
 				? getHolidaysForYear(holidayCountry, this.year)
 				: null;
+		const folder = this.plugin.settings.plannerFolder || "Planner";
+		const plannerFileScope = this.plugin.settings.plannerFileScope ?? "vault";
 		renderMonthlyListBody(inner, {
 			year: this.year,
 			month: this.month,
 			app: this.app,
+			folder,
+			plannerFileScope,
+			plannerFiles: getPlannerMarkdownFiles(
+				this.app,
+				folder,
+				plannerFileScope,
+			),
 			locale,
 			holidaysData,
 		});

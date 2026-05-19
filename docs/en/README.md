@@ -39,7 +39,7 @@ The images below were captured from a fresh demo vault with sample planner notes
 - **Monthly grid planner**: Inspect one month in a large calendar grid with chips, range bars, and holidays.
 - **Monthly list planner**: Review busy months in a day-by-day vertical list.
 - **Plan note panel**: Create and preview yearly notes (`YYYY.md`) and monthly notes (`YYYY-MM.md`) above the planner.
-- **Date and range notes**: Display notes as planner chips based on single-date and date-range filenames.
+- **Date and range notes**: Display notes as planner chips based on single-date and date-range filenames. Diary scans the whole vault by default, or only the planner folder when configured.
 - **Color, todo, and completion state**: Reflect `color`, `todo`, and `completed` frontmatter in chip styling and labels.
 - **Holiday overlays**: Show country-specific public holidays and select holiday badges to see their names.
 - **Local reminders**: Notes with `notify_minutes` show an Obsidian Notice on the event date while Obsidian is open.
@@ -136,9 +136,11 @@ On desktop, drag a date chip or range bar to another date to move it. Range note
 
 In a planner view, hold `Cmd` on macOS or `Ctrl` on Windows/Linux while selecting dates or chips.
 
+Diary keeps copied planner notes in an internal in-memory clipboard for the current Obsidian session. It does not read from or write to the system clipboard.
+
 - `Cmd/Ctrl + click`: replace the current selection.
 - `Cmd/Ctrl + Shift + click`: add to or remove from the current selection.
-- `Cmd/Ctrl + C`: copy selected planner notes in Diary's clipboard format.
+- `Cmd/Ctrl + C`: copy selected planner notes to Diary's internal clipboard.
 - `Cmd/Ctrl + V`: paste to selected target dates.
 - `Cmd/Ctrl + Delete` or `Cmd/Ctrl + Backspace`: move selected planner notes to the trash.
 - `Cmd/Ctrl + Z`: undo the last paste batch by moving pasted files to the trash.
@@ -164,7 +166,8 @@ Paste rules:
 | Setting | Description |
 | --- | --- |
 | Language | Plugin UI language. Default: `en`. Supports `en` and `ko`. |
-| Planner folder | Default folder for new planner notes and plan notes. Default: `Planner`. |
+| Planner folder | Default folder for new planner notes and plan notes. Also used when scan scope is set to planner folder only. Default: `Planner`. |
+| Planner note scan scope | Controls whether Diary finds planner notes across the entire vault or only inside **Planner folder** and its subfolders. Default: `Entire vault`. |
 | Date format | Stored date format setting. Planner filenames currently use the `YYYY-MM-DD` rule. |
 | Show holidays | Turns holiday rendering on or off. |
 | Holiday country | Holiday country. Supports `KR`, `US`, `JP`, `CN`, `GB`, `DE`, `FR`, `AU`, `CA`, `TW`, and `None`. |
@@ -187,7 +190,7 @@ Reminders are not scheduled OS notifications. While Obsidian is open, Diary chec
 
 ## Filename Rules
 
-Diary scans Markdown files across the vault and displays notes whose filenames match these rules. Newly created notes go into the configured **Planner folder** by default.
+Diary scans Markdown files across the vault by default and displays notes whose filenames match these rules. In settings, you can limit scanning to the configured **Planner folder** and its subfolders. Newly created notes go into the configured **Planner folder** by default.
 
 Single date:
 

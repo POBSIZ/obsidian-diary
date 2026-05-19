@@ -1,4 +1,4 @@
-import { App, setIcon } from "obsidian";
+import { App, TFile, setIcon } from "obsidian";
 import { t } from "../../i18n";
 import {
 	MONTH_LABELS_KO,
@@ -18,6 +18,7 @@ import {
 	getChipColor,
 	isTodoCompleted,
 	isTodoFile,
+	type PlannerFileScope,
 } from "./file-utils";
 import { parseRangeBasename } from "../../utils/range";
 import { isDateInSelection } from "./selection";
@@ -109,6 +110,8 @@ export interface CreateCellContext {
 	year: number;
 	app: App;
 	folder: string;
+	plannerFileScope: PlannerFileScope;
+	plannerFiles: TFile[];
 	dragState: DragState | null;
 	chipDragState: ChipDragState | null;
 	clipboardSelection: Set<string>;
@@ -169,9 +172,12 @@ export function createPlannerCell(
 
 	const { singleFiles, rangeFiles } = getFilesForDate(
 		ctx.app,
+		ctx.folder,
 		ctx.year,
 		month,
 		day,
+		ctx.plannerFileScope,
+		ctx.plannerFiles,
 	);
 
 	if (rangeFiles.length > 0) {

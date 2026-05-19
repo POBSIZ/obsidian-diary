@@ -3,6 +3,8 @@ import { t } from "./i18n";
 import {
 	getFileTitle,
 	getNotifyMinutes,
+	getPlannerMarkdownFiles,
+	type PlannerFileScope,
 } from "./views/yearly-planner/file-utils";
 import { getPlannerEventDateString } from "./views/yearly-planner/file-operations";
 
@@ -30,7 +32,14 @@ function debounce(
 /**
  * While Obsidian is open, shows a Notice when local time matches `notify_minutes` on the note's event day.
  */
-export function registerPlannerReminders(plugin: Plugin): void {
+export function registerPlannerReminders(
+	plugin: Plugin & {
+		settings: {
+			plannerFolder?: string;
+			plannerFileScope?: PlannerFileScope;
+		};
+	},
+): void {
 	type Entry = { file: TFile; dateStr: string; minutes: number };
 	let entries: Entry[] = [];
 	const fired = new Set<string>();
@@ -38,7 +47,11 @@ export function registerPlannerReminders(plugin: Plugin): void {
 	const rebuild = (): void => {
 		const app = plugin.app;
 		const next: Entry[] = [];
-		for (const file of app.vault.getMarkdownFiles()) {
+		for (const file of getPlannerMarkdownFiles(
+			app,
+			plugin.settings.plannerFolder || "Planner",
+			plugin.settings.plannerFileScope ?? "vault",
+		)) {
 			const minutes = getNotifyMinutes(app, file);
 			if (minutes === null) continue;
 			const dateStr = getPlannerEventDateString(file);

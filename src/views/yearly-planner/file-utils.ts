@@ -5,8 +5,52 @@ import type { RangeRunPosition } from "./types";
 
 const pad = (n: number) => String(n).padStart(2, "0");
 
-/** Returns all folder paths in the vault (sorted). Root folder "" is included. */
-export function getAllFolderPaths(app: App): string[] {
+export type PlannerFileScope = "vault" | "plannerFolder";
+
+function normalizePlannerFolder(folder: string): string {
+	return (folder || "Planner").trim().replace(/^\/+|\/+$/g, "");
+}
+
+export function getPlannerMarkdownFiles(
+	app: App,
+	folder: string,
+	scope: PlannerFileScope = "vault",
+): TFile[] {
+	if (scope === "vault") {
+		return app.vault
+			.getMarkdownFiles()
+			.sort((a, b) => a.path.localeCompare(b.path));
+	}
+
+	const trimmed = normalizePlannerFolder(folder);
+	const root = trimmed
+		? app.vault.getAbstractFileByPath(trimmed)
+		: app.vault.getRoot();
+	if (!(root instanceof TFolder)) return [];
+
+	const files: TFile[] = [];
+	function collect(current: TFolder): void {
+		for (const child of current.children) {
+			if (child instanceof TFolder) {
+				collect(child);
+			} else if (
+				child instanceof TFile &&
+				child.extension.toLowerCase() === "md"
+			) {
+				files.push(child);
+			}
+		}
+	}
+	collect(root);
+	return files.sort((a, b) => a.path.localeCompare(b.path));
+}
+
+/** Returns folder paths for note creation (sorted). */
+export function getAllFolderPaths(
+	app: App,
+	rootFolder: string,
+	scope: PlannerFileScope = "vault",
+): string[] {
 	const paths: string[] = [];
 	function collect(folder: TFolder): void {
 		paths.push(folder.path);
@@ -16,8 +60,15 @@ export function getAllFolderPaths(app: App): string[] {
 			}
 		}
 	}
-	const root = app.vault.getRoot();
-	if (root) collect(root);
+	let root: TFolder | null = app.vault.getRoot();
+	if (scope === "plannerFolder") {
+		const trimmed = normalizePlannerFolder(rootFolder);
+		const scopedRoot = trimmed
+			? app.vault.getAbstractFileByPath(trimmed)
+			: app.vault.getRoot();
+		root = scopedRoot instanceof TFolder ? scopedRoot : null;
+	}
+	if (root instanceof TFolder) collect(root);
 	return paths.sort((a, b) => a.localeCompare(b));
 }
 
@@ -55,11 +106,17 @@ export interface RangeForYear {
 }
 
 /** Returns all range files that intersect with the given year. */
-export function getRangesForYear(app: App, year: number): RangeForYear[] {
+export function getRangesForYear(
+	app: App,
+	year: number,
+	folder: string,
+	scope: PlannerFileScope = "vault",
+	plannerFiles: TFile[] = getPlannerMarkdownFiles(app, folder, scope),
+): RangeForYear[] {
 	const yearStart = `${year}-01-01`;
 	const yearEnd = `${year}-12-31`;
 	const ranges: RangeForYear[] = [];
-	for (const file of app.vault.getMarkdownFiles()) {
+	for (const file of plannerFiles) {
 		const parsed = parseRangeBasename(file.basename);
 		if (!parsed) continue;
 		if (parsed.end < yearStart || parsed.start > yearEnd) continue;
@@ -111,9 +168,12 @@ export function getRangeFilePath(
 
 export function getFilesForDate(
 	app: App,
+	folder: string,
 	year: number,
 	month: number,
 	day: number,
+	scope: PlannerFileScope = "vault",
+	plannerFiles: TFile[] = getPlannerMarkdownFiles(app, folder, scope),
 ): {
 	singleFiles: TFile[];
 	rangeFiles: Array<{
@@ -124,7 +184,7 @@ export function getFilesForDate(
 } {
 	const dateStr = `${year}-${pad(month)}-${pad(day)}`;
 
-	const singleFiles = app.vault.getMarkdownFiles().filter((file) => {
+	const singleFiles = plannerFiles.filter((file) => {
 		return (
 			file.basename === dateStr ||
 			(file.basename.startsWith(`${dateStr}-`) &&
@@ -140,7 +200,7 @@ export function getFilesForDate(
 		runPos: RangeRunPosition;
 		isFirst: boolean;
 	}> = [];
-	for (const file of app.vault.getMarkdownFiles()) {
+	for (const file of plannerFiles) {
 		const parsed = parseRangeBasename(file.basename);
 		if (!parsed || !isDateInRange(dateStr, parsed.start, parsed.end))
 			continue;

@@ -19,6 +19,7 @@ import {
 	getChipColor,
 	isTodoCompleted,
 	isTodoFile,
+	type PlannerFileScope,
 } from "../yearly-planner/file-utils";
 import { isDateInSelection } from "../yearly-planner/selection";
 import {
@@ -129,6 +130,8 @@ export function renderMonthlyPlannerHeader(
 export interface CreateMonthlyCellContext {
 	app: App;
 	folder: string;
+	plannerFileScope: PlannerFileScope;
+	plannerFiles: TFile[];
 	dragState: DragState | null;
 	chipDragState: ChipDragState | null;
 	clipboardSelection: Set<string>;
@@ -199,9 +202,12 @@ export function createMonthlyCell(
 
 	const { singleFiles, rangeFiles } = getFilesForDate(
 		ctx.app,
+		ctx.folder,
 		year,
 		month,
 		day,
+		ctx.plannerFileScope,
+		ctx.plannerFiles,
 	);
 	const isMobileView = Platform.isMobile;
 

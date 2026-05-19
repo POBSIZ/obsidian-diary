@@ -1,4 +1,4 @@
-import { App } from "obsidian";
+import { App, TFile } from "obsidian";
 import {
 	TODO_CHIP_EMOJI_COMPLETED,
 	TODO_CHIP_EMOJI_INCOMPLETE,
@@ -14,6 +14,7 @@ import {
 	getChipColor,
 	isTodoCompleted,
 	isTodoFile,
+	type PlannerFileScope,
 } from "../yearly-planner/file-utils";
 import { getWeekdayLabels } from "../monthly-planner/render";
 
@@ -23,11 +24,23 @@ export function renderMonthlyListBody(
 		year: number;
 		month: number;
 		app: App;
+		folder: string;
+		plannerFileScope: PlannerFileScope;
+		plannerFiles: TFile[];
 		locale: string;
 		holidaysData: HolidayData | null;
 	},
 ): void {
-	const { year, month, app, locale, holidaysData } = ctx;
+	const {
+		year,
+		month,
+		app,
+		folder,
+		plannerFileScope,
+		plannerFiles,
+		locale,
+		holidaysData,
+	} = ctx;
 	const daysInMonth = getDaysInMonth(year, month);
 	const weekdayShort = getWeekdayLabels(locale);
 	const weekendL = locale === "ko" ? WEEKEND_LABELS_KO : WEEKEND_LABELS_EN;
@@ -46,7 +59,15 @@ export function renderMonthlyListBody(
 		const dateKey = `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
 		const isHoliday = holidaysData?.dates.has(dateKey) ?? false;
 
-		const { singleFiles, rangeFiles } = getFilesForDate(app, year, month, day);
+		const { singleFiles, rangeFiles } = getFilesForDate(
+			app,
+			folder,
+			year,
+			month,
+			day,
+			plannerFileScope,
+			plannerFiles,
+		);
 
 		const dayBlock = parent.createDiv({
 			cls: [
