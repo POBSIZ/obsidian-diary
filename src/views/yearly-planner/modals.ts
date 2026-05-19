@@ -38,11 +38,12 @@ const CHIP_COLOR_PRESETS_EXTRA: readonly { hex: string }[] = [
 
 /** Resolves var(--interactive-accent) to 6-digit hex. Falls back to #7c3aed if unavailable. */
 function getThemeAccentHex(): string {
-	const el = document.createElement("div");
+	const doc = globalThis.document;
+	const el = doc.createElement("div");
 	el.setCssProps({ color: "var(--interactive-accent)" });
-	document.body.appendChild(el);
+	doc.body.appendChild(el);
 	const computed = getComputedStyle(el).color;
-	document.body.removeChild(el);
+	doc.body.removeChild(el);
 	const m = computed.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
 	if (m) {
 		const r = parseInt(m[1] ?? "0", 10);
@@ -111,11 +112,12 @@ function normalizeColorToHex(cssColor: string): string | null {
 	if (!trimmed) return null;
 	const hex = toHex6(trimmed);
 	if (hex) return hex.toLowerCase();
-	const div = document.createElement("div");
+	const doc = globalThis.document;
+	const div = doc.createElement("div");
 	div.style.color = trimmed;
-	document.body.appendChild(div);
+	doc.body.appendChild(div);
 	const computed = getComputedStyle(div).color;
-	document.body.removeChild(div);
+	doc.body.removeChild(div);
 	if (!computed) return null;
 	const m = computed.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
 	if (m) {
@@ -205,7 +207,7 @@ export class HolidayInfoModal extends Modal {
 			cls: "yearly-planner-holiday-modal-names",
 		});
 		for (const name of this.holidayNames) {
-			namesEl.createEl("span", {
+			namesEl.createSpan({
 				cls: "yearly-planner-holiday-name",
 				text: name,
 			});

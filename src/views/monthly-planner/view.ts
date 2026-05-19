@@ -1,10 +1,22 @@
 import { ItemView, Notice, Platform, TFile, WorkspaceLeaf } from "obsidian";
 import { t } from "../../i18n";
 import DiaryObsidian from "../../main";
-import { VIEW_TYPE_MONTHLY_PLANNER } from "../../constants";
-import type { ChipDragState } from "../yearly-planner/types";
-import type { MonthlyPlannerState } from "./types";
 import {
+	TODO_CHIP_EMOJI_COMPLETED,
+	TODO_CHIP_EMOJI_INCOMPLETE,
+	VIEW_TYPE_MONTHLY_PLANNER,
+} from "../../constants";
+import type { ChipDragState } from "../yearly-planner/types";
+import type {
+	MonthlyPlannerSelectedDate,
+	MonthlyPlannerState,
+} from "./types";
+import {
+	getChipColor,
+	getFileTitle,
+	getFilesForDate,
+	isTodoCompleted,
+	isTodoFile,
 	getRangeLaneMap,
 	getRangesForYear,
 	getMonthNoteFilePath,
@@ -60,6 +72,8 @@ export class MonthlyPlannerView
 	private interactionHandler: MonthlyInteractionHandler;
 	private pinchZoom: PinchZoomController | null = null;
 	private pinchZoomScale = 1;
+	private selectedDate: MonthlyPlannerSelectedDate | null = null;
+	private daySummaryOpen = false;
 	private clipboardKeydownRegistered = false;
 	private pasteUndoBatches: string[][] = [];
 	private boundClipboardKeydown = (e: KeyboardEvent) => {
@@ -92,7 +106,12 @@ export class MonthlyPlannerView
 	}
 
 	getState(): MonthlyPlannerState {
-		return { year: this.year, month: this.month };
+		return {
+			year: this.year,
+			month: this.month,
+			selectedDate: this.selectedDate,
+			daySummaryOpen: this.daySummaryOpen,
+		};
 	}
 
 	async setState(
@@ -102,6 +121,21 @@ export class MonthlyPlannerView
 		if (state?.year && state?.month) {
 			this.year = state.year;
 			this.month = state.month;
+			const selectedDate = state.selectedDate;
+			if (
+				selectedDate &&
+				selectedDate.year === this.year &&
+				selectedDate.month === this.month
+			) {
+				this.selectedDate = selectedDate;
+			} else {
+				this.selectedDate = null;
+			}
+			this.daySummaryOpen = Boolean(
+				state.daySummaryOpen &&
+					this.selectedDate &&
+					Platform.isMobile,
+			);
 			this.render();
 		}
 		await super.setState(state, result);
@@ -190,6 +224,15 @@ export class MonthlyPlannerView
 			`${pad}rem`,
 		);
 
+		if (
+			this.selectedDate &&
+			(this.selectedDate.year !== this.year ||
+				this.selectedDate.month !== this.month)
+		) {
+			this.selectedDate = null;
+			this.daySummaryOpen = false;
+		}
+
 		this.renderHeader(contentEl);
 		if (preservePlanNote && planNoteWrapper) {
 			contentEl.appendChild(planNoteWrapper);
@@ -210,6 +253,9 @@ export class MonthlyPlannerView
 		const newScrollEl = contentEl.querySelector<HTMLElement>(
 			".monthly-planner-scroll",
 		);
+		if (Platform.isMobile && newScrollEl) {
+			this.renderMobileDaySummary(newScrollEl);
+		}
 		if (newScrollEl) {
 			newScrollEl.scrollTop = scrollTop;
 			newScrollEl.scrollLeft = scrollLeft;
@@ -293,6 +339,8 @@ export class MonthlyPlannerView
 					} else {
 						this.month--;
 					}
+					this.daySummaryOpen = false;
+					this.selectedDate = null;
 					this.render();
 				},
 				onNext: () => {
@@ -304,17 +352,23 @@ export class MonthlyPlannerView
 					} else {
 						this.month++;
 					}
+					this.daySummaryOpen = false;
+					this.selectedDate = null;
 					this.render();
 				},
 				onToday: () => {
 					const now = new Date();
 					this.year = now.getFullYear();
 					this.month = now.getMonth() + 1;
+					this.daySummaryOpen = false;
+					this.selectedDate = null;
 					this.render();
 				},
 				onMonthYearClick: (year, month) => {
 					this.year = year;
 					this.month = month;
+					this.daySummaryOpen = false;
+					this.selectedDate = null;
 					this.render();
 				},
 				onAddFile: () => {
@@ -416,6 +470,7 @@ export class MonthlyPlannerView
 			holidaysData,
 			locale,
 			rangeLaneMap,
+			selectedDate: this.daySummaryOpen ? this.selectedDate : null,
 		};
 
 		const cells = getMonthCalendarCells(this.year, this.month);
@@ -487,6 +542,158 @@ export class MonthlyPlannerView
 		new FileOptionsModal(this.app, file, this.leaf, () =>
 			this.render(),
 		).open();
+	}
+
+	openDaySummaryPanel(year: number, month: number, day: number): void {
+		this.selectedDate = { year, month, day };
+		this.daySummaryOpen = true;
+		this.render();
+	}
+
+	private closeDaySummaryPanel(): void {
+		this.daySummaryOpen = false;
+		this.render();
+	}
+
+	private renderMobileDaySummary(contentEl: HTMLElement): void {
+		if (!this.daySummaryOpen || !this.selectedDate) return;
+		const { year, month, day } = this.selectedDate;
+		const sheet = contentEl.createDiv({
+			cls: "monthly-planner-day-summary-sheet",
+		});
+		const header = sheet.createDiv({
+			cls: "monthly-planner-day-summary-header",
+		});
+		header.createDiv({
+			cls: "monthly-planner-day-summary-title",
+			text: t("monthlyDaySheet.title", {
+				date: this.formatDaySummaryDate(year, month, day),
+			}),
+		});
+		const closeBtn = header.createEl("button", {
+			cls: "monthly-planner-day-summary-close",
+			text: "×",
+		});
+		closeBtn.ariaLabel = t("monthlyDaySheet.close");
+		closeBtn.onclick = () => this.closeDaySummaryPanel();
+
+		const body = sheet.createDiv({
+			cls: "monthly-planner-day-summary-body",
+		});
+		const { singleFiles, rangeFiles } = getFilesForDate(
+			this.app,
+			year,
+			month,
+			day,
+		);
+		const dateKey = `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+		const { showHolidays, holidayCountry } = this.plugin.settings;
+		const holidayNames =
+			showHolidays && holidayCountry
+				? (getHolidaysForYear(holidayCountry, year).names.get(dateKey) ?? [])
+				: [];
+
+		for (const { file } of rangeFiles) {
+			this.createDaySummaryChip({
+				container: body,
+				text: this.getDisplayTitle(file),
+				color: getChipColor(this.app, file),
+				onClick: () => this.openFileOptionsModal(file),
+			});
+		}
+
+		for (const file of singleFiles) {
+			this.createDaySummaryChip({
+				container: body,
+				text: this.getDisplayTitle(file),
+				color: getChipColor(this.app, file),
+				onClick: () => this.openFileOptionsModal(file),
+			});
+		}
+
+		for (const holidayName of holidayNames) {
+			this.createDaySummaryChip({
+				container: body,
+				text: holidayName,
+				color: "var(--text-accent)",
+				onClick: undefined,
+				extraClass: "monthly-planner-day-summary-item-holiday",
+			});
+		}
+
+		if (
+			singleFiles.length === 0 &&
+			rangeFiles.length === 0 &&
+			holidayNames.length === 0
+		) {
+			body.createDiv({
+				cls: "monthly-planner-day-summary-empty",
+				text: t("monthlyDaySheet.empty"),
+			});
+		}
+
+		const footer = sheet.createDiv({
+			cls: "monthly-planner-day-summary-footer",
+		});
+		const createBtn = footer.createEl("button", {
+			cls: "mod-cta monthly-planner-day-summary-create",
+			text: t("monthlyDaySheet.create"),
+			type: "button",
+		});
+		createBtn.onclick = () =>
+			this.openCreateFileModal({
+				startYear: year,
+				startMonth: month,
+				startDay: day,
+				endYear: year,
+				endMonth: month,
+				endDay: day,
+			});
+	}
+
+	private getDisplayTitle(file: TFile): string {
+		const title = getFileTitle(this.app, file);
+		if (isTodoCompleted(this.app, file)) {
+			return `${TODO_CHIP_EMOJI_COMPLETED} ${title}`;
+		}
+		if (isTodoFile(this.app, file)) {
+			return `${TODO_CHIP_EMOJI_INCOMPLETE} ${title}`;
+		}
+		return title;
+	}
+
+	private formatDaySummaryDate(year: number, month: number, day: number): string {
+		const locale = this.plugin.settings.locale ?? "en";
+		if (locale === "ko") {
+			return `${year}년 ${month}월 ${day}일`;
+		}
+		return `${month}/${day}/${year}`;
+	}
+
+	private createDaySummaryChip(opts: {
+		container: HTMLElement;
+		text: string;
+		color: string | null;
+		onClick?: (() => void) | undefined;
+		extraClass?: string;
+	}): void {
+		const item = opts.container.createEl("button", {
+			cls: [
+				"monthly-planner-day-summary-item",
+				"monthly-planner-cell-file",
+				opts.extraClass,
+			]
+				.filter(Boolean)
+				.join(" "),
+			type: "button",
+		});
+		item.textContent = opts.text;
+		if (opts.color) {
+			item.style.borderLeftColor = opts.color;
+		}
+		if (opts.onClick) {
+			item.onclick = opts.onClick;
+		}
 	}
 
 	private handleClipboardKeydown(e: KeyboardEvent): void {

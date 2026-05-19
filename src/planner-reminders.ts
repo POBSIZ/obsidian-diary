@@ -12,11 +12,15 @@ function localDateStr(d: Date): string {
 	return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
 }
 
-function debounce(fn: () => void, ms: number): () => void {
-	let t: ReturnType<typeof setTimeout> | null = null;
+function debounce(
+	fn: () => void,
+	ms: number,
+	win: Window,
+): () => void {
+	let t: number | null = null;
 	return () => {
-		if (t) clearTimeout(t);
-		t = setTimeout(() => {
+		if (t !== null) win.clearTimeout(t);
+		t = win.setTimeout(() => {
 			t = null;
 			fn();
 		}, ms);
@@ -44,7 +48,8 @@ export function registerPlannerReminders(plugin: Plugin): void {
 		entries = next;
 	};
 
-	const debounced = debounce(rebuild, 200);
+	const win = plugin.app.workspace.containerEl.ownerDocument.defaultView ?? window;
+	const debounced = debounce(rebuild, 200, win);
 	rebuild();
 
 	plugin.registerEvent(plugin.app.metadataCache.on("changed", debounced));
@@ -53,7 +58,7 @@ export function registerPlannerReminders(plugin: Plugin): void {
 	plugin.registerEvent(plugin.app.vault.on("rename", debounced));
 
 	plugin.registerInterval(
-		window.setInterval(() => {
+		win.setInterval(() => {
 			const now = new Date();
 			const todayStr = localDateStr(now);
 			const nowMins = now.getHours() * 60 + now.getMinutes();

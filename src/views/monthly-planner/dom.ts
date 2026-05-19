@@ -4,7 +4,7 @@ export function getTopmostMonthlyElementAt(
 	clientX: number,
 	clientY: number,
 ): Element | null {
-	const elements = document.elementsFromPoint(clientX, clientY);
+	const elements = contentEl.ownerDocument.elementsFromPoint(clientX, clientY);
 	for (const el of elements) {
 		if (!contentEl.contains(el as Node)) break;
 		const he = el as HTMLElement;
@@ -26,7 +26,7 @@ export function getChipOrBarAt(
 	clientX: number,
 	clientY: number,
 ): HTMLElement | null {
-	const elements = document.elementsFromPoint(clientX, clientY);
+	const elements = contentEl.ownerDocument.elementsFromPoint(clientX, clientY);
 	for (const el of elements) {
 		if (!contentEl.contains(el as Node)) break;
 		const chip = (el as HTMLElement).closest?.(
@@ -38,6 +38,7 @@ export function getChipOrBarAt(
 }
 
 export function getMonthlyCellAtClientPos(
+	contentEl: HTMLElement,
 	clientX: number,
 	clientY: number,
 ): {
@@ -45,7 +46,7 @@ export function getMonthlyCellAtClientPos(
 	month: number;
 	day: number;
 } | null {
-	const el = document.elementFromPoint(clientX, clientY);
+	const el = contentEl.ownerDocument.elementFromPoint(clientX, clientY);
 	const cell = el?.closest("td[data-year][data-month][data-day]");
 	if (!cell) return null;
 	const year = parseInt(cell.getAttribute("data-year") ?? "", 10);

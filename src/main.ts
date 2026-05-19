@@ -259,10 +259,11 @@ export default class DiaryObsidian extends Plugin {
 	}
 
 	private debounce(fn: () => void, delayMs: number): () => void {
-		let timeout: ReturnType<typeof setTimeout> | null = null;
+		const win = this.app.workspace.containerEl.ownerDocument.defaultView ?? window;
+		let timeout: number | null = null;
 		return () => {
-			if (timeout) clearTimeout(timeout);
-			timeout = setTimeout(() => {
+			if (timeout !== null) win.clearTimeout(timeout);
+			timeout = win.setTimeout(() => {
 				timeout = null;
 				fn();
 			}, delayMs);

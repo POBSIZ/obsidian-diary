@@ -1,4 +1,4 @@
-import { App, setIcon } from "obsidian";
+import { App, Platform, TFile, setIcon } from "obsidian";
 import { t } from "../../i18n";
 import {
 	MONTH_LABELS_KO,
@@ -27,6 +27,7 @@ import {
 } from "../planner-clipboard";
 import type { CalendarCell } from "../../utils/date";
 import { MonthYearInputModal } from "./modals";
+import type { MonthlyPlannerSelectedDate } from "./types";
 
 export interface MonthlyHeaderCallbacks {
 	onPrev: () => void;
@@ -68,7 +69,7 @@ export function renderMonthlyPlannerHeader(
 	prevBtn.ariaLabel = t("header.prevMonth");
 	prevBtn.onclick = callbacks.onPrev;
 
-	const monthYearDisplay = navWrapper.createEl("span", {
+	const monthYearDisplay = navWrapper.createSpan({
 		cls: "monthly-planner-month-year-display",
 		text: `${ctx.monthLabel} ${ctx.year}`,
 	});
@@ -134,13 +135,14 @@ export interface CreateMonthlyCellContext {
 	holidaysData: HolidayData | null;
 	locale: string;
 	rangeLaneMap: Map<string, number>;
+	selectedDate: MonthlyPlannerSelectedDate | null;
 }
 
 export function createMonthlyCell(
 	cellData: CalendarCell | null,
 	ctx: CreateMonthlyCellContext,
 ): HTMLTableCellElement {
-	const cell = document.createElement("td");
+	const cell = ctx.app.workspace.containerEl.ownerDocument.createElement("td");
 
 	if (!cellData) {
 		cell.addClass("monthly-planner-cell-invalid");
@@ -168,6 +170,10 @@ export function createMonthlyCell(
 		year === now.getFullYear() &&
 		month === now.getMonth() + 1 &&
 		day === now.getDate();
+	const isActiveDate =
+		ctx.selectedDate?.year === year &&
+		ctx.selectedDate?.month === month &&
+		ctx.selectedDate?.day === day;
 
 	cell.className = [
 		"monthly-planner-cell",
@@ -178,6 +184,7 @@ export function createMonthlyCell(
 		isSaturday && "monthly-planner-cell-saturday",
 		isSunday && "monthly-planner-cell-sunday",
 		isToday && "monthly-planner-cell-today",
+		isActiveDate && "monthly-planner-cell-active-date",
 	]
 		.filter(Boolean)
 		.join(" ");
@@ -196,6 +203,7 @@ export function createMonthlyCell(
 		month,
 		day,
 	);
+	const isMobileView = Platform.isMobile;
 
 	if (rangeFiles.length > 0 && singleFiles.length > 0) {
 		cell.dataset.hasBoth = "true";
@@ -209,6 +217,9 @@ export function createMonthlyCell(
 		const rangeContainer = inner.createDiv({
 			cls: "monthly-planner-range-bars",
 		});
+		if (isMobileView) {
+			rangeContainer.addClass("monthly-planner-range-bars-mobile");
+		}
 		const laneIndices = rangeFiles.map(
 			({ file }) => ctx.rangeLaneMap.get(file.basename) ?? 0,
 		);
@@ -229,6 +240,9 @@ export function createMonthlyCell(
 				.filter(Boolean)
 				.join(" ");
 			const barEl = rangeContainer.createDiv({ cls: barClasses });
+			if (isMobileView) {
+				barEl.addClass("monthly-planner-range-bar-mobile");
+			}
 			const laneIdx = ctx.rangeLaneMap.get(file.basename) ?? 0;
 			barEl.dataset.rangeStack = String(Math.min(laneIdx, 9));
 			barEl.dataset.path = file.path;
@@ -257,10 +271,14 @@ export function createMonthlyCell(
 		});
 	}
 
-	if (singleFiles.length > 0) {
+	if (singleFiles.length > 0 && isMobileView) {
+		createMobileSingleFileSummary(inner, ctx.app, singleFiles);
+	}
+
+	if (singleFiles.length > 0 && !isMobileView) {
 		const listEl = inner.createDiv({ cls: "monthly-planner-cell-files" });
 		for (const file of singleFiles) {
-			const linkEl = listEl.createEl("div", {
+			const linkEl = listEl.createDiv({
 				cls: "monthly-planner-cell-file",
 			});
 			const title = getFileTitle(ctx.app, file);
@@ -284,7 +302,12 @@ export function createMonthlyCell(
 		}
 	}
 
-	if (isHoliday && ctx.holidaysData?.names.has(dateKey)) {
+	if (isHoliday && ctx.holidaysData?.names.has(dateKey) && isMobileView) {
+		const holidayNames = ctx.holidaysData.names.get(dateKey) ?? [];
+		createMobileHolidaySummary(inner, holidayNames);
+	}
+
+	if (isHoliday && ctx.holidaysData?.names.has(dateKey) && !isMobileView) {
 		const holidayNames = ctx.holidaysData.names.get(dateKey) ?? [];
 		const holidaysContainer = inner.createDiv({
 			cls: "monthly-planner-cell-holidays",
@@ -312,6 +335,74 @@ export function createMonthlyCell(
 	}
 
 	return cell;
+}
+
+function createMobileSingleFileSummary(
+	inner: HTMLElement,
+	app: App,
+	singleFiles: TFile[],
+): void {
+	const summaryEl = getOrCreateMobileSummaryContainer(inner);
+	const groupedByColor = new Map<string, { color: string | null; count: number }>();
+	for (const file of singleFiles) {
+		const color = getChipColor(app, file);
+		const colorKey = color ?? "__default__";
+		const prev = groupedByColor.get(colorKey);
+		if (prev) {
+			prev.count += 1;
+			continue;
+		}
+		groupedByColor.set(colorKey, { color, count: 1 });
+	}
+
+	for (const { color, count } of groupedByColor.values()) {
+		const groupEl = summaryEl.createDiv({
+			cls: "monthly-planner-mobile-single-group",
+		});
+		const dotEl = groupEl.createSpan({
+			cls: "monthly-planner-mobile-single-dot",
+		});
+		if (color) {
+			dotEl.style.setProperty("--monthly-mobile-dot-color", color);
+		}
+		if (count > 1) {
+			groupEl.createSpan({
+				cls: "monthly-planner-mobile-single-plus",
+				text: `+${count - 1}`,
+			});
+		}
+	}
+}
+
+function createMobileHolidaySummary(inner: HTMLElement, holidayNames: string[]): void {
+	if (holidayNames.length === 0) return;
+	const summaryEl = getOrCreateMobileSummaryContainer(inner);
+	const groupEl = summaryEl.createDiv({
+		cls: "monthly-planner-mobile-single-group monthly-planner-mobile-single-group-holiday",
+	});
+	const dotEl = groupEl.createSpan({
+		cls: "monthly-planner-mobile-single-dot",
+	});
+	dotEl.setCssProps({
+		"--monthly-mobile-dot-color": "var(--text-accent)",
+	});
+	groupEl.title = holidayNames.join(", ");
+	if (holidayNames.length > 1) {
+		groupEl.createSpan({
+			cls: "monthly-planner-mobile-single-plus",
+			text: `+${holidayNames.length - 1}`,
+		});
+	}
+}
+
+function getOrCreateMobileSummaryContainer(inner: HTMLElement): HTMLElement {
+	const existing = inner.querySelector<HTMLElement>(
+		".monthly-planner-mobile-single-summary",
+	);
+	if (existing) return existing;
+	return inner.createDiv({
+		cls: "monthly-planner-mobile-single-summary",
+	});
 }
 
 export function getMonthLabel(locale: string, month: number): string {

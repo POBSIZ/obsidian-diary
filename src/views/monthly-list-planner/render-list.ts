@@ -84,7 +84,7 @@ export function renderMonthlyListBody(
 
 		if (rangeFiles.length > 0) {
 			const rangeWrap = body.createDiv({ cls: "monthly-list-planner-ranges" });
-			for (const { file, runPos, isFirst } of rangeFiles) {
+			for (const { file, runPos } of rangeFiles) {
 				const barClasses = [
 					"monthly-planner-range-bar",
 					"monthly-list-planner-range-bar",
@@ -102,20 +102,19 @@ export function renderMonthlyListBody(
 				if (chipColor) {
 					barEl.style.setProperty("--range-color", chipColor);
 				}
-				if (isFirst) {
-					const title = getFileTitle(app, file);
-					const displayTitle = isTodoCompleted(app, file)
-						? `${TODO_CHIP_EMOJI_COMPLETED} ${title}`
-						: isTodoFile(app, file)
-							? `${TODO_CHIP_EMOJI_INCOMPLETE} ${title}`
-							: title;
-					const labelEl = barEl.createSpan({
-						cls: "monthly-planner-range-label",
-						text: displayTitle,
-					});
-					if (isTodoCompleted(app, file)) {
-						labelEl.addClass("monthly-planner-chip-completed");
-					}
+				/* List view: show title on every day the range appears (grid view shows label only on run start). */
+				const title = getFileTitle(app, file);
+				const displayTitle = isTodoCompleted(app, file)
+					? `${TODO_CHIP_EMOJI_COMPLETED} ${title}`
+					: isTodoFile(app, file)
+						? `${TODO_CHIP_EMOJI_INCOMPLETE} ${title}`
+						: title;
+				const labelEl = barEl.createSpan({
+					cls: "monthly-planner-range-label",
+					text: displayTitle,
+				});
+				if (isTodoCompleted(app, file)) {
+					labelEl.addClass("monthly-planner-chip-completed");
 				}
 			}
 		}

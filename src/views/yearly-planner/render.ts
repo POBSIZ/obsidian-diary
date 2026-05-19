@@ -62,7 +62,7 @@ export function renderYearlyPlannerHeader(
 	prevBtn.ariaLabel = t("header.prevYear");
 	prevBtn.onclick = callbacks.onPrev;
 
-	const yearDisplay = yearWrapper.createEl("span", {
+	const yearDisplay = yearWrapper.createSpan({
 		cls: "yearly-planner-year-display",
 		text: String(ctx.year),
 	});
@@ -213,7 +213,7 @@ export function createPlannerCell(
 	if (allFiles.length > 0) {
 		const listEl = cell.createDiv({ cls: "yearly-planner-cell-files" });
 		for (const file of allFiles) {
-			const linkEl = listEl.createEl("div", {
+			const linkEl = listEl.createDiv({
 				cls: "yearly-planner-cell-file",
 			});
 			const title = getFileTitle(ctx.app, file);

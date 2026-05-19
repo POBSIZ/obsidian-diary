@@ -32,6 +32,7 @@ export interface MonthlyPlannerViewDelegate {
 	updateChipDragDropTarget(): void;
 	openCreateFileModal(bounds: SelectionBounds | null): void;
 	openFileOptionsModal(file: TFile): void;
+	openDaySummaryPanel(year: number, month: number, day: number): void;
 }
 
 interface ChipDragPending {
@@ -54,6 +55,9 @@ export class MonthlyInteractionHandler {
 	private touchStartPos: { x: number; y: number } | null = null;
 	private chipDragPending: ChipDragPending | null = null;
 	private chipDragJustEnded = false;
+	private get doc(): Document {
+		return this.view.contentEl.ownerDocument;
+	}
 
 	constructor(view: MonthlyPlannerViewDelegate) {
 		this.view = view;
@@ -105,6 +109,25 @@ export class MonthlyInteractionHandler {
 			clientY,
 		);
 		if (!el || !this.view.contentEl.contains(el as Node)) return;
+
+		const tappedCell = (el as HTMLElement).closest?.(
+			"td[data-year][data-month][data-day]:not(.monthly-planner-cell-invalid)",
+		);
+		if (Platform.isMobile && tappedCell) {
+			const year = parseInt((tappedCell as HTMLElement).dataset.year ?? "", 10);
+			const month = parseInt(
+				(tappedCell as HTMLElement).dataset.month ?? "",
+				10,
+			);
+			const day = parseInt((tappedCell as HTMLElement).dataset.day ?? "", 10);
+			if (!isNaN(year) && !isNaN(month) && !isNaN(day)) {
+				e.preventDefault();
+				e.stopPropagation();
+				e.stopImmediatePropagation?.();
+				this.view.openDaySummaryPanel(year, month, day);
+			}
+			return;
+		}
 
 		const rangeBar = (el as HTMLElement).closest?.(
 			".monthly-planner-range-bar[data-path]",
@@ -176,15 +199,19 @@ export class MonthlyInteractionHandler {
 			e.stopPropagation();
 			e.stopImmediatePropagation?.();
 			if (!isNaN(year) && !isNaN(month) && !isNaN(day)) {
-				const bounds: SelectionBounds = {
-					startYear: year,
-					startMonth: month,
-					startDay: day,
-					endYear: year,
-					endMonth: month,
-					endDay: day,
-				};
-				this.view.openCreateFileModal(bounds);
+				if (Platform.isMobile) {
+					this.view.openDaySummaryPanel(year, month, day);
+				} else {
+					const bounds: SelectionBounds = {
+						startYear: year,
+						startMonth: month,
+						startDay: day,
+						endYear: year,
+						endMonth: month,
+						endDay: day,
+					};
+					this.view.openCreateFileModal(bounds);
+				}
 			}
 		}
 	}
@@ -327,8 +354,8 @@ export class MonthlyInteractionHandler {
 			startX,
 			startY,
 		};
-		document.addEventListener("mousemove", this.boundHandleChipMouseMove);
-		document.addEventListener("mouseup", this.boundHandleChipMouseUp);
+		this.doc.addEventListener("mousemove", this.boundHandleChipMouseMove);
+		this.doc.addEventListener("mouseup", this.boundHandleChipMouseUp);
 	}
 
 	private handleChipMouseMove(e: MouseEvent): void {
@@ -354,7 +381,11 @@ export class MonthlyInteractionHandler {
 		}
 
 		if (this.view.chipDragState) {
-			const cell = getMonthlyCellAtClientPos(e.clientX, e.clientY);
+			const cell = getMonthlyCellAtClientPos(
+				this.view.contentEl,
+				e.clientX,
+				e.clientY,
+			);
 			if (cell) {
 				const s = this.view.chipDragState;
 				const changed =
@@ -429,11 +460,11 @@ export class MonthlyInteractionHandler {
 	}
 
 	clearChipDragListeners(): void {
-		document.removeEventListener(
+		this.doc.removeEventListener(
 			"mousemove",
 			this.boundHandleChipMouseMove,
 		);
-		document.removeEventListener("mouseup", this.boundHandleChipMouseUp);
+		this.doc.removeEventListener("mouseup", this.boundHandleChipMouseUp);
 	}
 
 	private handleDragStart(
@@ -450,19 +481,23 @@ export class MonthlyInteractionHandler {
 			currentMonth: month,
 			currentDay: day,
 		};
-		document.addEventListener("mousemove", this.boundHandleMouseMove);
-		document.addEventListener("mouseup", this.boundHandleMouseUp);
-		document.addEventListener("touchmove", this.boundHandleTouchMove, {
+		this.doc.addEventListener("mousemove", this.boundHandleMouseMove);
+		this.doc.addEventListener("mouseup", this.boundHandleMouseUp);
+		this.doc.addEventListener("touchmove", this.boundHandleTouchMove, {
 			passive: false,
 		});
-		document.addEventListener("touchend", this.boundHandleTouchEnd);
-		document.addEventListener("touchcancel", this.boundHandleTouchEnd);
+		this.doc.addEventListener("touchend", this.boundHandleTouchEnd);
+		this.doc.addEventListener("touchcancel", this.boundHandleTouchEnd);
 		this.view.render();
 	}
 
 	private handleMouseMove(e: MouseEvent): void {
 		if (!this.view.dragState) return;
-		const cell = getMonthlyCellAtClientPos(e.clientX, e.clientY);
+		const cell = getMonthlyCellAtClientPos(
+			this.view.contentEl,
+			e.clientX,
+			e.clientY,
+		);
 		if (!cell) return;
 		this.view.dragState.currentYear = cell.year;
 		this.view.dragState.currentMonth = cell.month;
@@ -474,7 +509,11 @@ export class MonthlyInteractionHandler {
 		const t = e.touches[0];
 		if (!this.view.dragState || !t) return;
 		e.preventDefault();
-		const cell = getMonthlyCellAtClientPos(t.clientX, t.clientY);
+		const cell = getMonthlyCellAtClientPos(
+			this.view.contentEl,
+			t.clientX,
+			t.clientY,
+		);
 		if (!cell) return;
 		this.view.dragState.currentYear = cell.year;
 		this.view.dragState.currentMonth = cell.month;
@@ -526,11 +565,11 @@ export class MonthlyInteractionHandler {
 	}
 
 	clearDragListeners(): void {
-		document.removeEventListener("mousemove", this.boundHandleMouseMove);
-		document.removeEventListener("mouseup", this.boundHandleMouseUp);
-		document.removeEventListener("touchmove", this.boundHandleTouchMove);
-		document.removeEventListener("touchend", this.boundHandleTouchEnd);
-		document.removeEventListener("touchcancel", this.boundHandleTouchEnd);
+		this.doc.removeEventListener("mousemove", this.boundHandleMouseMove);
+		this.doc.removeEventListener("mouseup", this.boundHandleMouseUp);
+		this.doc.removeEventListener("touchmove", this.boundHandleTouchMove);
+		this.doc.removeEventListener("touchend", this.boundHandleTouchEnd);
+		this.doc.removeEventListener("touchcancel", this.boundHandleTouchEnd);
 		this.clearChipDragListeners();
 	}
 

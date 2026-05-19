@@ -57,6 +57,9 @@ export class PlannerInteractionHandler {
 	private rangeHighlightColor: string | null = null;
 	private chipDragPending: ChipDragPending | null = null;
 	private chipDragJustEnded = false;
+	private get doc(): Document {
+		return this.view.contentEl.ownerDocument;
+	}
 
 	constructor(view: YearlyPlannerViewDelegate) {
 		this.view = view;
@@ -193,7 +196,7 @@ export class PlannerInteractionHandler {
 	private handleRangeTouchStart(e: TouchEvent): void {
 		const t = e.touches[0];
 		if (!t) return;
-		const el = document.elementFromPoint(t.clientX, t.clientY);
+		const el = this.doc.elementFromPoint(t.clientX, t.clientY);
 		const info = this.getHoverChipInfo(el);
 		if (!info) return;
 		this.applyRangeHighlight(info);
@@ -203,7 +206,7 @@ export class PlannerInteractionHandler {
 		if (this.rangeHighlightBasenames.size === 0) return;
 		const t = e.touches[0];
 		if (!t) return;
-		const el = document.elementFromPoint(t.clientX, t.clientY);
+		const el = this.doc.elementFromPoint(t.clientX, t.clientY);
 		const basenames = Array.from(this.rangeHighlightBasenames);
 		if (!basenames.some((b) => this.isOverChipWithBasename(el, b))) {
 			this.clearRangeHighlight();
@@ -463,8 +466,8 @@ export class PlannerInteractionHandler {
 			startX,
 			startY,
 		};
-		document.addEventListener("mousemove", this.boundHandleChipMouseMove);
-		document.addEventListener("mouseup", this.boundHandleChipMouseUp);
+		this.doc.addEventListener("mousemove", this.boundHandleChipMouseMove);
+		this.doc.addEventListener("mouseup", this.boundHandleChipMouseUp);
 	}
 
 	private handleChipMouseMove(e: MouseEvent): void {
@@ -491,7 +494,7 @@ export class PlannerInteractionHandler {
 
 		if (this.view.chipDragState) {
 			// render() adds pointer-events:none to chips, so getCellAtClientPos hits td
-			const cell = getCellAtClientPos(e.clientX, e.clientY);
+			const cell = getCellAtClientPos(this.view.contentEl, e.clientX, e.clientY);
 
 			if (cell) {
 				const s = this.view.chipDragState;
@@ -567,11 +570,11 @@ export class PlannerInteractionHandler {
 	}
 
 	clearChipDragListeners(): void {
-		document.removeEventListener(
+		this.doc.removeEventListener(
 			"mousemove",
 			this.boundHandleChipMouseMove,
 		);
-		document.removeEventListener("mouseup", this.boundHandleChipMouseUp);
+		this.doc.removeEventListener("mouseup", this.boundHandleChipMouseUp);
 	}
 
 	private handleDragStart(
@@ -588,19 +591,19 @@ export class PlannerInteractionHandler {
 			currentMonth: month,
 			currentDay: day,
 		};
-		document.addEventListener("mousemove", this.boundHandleMouseMove);
-		document.addEventListener("mouseup", this.boundHandleMouseUp);
-		document.addEventListener("touchmove", this.boundHandleTouchMove, {
+		this.doc.addEventListener("mousemove", this.boundHandleMouseMove);
+		this.doc.addEventListener("mouseup", this.boundHandleMouseUp);
+		this.doc.addEventListener("touchmove", this.boundHandleTouchMove, {
 			passive: false,
 		});
-		document.addEventListener("touchend", this.boundHandleTouchEnd);
-		document.addEventListener("touchcancel", this.boundHandleTouchEnd);
+		this.doc.addEventListener("touchend", this.boundHandleTouchEnd);
+		this.doc.addEventListener("touchcancel", this.boundHandleTouchEnd);
 		this.view.render();
 	}
 
 	private handleMouseMove(e: MouseEvent): void {
 		if (!this.view.dragState) return;
-		const cell = getCellAtClientPos(e.clientX, e.clientY);
+		const cell = getCellAtClientPos(this.view.contentEl, e.clientX, e.clientY);
 		if (!cell) return;
 		this.view.dragState.currentYear = cell.year;
 		this.view.dragState.currentMonth = cell.month;
@@ -612,7 +615,7 @@ export class PlannerInteractionHandler {
 		const t = e.touches[0];
 		if (!this.view.dragState || !t) return;
 		e.preventDefault();
-		const cell = getCellAtClientPos(t.clientX, t.clientY);
+		const cell = getCellAtClientPos(this.view.contentEl, t.clientX, t.clientY);
 		if (!cell) return;
 		this.view.dragState.currentYear = cell.year;
 		this.view.dragState.currentMonth = cell.month;
@@ -664,11 +667,11 @@ export class PlannerInteractionHandler {
 	}
 
 	clearDragListeners(): void {
-		document.removeEventListener("mousemove", this.boundHandleMouseMove);
-		document.removeEventListener("mouseup", this.boundHandleMouseUp);
-		document.removeEventListener("touchmove", this.boundHandleTouchMove);
-		document.removeEventListener("touchend", this.boundHandleTouchEnd);
-		document.removeEventListener("touchcancel", this.boundHandleTouchEnd);
+		this.doc.removeEventListener("mousemove", this.boundHandleMouseMove);
+		this.doc.removeEventListener("mouseup", this.boundHandleMouseUp);
+		this.doc.removeEventListener("touchmove", this.boundHandleTouchMove);
+		this.doc.removeEventListener("touchend", this.boundHandleTouchEnd);
+		this.doc.removeEventListener("touchcancel", this.boundHandleTouchEnd);
 		this.clearChipDragListeners();
 	}
 }

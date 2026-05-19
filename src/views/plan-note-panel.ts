@@ -45,7 +45,7 @@ export async function renderPlanNotePanel(
 				opts.onToggle!();
 			});
 		}
-		header.createEl("span", {
+		header.createSpan({
 			cls: "plan-note-panel-title",
 			text: opts.label,
 		});
@@ -53,10 +53,8 @@ export async function renderPlanNotePanel(
 			cls: "plan-note-panel-open-btn clickable-icon",
 			attr: { "aria-label": t("planNote.openButton") },
 		});
-		const svg = document.createElementNS(
-			"http://www.w3.org/2000/svg",
-			"svg",
-		);
+		const doc = openBtn.ownerDocument;
+		const svg = doc.createElementNS("http://www.w3.org/2000/svg", "svg");
 		svg.setAttribute("viewBox", "0 0 24 24");
 		svg.setAttribute("width", "14");
 		svg.setAttribute("height", "14");
@@ -65,23 +63,17 @@ export async function renderPlanNotePanel(
 		svg.setAttribute("stroke-width", "2");
 		svg.setAttribute("stroke-linecap", "round");
 		svg.setAttribute("stroke-linejoin", "round");
-		const path = document.createElementNS(
-			"http://www.w3.org/2000/svg",
-			"path",
-		);
+		const path = doc.createElementNS("http://www.w3.org/2000/svg", "path");
 		path.setAttribute(
 			"d",
 			"M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6",
 		);
-		const polyline = document.createElementNS(
+		const polyline = doc.createElementNS(
 			"http://www.w3.org/2000/svg",
 			"polyline",
 		);
 		polyline.setAttribute("points", "15 3 21 3 21 9");
-		const line = document.createElementNS(
-			"http://www.w3.org/2000/svg",
-			"line",
-		);
+		const line = doc.createElementNS("http://www.w3.org/2000/svg", "line");
 		line.setAttribute("x1", "10");
 		line.setAttribute("y1", "14");
 		line.setAttribute("x2", "21");
@@ -117,7 +109,7 @@ export async function renderPlanNotePanel(
 		body.addEventListener("click", () => opts.onOpen(file));
 	} else {
 		const emptyEl = panel.createDiv({ cls: "plan-note-panel-empty" });
-		emptyEl.createEl("span", {
+		emptyEl.createSpan({
 			cls: "plan-note-panel-empty-hint",
 			text: t("planNote.emptyHint", { label: opts.label }),
 		});

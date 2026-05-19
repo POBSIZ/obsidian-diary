@@ -1503,6 +1503,20 @@ body.-is-mobile .yearly-planner-cell-file {
 	box-shadow: inset 0 0 0 2px var(--interactive-accent);
 }
 
+.monthly-planner-cell-active-date {
+	box-shadow: inset 0 0 0 2px var(--text-accent);
+	background: color-mix(
+		in srgb,
+		var(--text-accent) 12%,
+		var(--table-background, var(--background-primary))
+	) !important;
+}
+
+.monthly-planner-cell-active-date .monthly-planner-cell-day {
+	color: var(--text-accent);
+	font-weight: 700;
+}
+
 .monthly-planner-cell-holiday {
 	border-left: 3px solid var(--text-accent) !important;
 }
@@ -1606,6 +1620,38 @@ body.-is-mobile .yearly-planner-cell-file {
 
 .monthly-planner-cell-file.monthly-planner-chip-completed {
 	text-decoration: line-through;
+}
+
+.monthly-planner-mobile-single-summary {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 0.12rem;
+	min-height: 0.65rem;
+}
+
+.monthly-planner-mobile-single-group {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.1rem;
+	font-size: 0.55em;
+	color: var(--text-muted);
+}
+
+.monthly-planner-mobile-single-dot {
+	width: 0.52rem;
+	height: 0.52rem;
+	border-radius: 999px;
+	background: var(--monthly-mobile-dot-color, var(--interactive-accent));
+	display: inline-block;
+}
+
+.monthly-planner-mobile-single-plus {
+	font-size: 0.95em;
+}
+
+.monthly-planner-mobile-single-group-holiday .monthly-planner-mobile-single-plus {
+	color: var(--text-accent);
 }
 
 /* Range bar: chip-like layer with distinct color per bar, gap between stacked bars */
@@ -1732,6 +1778,83 @@ body.-is-mobile .yearly-planner-cell-file {
 
 .monthly-planner-range-label.monthly-planner-chip-completed {
 	text-decoration: line-through;
+}
+
+.monthly-planner-day-summary-sheet {
+	margin-top: 0.45rem;
+	border: 1px solid var(--background-modifier-border);
+	background: var(--background-primary);
+	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+	border-radius: 0.55rem;
+	padding: 0.45rem 0.6rem calc(0.45rem + env(safe-area-inset-bottom, 0px));
+	display: flex;
+	flex-direction: column;
+	gap: 0.45rem;
+}
+
+.monthly-planner-day-summary-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 0.5rem;
+}
+
+.monthly-planner-day-summary-title {
+	font-size: 0.8rem;
+	font-weight: 600;
+	color: var(--text-normal);
+}
+
+.monthly-planner-day-summary-close {
+	border: 1px solid var(--background-modifier-border);
+	border-radius: 999px;
+	width: 1.8rem;
+	height: 1.8rem;
+	background: var(--background-secondary);
+	color: var(--text-muted);
+	font-size: 1.1rem;
+	line-height: 1;
+}
+
+.monthly-planner-day-summary-body {
+	display: flex;
+	flex-direction: column;
+	gap: 0.3rem;
+	overflow-y: auto;
+}
+
+.monthly-planner-day-summary-item.monthly-planner-cell-file,
+.monthly-planner-day-summary-item.monthly-planner-range-bar {
+	width: 100%;
+}
+
+.monthly-planner-day-summary-item.monthly-planner-cell-file {
+	text-align: left;
+	border: 1px solid var(--background-modifier-border);
+	border-left: 3px solid var(--interactive-accent);
+	white-space: normal;
+	overflow: visible;
+	text-overflow: unset;
+}
+
+.monthly-planner-day-summary-item-holiday.monthly-planner-cell-file {
+	color: var(--text-accent);
+	background: color-mix(in srgb, var(--text-accent) 12%, var(--background-primary));
+}
+
+.monthly-planner-day-summary-empty {
+	font-size: 0.75rem;
+	color: var(--text-faint);
+	padding: 0.3rem 0.1rem;
+}
+
+.monthly-planner-day-summary-footer {
+	display: flex;
+	justify-content: flex-end;
+}
+
+.monthly-planner-day-summary-create {
+	min-height: 2rem;
 }
 
 .monthly-planner-cell-holidays {
@@ -1884,17 +2007,76 @@ body.-is-mobile .monthly-planner-cell-day {
 	margin-bottom: 0.1rem;
 }
 
+body.is-mobile .monthly-planner-cell-active-date,
+body.-is-mobile .monthly-planner-cell-active-date {
+	box-shadow: inset 0 0 0 2px var(--text-accent);
+	background: color-mix(
+		in srgb,
+		var(--text-accent) 18%,
+		var(--table-background, var(--background-primary))
+	) !important;
+}
+
 body.is-mobile .monthly-planner-range-bars,
 body.-is-mobile .monthly-planner-range-bars {
-	--monthly-range-bar-height: 0.9rem;
-	--monthly-range-bar-gap: 0.08rem;
+	--monthly-range-bar-height: 0.42rem;
+	--monthly-range-bar-gap: 0.06rem;
 	--monthly-range-bars-max-visible: 2;
 }
 
-body.is-mobile .monthly-planner-range-bar,
-body.-is-mobile .monthly-planner-range-bar {
-	border-left-width: 2px;
-	padding: 0 0.22rem 0 0.3rem;
+body.is-mobile .monthly-planner-range-bars-mobile .monthly-planner-range-bar-mobile,
+body.-is-mobile
+	.monthly-planner-range-bars-mobile
+	.monthly-planner-range-bar-mobile {
+	border-left-width: 0;
+	padding: 0;
+	border-radius: 0;
+	background: color-mix(
+		in srgb,
+		var(--range-color) 55%,
+		var(--background-primary)
+	);
+	box-shadow: none;
+}
+
+body.is-mobile
+	.monthly-planner-range-bars-mobile
+	.monthly-planner-range-run-start.monthly-planner-range-bar-mobile,
+body.-is-mobile
+	.monthly-planner-range-bars-mobile
+	.monthly-planner-range-run-start.monthly-planner-range-bar-mobile {
+	border-top-left-radius: 999px;
+	border-bottom-left-radius: 999px;
+	margin-left: 0.04rem;
+}
+
+body.is-mobile
+	.monthly-planner-range-bars-mobile
+	.monthly-planner-range-run-end.monthly-planner-range-bar-mobile,
+body.-is-mobile
+	.monthly-planner-range-bars-mobile
+	.monthly-planner-range-run-end.monthly-planner-range-bar-mobile {
+	border-top-right-radius: 999px;
+	border-bottom-right-radius: 999px;
+	margin-right: 0.04rem;
+}
+
+body.is-mobile
+	.monthly-planner-range-bars-mobile
+	.monthly-planner-range-run-start.monthly-planner-range-run-end.monthly-planner-range-bar-mobile,
+body.-is-mobile
+	.monthly-planner-range-bars-mobile
+	.monthly-planner-range-run-start.monthly-planner-range-run-end.monthly-planner-range-bar-mobile {
+	border-radius: 999px;
+	margin-left: 0.04rem;
+	margin-right: 0.04rem;
+}
+
+body.is-mobile .monthly-planner-range-bars-mobile .monthly-planner-range-label,
+body.-is-mobile
+	.monthly-planner-range-bars-mobile
+	.monthly-planner-range-label {
+	display: none;
 }
 
 body.is-mobile .monthly-planner-range-label,
@@ -1907,6 +2089,22 @@ body.-is-mobile .monthly-planner-cell-file {
 	font-size: 0.6em;
 	padding: 0.1rem 0.2rem 0.1rem 0.3rem;
 	border-left-width: 2px;
+}
+
+body.is-mobile .monthly-planner-mobile-single-summary,
+body.-is-mobile .monthly-planner-mobile-single-summary {
+	margin-bottom: 0.05rem;
+}
+
+body.is-mobile .monthly-planner-mobile-single-dot,
+body.-is-mobile .monthly-planner-mobile-single-dot {
+	width: 0.42rem;
+	height: 0.42rem;
+}
+
+body.is-mobile .monthly-planner-mobile-single-plus,
+body.-is-mobile .monthly-planner-mobile-single-plus {
+	font-size: 0.5rem;
 }
 
 body.is-mobile .monthly-planner-cell-holiday-badge,

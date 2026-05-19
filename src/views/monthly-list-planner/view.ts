@@ -86,10 +86,12 @@ export class MonthlyListPlannerView extends ItemView {
 	/** Defer: setState can re-render after onOpen, which would reset scroll if we scrolled in render(). */
 	private queueInitialScrollToToday(): void {
 		if (!this.pendingScrollToTodayOnOpen) return;
+		const activeWindow =
+			this.contentEl.ownerDocument.defaultView ?? window;
 		if (this.initialScrollToTodayHandle != null) {
-			clearTimeout(this.initialScrollToTodayHandle);
+			activeWindow.clearTimeout(this.initialScrollToTodayHandle);
 		}
-		this.initialScrollToTodayHandle = window.setTimeout(() => {
+		this.initialScrollToTodayHandle = activeWindow.setTimeout(() => {
 			this.initialScrollToTodayHandle = null;
 			this.applyInitialScrollToToday();
 		}, 0);
@@ -97,7 +99,9 @@ export class MonthlyListPlannerView extends ItemView {
 
 	private clearInitialScrollToToday(): void {
 		if (this.initialScrollToTodayHandle != null) {
-			clearTimeout(this.initialScrollToTodayHandle);
+			const activeWindow =
+				this.contentEl.ownerDocument.defaultView ?? window;
+			activeWindow.clearTimeout(this.initialScrollToTodayHandle);
 			this.initialScrollToTodayHandle = null;
 		}
 		this.pendingScrollToTodayOnOpen = false;
@@ -135,7 +139,10 @@ export class MonthlyListPlannerView extends ItemView {
 		clientY: number,
 		e: Event,
 	): void {
-		const elements = document.elementsFromPoint(clientX, clientY);
+		const elements = this.contentEl.ownerDocument.elementsFromPoint(
+			clientX,
+			clientY,
+		);
 		for (const el of elements) {
 			if (!this.contentEl.contains(el)) break;
 			const h = el as HTMLElement;
