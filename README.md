@@ -11,7 +11,7 @@ Diary는 Obsidian vault 안의 Markdown 파일을 날짜 기반 플래너로 보
 | Item | Value |
 | --- | --- |
 | Plugin ID | `diary` |
-| Version | `1.0.10` |
+| Version | `1.1.1` |
 | Minimum Obsidian version | `1.7.2` |
 | Platforms | Desktop and mobile (`isDesktopOnly: false`) |
 | Default language | `en` |
@@ -35,16 +35,16 @@ Captured from a fresh demo vault with sample planner notes.
 
 - Yearly planner: `12 months x 31 days` overview.
 - Monthly grid planner: one-month calendar view with date chips, range bars, holidays, and mobile pinch zoom.
-- Monthly list planner: day-by-day list for dense monthly review.
+- Monthly list planner: day-by-day list for dense monthly review, with `All`, `With notes`, and `Upcoming` filters.
 - Date notes and range notes: recognized by `YYYY-MM-DD` and `YYYY-MM-DD--YYYY-MM-DD` filenames. By default Diary scans the entire vault, with an optional planner-folder-only scope.
 - Plan notes: yearly `{plannerFolder}/{year}.md` and monthly `{plannerFolder}/{year}-{month}.md` notes.
 - Chip metadata: `color`, `todo`, `completed`, `notify_minutes`, `title`, `date_start`, and `date_end` frontmatter.
-- Desktop workflows: drag range selection, chip drag-to-move, internal planner copy/paste/delete/undo.
-- Mobile workflows: tap a day to open the day summary sheet, create notes from the sheet, and adjust mobile spacing in settings.
+- Desktop workflows: drag range selection, chip drag-to-move, keyboard activation, internal planner copy/paste/delete/undo.
+- Mobile workflows: tap a day to open the day summary sheet, create notes from the sheet, pinch zoom the monthly grid, and adjust mobile spacing in settings.
 
 ## Quick Usage
 
-1. Enable **Diary** in **Settings -> Community plugins**.
+1. Enable **Diary** in **Settings → Community plugins**.
 2. Run **Open monthly planner**, **Open yearly planner**, or **Open monthly list planner** from the command palette.
 3. Select a date cell or the add-file button.
 4. Choose **Single date** or **Range**, then set the folder, dates, filename, color, todo state, and reminder time.
@@ -52,7 +52,7 @@ Captured from a fresh demo vault with sample planner notes.
 
 한국어 빠른 사용법:
 
-1. **Settings -> Community plugins**에서 **Diary**를 활성화합니다.
+1. **Settings → Community plugins**에서 **Diary**를 활성화합니다.
 2. 커맨드 팔레트에서 **Open monthly planner**, **Open yearly planner**, **Open monthly list planner** 중 하나를 실행합니다.
 3. 날짜 셀 또는 파일 추가 버튼을 선택합니다.
 4. **Single date** 또는 **Range**를 고르고 폴더, 날짜, 파일명, 색상, todo 여부, 알림 시간을 입력합니다.
@@ -62,7 +62,7 @@ Captured from a fresh demo vault with sample planner notes.
 
 1. Download the latest release from [Releases](https://github.com/POBSIZ/obsidian-diary/releases).
 2. Copy `main.js`, `manifest.json`, and `styles.css` to `Vault/.obsidian/plugins/diary/`.
-3. Enable **Diary** in **Settings -> Community plugins**.
+3. Enable **Diary** in **Settings → Community plugins**.
 
 ## Development
 
@@ -83,13 +83,19 @@ Lint:
 npm run lint
 ```
 
+Test:
+
+```bash
+npm test
+```
+
 ## Repository Map
 
 - `src/main.ts`: plugin lifecycle, view registration, commands, refresh wiring.
 - `src/settings.ts`: settings schema/defaults and settings tab UI.
 - `src/views/yearly-planner/*`: yearly calendar UI, interactions, modals, file operations.
 - `src/views/monthly-planner/*`: monthly grid UI, mobile pinch zoom, interactions.
-- `src/views/monthly-list-planner/*`: monthly list UI and interactions.
+- `src/views/monthly-list-planner/*`: monthly list UI, filters, and interactions.
 - `src/views/planner-clipboard.ts`: multi-select copy/paste/delete/undo flow.
 - `src/planner-reminders.ts`: runtime reminders based on `notify_minutes`.
 - `src/i18n.ts`, `locales/*`: English and Korean localization.
@@ -99,6 +105,7 @@ npm run lint
 
 - Release workflow: `.github/workflows/release.yml`
 - Release assets: `main.js`, `manifest.json`, `styles.css`
+- Version bump helper: `npm version patch|minor|major --no-git-tag-version`
 - Build provenance attestation is generated during release workflow.
 
 ## License

@@ -1,7 +1,10 @@
 # Obsidian Reminder Plugin → External Endpoint 연동 문서
 
+> [!info] 현재 상태
+> `Diary 1.1.1` 기준으로 이 문서는 향후 외부 endpoint 연동을 위한 설계 메모입니다. 현재 배포된 플러그인은 `notify_minutes` frontmatter를 읽어 Obsidian이 열려 있는 동안 로컬 Notice만 표시하며, reminder 데이터를 네트워크로 전송하거나 endpoint 설정을 노출하지 않습니다.
+
 ## 목표
-Obsidian 플러그인에서 리마인더가 생성/수정/삭제될 때 외부 endpoint로 이벤트를 보내고, 실제 예약/발송은 OpenClaw 쪽에서 처리한다.
+향후 Obsidian 플러그인에서 리마인더가 생성/수정/삭제될 때 외부 endpoint로 이벤트를 보내고, 실제 예약/발송은 OpenClaw 쪽에서 처리한다.
 
 이 구조의 목적:
 - Obsidian/iCloud 파일 전체 스캔 제거
@@ -12,12 +15,12 @@ Obsidian 플러그인에서 리마인더가 생성/수정/삭제될 때 외부 e
 
 ## 전체 구조
 
-### Plugin 역할
+### Plugin 역할 (구현 시)
 - note/file/frontmatter를 읽어 reminder 정보 해석
 - reminder absolute time(`notifyAt`) 계산
 - 외부 endpoint에 `upsert/delete` 요청 전송
 
-### External endpoint 역할
+### External endpoint 역할 (구현 시)
 - reminder를 식별 가능한 id 기준으로 저장/갱신/삭제
 - OpenClaw cron 또는 동등한 스케줄러에 등록
 - 시각이 되면 Discord 채널로 메시지 전송
@@ -184,7 +187,7 @@ notify_minutes: 1380
 
 ---
 
-## 플러그인 Settings 권장 항목
+## 플러그인 Settings 권장 항목 (미구현)
 
 ```ts
 interface ReminderPluginSettings {
@@ -327,7 +330,7 @@ await requestUrl({
 
 ---
 
-## 구현 권장 순서
+## 구현 권장 순서 (미구현 설계)
 
 1. 플러그인 settings 추가
 2. note에서 `notify_minutes` + 날짜 파싱

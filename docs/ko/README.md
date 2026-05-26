@@ -9,7 +9,7 @@ English documentation: [docs/en/README.md](https://github.com/POBSIZ/obsidian-di
 | 항목 | 값 |
 | --- | --- |
 | 플러그인 ID | `diary` |
-| 현재 버전 | `1.0.10` |
+| 현재 버전 | `1.1.1` |
 | 최소 Obsidian 버전 | `1.7.2` |
 | 지원 플랫폼 | 데스크톱 / 모바일 (`isDesktopOnly: false`) |
 | 기본 언어 | `en` |
@@ -37,20 +37,21 @@ English documentation: [docs/en/README.md](https://github.com/POBSIZ/obsidian-di
 
 - **연간 플래너**: `12개월 x 31일` 표로 한 해의 날짜 노트와 기간 노트를 한눈에 봅니다.
 - **월간 그리드 플래너**: 한 달 달력을 크게 보고 날짜별 칩, 기간 막대, 공휴일을 확인합니다.
-- **월간 목록 플래너**: 하루씩 세로로 훑으며 일정이 많은 달을 검토합니다.
+- **월간 목록 플래너**: 하루씩 세로로 훑으며 일정이 많은 달을 검토하고, `전체`, `노트 있음`, `오늘 이후` 필터로 범위를 좁힙니다.
 - **플랜 노트 패널**: 연간 노트(`YYYY.md`)와 월간 노트(`YYYY-MM.md`)를 플래너 상단에서 만들고 미리 봅니다.
 - **날짜/기간 노트**: 날짜 파일명과 기간 파일명을 기준으로 노트를 플래너 칩으로 표시합니다. 기본값은 vault 전체 스캔이며, 설정에서 플래너 폴더 안으로만 제한할 수 있습니다.
 - **색상, todo, 완료 상태**: frontmatter의 `color`, `todo`, `completed` 값을 칩 스타일과 라벨에 반영합니다.
 - **공휴일 오버레이**: 국가별 공휴일을 표시하고 공휴일 배지를 선택해 이름을 확인합니다.
 - **로컬 알림**: `notify_minutes`가 있는 날짜 노트는 Obsidian이 열려 있을 때 해당 날짜와 시간에 Notice를 표시합니다.
 - **플래너 클립보드**: 데스크톱에서 선택한 날짜/노트를 복사, 붙여넣기, 삭제, 붙여넣기 취소할 수 있습니다.
+- **키보드와 접근성 지원**: 날짜 셀, 칩, 기간 막대, 공휴일 배지, 플래너 라벨, 월간 목록 행을 키보드로 실행할 수 있고 접근성 라벨을 제공합니다.
 - **모바일 최적화**: 월간 그리드에서 핀치 줌, 확대 초기화, 일자 요약 시트를 지원합니다.
 
 ## 설치
 
 1. [Releases](https://github.com/POBSIZ/obsidian-diary/releases)에서 최신 릴리스를 다운로드합니다.
 2. `main.js`, `manifest.json`, `styles.css`를 vault의 `Vault/.obsidian/plugins/diary/` 폴더에 복사합니다.
-3. Obsidian에서 **Settings -> Community plugins**를 엽니다.
+3. Obsidian에서 **Settings → Community plugins**를 엽니다.
 4. Restricted mode가 켜져 있다면 신뢰하는 vault에서만 끄고, **Diary**를 활성화합니다.
 5. 왼쪽 리본 아이콘 또는 커맨드 팔레트에서 플래너를 엽니다.
 
@@ -85,6 +86,16 @@ Yearly -> Monthly Grid -> Monthly List -> Yearly
 ```
 
 이전/다음 버튼으로 연도나 월을 이동하고, 달력 아이콘으로 현재 연도/월로 돌아갑니다. 연도 또는 월 표시 텍스트를 선택하면 직접 값을 입력할 수 있습니다.
+
+## 월간 목록 필터
+
+월간 목록에는 세 가지 필터가 있습니다.
+
+- **전체**: 선택한 달의 모든 날짜를 표시합니다.
+- **노트 있음**: 단일 날짜 노트나 기간 노트가 있는 날짜만 표시합니다.
+- **오늘 이후**: 선택한 달에서 오늘과 이후 날짜만 표시합니다.
+
+월간 목록을 현재 달로 열면 오늘 행이 자동으로 보이도록 스크롤됩니다. 현재 달 버튼을 선택해도 오늘 행으로 돌아갑니다.
 
 ## 노트 만들기
 
@@ -131,6 +142,13 @@ Yearly -> Monthly Grid -> Monthly List -> Yearly
 - 파일 삭제
 
 데스크톱에서는 날짜 칩 또는 기간 막대를 다른 날짜로 드래그해 이동할 수 있습니다. 기간 노트는 시작일이 이동하며 전체 기간 길이는 유지됩니다. 대상 경로에 이미 파일이 있으면 이동하지 않습니다.
+
+## 키보드와 접근성
+
+- 포커스된 날짜 셀, 플래너 칩, 기간 막대, 공휴일 배지, 월간 목록 행, 연도 라벨, 월 라벨에서 `Enter` 또는 `Space`를 누르면 실행됩니다.
+- 플래너 컨트롤은 스크린 리더를 위해 button role, 상태 라벨, `aria-label` 텍스트를 제공합니다.
+- 월간 목록 필터는 탭 형태의 선택 상태를 `aria-selected`로 노출합니다.
+- 모달의 검증 메시지는 polite live region으로 안내됩니다.
 
 ## 플래너 클립보드 (데스크톱)
 
@@ -239,11 +257,17 @@ Lint:
 npm run lint
 ```
 
+테스트:
+
+```bash
+npm test
+```
+
 ## 릴리스
 
 - 릴리스 워크플로: `.github/workflows/release.yml`
 - 릴리스 에셋: `main.js`, `manifest.json`, `styles.css`
-- `manifest.json`의 `version`과 `versions.json`을 함께 갱신합니다.
+- `npm version patch|minor|major --no-git-tag-version`을 사용해 `package.json`, `package-lock.json`, `manifest.json`, `versions.json`을 함께 맞춥니다.
 - GitHub 릴리스 태그는 `manifest.json`의 버전과 정확히 같아야 하며, 앞에 `v`를 붙이지 않습니다.
 
 ## 개인정보와 네트워크
@@ -251,11 +275,12 @@ npm run lint
 - 플래너 기능은 vault 안의 로컬 Markdown 파일을 기준으로 동작합니다.
 - 숨겨진 telemetry나 analytics가 없습니다.
 - 공휴일 계산은 번들된 의존성을 사용하며, 플래너 표시를 위해 vault 내용을 외부 서비스로 보내지 않습니다.
+- `obsidian-reminder-endpoint-spec.md`는 향후 외부 endpoint 연동 설계 메모입니다. 현재 배포된 플러그인은 reminder 데이터를 네트워크로 전송하지 않습니다.
 
 ## 문제 해결
 
 - 플러그인이 보이지 않으면 `main.js`, `manifest.json`, `styles.css`가 `Vault/.obsidian/plugins/diary/` 바로 아래에 있는지 확인합니다.
-- 명령이 보이지 않으면 **Settings -> Community plugins**에서 **Diary**가 활성화되어 있는지 확인합니다.
+- 명령이 보이지 않으면 **Settings → Community plugins**에서 **Diary**가 활성화되어 있는지 확인합니다.
 - 칩이 표시되지 않으면 파일명이 `YYYY-MM-DD` 또는 `YYYY-MM-DD--YYYY-MM-DD` 규칙을 따르는지 확인합니다.
 - 모바일에서 표 하단이 가려지면 **Mobile bottom padding** 값을 키웁니다.
 - 알림이 오지 않으면 Obsidian이 열려 있는지, 노트의 이벤트 날짜가 오늘인지, `notify_minutes` 값이 `0-1439` 범위인지 확인합니다.

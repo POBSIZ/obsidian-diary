@@ -9,7 +9,7 @@ Diary is an Obsidian community plugin that turns Markdown files in your vault in
 | Item | Value |
 | --- | --- |
 | Plugin ID | `diary` |
-| Current version | `1.0.10` |
+| Current version | `1.1.1` |
 | Minimum Obsidian version | `1.7.2` |
 | Supported platforms | Desktop / mobile (`isDesktopOnly: false`) |
 | Default language | `en` |
@@ -37,20 +37,21 @@ The images below were captured from a fresh demo vault with sample planner notes
 
 - **Yearly planner**: View date notes and range notes in a `12 months x 31 days` table.
 - **Monthly grid planner**: Inspect one month in a large calendar grid with chips, range bars, and holidays.
-- **Monthly list planner**: Review busy months in a day-by-day vertical list.
+- **Monthly list planner**: Review busy months in a day-by-day vertical list with `All`, `With notes`, and `Upcoming` filters.
 - **Plan note panel**: Create and preview yearly notes (`YYYY.md`) and monthly notes (`YYYY-MM.md`) above the planner.
 - **Date and range notes**: Display notes as planner chips based on single-date and date-range filenames. Diary scans the whole vault by default, or only the planner folder when configured.
 - **Color, todo, and completion state**: Reflect `color`, `todo`, and `completed` frontmatter in chip styling and labels.
 - **Holiday overlays**: Show country-specific public holidays and select holiday badges to see their names.
 - **Local reminders**: Notes with `notify_minutes` show an Obsidian Notice on the event date while Obsidian is open.
 - **Planner clipboard**: On desktop, copy, paste, delete, and undo pasted planner notes from selected dates or chips.
+- **Keyboard and accessibility support**: Date cells, chips, range bars, holiday badges, planner labels, and monthly list rows expose keyboard activation and accessible labels.
 - **Mobile optimization**: Monthly grid supports pinch zoom, reset zoom, and a day summary sheet.
 
 ## Install
 
 1. Download the latest release from [Releases](https://github.com/POBSIZ/obsidian-diary/releases).
 2. Copy `main.js`, `manifest.json`, and `styles.css` into `Vault/.obsidian/plugins/diary/`.
-3. In Obsidian, open **Settings -> Community plugins**.
+3. In Obsidian, open **Settings → Community plugins**.
 4. If Restricted mode is enabled, turn it off only for vaults you trust, then enable **Diary**.
 5. Open a planner from the left ribbon icons or the command palette.
 
@@ -64,7 +65,7 @@ The images below were captured from a fresh demo vault with sample planner notes
 
 Created notes are ordinary Markdown files. They remain in your vault even if the plugin is disabled.
 
-## Opening And Switching Views
+## Opening and Switching Views
 
 Ribbon icons:
 
@@ -85,6 +86,16 @@ Yearly -> Monthly Grid -> Monthly List -> Yearly
 ```
 
 Use previous/next buttons to move through years or months, and the calendar icon to return to the current year or month. Select the year or month label to type a specific value.
+
+## Monthly List Filters
+
+The monthly list has three filters:
+
+- **All**: show every day in the selected month.
+- **With notes**: show only days with single-date notes or range notes.
+- **Upcoming**: show today and future dates in the selected month.
+
+When the monthly list opens on the current month, Diary scrolls today's row into view. The current-month button also returns to today.
 
 ## Creating Notes
 
@@ -131,6 +142,13 @@ Select a chip or range bar in the planner to open the file options modal.
 - Delete the file
 
 On desktop, drag a date chip or range bar to another date to move it. Range notes move by start date and keep the same duration. If the target path already exists, Diary does not move the file.
+
+## Keyboard and Accessibility
+
+- Press `Enter` or `Space` on a focused date cell, planner chip, range bar, holiday badge, monthly list row, year label, or month label to activate it.
+- Planner controls use button roles, state labels, and `aria-label` text for screen readers.
+- Monthly list filters expose tab-style selected state with `aria-selected`.
+- Modal validation messages are announced with polite live regions.
 
 ## Planner Clipboard (Desktop)
 
@@ -239,11 +257,17 @@ Lint:
 npm run lint
 ```
 
+Test:
+
+```bash
+npm test
+```
+
 ## Release
 
 - Release workflow: `.github/workflows/release.yml`
 - Release assets: `main.js`, `manifest.json`, `styles.css`
-- Update `version` in `manifest.json` and `versions.json` together.
+- Use `npm version patch|minor|major --no-git-tag-version` so `package.json`, `package-lock.json`, `manifest.json`, and `versions.json` stay in sync.
 - The GitHub release tag must exactly match the `manifest.json` version and should not have a leading `v`.
 
 ## Privacy And Network
@@ -251,11 +275,12 @@ npm run lint
 - Planner features operate on local Markdown files inside the vault.
 - Diary has no hidden telemetry or analytics.
 - Holiday calculation uses the bundled dependency and does not send vault content to external services for planner rendering.
+- `obsidian-reminder-endpoint-spec.md` is a future external endpoint design note. The released plugin currently does not send reminder data over the network.
 
 ## Troubleshooting
 
 - If the plugin is missing, make sure `main.js`, `manifest.json`, and `styles.css` are directly inside `Vault/.obsidian/plugins/diary/`.
-- If commands are missing, confirm that **Diary** is enabled in **Settings -> Community plugins**.
+- If commands are missing, confirm that **Diary** is enabled in **Settings → Community plugins**.
 - If chips do not appear, confirm that filenames follow `YYYY-MM-DD` or `YYYY-MM-DD--YYYY-MM-DD` rules.
 - If mobile content is covered at the bottom, increase **Mobile bottom padding**.
 - If a reminder does not appear, confirm that Obsidian is open, the event date is today, and `notify_minutes` is within `0-1439`.
