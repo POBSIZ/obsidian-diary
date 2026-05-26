@@ -63,18 +63,17 @@ export function renderMonthlyPlannerHeader(
 		cls: "monthly-planner-nav-wrapper",
 	});
 
-	const prevBtn = navWrapper.createEl("button", {
-		cls: "monthly-planner-nav-btn",
+	createHeaderIconButton(navWrapper, "monthly-planner-nav-btn", {
+		icon: "chevron-left",
+		label: t("header.prevMonth"),
+		onClick: callbacks.onPrev,
 	});
-	setIcon(prevBtn, "chevron-left");
-	prevBtn.ariaLabel = t("header.prevMonth");
-	prevBtn.onclick = callbacks.onPrev;
 
 	const monthYearDisplay = navWrapper.createSpan({
 		cls: "monthly-planner-month-year-display",
 		text: `${ctx.monthLabel} ${ctx.year}`,
 	});
-	monthYearDisplay.onclick = () => {
+	const openMonthYearModal = () => {
 		new MonthYearInputModal(
 			ctx.app,
 			ctx.year,
@@ -82,48 +81,124 @@ export function renderMonthlyPlannerHeader(
 			callbacks.onMonthYearClick,
 		).open();
 	};
+	monthYearDisplay.onclick = openMonthYearModal;
+	monthYearDisplay.tabIndex = 0;
+	monthYearDisplay.setAttribute("role", "button");
+	monthYearDisplay.onkeydown = (e) => {
+		if (e.key !== "Enter" && e.key !== " ") return;
+		e.preventDefault();
+		openMonthYearModal();
+	};
 	monthYearDisplay.title = t("header.clickToEnterMonthYear");
 
-	const nextBtn = navWrapper.createEl("button", {
-		cls: "monthly-planner-nav-btn",
+	createHeaderIconButton(navWrapper, "monthly-planner-nav-btn", {
+		icon: "chevron-right",
+		label: t("header.nextMonth"),
+		onClick: callbacks.onNext,
 	});
-	setIcon(nextBtn, "chevron-right");
-	nextBtn.ariaLabel = t("header.nextMonth");
-	nextBtn.onclick = callbacks.onNext;
 
-	const todayBtn = navWrapper.createEl("button", {
-		cls: "monthly-planner-nav-btn",
-	});
-	setIcon(todayBtn, "calendar");
-	todayBtn.ariaLabel = t("header.goToCurrentMonth");
-	todayBtn.onclick = callbacks.onToday;
+	const secondaryActions: HeaderAction[] = [
+		{
+			icon: "calendar",
+			label: t("header.goToCurrentMonth"),
+			onClick: callbacks.onToday,
+		},
+	];
 
 	if (callbacks.onCyclePlannerView) {
-		const cycleBtn = navWrapper.createEl("button", {
-			cls: "monthly-planner-nav-btn monthly-planner-nav-btn--cycle-view",
+		secondaryActions.push({
+			icon: "repeat",
+			label: t("header.cyclePlannerView"),
+			title: t("header.cyclePlannerViewHint"),
+			onClick: callbacks.onCyclePlannerView,
+			extraClass: "monthly-planner-nav-btn--cycle-view",
 		});
-		setIcon(cycleBtn, "repeat");
-		cycleBtn.ariaLabel = t("header.cyclePlannerView");
-		cycleBtn.title = t("header.cyclePlannerViewHint");
-		cycleBtn.onclick = callbacks.onCyclePlannerView;
 	}
 
 	if (callbacks.onAddFile) {
-		const addFileBtn = navWrapper.createEl("button", {
-			cls: "monthly-planner-nav-btn",
+		secondaryActions.push({
+			icon: "file-plus",
+			label: t("header.addFile"),
+			onClick: callbacks.onAddFile,
 		});
-		setIcon(addFileBtn, "file-plus");
-		addFileBtn.ariaLabel = t("header.addFile");
-		addFileBtn.onclick = callbacks.onAddFile;
 	}
 
 	if (callbacks.onResetZoom) {
-		const resetZoomBtn = navWrapper.createEl("button", {
-			cls: "monthly-planner-nav-btn monthly-planner-reset-zoom-btn",
+		secondaryActions.push({
+			icon: "rotate-ccw",
+			label: t("header.resetZoom"),
+			onClick: callbacks.onResetZoom,
+			extraClass: "monthly-planner-reset-zoom-btn",
 		});
-		setIcon(resetZoomBtn, "rotate-ccw");
-		resetZoomBtn.ariaLabel = t("header.resetZoom");
-		resetZoomBtn.onclick = callbacks.onResetZoom;
+	}
+
+	renderSecondaryHeaderActions(
+		navWrapper,
+		"monthly-planner-nav-btn",
+		secondaryActions,
+	);
+}
+
+interface HeaderAction {
+	icon: string;
+	label: string;
+	onClick: () => void;
+	title?: string;
+	extraClass?: string;
+}
+
+function createHeaderIconButton(
+	parent: HTMLElement,
+	baseClass: string,
+	action: HeaderAction,
+): HTMLButtonElement {
+	const btn = parent.createEl("button", {
+		cls: [baseClass, action.extraClass].filter(Boolean).join(" "),
+		attr: { type: "button" },
+	});
+	setIcon(btn, action.icon);
+	btn.ariaLabel = action.label;
+	if (action.title) btn.title = action.title;
+	btn.onclick = action.onClick;
+	return btn;
+}
+
+function renderSecondaryHeaderActions(
+	parent: HTMLElement,
+	baseClass: string,
+	actions: HeaderAction[],
+): void {
+	if (actions.length === 0) return;
+	const inline = parent.createDiv({ cls: "planner-nav-secondary" });
+	for (const action of actions) {
+		createHeaderIconButton(inline, baseClass, action);
+	}
+
+	const moreMenu = parent.createEl("details", { cls: "planner-more-menu" });
+	const trigger = moreMenu.createEl("summary", {
+		cls: `${baseClass} planner-more-menu-trigger`,
+		attr: {
+			"aria-label": t("header.moreActions"),
+			role: "button",
+		},
+	});
+	setIcon(trigger, "ellipsis");
+
+	const popover = moreMenu.createDiv({ cls: "planner-more-menu-popover" });
+	for (const action of actions) {
+		const item = popover.createEl("button", {
+			cls: "planner-more-menu-item",
+			attr: { type: "button" },
+		});
+		const icon = item.createSpan({ cls: "planner-more-menu-item-icon" });
+		setIcon(icon, action.icon);
+		item.createSpan({ cls: "planner-more-menu-item-label", text: action.label });
+		item.ariaLabel = action.label;
+		if (action.title) item.title = action.title;
+		item.onclick = () => {
+			moreMenu.removeAttribute("open");
+			action.onClick();
+		};
 	}
 }
 
@@ -195,6 +270,8 @@ export function createMonthlyCell(
 	cell.dataset.year = String(year);
 	cell.dataset.month = String(month);
 	cell.dataset.day = String(day);
+	cell.tabIndex = 0;
+	cell.setAttribute("role", "button");
 
 	const inner = cell.createDiv({ cls: "monthly-planner-cell-inner" });
 	const dayNumEl = inner.createDiv({ cls: "monthly-planner-cell-day" });
@@ -210,6 +287,16 @@ export function createMonthlyCell(
 		ctx.plannerFiles,
 	);
 	const isMobileView = Platform.isMobile;
+	const holidayNames =
+		isHoliday && ctx.holidaysData?.names.has(dateKey)
+			? (ctx.holidaysData.names.get(dateKey) ?? [])
+			: [];
+	cell.ariaLabel = t("a11y.monthlyDateCell", {
+		date: dateKey,
+		notes: singleFiles.length,
+		ranges: rangeFiles.length,
+		holidays: holidayNames.length,
+	});
 
 	if (rangeFiles.length > 0 && singleFiles.length > 0) {
 		cell.dataset.hasBoth = "true";
@@ -245,7 +332,11 @@ export function createMonthlyCell(
 			]
 				.filter(Boolean)
 				.join(" ");
-			const barEl = rangeContainer.createDiv({ cls: barClasses });
+			const barEl = rangeContainer.createDiv({
+				cls: barClasses,
+			});
+			barEl.tabIndex = 0;
+			barEl.setAttribute("role", "button");
 			if (isMobileView) {
 				barEl.addClass("monthly-planner-range-bar-mobile");
 			}
@@ -266,6 +357,10 @@ export function createMonthlyCell(
 					: isTodoFile(ctx.app, file)
 						? `${TODO_CHIP_EMOJI_INCOMPLETE} ${title}`
 						: title;
+				barEl.ariaLabel = t("a11y.openPlannerNote", {
+					title: displayTitle,
+					path: file.path,
+				});
 				const labelEl = barEl.createSpan({
 					cls: "monthly-planner-range-label",
 					text: displayTitle,
@@ -273,12 +368,23 @@ export function createMonthlyCell(
 				if (isTodoCompleted(ctx.app, file)) {
 					labelEl.addClass("monthly-planner-chip-completed");
 				}
+			} else {
+				barEl.ariaLabel = t("a11y.openPlannerNote", {
+					title: getFileTitle(ctx.app, file),
+					path: file.path,
+				});
 			}
 		});
 	}
 
 	if (singleFiles.length > 0 && isMobileView) {
 		createMobileSingleFileSummary(inner, ctx.app, singleFiles);
+	}
+	if (isMobileView) {
+		createMobileEntryCount(
+			inner,
+			singleFiles.length + rangeFiles.length + holidayNames.length,
+		);
 	}
 
 	if (singleFiles.length > 0 && !isMobileView) {
@@ -287,6 +393,8 @@ export function createMonthlyCell(
 			const linkEl = listEl.createDiv({
 				cls: "monthly-planner-cell-file",
 			});
+			linkEl.tabIndex = 0;
+			linkEl.setAttribute("role", "button");
 			const title = getFileTitle(ctx.app, file);
 			if (isTodoCompleted(ctx.app, file)) {
 				linkEl.addClass("monthly-planner-chip-completed");
@@ -297,6 +405,10 @@ export function createMonthlyCell(
 				linkEl.textContent = title;
 			}
 			linkEl.title = file.path;
+			linkEl.ariaLabel = t("a11y.openPlannerNote", {
+				title,
+				path: file.path,
+			});
 			linkEl.dataset.path = file.path;
 			const chipColor = getChipColor(ctx.app, file);
 			if (chipColor) {
@@ -309,21 +421,25 @@ export function createMonthlyCell(
 	}
 
 	if (isHoliday && ctx.holidaysData?.names.has(dateKey) && isMobileView) {
-		const holidayNames = ctx.holidaysData.names.get(dateKey) ?? [];
 		createMobileHolidaySummary(inner, holidayNames);
 	}
 
 	if (isHoliday && ctx.holidaysData?.names.has(dateKey) && !isMobileView) {
-		const holidayNames = ctx.holidaysData.names.get(dateKey) ?? [];
 		const holidaysContainer = inner.createDiv({
 			cls: "monthly-planner-cell-holidays",
 		});
 		const badge = holidaysContainer.createDiv({
 			cls: "monthly-planner-cell-holiday-badge",
 		});
+		badge.tabIndex = 0;
+		badge.setAttribute("role", "button");
 		badge.createSpan({
 			cls: "monthly-planner-holiday-label",
 			text: holidayNames.join(", "),
+		});
+		badge.ariaLabel = t("a11y.openHoliday", {
+			date: dateKey,
+			names: holidayNames.join(", "),
 		});
 		badge.dataset.holidayDate = dateKey;
 		badge.dataset.holidayNames = JSON.stringify(holidayNames);
@@ -399,6 +515,15 @@ function createMobileHolidaySummary(inner: HTMLElement, holidayNames: string[]):
 			text: `+${holidayNames.length - 1}`,
 		});
 	}
+}
+
+function createMobileEntryCount(inner: HTMLElement, count: number): void {
+	if (count <= 1) return;
+	inner.createSpan({
+		cls: "monthly-planner-mobile-entry-count",
+		text: String(count),
+		attr: { "aria-hidden": "true" },
+	});
 }
 
 function getOrCreateMobileSummaryContainer(inner: HTMLElement): HTMLElement {

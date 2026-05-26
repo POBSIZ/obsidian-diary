@@ -1,4 +1,4 @@
-import { App, Modal } from "obsidian";
+import { App, Modal, Notice } from "obsidian";
 import { t } from "../../i18n";
 
 export class MonthYearInputModal extends Modal {
@@ -41,8 +41,9 @@ export class MonthYearInputModal extends Modal {
 		const btn = form.createEl("button", {
 			text: t("modal.apply"),
 			cls: "mod-cta",
+			attr: { type: "button" },
 		});
-		btn.onclick = () => {
+		const submit = () => {
 			const month = parseInt(monthInput.value, 10);
 			const year = parseInt(yearInput.value, 10);
 			if (
@@ -55,7 +56,17 @@ export class MonthYearInputModal extends Modal {
 			) {
 				this.onSubmit(year, month);
 				this.close();
+			} else {
+				new Notice(t("modal.invalidMonthYear"));
 			}
 		};
+		btn.onclick = submit;
+		this.contentEl.addEventListener("keydown", (e) => {
+			if (e.key !== "Enter" || e.isComposing) return;
+			e.preventDefault();
+			submit();
+		});
+		monthInput.focus();
+		monthInput.select();
 	}
 }

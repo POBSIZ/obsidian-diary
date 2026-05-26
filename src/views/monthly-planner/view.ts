@@ -239,7 +239,7 @@ export class MonthlyPlannerView
 			contentEl.appendChild(planNoteWrapper);
 			syncPlanNotePanelExpandedState(
 				planNoteWrapper,
-				this.plugin.settings.planNotePanelExpanded ?? true,
+				this.plugin.isPlanNotePanelExpanded(),
 			);
 		} else {
 			const notePanelEl = contentEl.createDiv({
@@ -299,7 +299,7 @@ export class MonthlyPlannerView
 		const label = `${monthLabel} ${this.year}`;
 		await renderPlanNotePanel(container, this.app, filePath, this, {
 			label,
-			expanded: this.plugin.settings.planNotePanelExpanded ?? true,
+			expanded: this.plugin.isPlanNotePanelExpanded(),
 			onToggle: () => void this.plugin.togglePlanNotePanelExpanded(),
 			onCreate: async () => {
 				const dir = filePath.split("/").slice(0, -1).join("/");
@@ -425,6 +425,13 @@ export class MonthlyPlannerView
 		scrollContainer.addEventListener(
 			"touchcancel",
 			this.interactionHandler.handlePlannerTouchCancel.bind(
+				this.interactionHandler,
+			),
+			{ capture: true },
+		);
+		scrollContainer.addEventListener(
+			"keydown",
+			this.interactionHandler.handlePlannerKeyDown.bind(
 				this.interactionHandler,
 			),
 			{ capture: true },

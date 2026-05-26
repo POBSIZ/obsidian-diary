@@ -1,4 +1,4 @@
-import { Plugin, WorkspaceLeaf } from "obsidian";
+import { Platform, Plugin, WorkspaceLeaf } from "obsidian";
 import { setLocale, t } from "./i18n";
 import {
 	DEFAULT_SETTINGS,
@@ -217,9 +217,20 @@ export default class DiaryObsidian extends Plugin {
 
 	/** Toggle plan note panel expanded state and persist. */
 	async togglePlanNotePanelExpanded(): Promise<void> {
-		this.settings.planNotePanelExpanded =
-			!(this.settings.planNotePanelExpanded ?? true);
+		const next = !this.isPlanNotePanelExpanded();
+		if (Platform.isMobile) {
+			this.settings.mobilePlanNotePanelExpanded = next;
+		} else {
+			this.settings.planNotePanelExpanded = next;
+		}
 		await this.saveSettings();
+	}
+
+	isPlanNotePanelExpanded(): boolean {
+		if (Platform.isMobile) {
+			return this.settings.mobilePlanNotePanelExpanded ?? false;
+		}
+		return this.settings.planNotePanelExpanded ?? true;
 	}
 
 	refreshYearlyPlannerViews(): void {

@@ -80,6 +80,36 @@ export class MonthlyInteractionHandler {
 		this.handlePlannerClickAt(e.clientX, e.clientY, e);
 	}
 
+	handlePlannerKeyDown(e: KeyboardEvent): void {
+		if (e.key !== "Enter" && e.key !== " ") return;
+		const target = e.target;
+		if (!(target instanceof HTMLElement)) return;
+		const directTarget = target.closest(
+			".monthly-planner-cell-file, .monthly-planner-range-bar, .monthly-planner-cell-holiday-badge",
+		);
+		if (directTarget instanceof HTMLElement) {
+			const rect = directTarget.getBoundingClientRect();
+			e.preventDefault();
+			this.handlePlannerClickAt(
+				rect.left + rect.width / 2,
+				rect.top + rect.height / 2,
+				e as unknown as MouseEvent,
+			);
+			return;
+		}
+		const cell = target.closest(
+			"td[data-year][data-month][data-day]:not(.monthly-planner-cell-invalid)",
+		);
+		if (!(cell instanceof HTMLElement)) return;
+		const rect = cell.getBoundingClientRect();
+		e.preventDefault();
+		this.handlePlannerClickAt(
+			rect.left + rect.width / 2,
+			rect.top + rect.height / 2,
+			e as unknown as MouseEvent,
+		);
+	}
+
 	handlePlannerClickAt(
 		clientX: number,
 		clientY: number,

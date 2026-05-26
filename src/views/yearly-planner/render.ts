@@ -56,53 +56,128 @@ export function renderYearlyPlannerHeader(
 		cls: "yearly-planner-year-wrapper",
 	});
 
-	const prevBtn = yearWrapper.createEl("button", {
-		cls: "yearly-planner-year-btn",
+	createHeaderIconButton(yearWrapper, "yearly-planner-year-btn", {
+		icon: "chevron-left",
+		label: t("header.prevYear"),
+		onClick: callbacks.onPrev,
 	});
-	setIcon(prevBtn, "chevron-left");
-	prevBtn.ariaLabel = t("header.prevYear");
-	prevBtn.onclick = callbacks.onPrev;
 
 	const yearDisplay = yearWrapper.createSpan({
 		cls: "yearly-planner-year-display",
 		text: String(ctx.year),
 	});
-	yearDisplay.onclick = () => {
+	const openYearModal = () => {
 		new YearInputModal(ctx.app, ctx.year, callbacks.onYearClick).open();
+	};
+	yearDisplay.onclick = openYearModal;
+	yearDisplay.tabIndex = 0;
+	yearDisplay.setAttribute("role", "button");
+	yearDisplay.onkeydown = (e) => {
+		if (e.key !== "Enter" && e.key !== " ") return;
+		e.preventDefault();
+		openYearModal();
 	};
 	yearDisplay.title = t("header.clickToEnterYear");
 
-	const nextBtn = yearWrapper.createEl("button", {
-		cls: "yearly-planner-year-btn",
+	createHeaderIconButton(yearWrapper, "yearly-planner-year-btn", {
+		icon: "chevron-right",
+		label: t("header.nextYear"),
+		onClick: callbacks.onNext,
 	});
-	setIcon(nextBtn, "chevron-right");
-	nextBtn.ariaLabel = t("header.nextYear");
-	nextBtn.onclick = callbacks.onNext;
 
-	const todayBtn = yearWrapper.createEl("button", {
-		cls: "yearly-planner-year-btn",
-	});
-	setIcon(todayBtn, "calendar");
-	todayBtn.ariaLabel = t("header.goToCurrentYear");
-	todayBtn.onclick = callbacks.onToday;
+	const secondaryActions: HeaderAction[] = [
+		{
+			icon: "calendar",
+			label: t("header.goToCurrentYear"),
+			onClick: callbacks.onToday,
+		},
+	];
 
 	if (callbacks.onCyclePlannerView) {
-		const cycleBtn = yearWrapper.createEl("button", {
-			cls: "yearly-planner-year-btn yearly-planner-year-btn--cycle-view",
+		secondaryActions.push({
+			icon: "repeat",
+			label: t("header.cyclePlannerView"),
+			title: t("header.cyclePlannerViewHint"),
+			onClick: callbacks.onCyclePlannerView,
+			extraClass: "yearly-planner-year-btn--cycle-view",
 		});
-		setIcon(cycleBtn, "repeat");
-		cycleBtn.ariaLabel = t("header.cyclePlannerView");
-		cycleBtn.title = t("header.cyclePlannerViewHint");
-		cycleBtn.onclick = callbacks.onCyclePlannerView;
 	}
 
 	if (callbacks.onAddFile) {
-		const addFileBtn = yearWrapper.createEl("button", {
-			cls: "yearly-planner-year-btn",
+		secondaryActions.push({
+			icon: "file-plus",
+			label: t("header.addFile"),
+			onClick: callbacks.onAddFile,
 		});
-		setIcon(addFileBtn, "file-plus");
-		addFileBtn.ariaLabel = t("header.addFile");
-		addFileBtn.onclick = callbacks.onAddFile;
+	}
+
+	renderSecondaryHeaderActions(
+		yearWrapper,
+		"yearly-planner-year-btn",
+		secondaryActions,
+	);
+}
+
+interface HeaderAction {
+	icon: string;
+	label: string;
+	onClick: () => void;
+	title?: string;
+	extraClass?: string;
+}
+
+function createHeaderIconButton(
+	parent: HTMLElement,
+	baseClass: string,
+	action: HeaderAction,
+): HTMLButtonElement {
+	const btn = parent.createEl("button", {
+		cls: [baseClass, action.extraClass].filter(Boolean).join(" "),
+		attr: { type: "button" },
+	});
+	setIcon(btn, action.icon);
+	btn.ariaLabel = action.label;
+	if (action.title) btn.title = action.title;
+	btn.onclick = action.onClick;
+	return btn;
+}
+
+function renderSecondaryHeaderActions(
+	parent: HTMLElement,
+	baseClass: string,
+	actions: HeaderAction[],
+): void {
+	if (actions.length === 0) return;
+	const inline = parent.createDiv({ cls: "planner-nav-secondary" });
+	for (const action of actions) {
+		createHeaderIconButton(inline, baseClass, action);
+	}
+
+	const moreMenu = parent.createEl("details", { cls: "planner-more-menu" });
+	const trigger = moreMenu.createEl("summary", {
+		cls: `${baseClass} planner-more-menu-trigger`,
+		attr: {
+			"aria-label": t("header.moreActions"),
+			role: "button",
+		},
+	});
+	setIcon(trigger, "ellipsis");
+
+	const popover = moreMenu.createDiv({ cls: "planner-more-menu-popover" });
+	for (const action of actions) {
+		const item = popover.createEl("button", {
+			cls: "planner-more-menu-item",
+			attr: { type: "button" },
+		});
+		const icon = item.createSpan({ cls: "planner-more-menu-item-icon" });
+		setIcon(icon, action.icon);
+		item.createSpan({ cls: "planner-more-menu-item-label", text: action.label });
+		item.ariaLabel = action.label;
+		if (action.title) item.title = action.title;
+		item.onclick = () => {
+			moreMenu.removeAttribute("open");
+			action.onClick();
+		};
 	}
 }
 
@@ -151,6 +226,7 @@ export function createPlannerCell(
 
 	const cell = row.createEl("td", {
 		cls: [
+			"yearly-planner-cell",
 			isValid ? "" : "yearly-planner-cell-invalid",
 			isSelected && "yearly-planner-cell-selected",
 			isClipboardDate && "yearly-planner-cell-clipboard-selected",
@@ -169,6 +245,8 @@ export function createPlannerCell(
 	cell.dataset.year = String(ctx.year);
 	cell.dataset.month = String(month);
 	cell.dataset.day = String(day);
+	cell.tabIndex = 0;
+	cell.setAttribute("role", "button");
 
 	const { singleFiles, rangeFiles } = getFilesForDate(
 		ctx.app,
@@ -179,6 +257,10 @@ export function createPlannerCell(
 		ctx.plannerFileScope,
 		ctx.plannerFiles,
 	);
+	const holidayNames =
+		isHoliday && ctx.holidaysData?.names.has(dateKey)
+			? (ctx.holidaysData.names.get(dateKey) ?? [])
+			: [];
 
 	if (rangeFiles.length > 0) {
 		const basenames = rangeFiles.map((r) => r.file.basename);
@@ -195,8 +277,14 @@ export function createPlannerCell(
 			const bar = barsContainer.createDiv({
 				cls: "yearly-planner-cell-range-bar",
 			});
+			bar.tabIndex = 0;
+			bar.setAttribute("role", "button");
 			bar.dataset.lane = String(lane);
 			bar.dataset.path = file.path;
+			bar.ariaLabel = t("a11y.openPlannerNote", {
+				title: getFileTitle(ctx.app, file),
+				path: file.path,
+			});
 			(bar as HTMLElement).style.right = `${lane * 4}px`;
 			bar.dataset.basename = file.basename;
 			const chipColor = getChipColor(ctx.app, file);
@@ -215,6 +303,12 @@ export function createPlannerCell(
 
 	const startDateRangeFiles = rangeFiles.filter((r) => r.isFirst).map((r) => r.file);
 	const allFiles = [...singleFiles, ...startDateRangeFiles];
+	cell.ariaLabel = t("a11y.yearlyDateCell", {
+		date: dateKey,
+		notes: allFiles.length,
+		ranges: rangeFiles.length,
+		holidays: holidayNames.length,
+	});
 
 	if (allFiles.length > 0) {
 		const listEl = cell.createDiv({ cls: "yearly-planner-cell-files" });
@@ -222,6 +316,8 @@ export function createPlannerCell(
 			const linkEl = listEl.createDiv({
 				cls: "yearly-planner-cell-file",
 			});
+			linkEl.tabIndex = 0;
+			linkEl.setAttribute("role", "button");
 			const title = getFileTitle(ctx.app, file);
 			if (isTodoCompleted(ctx.app, file)) {
 				linkEl.addClass("yearly-planner-chip-completed");
@@ -232,6 +328,10 @@ export function createPlannerCell(
 				linkEl.textContent = title;
 			}
 			linkEl.title = file.path;
+			linkEl.ariaLabel = t("a11y.openPlannerNote", {
+				title,
+				path: file.path,
+			});
 			linkEl.dataset.path = file.path;
 			const chipColor = getChipColor(ctx.app, file);
 			if (chipColor) {
@@ -250,16 +350,21 @@ export function createPlannerCell(
 	}
 
 	if (isHoliday && ctx.holidaysData?.names.has(dateKey)) {
-		const holidayNames = ctx.holidaysData.names.get(dateKey) ?? [];
 		const holidaysContainer = cell.createDiv({
 			cls: "yearly-planner-cell-holidays",
 		});
 		const badge = holidaysContainer.createDiv({
 			cls: "yearly-planner-cell-holiday-badge",
 		});
+		badge.tabIndex = 0;
+		badge.setAttribute("role", "button");
 		badge.createSpan({
 			cls: "yearly-planner-holiday-label",
 			text: holidayNames.join(", "),
+		});
+		badge.ariaLabel = t("a11y.openHoliday", {
+			date: dateKey,
+			names: holidayNames.join(", "),
 		});
 		badge.dataset.holidayDate = dateKey;
 		badge.dataset.holidayNames = JSON.stringify(holidayNames);

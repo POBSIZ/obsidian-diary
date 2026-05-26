@@ -266,6 +266,23 @@ function parseDateStr(str: string): {
 	return { year, month, day };
 }
 
+function isValidDateStr(str: string): boolean {
+	const parsed = parseDateStr(str);
+	if (!parsed) return false;
+	const date = new Date(parsed.year, parsed.month - 1, parsed.day);
+	return (
+		date.getFullYear() === parsed.year &&
+		date.getMonth() === parsed.month - 1 &&
+		date.getDate() === parsed.day
+	);
+}
+
+function getSingleDateFromFilename(filename: string): string | null {
+	const m = filename.match(/^(\d{4}-\d{2}-\d{2})(?:-.+)?$/);
+	if (!m) return null;
+	return m[1] ?? null;
+}
+
 export interface CreateFileModalOptions {
 	bounds: SelectionBounds | null;
 	defaultFolder: string;
@@ -294,6 +311,8 @@ export class CreateFileModal extends Modal {
 	private rangeRow!: HTMLElement;
 	private singleModeBtn!: HTMLButtonElement;
 	private rangeModeBtn!: HTMLButtonElement;
+	private createBtn!: HTMLButtonElement;
+	private createErrorEl!: HTMLElement;
 
 	constructor(
 		app: App,
@@ -349,10 +368,12 @@ export class CreateFileModal extends Modal {
 		this.singleModeBtn = modeBtnsWrap.createEl("button", {
 			cls: "yearly-planner-mode-btn",
 			text: t("modal.singleDate"),
+			attr: { type: "button" },
 		});
 		this.rangeModeBtn = modeBtnsWrap.createEl("button", {
 			cls: "yearly-planner-mode-btn",
 			text: t("modal.range"),
+			attr: { type: "button" },
 		});
 		this.singleModeBtn.onclick = () => this.setMode("single");
 		this.rangeModeBtn.onclick = () => this.setMode("range");
@@ -396,7 +417,10 @@ export class CreateFileModal extends Modal {
 		} else {
 			this.folderSelect.value = folderPaths[0] ?? FOLDER_OTHER;
 		}
-		this.folderSelect.onchange = () => this.updateFolderOtherVisibility();
+		this.folderSelect.onchange = () => {
+			this.updateFolderOtherVisibility();
+			this.updateCreateState();
+		};
 
 		this.folderOtherRow = form.createDiv({
 			cls: "yearly-planner-create-file-row yearly-planner-folder-other-row",
@@ -411,6 +435,9 @@ export class CreateFileModal extends Modal {
 		this.folderCustomInput.placeholder =
 			"Planner"; /* Default folder name */
 		this.folderCustomInput.value = defaultFolder || "";
+		this.folderCustomInput.addEventListener("input", () =>
+			this.updateCreateState(),
+		);
 		this.updateFolderOtherVisibility();
 
 		const startRow = form.createDiv({
@@ -422,7 +449,10 @@ export class CreateFileModal extends Modal {
 			cls: "yearly-planner-date-input",
 		});
 		this.startDateInput.value = startStr;
-		this.startDateInput.oninput = () => this.syncFilename();
+		this.startDateInput.oninput = () => {
+			this.syncFilename();
+			this.updateCreateState();
+		};
 
 		this.rangeRow = form.createDiv({
 			cls: "yearly-planner-create-file-row",
@@ -433,7 +463,10 @@ export class CreateFileModal extends Modal {
 			cls: "yearly-planner-date-input",
 		});
 		this.endDateInput.value = endStr;
-		this.endDateInput.oninput = () => this.syncFilename();
+		this.endDateInput.oninput = () => {
+			this.syncFilename();
+			this.updateCreateState();
+		};
 
 		const filenameRow = form.createDiv({
 			cls: "yearly-planner-create-file-row",
@@ -446,6 +479,7 @@ export class CreateFileModal extends Modal {
 		this.filenameInput.placeholder = t("modal.fileNamePlaceholder");
 		this.filenameInput.oninput = () => {
 			if (this.mode === "range") this.syncDatesFromFilename();
+			this.updateCreateState();
 		};
 		const filenameHint = filenameRow.createDiv({
 			cls: "yearly-planner-create-file-hint",
@@ -524,12 +558,27 @@ export class CreateFileModal extends Modal {
 
 		this.syncFilename();
 		this.updateModeUI();
+		this.createErrorEl = this.contentEl.createDiv({
+			cls: "yearly-planner-modal-error",
+			attr: { "aria-live": "polite" },
+		});
 
-		const btn = this.contentEl.createEl("button", {
+		this.createBtn = this.contentEl.createEl("button", {
 			text: t("modal.create"),
 			cls: "mod-cta",
+			attr: { type: "button" },
 		});
-		btn.onclick = () => void this.handleCreate();
+		this.createBtn.onclick = () => void this.handleCreate();
+		this.contentEl.addEventListener("keydown", (e) => {
+			if (e.key !== "Enter" || e.isComposing) return;
+			if (e.target instanceof HTMLTextAreaElement) return;
+			if (this.createBtn.disabled) return;
+			e.preventDefault();
+			void this.handleCreate();
+		});
+		this.updateCreateState();
+		this.filenameInput.focus();
+		this.filenameInput.select();
 	}
 
 	private updateFolderOtherVisibility(): void {
@@ -538,6 +587,33 @@ export class CreateFileModal extends Modal {
 		if (isOther && !this.folderCustomInput.value) {
 			this.folderCustomInput.focus();
 		}
+	}
+
+	private updateCreateState(): void {
+		const error = this.getCreateValidationError();
+		if (this.createBtn) this.createBtn.disabled = Boolean(error);
+		if (!this.createErrorEl) return;
+		this.createErrorEl.setText(error ?? "");
+		this.createErrorEl.toggleClass("is-hidden", !error);
+	}
+
+	private getCreateValidationError(): string | null {
+		const folder = this.getFolderValue();
+		const filename = this.filenameInput.value.trim().replace(/\.md$/i, "");
+		if (!folder) return t("modal.folderRequired");
+		if (!filename) return t("modal.fileNameRequired");
+		if (this.mode === "single") {
+			const dateStr = getSingleDateFromFilename(filename);
+			if (!dateStr || !isValidDateStr(dateStr)) {
+				return t("modal.invalidDateFileName");
+			}
+			return null;
+		}
+		const range = parseRangeBasename(filename);
+		if (!range || !isValidDateStr(range.start) || !isValidDateStr(range.end)) {
+			return t("modal.invalidRangeFileName");
+		}
+		return null;
 	}
 
 	private setColorFromPreset(hex: string): void {
@@ -575,6 +651,7 @@ export class CreateFileModal extends Modal {
 		this.mode = mode;
 		this.updateModeUI();
 		this.syncFilename();
+		this.updateCreateState();
 	}
 
 	private updateModeUI(): void {
@@ -605,16 +682,17 @@ export class CreateFileModal extends Modal {
 	}
 
 	private async handleCreate(): Promise<void> {
+		const validationError = this.getCreateValidationError();
+		if (validationError) {
+			this.updateCreateState();
+			new Notice(validationError);
+			return;
+		}
 		const folder = this.getFolderValue();
 		const filename = this.filenameInput.value.trim().replace(/\.md$/i, "");
 
 		try {
 			if (this.mode === "single") {
-				if (!filename) return;
-				const parsed = parseDateStr(
-					filename.split("-").slice(0, 3).join("-"),
-				);
-				if (!parsed && !/^\d{4}-\d{2}-\d{2}/.test(filename)) return;
 				const rawColor = this.colorInput.value.trim();
 				const themeHex = getThemeAccentHex().toLowerCase();
 				const color =
@@ -694,14 +772,25 @@ export class YearInputModal extends Modal {
 		const btn = form.createEl("button", {
 			text: t("modal.apply"),
 			cls: "mod-cta",
+			attr: { type: "button" },
 		});
-		btn.onclick = () => {
+		const submit = () => {
 			const val = parseInt(input.value, 10);
 			if (!isNaN(val) && val >= 1900 && val <= 2100) {
 				this.onSubmit(val);
 				this.close();
+			} else {
+				new Notice(t("modal.invalidYear"));
 			}
 		};
+		btn.onclick = submit;
+		input.addEventListener("keydown", (e) => {
+			if (e.key !== "Enter") return;
+			e.preventDefault();
+			submit();
+		});
+		input.focus();
+		input.select();
 	}
 }
 
@@ -754,6 +843,8 @@ export class FileOptionsModal extends Modal {
 	private startDateInput?: HTMLInputElement;
 	private endDateInput?: HTMLInputElement;
 	private singleDateInput?: HTMLInputElement;
+	private applyBtn!: HTMLButtonElement;
+	private fileOptionsErrorEl!: HTMLElement;
 
 	constructor(
 		app: App,
@@ -794,6 +885,9 @@ export class FileOptionsModal extends Modal {
 		});
 		this.titleInput.value = getFileTitle(this.app, this.file);
 		this.titleInput.placeholder = t("modal.displayTitle");
+		this.titleInput.addEventListener("input", () =>
+			this.updateFileOptionsState(),
+		);
 		titleRow.createDiv({
 			cls: "yearly-planner-create-file-hint",
 			text: t("modal.displayTitleHint"),
@@ -813,6 +907,9 @@ export class FileOptionsModal extends Modal {
 				cls: "yearly-planner-date-input",
 			});
 			this.startDateInput.value = rangeParsed.start;
+			this.startDateInput.addEventListener("input", () =>
+				this.updateFileOptionsState(),
+			);
 			const endRow = form.createDiv({
 				cls: "yearly-planner-create-file-row",
 			});
@@ -822,6 +919,9 @@ export class FileOptionsModal extends Modal {
 				cls: "yearly-planner-date-input",
 			});
 			this.endDateInput.value = rangeParsed.end;
+			this.endDateInput.addEventListener("input", () =>
+				this.updateFileOptionsState(),
+			);
 		} else if (singleParsed) {
 			const dateRow = form.createDiv({
 				cls: "yearly-planner-create-file-row",
@@ -832,6 +932,9 @@ export class FileOptionsModal extends Modal {
 				cls: "yearly-planner-date-input",
 			});
 			this.singleDateInput.value = singleParsed.date;
+			this.singleDateInput.addEventListener("input", () =>
+				this.updateFileOptionsState(),
+			);
 		}
 
 		this.colorPresets = getChipColorPresets();
@@ -933,27 +1036,44 @@ export class FileOptionsModal extends Modal {
 			cls: "yearly-planner-file-preview-loading",
 		});
 		void this.loadPreview(previewEl);
+		this.fileOptionsErrorEl = this.contentEl.createDiv({
+			cls: "yearly-planner-modal-error",
+			attr: { "aria-live": "polite" },
+		});
 
 		const btnRow = this.contentEl.createDiv({
 			cls: "yearly-planner-file-options-buttons",
 		});
 		const openBtn = btnRow.createEl("button", {
 			text: t("modal.openFile"),
-			cls: "mod-cta",
+			attr: { type: "button" },
 		});
 		openBtn.onclick = () => {
 			void this.leaf.openFile(this.file);
 			this.close();
 		};
-		const applyBtn = btnRow.createEl("button", {
+		this.applyBtn = btnRow.createEl("button", {
 			text: t("modal.applyChange"),
+			cls: "mod-cta",
+			attr: { type: "button" },
 		});
-		applyBtn.onclick = () => void this.handleApplyChange();
+		this.applyBtn.onclick = () => void this.handleApplyChange();
 		const deleteBtn = btnRow.createEl("button", {
 			text: t("modal.delete"),
 			cls: "mod-danger",
+			attr: { type: "button" },
 		});
 		deleteBtn.onclick = () => this.handleDelete();
+		this.contentEl.addEventListener("keydown", (e) => {
+			if (e.key !== "Enter" || e.isComposing) return;
+			if (e.target instanceof HTMLTextAreaElement) return;
+			if (this.applyBtn.disabled) return;
+			e.preventDefault();
+			void this.handleApplyChange();
+		});
+		this.updateFileOptionsState();
+		this.titleInput.focus();
+		this.titleInput.select();
 	}
 
 	private setColorFromPreset(hex: string): void {
@@ -984,7 +1104,39 @@ export class FileOptionsModal extends Modal {
 		this.completedRow.toggleClass("is-hidden", !this.todoCheckbox.checked);
 	}
 
+	private updateFileOptionsState(): void {
+		const error = this.getFileOptionsValidationError();
+		if (this.applyBtn) this.applyBtn.disabled = Boolean(error);
+		if (!this.fileOptionsErrorEl) return;
+		this.fileOptionsErrorEl.setText(error ?? "");
+		this.fileOptionsErrorEl.toggleClass("is-hidden", !error);
+	}
+
+	private getFileOptionsValidationError(): string | null {
+		if (this.singleDateInput) {
+			if (!isValidDateStr(this.singleDateInput.value)) {
+				return t("modal.invalidDate");
+			}
+			return null;
+		}
+		if (this.startDateInput && this.endDateInput) {
+			const start = this.startDateInput.value;
+			const end = this.endDateInput.value;
+			if (!isValidDateStr(start) || !isValidDateStr(end)) {
+				return t("modal.invalidDate");
+			}
+			if (start > end) return t("modal.invalidDateRange");
+		}
+		return null;
+	}
+
 	private async handleApplyChange(): Promise<void> {
+		const validationError = this.getFileOptionsValidationError();
+		if (validationError) {
+			this.updateFileOptionsState();
+			new Notice(validationError);
+			return;
+		}
 		let fileToUpdate: TFile = this.file;
 
 		if (this.singleDateInput) {

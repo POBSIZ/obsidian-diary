@@ -120,6 +120,82 @@ available in the app when your plugin is enabled.
 	min-width: 8ch;
 }
 
+.planner-nav-secondary {
+	display: contents;
+}
+
+.planner-more-menu {
+	display: none;
+	position: relative;
+}
+
+.planner-more-menu > summary {
+	list-style: none;
+}
+
+.planner-more-menu > summary::-webkit-details-marker {
+	display: none;
+}
+
+.planner-more-menu-popover {
+	position: absolute;
+	top: calc(100% + 0.25rem);
+	right: 0;
+	z-index: 1003;
+	min-width: 11rem;
+	padding: 0.25rem;
+	border: 1px solid var(--background-modifier-border);
+	border-radius: var(--planner-radius-sm);
+	background: var(--background-secondary);
+	box-shadow: var(--shadow-s);
+}
+
+.planner-more-menu-item {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	width: 100%;
+	min-height: 2rem;
+	padding: 0.35rem 0.5rem;
+	border: none;
+	border-radius: var(--planner-radius-sm);
+	background: transparent;
+	color: var(--text-normal);
+	font: inherit;
+	font-size: 0.85rem;
+	text-align: left;
+	cursor: pointer;
+}
+
+.planner-more-menu-item:hover,
+.planner-more-menu-item:focus-visible {
+	background: var(--background-modifier-hover);
+}
+
+.planner-more-menu-item-icon {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 1rem;
+	height: 1rem;
+	color: var(--text-muted);
+	flex-shrink: 0;
+}
+
+.yearly-planner-cell:focus-visible,
+.monthly-planner-cell:focus-visible,
+.monthly-list-planner-day:focus-visible,
+.yearly-planner-cell-file:focus-visible,
+.monthly-planner-cell-file:focus-visible,
+.yearly-planner-cell-range-bar:focus-visible,
+.monthly-planner-range-bar:focus-visible,
+.yearly-planner-cell-holiday-badge:focus-visible,
+.monthly-planner-cell-holiday-badge:focus-visible,
+.monthly-list-planner-filter-btn:focus-visible {
+	outline: 2px solid var(--interactive-accent);
+	outline-offset: 2px;
+}
+
 .yearly-planner-year-modal {
 	display: flex;
 	flex-direction: column;
@@ -155,6 +231,17 @@ available in the app when your plugin is enabled.
 	font-size: 0.75rem;
 	color: var(--text-muted);
 	margin-top: 0.25rem;
+}
+
+.yearly-planner-modal-error {
+	min-height: 1rem;
+	margin-top: 0.25rem;
+	color: var(--text-error, var(--text-accent));
+	font-size: 0.8rem;
+}
+
+.yearly-planner-modal-error.is-hidden {
+	display: none;
 }
 
 .yearly-planner-create-file-row.is-hidden,
@@ -1656,6 +1743,23 @@ body.-is-mobile .yearly-planner-file-preview {
 	font-size: 0.95em;
 }
 
+.monthly-planner-mobile-entry-count {
+	position: absolute;
+	right: 0.12rem;
+	bottom: 0.12rem;
+	min-width: 0.9rem;
+	height: 0.9rem;
+	padding: 0 0.2rem;
+	border-radius: 999px;
+	background: var(--background-modifier-hover);
+	color: var(--text-muted);
+	font-size: 0.55rem;
+	font-weight: 600;
+	line-height: 0.9rem;
+	text-align: center;
+	pointer-events: none;
+}
+
 .monthly-planner-mobile-single-group-holiday .monthly-planner-mobile-single-plus {
 	color: var(--text-accent);
 }
@@ -1955,6 +2059,16 @@ body.-is-mobile .monthly-planner-nav-wrapper {
 	gap: 0.25rem;
 }
 
+body.is-mobile .planner-nav-secondary,
+body.-is-mobile .planner-nav-secondary {
+	display: none;
+}
+
+body.is-mobile .planner-more-menu,
+body.-is-mobile .planner-more-menu {
+	display: block;
+}
+
 body.is-mobile .yearly-planner-year-btn,
 body.-is-mobile .yearly-planner-year-btn,
 body.is-mobile .monthly-planner-nav-btn,
@@ -2162,6 +2276,46 @@ body.-is-mobile .monthly-planner-weekend-label {
 	padding: 0 0.15rem 0.35rem;
 }
 
+.monthly-list-planner-filter-bar {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.25rem;
+	margin: 0 0 0.5rem;
+	flex-shrink: 0;
+}
+
+.monthly-list-planner-filter-btn {
+	min-height: 1.75rem;
+	padding: 0.2rem 0.65rem;
+	border: 1px solid var(--background-modifier-border);
+	border-radius: var(--planner-radius-sm);
+	background: var(--background-modifier-form-field);
+	color: var(--text-muted);
+	font: inherit;
+	font-size: 0.78rem;
+	cursor: pointer;
+}
+
+.monthly-list-planner-filter-btn:hover {
+	background: var(--background-modifier-hover);
+	color: var(--text-normal);
+}
+
+.monthly-list-planner-filter-btn.is-active {
+	background: var(--interactive-accent);
+	border-color: var(--interactive-accent);
+	color: var(--text-on-accent);
+}
+
+.monthly-list-planner-filter-empty {
+	border: 1px dashed var(--background-modifier-border);
+	border-radius: var(--radius-s, 6px);
+	padding: 1rem;
+	color: var(--text-muted);
+	font-size: 0.85rem;
+	text-align: center;
+}
+
 .monthly-list-planner-day {
 	border: 1px solid var(--background-modifier-border);
 	border-radius: var(--radius-m, 8px);
@@ -2334,6 +2488,18 @@ body.is-mobile .monthly-list-planner-inner,
 body.-is-mobile .monthly-list-planner-inner {
 	padding-left: 0;
 	padding-right: 0;
+}
+
+body.is-mobile .monthly-list-planner-filter-bar,
+body.-is-mobile .monthly-list-planner-filter-bar {
+	margin-bottom: 0.4rem;
+}
+
+body.is-mobile .monthly-list-planner-filter-btn,
+body.-is-mobile .monthly-list-planner-filter-btn {
+	min-height: 2.25rem;
+	padding: 0.35rem 0.75rem;
+	font-size: 0.75rem;
 }
 
 /* List planner only: larger touch targets on mobile (not grid / yearly) */

@@ -18,6 +18,8 @@ import {
 } from "../yearly-planner/file-utils";
 import { getWeekdayLabels } from "../monthly-planner/render";
 
+export type MonthlyListFilter = "all" | "withNotes" | "upcoming";
+
 export function renderMonthlyListBody(
 	parent: HTMLElement,
 	ctx: {
@@ -29,6 +31,7 @@ export function renderMonthlyListBody(
 		plannerFiles: TFile[];
 		locale: string;
 		holidaysData: HolidayData | null;
+		filter: MonthlyListFilter;
 	},
 ): void {
 	const {
@@ -40,11 +43,13 @@ export function renderMonthlyListBody(
 		plannerFiles,
 		locale,
 		holidaysData,
+		filter,
 	} = ctx;
 	const daysInMonth = getDaysInMonth(year, month);
 	const weekdayShort = getWeekdayLabels(locale);
 	const weekendL = locale === "ko" ? WEEKEND_LABELS_KO : WEEKEND_LABELS_EN;
 	const now = new Date();
+	let renderedDays = 0;
 
 	for (let day = 1; day <= daysInMonth; day++) {
 		const dayOfWeek = getDayOfWeek(year, month, day);
@@ -55,10 +60,9 @@ export function renderMonthlyListBody(
 			year === now.getFullYear() &&
 			month === now.getMonth() + 1 &&
 			day === now.getDate();
-
 		const dateKey = `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
 		const isHoliday = holidaysData?.dates.has(dateKey) ?? false;
-
+		const holidayNames = holidaysData?.names.get(dateKey) ?? [];
 		const { singleFiles, rangeFiles } = getFilesForDate(
 			app,
 			folder,
@@ -68,6 +72,16 @@ export function renderMonthlyListBody(
 			plannerFileScope,
 			plannerFiles,
 		);
+		const hasNotes = singleFiles.length > 0 || rangeFiles.length > 0;
+		const dateIsUpcoming =
+			year > now.getFullYear() ||
+			(year === now.getFullYear() && month > now.getMonth() + 1) ||
+			(year === now.getFullYear() &&
+				month === now.getMonth() + 1 &&
+				day >= now.getDate());
+		if (filter === "withNotes" && !hasNotes) continue;
+		if (filter === "upcoming" && !dateIsUpcoming) continue;
+		renderedDays++;
 
 		const dayBlock = parent.createDiv({
 			cls: [
@@ -83,6 +97,14 @@ export function renderMonthlyListBody(
 		dayBlock.dataset.year = String(year);
 		dayBlock.dataset.month = String(month);
 		dayBlock.dataset.day = String(day);
+		dayBlock.tabIndex = 0;
+		dayBlock.setAttribute("role", "button");
+		dayBlock.ariaLabel = t("a11y.monthlyListDate", {
+			date: dateKey,
+			notes: singleFiles.length,
+			ranges: rangeFiles.length,
+			holidays: holidayNames.length,
+		});
 
 		const head = dayBlock.createDiv({ cls: "monthly-list-planner-day-header" });
 		const dateLine = head.createDiv({ cls: "monthly-list-planner-day-date-line" });
@@ -102,7 +124,6 @@ export function renderMonthlyListBody(
 		}
 
 		const body = dayBlock.createDiv({ cls: "monthly-list-planner-day-body" });
-
 		if (rangeFiles.length > 0) {
 			const rangeWrap = body.createDiv({ cls: "monthly-list-planner-ranges" });
 			for (const { file, runPos } of rangeFiles) {
@@ -117,13 +138,16 @@ export function renderMonthlyListBody(
 				]
 					.filter(Boolean)
 					.join(" ");
-				const barEl = rangeWrap.createDiv({ cls: barClasses });
+				const barEl = rangeWrap.createDiv({
+					cls: barClasses,
+				});
+				barEl.tabIndex = 0;
+				barEl.setAttribute("role", "button");
 				barEl.dataset.path = file.path;
 				const chipColor = getChipColor(app, file);
 				if (chipColor) {
 					barEl.style.setProperty("--range-color", chipColor);
 				}
-				/* List view: show title on every day the range appears (grid view shows label only on run start). */
 				const title = getFileTitle(app, file);
 				const displayTitle = isTodoCompleted(app, file)
 					? `${TODO_CHIP_EMOJI_COMPLETED} ${title}`
@@ -133,6 +157,10 @@ export function renderMonthlyListBody(
 				const labelEl = barEl.createSpan({
 					cls: "monthly-planner-range-label",
 					text: displayTitle,
+				});
+				barEl.ariaLabel = t("a11y.openPlannerNote", {
+					title: displayTitle,
+					path: file.path,
 				});
 				if (isTodoCompleted(app, file)) {
 					labelEl.addClass("monthly-planner-chip-completed");
@@ -146,6 +174,8 @@ export function renderMonthlyListBody(
 				const linkEl = listEl.createEl("div", {
 					cls: "monthly-planner-cell-file monthly-list-planner-cell-file",
 				});
+				linkEl.tabIndex = 0;
+				linkEl.setAttribute("role", "button");
 				const title = getFileTitle(app, file);
 				if (isTodoCompleted(app, file)) {
 					linkEl.addClass("monthly-planner-chip-completed");
@@ -156,6 +186,10 @@ export function renderMonthlyListBody(
 					linkEl.textContent = title;
 				}
 				linkEl.title = file.path;
+				linkEl.ariaLabel = t("a11y.openPlannerNote", {
+					title,
+					path: file.path,
+				});
 				linkEl.dataset.path = file.path;
 				const chipColor = getChipColor(app, file);
 				if (chipColor) {
@@ -164,33 +198,39 @@ export function renderMonthlyListBody(
 			}
 		}
 
-		if (isHoliday && holidaysData?.names.has(dateKey)) {
-			const holidayNames = holidaysData.names.get(dateKey) ?? [];
+		if (isHoliday && holidayNames.length > 0) {
 			const holidaysContainer = body.createDiv({
 				cls: "monthly-planner-cell-holidays",
 			});
 			const badge = holidaysContainer.createDiv({
 				cls: "monthly-planner-cell-holiday-badge",
 			});
+			badge.tabIndex = 0;
+			badge.setAttribute("role", "button");
 			badge.createSpan({
 				cls: "monthly-planner-holiday-label",
 				text: holidayNames.join(", "),
+			});
+			badge.ariaLabel = t("a11y.openHoliday", {
+				date: dateKey,
+				names: holidayNames.join(", "),
 			});
 			badge.dataset.holidayDate = dateKey;
 			badge.dataset.holidayNames = JSON.stringify(holidayNames);
 		}
 
-		const hasHolidayLine =
-			isHoliday && (holidaysData?.names.get(dateKey)?.length ?? 0) > 0;
-		if (
-			rangeFiles.length === 0 &&
-			singleFiles.length === 0 &&
-			!hasHolidayLine
-		) {
+		if (rangeFiles.length === 0 && singleFiles.length === 0 && holidayNames.length === 0) {
 			body.createDiv({
 				cls: "monthly-list-planner-empty",
 				text: t("view.monthlyListEmptyDay"),
 			});
 		}
+	}
+
+	if (renderedDays === 0) {
+		parent.createDiv({
+			cls: "monthly-list-planner-filter-empty",
+			text: t("monthlyListFilter.empty"),
+		});
 	}
 }

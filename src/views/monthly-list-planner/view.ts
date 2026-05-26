@@ -3,7 +3,10 @@ import { t } from "../../i18n";
 import DiaryObsidian from "../../main";
 import { VIEW_TYPE_MONTHLY_LIST_PLANNER } from "../../constants";
 import type { MonthlyPlannerState } from "../monthly-planner/types";
-import { getMonthLabel, renderMonthlyPlannerHeader } from "../monthly-planner/render";
+import {
+	getMonthLabel,
+	renderMonthlyPlannerHeader,
+} from "../monthly-planner/render";
 import {
 	getMonthNoteFilePath,
 	getPlannerMarkdownFiles,
@@ -13,13 +16,20 @@ import {
 	syncPlanNotePanelExpandedState,
 } from "../plan-note-panel";
 import { getHolidaysForYear } from "../../utils/holidays";
-import { CreateFileModal, FileOptionsModal, HolidayInfoModal } from "../yearly-planner/modals";
+import {
+	CreateFileModal,
+	FileOptionsModal,
+	HolidayInfoModal,
+} from "../yearly-planner/modals";
 import type { SelectionBounds } from "../yearly-planner/types";
 import {
 	createRangeFile as createRangeFileOp,
 	createSingleDateFile as createSingleDateFileOp,
 } from "../yearly-planner/file-operations";
-import { renderMonthlyListBody } from "./render-list";
+import {
+	type MonthlyListFilter,
+	renderMonthlyListBody,
+} from "./render-list";
 
 export class MonthlyListPlannerView extends ItemView {
 	year: number;
@@ -31,6 +41,7 @@ export class MonthlyListPlannerView extends ItemView {
 	/** After opening the list view, scroll to today once (applied after final layout; see queue). */
 	private pendingScrollToTodayOnOpen = false;
 	private initialScrollToTodayHandle: number | null = null;
+	private listFilter: MonthlyListFilter = "all";
 
 	constructor(
 		leaf: WorkspaceLeaf,
@@ -226,6 +237,36 @@ export class MonthlyListPlannerView extends ItemView {
 		}
 	}
 
+	private handleListKeyDown(e: KeyboardEvent): void {
+		if (e.key !== "Enter" && e.key !== " ") return;
+		const target = e.target;
+		if (!(target instanceof HTMLElement)) return;
+		const directTarget = target.closest(
+			".monthly-planner-cell-file, .monthly-planner-range-bar, .monthly-planner-cell-holiday-badge",
+		);
+		if (directTarget instanceof HTMLElement) {
+			const rect = directTarget.getBoundingClientRect();
+			e.preventDefault();
+			this.handleListClickAt(
+				rect.left + rect.width / 2,
+				rect.top + rect.height / 2,
+				e,
+			);
+			return;
+		}
+		const dayBlock = target.closest(
+			".monthly-list-planner-day[data-year][data-month][data-day]",
+		);
+		if (!(dayBlock instanceof HTMLElement)) return;
+		const rect = dayBlock.getBoundingClientRect();
+		e.preventDefault();
+		this.handleListClickAt(
+			rect.left + rect.width / 2,
+			rect.top + rect.height / 2,
+			e,
+		);
+	}
+
 	render(): void {
 		const { contentEl } = this;
 		const shouldScrollToToday = this.pendingScrollToToday;
@@ -262,7 +303,7 @@ export class MonthlyListPlannerView extends ItemView {
 			contentEl.appendChild(planNoteWrapper);
 			syncPlanNotePanelExpandedState(
 				planNoteWrapper,
-				this.plugin.settings.planNotePanelExpanded ?? true,
+				this.plugin.isPlanNotePanelExpanded(),
 			);
 		} else {
 			const notePanelEl = contentEl.createDiv({
@@ -272,6 +313,7 @@ export class MonthlyListPlannerView extends ItemView {
 			notePanelEl.dataset.month = String(this.month);
 			void this.renderMonthNotePanel(notePanelEl);
 		}
+		this.renderListFilters(contentEl);
 		this.renderList(contentEl);
 
 		const newScroll = contentEl.querySelector<HTMLElement>(
@@ -312,7 +354,7 @@ export class MonthlyListPlannerView extends ItemView {
 		const label = `${monthLabel} ${this.year}`;
 		await renderPlanNotePanel(container, this.app, filePath, this, {
 			label,
-			expanded: this.plugin.settings.planNotePanelExpanded ?? true,
+			expanded: this.plugin.isPlanNotePanelExpanded(),
 			onToggle: () => void this.plugin.togglePlanNotePanelExpanded(),
 			onCreate: async () => {
 				const dir = filePath.split("/").slice(0, -1).join("/");
@@ -330,6 +372,36 @@ export class MonthlyListPlannerView extends ItemView {
 				void this.leaf.openFile(file);
 			},
 		});
+	}
+
+	private renderListFilters(contentEl: HTMLElement): void {
+		const filterBar = contentEl.createDiv({
+			cls: "monthly-list-planner-filter-bar",
+			attr: {
+				role: "tablist",
+				"aria-label": t("monthlyListFilter.label"),
+			},
+		});
+		const options: { value: MonthlyListFilter; label: string }[] = [
+			{ value: "all", label: t("monthlyListFilter.all") },
+			{ value: "withNotes", label: t("monthlyListFilter.withNotes") },
+			{ value: "upcoming", label: t("monthlyListFilter.upcoming") },
+		];
+		for (const option of options) {
+			const btn = filterBar.createEl("button", {
+				cls: "monthly-list-planner-filter-btn",
+				text: option.label,
+				attr: { type: "button", role: "tab" },
+			});
+			const selected = this.listFilter === option.value;
+			btn.toggleClass("is-active", selected);
+			btn.setAttribute("aria-selected", selected ? "true" : "false");
+			btn.onclick = () => {
+				if (this.listFilter === option.value) return;
+				this.listFilter = option.value;
+				this.render();
+			};
+		}
 	}
 
 	private renderHeader(contentEl: HTMLElement): void {
@@ -472,6 +544,11 @@ export class MonthlyListPlannerView extends ItemView {
 			},
 			{ capture: true },
 		);
+		scrollContainer.addEventListener(
+			"keydown",
+			(e: KeyboardEvent) => this.handleListKeyDown(e),
+			{ capture: true },
+		);
 
 		const inner = scrollContainer.createDiv({ cls: "monthly-list-planner-inner" });
 		const locale = this.plugin.settings.locale ?? "en";
@@ -495,6 +572,7 @@ export class MonthlyListPlannerView extends ItemView {
 			),
 			locale,
 			holidaysData,
+			filter: this.listFilter,
 		});
 	}
 }
