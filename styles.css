@@ -121,7 +121,10 @@ available in the app when your plugin is enabled.
 }
 
 .planner-nav-secondary {
-	display: contents;
+	display: flex;
+	align-items: center;
+	gap: var(--planner-header-gap);
+	flex-wrap: wrap;
 }
 
 .planner-more-menu {
