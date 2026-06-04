@@ -28,6 +28,7 @@ export interface YearlyPlannerViewDelegate {
 	updateChipDragDropTarget(): void;
 	openCreateFileModal(bounds: SelectionBounds | null): void;
 	openFileOptionsModal(file: TFile): void;
+	isRangeBarInteractionEnabled(): boolean;
 }
 
 interface ChipDragPending {
@@ -263,6 +264,52 @@ export class PlannerInteractionHandler {
 			e.stopPropagation();
 			return;
 		}
+		const el = getTopmostPlannerElementAt(
+			this.view.contentEl,
+			clientX,
+			clientY,
+		);
+		if (!el || !this.view.contentEl.contains(el as Node)) return;
+
+		const rangeBar = (el as HTMLElement).closest?.(
+			".yearly-planner-cell-range-bar[data-path]",
+		);
+		const canInteractWithRangeBar =
+			this.view.isRangeBarInteractionEnabled();
+		if (rangeBar && !canInteractWithRangeBar) {
+			const cell = (rangeBar as HTMLElement).closest?.(
+				"td[data-year][data-month][data-day]:not(.yearly-planner-cell-invalid)",
+			);
+			if (cell) {
+				const year = parseInt(
+					(cell as HTMLElement).dataset.year ?? "",
+					10,
+				);
+				const month = parseInt(
+					(cell as HTMLElement).dataset.month ?? "",
+					10,
+				);
+				const day = parseInt(
+					(cell as HTMLElement).dataset.day ?? "",
+					10,
+				);
+				if (!isNaN(year) && !isNaN(month) && !isNaN(day)) {
+					e.preventDefault();
+					e.stopPropagation();
+					e.stopImmediatePropagation?.();
+					this.view.openCreateFileModal({
+						startYear: year,
+						startMonth: month,
+						startDay: day,
+						endYear: year,
+						endMonth: month,
+						endDay: day,
+					});
+				}
+			}
+			return;
+		}
+
 		if (
 			applyClipboardModifierClick({
 				contentEl: this.view.contentEl,
@@ -271,8 +318,9 @@ export class PlannerInteractionHandler {
 				e,
 				topmostAt: (cx, cy) =>
 					getTopmostPlannerElementAt(this.view.contentEl, cx, cy),
-				chipBarSelector:
-					".yearly-planner-cell-file[data-path], .yearly-planner-cell-range-bar[data-path]",
+				chipBarSelector: canInteractWithRangeBar
+					? ".yearly-planner-cell-file[data-path], .yearly-planner-cell-range-bar[data-path]"
+					: ".yearly-planner-cell-file[data-path]",
 				cellSelector:
 					"td[data-year][data-month][data-day]:not(.yearly-planner-cell-invalid)",
 				selection: this.view.clipboardSelection,
@@ -281,12 +329,6 @@ export class PlannerInteractionHandler {
 		) {
 			return;
 		}
-		const el = getTopmostPlannerElementAt(
-			this.view.contentEl,
-			clientX,
-			clientY,
-		);
-		if (!el || !this.view.contentEl.contains(el as Node)) return;
 
 		const holidayBadge = (el as HTMLElement).closest?.(
 			".yearly-planner-cell-holiday-badge",
@@ -313,10 +355,8 @@ export class PlannerInteractionHandler {
 		const cellFile = (el as HTMLElement).closest?.(
 			".yearly-planner-cell-file[data-path]",
 		);
-		const rangeBar = (el as HTMLElement).closest?.(
-			".yearly-planner-cell-range-bar[data-path]",
-		);
-		const chipOrBar = cellFile ?? rangeBar;
+		const chipOrBar =
+			cellFile ?? (canInteractWithRangeBar ? rangeBar : null);
 		if (chipOrBar) {
 			const path = (chipOrBar as HTMLElement).dataset.path;
 			if (path) {

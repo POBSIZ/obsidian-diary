@@ -31,6 +31,8 @@ import {
 	renderMonthlyListBody,
 } from "./render-list";
 
+const MONTHLY_LIST_PLANNER_COMPACT_LAYOUT_MAX_WIDTH = 560;
+
 export class MonthlyListPlannerView extends ItemView {
 	year: number;
 	month: number;
@@ -42,6 +44,8 @@ export class MonthlyListPlannerView extends ItemView {
 	private pendingScrollToTodayOnOpen = false;
 	private initialScrollToTodayHandle: number | null = null;
 	private listFilter: MonthlyListFilter = "all";
+	private compactLayout = Platform.isMobile;
+	private resizeObserver: ResizeObserver | null = null;
 
 	constructor(
 		leaf: WorkspaceLeaf,
@@ -86,6 +90,7 @@ export class MonthlyListPlannerView extends ItemView {
 
 	onOpen(): Promise<void> {
 		this.pendingScrollToTodayOnOpen = true;
+		this.attachResizeObserver();
 		this.render();
 		this.queueInitialScrollToToday();
 		return Promise.resolve();
@@ -93,8 +98,14 @@ export class MonthlyListPlannerView extends ItemView {
 
 	onClose(): Promise<void> {
 		this.touchStartPos = null;
+		this.resizeObserver?.disconnect();
+		this.resizeObserver = null;
 		this.clearInitialScrollToToday();
 		return Promise.resolve();
+	}
+
+	protected isRangeBarInteractionEnabled(): boolean {
+		return true;
 	}
 
 	/** Defer: setState can re-render after onOpen, which would reset scroll if we scrolled in render(). */
@@ -162,6 +173,30 @@ export class MonthlyListPlannerView extends ItemView {
 			const h = el as HTMLElement;
 
 			const rangeBar = h.closest?.(".monthly-planner-range-bar[data-path]");
+			if (rangeBar && !this.isRangeBarInteractionEnabled()) {
+				const dayBlock = (rangeBar as HTMLElement).closest(
+					".monthly-list-planner-day[data-year][data-month][data-day]",
+				);
+				if (dayBlock instanceof HTMLElement) {
+					const year = parseInt(dayBlock.dataset.year ?? "", 10);
+					const month = parseInt(dayBlock.dataset.month ?? "", 10);
+					const day = parseInt(dayBlock.dataset.day ?? "", 10);
+					if (!isNaN(year) && !isNaN(month) && !isNaN(day)) {
+						e.preventDefault();
+						e.stopPropagation();
+						e.stopImmediatePropagation();
+						this.openCreateFileModal({
+							startYear: year,
+							startMonth: month,
+							startDay: day,
+							endYear: year,
+							endMonth: month,
+							endDay: day,
+						});
+					}
+				}
+				return;
+			}
 			if (rangeBar) {
 				const path = (rangeBar as HTMLElement).dataset.path;
 				if (path) {
@@ -269,6 +304,7 @@ export class MonthlyListPlannerView extends ItemView {
 
 	render(): void {
 		const { contentEl } = this;
+		this.compactLayout = this.shouldUseCompactLayout();
 		const shouldScrollToToday = this.pendingScrollToToday;
 		this.pendingScrollToToday = false;
 		/* Open-scroll runs via queueInitialScrollToToday, not here (avoids setState re-render reset). */
@@ -292,6 +328,11 @@ export class MonthlyListPlannerView extends ItemView {
 
 		contentEl.empty();
 		contentEl.addClass("monthly-list-planner-container");
+		contentEl.toggleClass("planner-container-compact", this.compactLayout);
+		contentEl.toggleClass(
+			"monthly-list-planner-container-compact",
+			this.compactLayout,
+		);
 		const pad = this.plugin.settings.mobileBottomPadding ?? 3.5;
 		contentEl.style.setProperty(
 			"--monthly-list-planner-mobile-bottom-padding",
@@ -365,11 +406,11 @@ export class MonthlyListPlannerView extends ItemView {
 					filePath,
 					`# ${label}\n\n`,
 				);
-				await this.leaf.openFile(newFile);
+				await this.plugin.openPlannerFile(this.leaf, newFile);
 				this.render();
 			},
 			onOpen: (file) => {
-				void this.leaf.openFile(file);
+				void this.plugin.openPlannerFile(this.leaf, file);
 			},
 		});
 	}
@@ -486,11 +527,19 @@ export class MonthlyListPlannerView extends ItemView {
 					notifyMinutes,
 				),
 			onCreated: () => this.render(),
+			openCreatedFile: (file) =>
+				this.plugin.openPlannerFile(this.leaf, file),
 		}).open();
 	}
 
 	private openFileOptionsModal(file: TFile): void {
-		new FileOptionsModal(this.app, file, this.leaf, () => this.render()).open();
+		new FileOptionsModal(
+			this.app,
+			file,
+			this.leaf,
+			() => this.render(),
+			(openFile) => this.plugin.openPlannerFile(this.leaf, openFile),
+		).open();
 	}
 
 	private renderList(contentEl: HTMLElement): void {
@@ -574,5 +623,48 @@ export class MonthlyListPlannerView extends ItemView {
 			holidaysData,
 			filter: this.listFilter,
 		});
+	}
+
+	private shouldUseCompactLayout(): boolean {
+		if (Platform.isMobile) return true;
+		if (this.isInSidebar()) return true;
+		const width = this.getAvailableLayoutWidth();
+		if (width <= 0) return this.compactLayout;
+		return width <= MONTHLY_LIST_PLANNER_COMPACT_LAYOUT_MAX_WIDTH;
+	}
+
+	private isInSidebar(): boolean {
+		return Boolean(
+			this.contentEl.closest(".mod-left-split, .mod-right-split"),
+		);
+	}
+
+	private getAvailableLayoutWidth(): number {
+		const leafEl = this.contentEl.closest(".workspace-leaf");
+		const widths = [
+			this.contentEl.clientWidth,
+			this.contentEl.parentElement?.clientWidth ?? 0,
+			leafEl instanceof HTMLElement ? leafEl.clientWidth : 0,
+		];
+		return widths.find((width) => width > 0) ?? 0;
+	}
+
+	private attachResizeObserver(): void {
+		if (this.resizeObserver) return;
+		const ResizeObserverCtor =
+			this.contentEl.ownerDocument.defaultView?.ResizeObserver;
+		if (!ResizeObserverCtor) return;
+
+		this.resizeObserver = new ResizeObserverCtor(() => {
+			const nextCompactLayout = this.shouldUseCompactLayout();
+			if (nextCompactLayout === this.compactLayout) return;
+			this.compactLayout = nextCompactLayout;
+			this.render();
+		});
+		this.resizeObserver.observe(this.contentEl);
+		const leafEl = this.contentEl.closest(".workspace-leaf");
+		if (leafEl instanceof HTMLElement) {
+			this.resizeObserver.observe(leafEl);
+		}
 	}
 }

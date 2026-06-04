@@ -290,6 +290,7 @@ export interface CreateFileModalOptions {
 	createSingleDateFile: CreateSingleDateFileWithFolderFn;
 	createRangeFile: CreateRangeFileWithFolderFn;
 	onCreated: () => void;
+	openCreatedFile?: (file: TFile) => void | Promise<void>;
 }
 
 const FOLDER_OTHER = "__other__";
@@ -713,7 +714,7 @@ export class CreateFileModal extends Modal {
 				);
 				this.options.onCreated();
 				this.close();
-				void this.app.workspace.getLeaf().openFile(file);
+				await this.openCreatedFile(file);
 			} else {
 				if (!filename) return;
 				const rawColor = this.colorInput.value.trim();
@@ -736,7 +737,7 @@ export class CreateFileModal extends Modal {
 				);
 				this.options.onCreated();
 				this.close();
-				void this.app.workspace.getLeaf().openFile(file);
+				await this.openCreatedFile(file);
 			}
 		} catch (err) {
 			const msg =
@@ -745,6 +746,14 @@ export class CreateFileModal extends Modal {
 					: t("modal.failedToCreateFile");
 			new Notice(msg);
 		}
+	}
+
+	private async openCreatedFile(file: TFile): Promise<void> {
+		if (this.options.openCreatedFile) {
+			await this.options.openCreatedFile(file);
+			return;
+		}
+		await this.app.workspace.getLeaf().openFile(file);
 	}
 }
 
@@ -851,6 +860,7 @@ export class FileOptionsModal extends Modal {
 		private file: TFile,
 		private leaf: WorkspaceLeaf,
 		private onClosed: () => void,
+		private openFile?: (file: TFile) => void | Promise<void>,
 	) {
 		super(app);
 	}
@@ -1049,7 +1059,7 @@ export class FileOptionsModal extends Modal {
 			attr: { type: "button" },
 		});
 		openBtn.onclick = () => {
-			void this.leaf.openFile(this.file);
+			void this.openPlannerFile();
 			this.close();
 		};
 		this.applyBtn = btnRow.createEl("button", {
@@ -1074,6 +1084,14 @@ export class FileOptionsModal extends Modal {
 		this.updateFileOptionsState();
 		this.titleInput.focus();
 		this.titleInput.select();
+	}
+
+	private async openPlannerFile(): Promise<void> {
+		if (this.openFile) {
+			await this.openFile(this.file);
+			return;
+		}
+		await this.leaf.openFile(this.file);
 	}
 
 	private setColorFromPreset(hex: string): void {

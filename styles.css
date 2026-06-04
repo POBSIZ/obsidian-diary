@@ -185,6 +185,50 @@ available in the app when your plugin is enabled.
 	flex-shrink: 0;
 }
 
+.planner-container-compact .yearly-planner-header,
+.planner-container-compact .monthly-planner-header {
+	margin-bottom: var(--planner-header-margin-mobile);
+	flex-wrap: wrap;
+	gap: 0.5rem;
+}
+
+.planner-container-compact .yearly-planner-title,
+.planner-container-compact .monthly-planner-title {
+	font-size: var(--planner-title-size-mobile);
+}
+
+.planner-container-compact .yearly-planner-year-wrapper,
+.planner-container-compact .monthly-planner-nav-wrapper {
+	flex-wrap: wrap;
+	gap: 0.25rem;
+}
+
+.planner-container-compact .planner-nav-secondary {
+	display: none;
+}
+
+.planner-container-compact .planner-more-menu {
+	display: block;
+}
+
+.planner-container-compact .yearly-planner-year-btn,
+.planner-container-compact .monthly-planner-nav-btn {
+	width: var(--planner-btn-size-mobile);
+	height: var(--planner-btn-size-mobile);
+	min-width: var(--planner-btn-size-mobile);
+	min-height: var(--planner-btn-size-mobile);
+}
+
+.planner-container-compact .yearly-planner-year-display,
+.planner-container-compact .monthly-planner-month-year-display {
+	font-size: 0.85rem;
+	padding: 0.2rem 0.4rem;
+}
+
+.planner-container-compact .monthly-planner-month-year-display {
+	min-width: 5.5ch;
+}
+
 .yearly-planner-cell:focus-visible,
 .monthly-planner-cell:focus-visible,
 .monthly-list-planner-day:focus-visible,
@@ -409,6 +453,72 @@ available in the app when your plugin is enabled.
 
 .yearly-planner-table {
 	min-width: min(100%, max-content);
+}
+
+.yearly-planner-container.yearly-planner-container-compact {
+	padding: var(--planner-container-padding-mobile);
+}
+
+.yearly-planner-container.yearly-planner-container-compact
+	.yearly-planner-scroll {
+	overflow-x: auto;
+	overflow-y: auto;
+}
+
+.yearly-planner-container.yearly-planner-container-compact
+	.yearly-planner-table {
+	table-layout: fixed;
+	width: calc(2.25rem + 12 * var(--yearly-planner-mobile-cell-width, 4.5rem));
+	min-width: calc(
+		2.25rem + 12 * var(--yearly-planner-mobile-cell-width, 4.5rem)
+	);
+	border-radius: 2px;
+}
+
+.yearly-planner-container.yearly-planner-container-compact
+	.yearly-planner-table
+	th,
+.yearly-planner-container.yearly-planner-container-compact
+	.yearly-planner-table
+	td {
+	box-sizing: border-box;
+	min-width: var(--yearly-planner-mobile-cell-width, 4.5rem);
+	width: var(--yearly-planner-mobile-cell-width, 4.5rem);
+	padding: 0.6rem 0.5rem;
+	font-size: 0.9rem;
+}
+
+.yearly-planner-container.yearly-planner-container-compact
+	.yearly-planner-table
+	thead
+	th {
+	min-width: var(--yearly-planner-mobile-cell-width, 4.5rem);
+	width: var(--yearly-planner-mobile-cell-width, 4.5rem);
+	font-size: 0.9rem;
+}
+
+.yearly-planner-container.yearly-planner-container-compact
+	.yearly-planner-table
+	thead
+	.yearly-planner-corner {
+	min-width: 2.25rem;
+	width: 2.25rem;
+}
+
+.yearly-planner-container.yearly-planner-container-compact
+	.yearly-planner-table
+	tbody
+	th {
+	min-width: 2.25rem;
+	width: 2.25rem;
+}
+
+.yearly-planner-container.yearly-planner-container-compact
+	.yearly-planner-table
+	tbody
+	td {
+	overflow-x: hidden;
+	overflow-y: visible;
 }
 
 .yearly-planner-table th,
@@ -2249,6 +2359,217 @@ body.-is-mobile .monthly-planner-weekend-label {
 	right: 0.15rem;
 }
 
+.monthly-planner-container.monthly-planner-container-compact {
+	padding: var(--planner-container-padding-mobile);
+}
+
+.monthly-planner-container.monthly-planner-container-compact
+	.monthly-planner-header {
+	margin-bottom: var(--planner-header-margin-mobile);
+	flex-wrap: wrap;
+	gap: 0.5rem;
+}
+
+.monthly-planner-container.monthly-planner-container-compact
+	.monthly-planner-title {
+	font-size: 1rem;
+}
+
+.monthly-planner-container.monthly-planner-container-compact
+	.monthly-planner-nav-wrapper {
+	flex-wrap: wrap;
+	gap: 0.25rem;
+}
+
+.monthly-planner-container.monthly-planner-container-compact
+	.planner-nav-secondary {
+	display: none;
+}
+
+.monthly-planner-container.monthly-planner-container-compact
+	.planner-more-menu {
+	display: block;
+}
+
+.monthly-planner-container.monthly-planner-container-compact
+	.monthly-planner-nav-btn {
+	width: var(--planner-btn-size-mobile);
+	height: var(--planner-btn-size-mobile);
+	min-width: var(--planner-btn-size-mobile);
+	min-height: var(--planner-btn-size-mobile);
+}
+
+.monthly-planner-container.monthly-planner-container-compact
+	.monthly-planner-month-year-display {
+	font-size: 0.85rem;
+	padding: 0.2rem 0.4rem;
+	min-width: 5.5ch;
+}
+
+.monthly-planner-container.monthly-planner-container-compact
+	.monthly-planner-table {
+	border-width: 0.5px;
+}
+
+.monthly-planner-container.monthly-planner-container-compact
+	.monthly-planner-table
+	th,
+.monthly-planner-container.monthly-planner-container-compact
+	.monthly-planner-table
+	td {
+	--monthly-cell-padding-v: 0.15rem;
+	--monthly-cell-padding-h: 0.2rem;
+	font-size: 0.75em;
+	border-width: 0.5px;
+}
+
+.monthly-planner-container.monthly-planner-container-compact
+	.monthly-planner-table
+	th {
+	font-size: 0.65em;
+}
+
+.monthly-planner-container.monthly-planner-container-compact
+	.monthly-planner-cell-inner {
+	--monthly-planner-cell-min-height: 2.5rem;
+	min-height: var(--monthly-planner-cell-min-height, 2.5rem);
+	gap: 0.1rem;
+}
+
+.monthly-planner-container.monthly-planner-container-compact
+	.monthly-planner-cell-day {
+	font-size: 0.75em;
+	margin-bottom: 0.1rem;
+}
+
+.monthly-planner-container.monthly-planner-container-compact
+	.monthly-planner-cell-active-date {
+	box-shadow: inset 0 0 0 2px var(--text-accent);
+	background: color-mix(
+		in srgb,
+		var(--text-accent) 18%,
+		var(--table-background, var(--background-primary))
+	);
+}
+
+.monthly-planner-container.monthly-planner-container-compact
+	.monthly-planner-range-bars {
+	--monthly-range-bar-height: 0.42rem;
+	--monthly-range-bar-gap: 0.06rem;
+	--monthly-range-bars-max-visible: 2;
+}
+
+.monthly-planner-container.monthly-planner-container-compact
+	.monthly-planner-range-bars-mobile
+	.monthly-planner-range-bar-mobile {
+	border-left-width: 0;
+	padding: 0;
+	border-radius: 0;
+	background: color-mix(
+		in srgb,
+		var(--range-color) 55%,
+		var(--background-primary)
+	);
+	box-shadow: none;
+}
+
+.monthly-planner-container.monthly-planner-container-compact
+	.monthly-planner-range-bars-mobile
+	.monthly-planner-range-run-start.monthly-planner-range-bar-mobile {
+	border-top-left-radius: 999px;
+	border-bottom-left-radius: 999px;
+	margin-left: 0.04rem;
+}
+
+.monthly-planner-container.monthly-planner-container-compact
+	.monthly-planner-range-bars-mobile
+	.monthly-planner-range-run-end.monthly-planner-range-bar-mobile {
+	border-top-right-radius: 999px;
+	border-bottom-right-radius: 999px;
+	margin-right: 0.04rem;
+}
+
+.monthly-planner-container.monthly-planner-container-compact
+	.monthly-planner-range-bars-mobile
+	.monthly-planner-range-run-start.monthly-planner-range-run-end.monthly-planner-range-bar-mobile {
+	border-radius: 999px;
+	margin-left: 0.04rem;
+	margin-right: 0.04rem;
+}
+
+.monthly-planner-container.monthly-planner-container-compact
+	.monthly-planner-range-bars-mobile
+	.monthly-planner-range-label {
+	display: none;
+}
+
+.monthly-planner-container.monthly-planner-container-compact
+	.monthly-planner-range-label {
+	font-size: 0.55em;
+}
+
+.monthly-planner-container.monthly-planner-container-compact
+	.monthly-planner-cell-file {
+	font-size: 0.6em;
+	padding: 0.1rem 0.2rem 0.1rem 0.3rem;
+	border-left-width: 2px;
+}
+
+.monthly-planner-container.monthly-planner-container-compact
+	.monthly-planner-mobile-single-summary {
+	margin-bottom: 0.05rem;
+}
+
+.monthly-planner-container.monthly-planner-container-compact
+	.monthly-planner-mobile-single-dot {
+	width: 0.42rem;
+	height: 0.42rem;
+}
+
+.monthly-planner-container.monthly-planner-container-compact
+	.monthly-planner-mobile-single-plus {
+	font-size: 0.5rem;
+}
+
+.monthly-planner-container.monthly-planner-container-compact
+	.monthly-planner-cell-holiday-badge {
+	font-size: 0.6em;
+	padding: 0.1rem 0.2rem 0.1rem 0.3rem;
+	border-left-width: 2px;
+}
+
+.monthly-planner-container.monthly-planner-container-compact
+	.monthly-planner-cell-holiday {
+	border-left-width: 2px;
+}
+
+.monthly-planner-container.monthly-planner-container-compact
+	.monthly-planner-weekend-label {
+	font-size: 0.5em;
+	top: 0.05rem;
+	right: 0.15rem;
+}
+
+.monthly-planner-container.monthly-planner-container-compact .plan-note-panel {
+	margin-bottom: 0.5rem;
+}
+
+.monthly-planner-container.monthly-planner-container-compact
+	.plan-note-panel-header {
+	padding: 0.25rem 0.5rem 0.25rem 0.6rem;
+}
+
+.monthly-planner-container.monthly-planner-container-compact
+	.plan-note-panel-title {
+	font-size: 0.75rem;
+}
+
+.monthly-planner-container.monthly-planner-container-compact
+	.plan-note-panel-body {
+	padding: 0.5rem 0.65rem;
+	max-height: 10rem;
+}
+
 /* ========== Monthly list planner ========== */
 
 .monthly-list-planner-container {
@@ -2258,6 +2579,10 @@ body.-is-mobile .monthly-planner-weekend-label {
 	flex-direction: column;
 	overflow: hidden;
 	box-sizing: border-box;
+}
+
+.monthly-list-planner-container.monthly-list-planner-container-compact {
+	padding: var(--planner-container-padding-mobile);
 }
 
 .monthly-list-planner-container > .plan-note-panel-wrapper {

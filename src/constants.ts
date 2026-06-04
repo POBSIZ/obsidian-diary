@@ -1,6 +1,12 @@
 export const VIEW_TYPE_YEARLY_PLANNER = "yearly-planner-view";
+export const VIEW_TYPE_YEARLY_SIDEBAR_PLANNER =
+	"yearly-sidebar-planner-view";
 export const VIEW_TYPE_MONTHLY_PLANNER = "monthly-planner-view";
+export const VIEW_TYPE_MONTHLY_SIDEBAR_PLANNER =
+	"monthly-sidebar-planner-view";
 export const VIEW_TYPE_MONTHLY_LIST_PLANNER = "monthly-list-planner-view";
+export const VIEW_TYPE_MONTHLY_LIST_SIDEBAR_PLANNER =
+	"monthly-list-sidebar-planner-view";
 
 /** Todo chip emoji: completed */
 export const TODO_CHIP_EMOJI_COMPLETED = "✅";

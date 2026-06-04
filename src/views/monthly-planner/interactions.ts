@@ -33,6 +33,8 @@ export interface MonthlyPlannerViewDelegate {
 	openCreateFileModal(bounds: SelectionBounds | null): void;
 	openFileOptionsModal(file: TFile): void;
 	openDaySummaryPanel(year: number, month: number, day: number): void;
+	isCompactLayout(): boolean;
+	isRangeBarInteractionEnabled(): boolean;
 }
 
 interface ChipDragPending {
@@ -121,6 +123,45 @@ export class MonthlyInteractionHandler {
 			e.stopPropagation();
 			return;
 		}
+		const el = getTopmostMonthlyElementAt(
+			this.view.contentEl,
+			clientX,
+			clientY,
+		);
+		if (!el || !this.view.contentEl.contains(el as Node)) return;
+
+		const rangeBar = (el as HTMLElement).closest?.(
+			".monthly-planner-range-bar[data-path]",
+		);
+		const canInteractWithRangeBar =
+			this.view.isRangeBarInteractionEnabled();
+		if (rangeBar && !canInteractWithRangeBar) {
+			const tappedCell = (rangeBar as HTMLElement).closest?.(
+				"td[data-year][data-month][data-day]:not(.monthly-planner-cell-invalid)",
+			);
+			if (this.view.isCompactLayout() && tappedCell) {
+				const year = parseInt(
+					(tappedCell as HTMLElement).dataset.year ?? "",
+					10,
+				);
+				const month = parseInt(
+					(tappedCell as HTMLElement).dataset.month ?? "",
+					10,
+				);
+				const day = parseInt(
+					(tappedCell as HTMLElement).dataset.day ?? "",
+					10,
+				);
+				if (!isNaN(year) && !isNaN(month) && !isNaN(day)) {
+					e.preventDefault();
+					e.stopPropagation();
+					e.stopImmediatePropagation?.();
+					this.view.openDaySummaryPanel(year, month, day);
+				}
+			}
+			return;
+		}
+
 		if (
 			applyClipboardModifierClick({
 				contentEl: this.view.contentEl,
@@ -129,8 +170,9 @@ export class MonthlyInteractionHandler {
 				e,
 				topmostAt: (cx, cy) =>
 					getTopmostMonthlyElementAt(this.view.contentEl, cx, cy),
-				chipBarSelector:
-					".monthly-planner-cell-file[data-path], .monthly-planner-range-bar[data-path]",
+				chipBarSelector: canInteractWithRangeBar
+					? ".monthly-planner-cell-file[data-path], .monthly-planner-range-bar[data-path]"
+					: ".monthly-planner-cell-file[data-path]",
 				cellSelector:
 					"td[data-year][data-month][data-day]:not(.monthly-planner-cell-invalid)",
 				selection: this.view.clipboardSelection,
@@ -139,36 +181,7 @@ export class MonthlyInteractionHandler {
 		) {
 			return;
 		}
-		const el = getTopmostMonthlyElementAt(
-			this.view.contentEl,
-			clientX,
-			clientY,
-		);
-		if (!el || !this.view.contentEl.contains(el as Node)) return;
-
-		const tappedCell = (el as HTMLElement).closest?.(
-			"td[data-year][data-month][data-day]:not(.monthly-planner-cell-invalid)",
-		);
-		if (Platform.isMobile && tappedCell) {
-			const year = parseInt((tappedCell as HTMLElement).dataset.year ?? "", 10);
-			const month = parseInt(
-				(tappedCell as HTMLElement).dataset.month ?? "",
-				10,
-			);
-			const day = parseInt((tappedCell as HTMLElement).dataset.day ?? "", 10);
-			if (!isNaN(year) && !isNaN(month) && !isNaN(day)) {
-				e.preventDefault();
-				e.stopPropagation();
-				e.stopImmediatePropagation?.();
-				this.view.openDaySummaryPanel(year, month, day);
-			}
-			return;
-		}
-
-		const rangeBar = (el as HTMLElement).closest?.(
-			".monthly-planner-range-bar[data-path]",
-		);
-		if (rangeBar) {
+		if (rangeBar && canInteractWithRangeBar) {
 			const path = (rangeBar as HTMLElement).dataset.path;
 			if (path) {
 				e.preventDefault();
@@ -221,6 +234,31 @@ export class MonthlyInteractionHandler {
 			return;
 		}
 
+		const tappedCell = (el as HTMLElement).closest?.(
+			"td[data-year][data-month][data-day]:not(.monthly-planner-cell-invalid)",
+		);
+		if (this.view.isCompactLayout() && tappedCell) {
+			const year = parseInt(
+				(tappedCell as HTMLElement).dataset.year ?? "",
+				10,
+			);
+			const month = parseInt(
+				(tappedCell as HTMLElement).dataset.month ?? "",
+				10,
+			);
+			const day = parseInt(
+				(tappedCell as HTMLElement).dataset.day ?? "",
+				10,
+			);
+			if (!isNaN(year) && !isNaN(month) && !isNaN(day)) {
+				e.preventDefault();
+				e.stopPropagation();
+				e.stopImmediatePropagation?.();
+				this.view.openDaySummaryPanel(year, month, day);
+			}
+			return;
+		}
+
 		const cell = (el as HTMLElement).closest?.(
 			"td[data-year][data-month][data-day]:not(.monthly-planner-cell-invalid)",
 		);
@@ -235,7 +273,7 @@ export class MonthlyInteractionHandler {
 			e.stopPropagation();
 			e.stopImmediatePropagation?.();
 			if (!isNaN(year) && !isNaN(month) && !isNaN(day)) {
-				if (Platform.isMobile) {
+				if (this.view.isCompactLayout()) {
 					this.view.openDaySummaryPanel(year, month, day);
 				} else {
 					const bounds: SelectionBounds = {
@@ -253,7 +291,7 @@ export class MonthlyInteractionHandler {
 	}
 
 	handlePlannerMouseDown(e: MouseEvent): void {
-		if (!Platform.isMobile) {
+		if (!this.view.isCompactLayout()) {
 			this.maybeStartDrag(e.clientX, e.clientY, e);
 		}
 	}
@@ -269,7 +307,7 @@ export class MonthlyInteractionHandler {
 		}
 		const t = e.touches[0];
 		if (e.touches.length === 1 && t) {
-			if (Platform.isMobile) {
+			if (this.view.isCompactLayout()) {
 				this.touchStartPos = { x: t.clientX, y: t.clientY };
 				return;
 			}
@@ -290,7 +328,7 @@ export class MonthlyInteractionHandler {
 		const t = e.changedTouches[0];
 		if (!t) return;
 
-		if (Platform.isMobile) {
+		if (this.view.isCompactLayout()) {
 			if (!this.touchStartPos) return; /* Pinch or multi-touch: no tap */
 			const dx = t.clientX - this.touchStartPos.x;
 			const dy = t.clientY - this.touchStartPos.y;

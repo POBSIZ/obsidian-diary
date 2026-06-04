@@ -1,4 +1,4 @@
-import { ItemView, Notice, TFile, WorkspaceLeaf } from "obsidian";
+import { ItemView, Notice, Platform, TFile, WorkspaceLeaf } from "obsidian";
 import { t } from "../../i18n";
 import DiaryObsidian from "../../main";
 import { VIEW_TYPE_YEARLY_PLANNER } from "../../constants";
@@ -50,6 +50,8 @@ import {
 
 export type { YearlyPlannerState } from "./types";
 
+const YEARLY_PLANNER_COMPACT_LAYOUT_MAX_WIDTH = 768;
+
 export class YearlyPlannerView
 	extends ItemView
 	implements YearlyPlannerViewDelegate
@@ -60,6 +62,8 @@ export class YearlyPlannerView
 	clipboardSelection = new Set<string>();
 	private interactionHandler: PlannerInteractionHandler;
 	private clipboardKeydownRegistered = false;
+	private compactLayout = Platform.isMobile;
+	private resizeObserver: ResizeObserver | null = null;
 	/** LIFO stack of paths created by each Cmd/Ctrl+V paste (for Cmd/Ctrl+Z undo). */
 	private pasteUndoBatches: string[][] = [];
 	private boundClipboardKeydown = (e: KeyboardEvent) => {
@@ -106,15 +110,22 @@ export class YearlyPlannerView
 			});
 			this.clipboardKeydownRegistered = true;
 		}
+		this.attachResizeObserver();
 		this.render();
 		return Promise.resolve();
 	}
 
 	onClose(): Promise<void> {
 		this.interactionHandler.clearDragListeners();
+		this.resizeObserver?.disconnect();
+		this.resizeObserver = null;
 		this.clipboardSelection.clear();
 		this.pasteUndoBatches.length = 0;
 		return Promise.resolve();
+	}
+
+	isRangeBarInteractionEnabled(): boolean {
+		return true;
 	}
 
 	/** Update chip-drag state without full render: add chip-dragging class and drop-target. */
@@ -146,6 +157,7 @@ export class YearlyPlannerView
 
 	render(): void {
 		const { contentEl } = this;
+		this.compactLayout = this.shouldUseCompactLayout();
 		const scrollEl = contentEl.querySelector<HTMLElement>(
 			".yearly-planner-scroll",
 		);
@@ -163,6 +175,11 @@ export class YearlyPlannerView
 
 		contentEl.empty();
 		contentEl.addClass("yearly-planner-container");
+		contentEl.toggleClass("planner-container-compact", this.compactLayout);
+		contentEl.toggleClass(
+			"yearly-planner-container-compact",
+			this.compactLayout,
+		);
 		if (this.chipDragState) {
 			contentEl.addClass("yearly-planner-chip-dragging");
 		} else {
@@ -234,11 +251,11 @@ export class YearlyPlannerView
 					filePath,
 					`# ${this.year}\n\n`,
 				);
-				await this.leaf.openFile(newFile);
+				await this.plugin.openPlannerFile(this.leaf, newFile);
 				this.render();
 			},
 			onOpen: (file) => {
-				void this.leaf.openFile(file);
+				void this.plugin.openPlannerFile(this.leaf, file);
 			},
 		});
 	}
@@ -400,7 +417,11 @@ export class YearlyPlannerView
 		day: number,
 	): Promise<void> {
 		const folder = this.plugin.settings.plannerFolder || "Planner";
-		await openDateNoteOp(this.app, this.leaf, folder, year, month, day);
+		const leaf = this.plugin.getPlannerFileOpenLeaf(this.leaf);
+		await openDateNoteOp(this.app, leaf, folder, year, month, day);
+		if (leaf !== this.leaf) {
+			await this.app.workspace.revealLeaf(leaf);
+		}
 	}
 
 	openCreateFileModal(bounds: SelectionBounds | null): void {
@@ -428,13 +449,62 @@ export class YearlyPlannerView
 					notifyMinutes,
 				),
 			onCreated: () => this.render(),
+			openCreatedFile: (file) =>
+				this.plugin.openPlannerFile(this.leaf, file),
 		}).open();
 	}
 
 	openFileOptionsModal(file: TFile): void {
-		new FileOptionsModal(this.app, file, this.leaf, () =>
-			this.render(),
+		new FileOptionsModal(
+			this.app,
+			file,
+			this.leaf,
+			() => this.render(),
+			(openFile) => this.plugin.openPlannerFile(this.leaf, openFile),
 		).open();
+	}
+
+	private shouldUseCompactLayout(): boolean {
+		if (Platform.isMobile) return true;
+		if (this.isInSidebar()) return true;
+		const width = this.getAvailableLayoutWidth();
+		if (width <= 0) return this.compactLayout;
+		return width <= YEARLY_PLANNER_COMPACT_LAYOUT_MAX_WIDTH;
+	}
+
+	private isInSidebar(): boolean {
+		return Boolean(
+			this.contentEl.closest(".mod-left-split, .mod-right-split"),
+		);
+	}
+
+	private getAvailableLayoutWidth(): number {
+		const leafEl = this.contentEl.closest(".workspace-leaf");
+		const widths = [
+			this.contentEl.clientWidth,
+			this.contentEl.parentElement?.clientWidth ?? 0,
+			leafEl instanceof HTMLElement ? leafEl.clientWidth : 0,
+		];
+		return widths.find((width) => width > 0) ?? 0;
+	}
+
+	private attachResizeObserver(): void {
+		if (this.resizeObserver) return;
+		const ResizeObserverCtor =
+			this.contentEl.ownerDocument.defaultView?.ResizeObserver;
+		if (!ResizeObserverCtor) return;
+
+		this.resizeObserver = new ResizeObserverCtor(() => {
+			const nextCompactLayout = this.shouldUseCompactLayout();
+			if (nextCompactLayout === this.compactLayout) return;
+			this.compactLayout = nextCompactLayout;
+			this.render();
+		});
+		this.resizeObserver.observe(this.contentEl);
+		const leafEl = this.contentEl.closest(".workspace-leaf");
+		if (leafEl instanceof HTMLElement) {
+			this.resizeObserver.observe(leafEl);
+		}
 	}
 
 	private handleClipboardKeydown(e: KeyboardEvent): void {

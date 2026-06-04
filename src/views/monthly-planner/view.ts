@@ -61,6 +61,8 @@ import {
 
 export type { MonthlyPlannerState } from "./types";
 
+const MONTHLY_PLANNER_COMPACT_LAYOUT_MAX_WIDTH = 560;
+
 export class MonthlyPlannerView
 	extends ItemView
 	implements MonthlyPlannerViewDelegate
@@ -73,6 +75,8 @@ export class MonthlyPlannerView
 	private interactionHandler: MonthlyInteractionHandler;
 	private pinchZoom: PinchZoomController | null = null;
 	private pinchZoomScale = 1;
+	private compactLayout = Platform.isMobile;
+	private resizeObserver: ResizeObserver | null = null;
 	private selectedDate: MonthlyPlannerSelectedDate | null = null;
 	private daySummaryOpen = false;
 	private clipboardKeydownRegistered = false;
@@ -106,6 +110,10 @@ export class MonthlyPlannerView
 		});
 	}
 
+	getIcon(): string {
+		return "calendar-days";
+	}
+
 	getState(): MonthlyPlannerState {
 		return {
 			year: this.year,
@@ -135,7 +143,7 @@ export class MonthlyPlannerView
 			this.daySummaryOpen = Boolean(
 				state.daySummaryOpen &&
 					this.selectedDate &&
-					Platform.isMobile,
+					this.shouldUseCompactLayout(),
 			);
 			this.render();
 		}
@@ -149,6 +157,7 @@ export class MonthlyPlannerView
 			});
 			this.clipboardKeydownRegistered = true;
 		}
+		this.attachResizeObserver();
 		this.render();
 		return Promise.resolve();
 	}
@@ -157,9 +166,19 @@ export class MonthlyPlannerView
 		this.interactionHandler.clearDragListeners();
 		this.pinchZoom?.detach();
 		this.pinchZoom = null;
+		this.resizeObserver?.disconnect();
+		this.resizeObserver = null;
 		this.clipboardSelection.clear();
 		this.pasteUndoBatches.length = 0;
 		return Promise.resolve();
+	}
+
+	isCompactLayout(): boolean {
+		return this.compactLayout;
+	}
+
+	isRangeBarInteractionEnabled(): boolean {
+		return true;
 	}
 
 	/** Update chip-drag state without full render: add chip-dragging class and drop-target. */
@@ -191,6 +210,10 @@ export class MonthlyPlannerView
 
 	render(): void {
 		const { contentEl } = this;
+		this.compactLayout = this.shouldUseCompactLayout();
+		if (!this.compactLayout) {
+			this.daySummaryOpen = false;
+		}
 		const scrollEl = contentEl.querySelector<HTMLElement>(
 			".monthly-planner-scroll",
 		);
@@ -212,7 +235,12 @@ export class MonthlyPlannerView
 		if (preservePlanNote) planNoteWrapper.remove();
 
 		contentEl.empty();
-		contentEl.addClass("monthly-planner-container");
+			contentEl.addClass("monthly-planner-container");
+			contentEl.toggleClass("planner-container-compact", this.compactLayout);
+			contentEl.toggleClass(
+				"monthly-planner-container-compact",
+				this.compactLayout,
+		);
 		if (this.chipDragState) {
 			contentEl.addClass("monthly-planner-chip-dragging");
 		} else {
@@ -254,7 +282,7 @@ export class MonthlyPlannerView
 		const newScrollEl = contentEl.querySelector<HTMLElement>(
 			".monthly-planner-scroll",
 		);
-		if (Platform.isMobile && newScrollEl) {
+		if (this.compactLayout && newScrollEl) {
 			this.renderMobileDaySummary(newScrollEl);
 		}
 		if (newScrollEl) {
@@ -310,11 +338,11 @@ export class MonthlyPlannerView
 					filePath,
 					`# ${label}\n\n`,
 				);
-				await this.leaf.openFile(newFile);
+				await this.plugin.openPlannerFile(this.leaf, newFile);
 				this.render();
 			},
 			onOpen: (file) => {
-				void this.leaf.openFile(file);
+				void this.plugin.openPlannerFile(this.leaf, file);
 			},
 		});
 	}
@@ -493,6 +521,7 @@ export class MonthlyPlannerView
 			locale,
 			rangeLaneMap,
 			selectedDate: this.daySummaryOpen ? this.selectedDate : null,
+			isCompactLayout: this.compactLayout,
 		};
 
 		const cells = getMonthCalendarCells(this.year, this.month);
@@ -528,7 +557,11 @@ export class MonthlyPlannerView
 		day: number,
 	): Promise<void> {
 		const folder = this.plugin.settings.plannerFolder || "Planner";
-		await openDateNoteOp(this.app, this.leaf, folder, year, month, day);
+		const leaf = this.plugin.getPlannerFileOpenLeaf(this.leaf);
+		await openDateNoteOp(this.app, leaf, folder, year, month, day);
+		if (leaf !== this.leaf) {
+			await this.app.workspace.revealLeaf(leaf);
+		}
 	}
 
 	openCreateFileModal(
@@ -558,12 +591,18 @@ export class MonthlyPlannerView
 					notifyMinutes,
 				),
 			onCreated: () => this.render(),
+			openCreatedFile: (file) =>
+				this.plugin.openPlannerFile(this.leaf, file),
 		}).open();
 	}
 
 	openFileOptionsModal(file: TFile): void {
-		new FileOptionsModal(this.app, file, this.leaf, () =>
-			this.render(),
+		new FileOptionsModal(
+			this.app,
+			file,
+			this.leaf,
+			() => this.render(),
+			(openFile) => this.plugin.openPlannerFile(this.leaf, openFile),
 		).open();
 	}
 
@@ -674,6 +713,52 @@ export class MonthlyPlannerView
 				endMonth: month,
 				endDay: day,
 			});
+	}
+
+	private shouldUseCompactLayout(): boolean {
+		if (Platform.isMobile) return true;
+		if (this.isInSidebar()) return true;
+		const width = this.getAvailableLayoutWidth();
+		if (width <= 0) return this.compactLayout;
+		return width <= MONTHLY_PLANNER_COMPACT_LAYOUT_MAX_WIDTH;
+	}
+
+	private isInSidebar(): boolean {
+		return Boolean(
+			this.contentEl.closest(".mod-left-split, .mod-right-split"),
+		);
+	}
+
+	private getAvailableLayoutWidth(): number {
+		const leafEl = this.contentEl.closest(".workspace-leaf");
+		const widths = [
+			this.contentEl.clientWidth,
+			this.contentEl.parentElement?.clientWidth ?? 0,
+			leafEl instanceof HTMLElement ? leafEl.clientWidth : 0,
+		];
+		return widths.find((width) => width > 0) ?? 0;
+	}
+
+	private attachResizeObserver(): void {
+		if (this.resizeObserver) return;
+		const ResizeObserverCtor =
+			this.contentEl.ownerDocument.defaultView?.ResizeObserver;
+		if (!ResizeObserverCtor) return;
+
+		this.resizeObserver = new ResizeObserverCtor(() => {
+			const nextCompactLayout = this.shouldUseCompactLayout();
+			if (nextCompactLayout === this.compactLayout) return;
+			this.compactLayout = nextCompactLayout;
+			if (!nextCompactLayout) {
+				this.daySummaryOpen = false;
+			}
+			this.render();
+		});
+		this.resizeObserver.observe(this.contentEl);
+		const leafEl = this.contentEl.closest(".workspace-leaf");
+		if (leafEl instanceof HTMLElement) {
+			this.resizeObserver.observe(leafEl);
+		}
 	}
 
 	private getDisplayTitle(file: TFile): string {

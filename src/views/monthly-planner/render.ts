@@ -1,4 +1,4 @@
-import { App, Platform, TFile, setIcon } from "obsidian";
+import { App, TFile, setIcon } from "obsidian";
 import { t } from "../../i18n";
 import {
 	MONTH_LABELS_KO,
@@ -214,6 +214,7 @@ export interface CreateMonthlyCellContext {
 	locale: string;
 	rangeLaneMap: Map<string, number>;
 	selectedDate: MonthlyPlannerSelectedDate | null;
+	isCompactLayout: boolean;
 }
 
 export function createMonthlyCell(
@@ -286,7 +287,7 @@ export function createMonthlyCell(
 		ctx.plannerFileScope,
 		ctx.plannerFiles,
 	);
-	const isMobileView = Platform.isMobile;
+	const isCompactLayout = ctx.isCompactLayout;
 	const holidayNames =
 		isHoliday && ctx.holidaysData?.names.has(dateKey)
 			? (ctx.holidaysData.names.get(dateKey) ?? [])
@@ -310,7 +311,7 @@ export function createMonthlyCell(
 		const rangeContainer = inner.createDiv({
 			cls: "monthly-planner-range-bars",
 		});
-		if (isMobileView) {
+		if (isCompactLayout) {
 			rangeContainer.addClass("monthly-planner-range-bars-mobile");
 		}
 		const laneIndices = rangeFiles.map(
@@ -337,7 +338,7 @@ export function createMonthlyCell(
 			});
 			barEl.tabIndex = 0;
 			barEl.setAttribute("role", "button");
-			if (isMobileView) {
+			if (isCompactLayout) {
 				barEl.addClass("monthly-planner-range-bar-mobile");
 			}
 			const laneIdx = ctx.rangeLaneMap.get(file.basename) ?? 0;
@@ -377,17 +378,17 @@ export function createMonthlyCell(
 		});
 	}
 
-	if (singleFiles.length > 0 && isMobileView) {
+	if (singleFiles.length > 0 && isCompactLayout) {
 		createMobileSingleFileSummary(inner, ctx.app, singleFiles);
 	}
-	if (isMobileView) {
+	if (isCompactLayout) {
 		createMobileEntryCount(
 			inner,
 			singleFiles.length + rangeFiles.length + holidayNames.length,
 		);
 	}
 
-	if (singleFiles.length > 0 && !isMobileView) {
+	if (singleFiles.length > 0 && !isCompactLayout) {
 		const listEl = inner.createDiv({ cls: "monthly-planner-cell-files" });
 		for (const file of singleFiles) {
 			const linkEl = listEl.createDiv({
@@ -420,11 +421,11 @@ export function createMonthlyCell(
 		}
 	}
 
-	if (isHoliday && ctx.holidaysData?.names.has(dateKey) && isMobileView) {
+	if (isHoliday && ctx.holidaysData?.names.has(dateKey) && isCompactLayout) {
 		createMobileHolidaySummary(inner, holidayNames);
 	}
 
-	if (isHoliday && ctx.holidaysData?.names.has(dateKey) && !isMobileView) {
+	if (isHoliday && ctx.holidaysData?.names.has(dateKey) && !isCompactLayout) {
 		const holidaysContainer = inner.createDiv({
 			cls: "monthly-planner-cell-holidays",
 		});

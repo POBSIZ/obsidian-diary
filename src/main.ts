@@ -1,4 +1,4 @@
-import { Platform, Plugin, WorkspaceLeaf } from "obsidian";
+import { Platform, Plugin, TFile, WorkspaceLeaf } from "obsidian";
 import { setLocale, t } from "./i18n";
 import {
 	DEFAULT_SETTINGS,
@@ -7,13 +7,25 @@ import {
 } from "./settings";
 import {
 	VIEW_TYPE_YEARLY_PLANNER,
+	VIEW_TYPE_YEARLY_SIDEBAR_PLANNER,
 	VIEW_TYPE_MONTHLY_PLANNER,
+	VIEW_TYPE_MONTHLY_SIDEBAR_PLANNER,
 	VIEW_TYPE_MONTHLY_LIST_PLANNER,
+	VIEW_TYPE_MONTHLY_LIST_SIDEBAR_PLANNER,
 } from "./constants";
 import { YearlyPlannerView } from "./views/yearly-planner/view";
+import { YearlySidebarPlannerView } from "./views/yearly-planner/sidebar-view";
 import { MonthlyPlannerView } from "./views/monthly-planner/view";
+import { MonthlySidebarPlannerView } from "./views/monthly-planner/sidebar-view";
 import { MonthlyListPlannerView } from "./views/monthly-list-planner/view";
+import { MonthlyListSidebarPlannerView } from "./views/monthly-list-planner/sidebar-view";
 import { registerPlannerReminders } from "./planner-reminders";
+
+const SIDEBAR_PLANNER_VIEW_TYPES = [
+	VIEW_TYPE_YEARLY_SIDEBAR_PLANNER,
+	VIEW_TYPE_MONTHLY_SIDEBAR_PLANNER,
+	VIEW_TYPE_MONTHLY_LIST_SIDEBAR_PLANNER,
+] as const;
 
 export default class DiaryObsidian extends Plugin {
 	settings: DiaryObsidianSettings;
@@ -27,12 +39,24 @@ export default class DiaryObsidian extends Plugin {
 			(leaf) => new YearlyPlannerView(leaf, this),
 		);
 		this.registerView(
+			VIEW_TYPE_YEARLY_SIDEBAR_PLANNER,
+			(leaf) => new YearlySidebarPlannerView(leaf, this),
+		);
+		this.registerView(
 			VIEW_TYPE_MONTHLY_PLANNER,
 			(leaf) => new MonthlyPlannerView(leaf, this),
 		);
 		this.registerView(
+			VIEW_TYPE_MONTHLY_SIDEBAR_PLANNER,
+			(leaf) => new MonthlySidebarPlannerView(leaf, this),
+		);
+		this.registerView(
 			VIEW_TYPE_MONTHLY_LIST_PLANNER,
 			(leaf) => new MonthlyListPlannerView(leaf, this),
+		);
+		this.registerView(
+			VIEW_TYPE_MONTHLY_LIST_SIDEBAR_PLANNER,
+			(leaf) => new MonthlyListSidebarPlannerView(leaf, this),
 		);
 
 		this.addRibbonIcon(
@@ -44,9 +68,9 @@ export default class DiaryObsidian extends Plugin {
 		);
 		this.addRibbonIcon(
 			"calendar-days",
-			t("ribbon.openMonthlyPlanner"),
+			t("command.openMonthlyPlannerInSidebar"),
 			() => {
-				void this.activateMonthlyPlanner();
+				void this.activateMonthlyPlannerInSidebar();
 			},
 		);
 		this.addRibbonIcon(
@@ -68,9 +92,21 @@ export default class DiaryObsidian extends Plugin {
 			callback: () => void this.activateMonthlyPlanner(),
 		});
 		this.addCommand({
+			id: "open-monthly-planner-in-sidebar",
+			name: t("command.openMonthlyPlannerInSidebar"),
+			callback: () => void this.activateMonthlyPlannerInSidebar(),
+		});
+		this.addCommand({
 			id: "open-monthly-list-planner",
 			name: t("command.openMonthlyListPlanner"),
 			callback: () => void this.activateMonthlyListPlanner(),
+		});
+
+		this.app.workspace.onLayoutReady(() => {
+			void this.ensureMonthlyPlannerSidebarLeaf({
+				active: false,
+				reveal: false,
+			});
 		});
 
 		this.addSettingTab(new DiaryObsidianSettingTab(this.app, this));
@@ -134,6 +170,37 @@ export default class DiaryObsidian extends Plugin {
 		await workspace.revealLeaf(leaf);
 	}
 
+	async activateMonthlyPlannerInSidebar(
+		year?: number,
+		month?: number,
+	): Promise<void> {
+		await this.ensureMonthlyPlannerSidebarLeaf({
+			year,
+			month,
+			active: true,
+			reveal: true,
+		});
+	}
+
+	getPlannerFileOpenLeaf(sourceLeaf: WorkspaceLeaf): WorkspaceLeaf {
+		if (!this.isSidebarLeaf(sourceLeaf)) return sourceLeaf;
+		return (
+			this.app.workspace.getMostRecentLeaf(this.app.workspace.rootSplit) ??
+			this.app.workspace.getLeaf("tab")
+		);
+	}
+
+	async openPlannerFile(
+		sourceLeaf: WorkspaceLeaf,
+		file: TFile,
+	): Promise<void> {
+		const targetLeaf = this.getPlannerFileOpenLeaf(sourceLeaf);
+		await targetLeaf.openFile(file);
+		if (targetLeaf !== sourceLeaf) {
+			await this.app.workspace.revealLeaf(targetLeaf);
+		}
+	}
+
 	async activateMonthlyListPlanner(): Promise<void> {
 		const { workspace } = this.app;
 		const now = new Date();
@@ -158,6 +225,18 @@ export default class DiaryObsidian extends Plugin {
 		await this.app.workspace.revealLeaf(leaf);
 	}
 
+	async switchToMonthlySidebar(
+		leaf: WorkspaceLeaf,
+		year: number,
+		month: number,
+	): Promise<void> {
+		await leaf.setViewState({
+			type: VIEW_TYPE_MONTHLY_SIDEBAR_PLANNER,
+			state: { year, month },
+		});
+		await this.app.workspace.revealLeaf(leaf);
+	}
+
 	/** Switch leaf to monthly list planner. Reuses the same leaf. */
 	async switchToMonthlyList(
 		leaf: WorkspaceLeaf,
@@ -171,10 +250,33 @@ export default class DiaryObsidian extends Plugin {
 		await this.app.workspace.revealLeaf(leaf);
 	}
 
+	async switchToMonthlyListSidebar(
+		leaf: WorkspaceLeaf,
+		year: number,
+		month: number,
+	): Promise<void> {
+		await leaf.setViewState({
+			type: VIEW_TYPE_MONTHLY_LIST_SIDEBAR_PLANNER,
+			state: { year, month },
+		});
+		await this.app.workspace.revealLeaf(leaf);
+	}
+
 	/** Switch leaf to yearly planner. Reuses the same leaf. */
 	async switchToYearly(leaf: WorkspaceLeaf, year: number): Promise<void> {
 		await leaf.setViewState({
 			type: VIEW_TYPE_YEARLY_PLANNER,
+			state: { year },
+		});
+		await this.app.workspace.revealLeaf(leaf);
+	}
+
+	async switchToYearlySidebar(
+		leaf: WorkspaceLeaf,
+		year: number,
+	): Promise<void> {
+		await leaf.setViewState({
+			type: VIEW_TYPE_YEARLY_SIDEBAR_PLANNER,
 			state: { year },
 		});
 		await this.app.workspace.revealLeaf(leaf);
@@ -191,9 +293,21 @@ export default class DiaryObsidian extends Plugin {
 			const now = new Date();
 			const m =
 				now.getFullYear() === y ? now.getMonth() + 1 : 1;
-			await this.switchToMonthly(leaf, y, m);
+			if (view instanceof YearlySidebarPlannerView) {
+				await this.switchToMonthlySidebar(leaf, y, m);
+			} else {
+				await this.switchToMonthly(leaf, y, m);
+			}
+		} else if (view instanceof MonthlySidebarPlannerView) {
+			await this.switchToMonthlyListSidebar(
+				leaf,
+				view.year,
+				view.month,
+			);
 		} else if (view instanceof MonthlyPlannerView) {
 			await this.switchToMonthlyList(leaf, view.year, view.month);
+		} else if (view instanceof MonthlyListSidebarPlannerView) {
+			await this.switchToYearlySidebar(leaf, view.year);
 		} else if (view instanceof MonthlyListPlannerView) {
 			await this.switchToYearly(leaf, view.year);
 		}
@@ -234,9 +348,14 @@ export default class DiaryObsidian extends Plugin {
 	}
 
 	refreshYearlyPlannerViews(): void {
-		const leaves = this.app.workspace.getLeavesOfType(
-			VIEW_TYPE_YEARLY_PLANNER,
-		);
+		const leaves = [
+			...this.app.workspace.getLeavesOfType(
+				VIEW_TYPE_YEARLY_PLANNER,
+			),
+			...this.app.workspace.getLeavesOfType(
+				VIEW_TYPE_YEARLY_SIDEBAR_PLANNER,
+			),
+		];
 		for (const leaf of leaves) {
 			const view = leaf.view;
 			if (view instanceof YearlyPlannerView) {
@@ -246,9 +365,14 @@ export default class DiaryObsidian extends Plugin {
 	}
 
 	refreshMonthlyPlannerViews(): void {
-		const leaves = this.app.workspace.getLeavesOfType(
-			VIEW_TYPE_MONTHLY_PLANNER,
-		);
+		const leaves = [
+			...this.app.workspace.getLeavesOfType(
+				VIEW_TYPE_MONTHLY_PLANNER,
+			),
+			...this.app.workspace.getLeavesOfType(
+				VIEW_TYPE_MONTHLY_SIDEBAR_PLANNER,
+			),
+		];
 		for (const leaf of leaves) {
 			const view = leaf.view;
 			if (view instanceof MonthlyPlannerView) {
@@ -258,15 +382,146 @@ export default class DiaryObsidian extends Plugin {
 	}
 
 	refreshMonthlyListPlannerViews(): void {
-		const leaves = this.app.workspace.getLeavesOfType(
-			VIEW_TYPE_MONTHLY_LIST_PLANNER,
-		);
+		const leaves = [
+			...this.app.workspace.getLeavesOfType(
+				VIEW_TYPE_MONTHLY_LIST_PLANNER,
+			),
+			...this.app.workspace.getLeavesOfType(
+				VIEW_TYPE_MONTHLY_LIST_SIDEBAR_PLANNER,
+			),
+		];
 		for (const leaf of leaves) {
 			const view = leaf.view;
 			if (view instanceof MonthlyListPlannerView) {
 				view.render();
 			}
 		}
+	}
+
+	private async ensureMonthlyPlannerSidebarLeaf(options: {
+		year?: number;
+		month?: number;
+		active: boolean;
+		reveal: boolean;
+	}): Promise<WorkspaceLeaf> {
+		const now = new Date();
+		const hasExplicitDate =
+			options.year !== undefined || options.month !== undefined;
+		const existingLeaf = this.findPlannerSidebarLeaf();
+		const legacyLeaf = this.findMonthlyPlannerLeafInRightSidebar();
+		const legacyState = this.getMonthlyPlannerLeafState(legacyLeaf);
+		const state =
+			hasExplicitDate || !existingLeaf
+				? {
+						year: options.year ?? legacyState?.year ?? now.getFullYear(),
+						month: options.month ?? legacyState?.month ?? now.getMonth() + 1,
+					}
+				: null;
+
+		if (existingLeaf) {
+			if (state) {
+				await existingLeaf.setViewState({
+					type: VIEW_TYPE_MONTHLY_SIDEBAR_PLANNER,
+					state,
+					active: options.active,
+				});
+			}
+			if (options.reveal) {
+				await this.app.workspace.revealLeaf(existingLeaf);
+			}
+			await this.detachDuplicateMonthlySidebarPlannerLeaves(existingLeaf);
+			await this.detachLegacyRightMonthlyPlannerLeaves();
+			return existingLeaf;
+		}
+
+		const sideLeafOptions: {
+			active: boolean;
+			reveal: boolean;
+			split: boolean;
+			state?: { year: number; month: number };
+		} = {
+			active: options.active,
+			reveal: options.reveal,
+			split: false,
+		};
+		if (state) {
+			sideLeafOptions.state = state;
+		}
+
+		const leaf = await this.app.workspace.ensureSideLeaf(
+			VIEW_TYPE_MONTHLY_SIDEBAR_PLANNER,
+			"right",
+			sideLeafOptions,
+		);
+		await this.detachDuplicateMonthlySidebarPlannerLeaves(leaf);
+		await this.detachLegacyRightMonthlyPlannerLeaves();
+		return leaf;
+	}
+
+	private findPlannerSidebarLeaf(): WorkspaceLeaf | null {
+		const leaves = SIDEBAR_PLANNER_VIEW_TYPES.flatMap((type) =>
+			this.app.workspace.getLeavesOfType(type),
+		);
+		for (const leaf of leaves) {
+			if (leaf.view.containerEl.closest(".mod-right-split")) {
+				return leaf;
+			}
+		}
+		return leaves[0] ?? null;
+	}
+
+	private findMonthlyPlannerLeafInRightSidebar(): WorkspaceLeaf | null {
+		const leaves = this.app.workspace.getLeavesOfType(
+			VIEW_TYPE_MONTHLY_PLANNER,
+		);
+		for (const leaf of leaves) {
+			if (
+				leaf.view instanceof MonthlyPlannerView &&
+				leaf.view.containerEl.closest(".mod-right-split")
+			) {
+				return leaf;
+			}
+		}
+		return null;
+	}
+
+	private getMonthlyPlannerLeafState(
+		leaf: WorkspaceLeaf | null,
+	): { year: number; month: number } | null {
+		if (!(leaf?.view instanceof MonthlyPlannerView)) return null;
+		return { year: leaf.view.year, month: leaf.view.month };
+	}
+
+	private async detachLegacyRightMonthlyPlannerLeaves(): Promise<void> {
+		const leaves = this.app.workspace.getLeavesOfType(
+			VIEW_TYPE_MONTHLY_PLANNER,
+		);
+		await Promise.all(
+			leaves
+				.filter((leaf) =>
+					leaf.view.containerEl.closest(".mod-right-split"),
+				)
+				.map((leaf) => leaf.detach()),
+		);
+	}
+
+	private async detachDuplicateMonthlySidebarPlannerLeaves(
+		keepLeaf: WorkspaceLeaf,
+	): Promise<void> {
+		const leaves = SIDEBAR_PLANNER_VIEW_TYPES.flatMap((type) =>
+			this.app.workspace.getLeavesOfType(type),
+		);
+		await Promise.all(
+			leaves
+				.filter((leaf) => leaf !== keepLeaf)
+				.map((leaf) => leaf.detach()),
+		);
+	}
+
+	private isSidebarLeaf(leaf: WorkspaceLeaf): boolean {
+		return Boolean(
+			leaf.view.containerEl.closest(".mod-left-split, .mod-right-split"),
+		);
 	}
 
 	private debounce(fn: () => void, delayMs: number): () => void {
