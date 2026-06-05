@@ -226,8 +226,8 @@ export class YearlyPlannerView
 		if (newScrollEl) {
 			newScrollEl.scrollTop = scrollTop;
 			newScrollEl.scrollLeft = scrollLeft;
-			requestAnimationFrame(() => {
-				requestAnimationFrame(() => {
+			window.requestAnimationFrame(() => {
+				window.requestAnimationFrame(() => {
 					newScrollEl.scrollTop = scrollTop;
 					newScrollEl.scrollLeft = scrollLeft;
 				});

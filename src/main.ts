@@ -429,8 +429,8 @@ export default class DiaryObsidian extends Plugin {
 			if (options.reveal) {
 				await this.app.workspace.revealLeaf(existingLeaf);
 			}
-			await this.detachDuplicateMonthlySidebarPlannerLeaves(existingLeaf);
-			await this.detachLegacyRightMonthlyPlannerLeaves();
+			this.detachDuplicateMonthlySidebarPlannerLeaves(existingLeaf);
+			this.detachLegacyRightMonthlyPlannerLeaves();
 			return existingLeaf;
 		}
 
@@ -453,8 +453,8 @@ export default class DiaryObsidian extends Plugin {
 			"right",
 			sideLeafOptions,
 		);
-		await this.detachDuplicateMonthlySidebarPlannerLeaves(leaf);
-		await this.detachLegacyRightMonthlyPlannerLeaves();
+		this.detachDuplicateMonthlySidebarPlannerLeaves(leaf);
+		this.detachLegacyRightMonthlyPlannerLeaves();
 		return leaf;
 	}
 
@@ -492,30 +492,28 @@ export default class DiaryObsidian extends Plugin {
 		return { year: leaf.view.year, month: leaf.view.month };
 	}
 
-	private async detachLegacyRightMonthlyPlannerLeaves(): Promise<void> {
+	private detachLegacyRightMonthlyPlannerLeaves(): void {
 		const leaves = this.app.workspace.getLeavesOfType(
 			VIEW_TYPE_MONTHLY_PLANNER,
 		);
-		await Promise.all(
-			leaves
-				.filter((leaf) =>
-					leaf.view.containerEl.closest(".mod-right-split"),
-				)
-				.map((leaf) => leaf.detach()),
-		);
+		for (const leaf of leaves) {
+			if (leaf.view.containerEl.closest(".mod-right-split")) {
+				leaf.detach();
+			}
+		}
 	}
 
-	private async detachDuplicateMonthlySidebarPlannerLeaves(
+	private detachDuplicateMonthlySidebarPlannerLeaves(
 		keepLeaf: WorkspaceLeaf,
-	): Promise<void> {
+	): void {
 		const leaves = SIDEBAR_PLANNER_VIEW_TYPES.flatMap((type) =>
 			this.app.workspace.getLeavesOfType(type),
 		);
-		await Promise.all(
-			leaves
-				.filter((leaf) => leaf !== keepLeaf)
-				.map((leaf) => leaf.detach()),
-		);
+		for (const leaf of leaves) {
+			if (leaf !== keepLeaf) {
+				leaf.detach();
+			}
+		}
 	}
 
 	private isSidebarLeaf(leaf: WorkspaceLeaf): boolean {
@@ -525,11 +523,10 @@ export default class DiaryObsidian extends Plugin {
 	}
 
 	private debounce(fn: () => void, delayMs: number): () => void {
-		const win = this.app.workspace.containerEl.ownerDocument.defaultView ?? window;
 		let timeout: number | null = null;
 		return () => {
-			if (timeout !== null) win.clearTimeout(timeout);
-			timeout = win.setTimeout(() => {
+			if (timeout !== null) window.clearTimeout(timeout);
+			timeout = window.setTimeout(() => {
 				timeout = null;
 				fn();
 			}, delayMs);

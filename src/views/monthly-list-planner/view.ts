@@ -111,12 +111,10 @@ export class MonthlyListPlannerView extends ItemView {
 	/** Defer: setState can re-render after onOpen, which would reset scroll if we scrolled in render(). */
 	private queueInitialScrollToToday(): void {
 		if (!this.pendingScrollToTodayOnOpen) return;
-		const activeWindow =
-			this.contentEl.ownerDocument.defaultView ?? window;
 		if (this.initialScrollToTodayHandle != null) {
-			activeWindow.clearTimeout(this.initialScrollToTodayHandle);
+			window.clearTimeout(this.initialScrollToTodayHandle);
 		}
-		this.initialScrollToTodayHandle = activeWindow.setTimeout(() => {
+		this.initialScrollToTodayHandle = window.setTimeout(() => {
 			this.initialScrollToTodayHandle = null;
 			this.applyInitialScrollToToday();
 		}, 0);
@@ -124,9 +122,7 @@ export class MonthlyListPlannerView extends ItemView {
 
 	private clearInitialScrollToToday(): void {
 		if (this.initialScrollToTodayHandle != null) {
-			const activeWindow =
-				this.contentEl.ownerDocument.defaultView ?? window;
-			activeWindow.clearTimeout(this.initialScrollToTodayHandle);
+			window.clearTimeout(this.initialScrollToTodayHandle);
 			this.initialScrollToTodayHandle = null;
 		}
 		this.pendingScrollToTodayOnOpen = false;
@@ -142,8 +138,8 @@ export class MonthlyListPlannerView extends ItemView {
 			this.pendingScrollToTodayOnOpen = false;
 			return;
 		}
-		requestAnimationFrame(() => {
-			requestAnimationFrame(() => {
+		window.requestAnimationFrame(() => {
+			window.requestAnimationFrame(() => {
 				if (!this.pendingScrollToTodayOnOpen) return;
 				const newScroll = this.contentEl.querySelector<HTMLElement>(
 					".monthly-list-planner-scroll",
@@ -363,8 +359,8 @@ export class MonthlyListPlannerView extends ItemView {
 		if (newScroll) {
 			if (wantScrollToToday) {
 				newScroll.scrollTop = 0;
-				requestAnimationFrame(() => {
-					requestAnimationFrame(() => {
+				window.requestAnimationFrame(() => {
+					window.requestAnimationFrame(() => {
 						const todayRow = newScroll.querySelector<HTMLElement>(
 							".monthly-list-planner-day-today",
 						);
@@ -378,8 +374,8 @@ export class MonthlyListPlannerView extends ItemView {
 				});
 			} else {
 				newScroll.scrollTop = scrollTop;
-				requestAnimationFrame(() => {
-					requestAnimationFrame(() => {
+				window.requestAnimationFrame(() => {
+					window.requestAnimationFrame(() => {
 						newScroll.scrollTop = scrollTop;
 					});
 				});

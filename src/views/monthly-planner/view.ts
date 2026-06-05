@@ -288,8 +288,8 @@ export class MonthlyPlannerView
 		if (newScrollEl) {
 			newScrollEl.scrollTop = scrollTop;
 			newScrollEl.scrollLeft = scrollLeft;
-			requestAnimationFrame(() => {
-				requestAnimationFrame(() => {
+			window.requestAnimationFrame(() => {
+				window.requestAnimationFrame(() => {
 					newScrollEl.scrollTop = scrollTop;
 					newScrollEl.scrollLeft = scrollLeft;
 				});
@@ -314,7 +314,7 @@ export class MonthlyPlannerView
 					},
 				});
 				this.pinchZoom.attach();
-				requestAnimationFrame(() => this.pinchZoom?.refresh());
+				window.requestAnimationFrame(() => this.pinchZoom?.refresh());
 			}
 		}
 	}

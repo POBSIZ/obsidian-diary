@@ -38,12 +38,12 @@ const CHIP_COLOR_PRESETS_EXTRA: readonly { hex: string }[] = [
 ];
 
 /** Resolves var(--interactive-accent) to 6-digit hex. Falls back to #7c3aed if unavailable. */
-function getThemeAccentHex(): string {
-	const doc = globalThis.document;
+function getThemeAccentHex(doc: Document = window.document): string {
+	const activeWindow = doc.defaultView ?? window;
 	const el = doc.createElement("div");
 	el.setCssProps({ color: "var(--interactive-accent)" });
 	doc.body.appendChild(el);
-	const computed = getComputedStyle(el).color;
+	const computed = activeWindow.getComputedStyle(el).color;
 	doc.body.removeChild(el);
 	const m = computed.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
 	if (m) {
@@ -78,8 +78,8 @@ function getThemeAccentHex(): string {
 }
 
 /** Chip color presets: first = theme accent, rest = static. Deduplicates by normalized hex. */
-function getChipColorPresets(): { hex: string }[] {
-	const themeHex = getThemeAccentHex();
+function getChipColorPresets(doc: Document = window.document): { hex: string }[] {
+	const themeHex = getThemeAccentHex(doc);
 	const all = [{ hex: themeHex }, ...CHIP_COLOR_PRESETS_EXTRA];
 	const seen = new Set<string>();
 	return all.filter((p) => {
@@ -108,16 +108,19 @@ function toHex6(hex: string): string | null {
 }
 
 /** Normalize any CSS color to 6-digit hex for comparison. Returns null if invalid. */
-function normalizeColorToHex(cssColor: string): string | null {
+function normalizeColorToHex(
+	cssColor: string,
+	doc: Document = window.document,
+): string | null {
 	const trimmed = cssColor.trim();
 	if (!trimmed) return null;
 	const hex = toHex6(trimmed);
 	if (hex) return hex.toLowerCase();
-	const doc = globalThis.document;
+	const activeWindow = doc.defaultView ?? window;
 	const div = doc.createElement("div");
 	div.style.color = trimmed;
 	doc.body.appendChild(div);
-	const computed = getComputedStyle(div).color;
+	const computed = activeWindow.getComputedStyle(div).color;
 	doc.body.removeChild(div);
 	if (!computed) return null;
 	const m = computed.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
@@ -489,7 +492,7 @@ export class CreateFileModal extends Modal {
 		filenameHint.appendText(" ");
 		filenameHint.appendText(t("modal.suffixExample"));
 
-		this.colorPresets = getChipColorPresets();
+		this.colorPresets = getChipColorPresets(this.contentEl.ownerDocument);
 		const defaultColor = this.colorPresets[0]!.hex;
 		const colorRow = form.createDiv({
 			cls: "yearly-planner-create-file-row",
@@ -633,7 +636,9 @@ export class CreateFileModal extends Modal {
 
 	private updateColorPresetActive(): void {
 		const val = this.colorInput.value.trim();
-		const normalizedVal = normalizeColorToHex(val) ?? val.toLowerCase();
+		const normalizedVal =
+			normalizeColorToHex(val, this.contentEl.ownerDocument) ??
+			val.toLowerCase();
 		this.colorPresets.forEach((preset, i) => {
 			const btn = this.colorPresetBtns[i];
 			const presetHex = (toHex6(preset.hex) ?? preset.hex).toLowerCase();
@@ -695,7 +700,9 @@ export class CreateFileModal extends Modal {
 		try {
 			if (this.mode === "single") {
 				const rawColor = this.colorInput.value.trim();
-				const themeHex = getThemeAccentHex().toLowerCase();
+				const themeHex = getThemeAccentHex(
+					this.contentEl.ownerDocument,
+				).toLowerCase();
 				const color =
 					rawColor &&
 					(toHex6(rawColor) ?? rawColor).toLowerCase() !== themeHex
@@ -718,7 +725,9 @@ export class CreateFileModal extends Modal {
 			} else {
 				if (!filename) return;
 				const rawColor = this.colorInput.value.trim();
-				const themeHex = getThemeAccentHex().toLowerCase();
+				const themeHex = getThemeAccentHex(
+					this.contentEl.ownerDocument,
+				).toLowerCase();
 				const color =
 					rawColor &&
 					(toHex6(rawColor) ?? rawColor).toLowerCase() !== themeHex
@@ -947,7 +956,7 @@ export class FileOptionsModal extends Modal {
 			);
 		}
 
-		this.colorPresets = getChipColorPresets();
+		this.colorPresets = getChipColorPresets(this.contentEl.ownerDocument);
 		const defaultColor = this.colorPresets[0]!.hex;
 		const colorRow = form.createDiv({
 			cls: "yearly-planner-create-file-row",
@@ -1110,7 +1119,9 @@ export class FileOptionsModal extends Modal {
 
 	private updateColorPresetActive(): void {
 		const val = this.colorInput.value.trim();
-		const normalizedVal = normalizeColorToHex(val) ?? val.toLowerCase();
+		const normalizedVal =
+			normalizeColorToHex(val, this.contentEl.ownerDocument) ??
+			val.toLowerCase();
 		this.colorPresets.forEach((preset, i) => {
 			const btn = this.colorPresetBtns[i];
 			const presetHex = (toHex6(preset.hex) ?? preset.hex).toLowerCase();
@@ -1206,7 +1217,9 @@ export class FileOptionsModal extends Modal {
 		}
 
 		const rawColor = this.colorInput.value.trim();
-		const themeHex = getThemeAccentHex().toLowerCase();
+		const themeHex = getThemeAccentHex(
+			this.contentEl.ownerDocument,
+		).toLowerCase();
 		const color =
 			rawColor &&
 			(toHex6(rawColor) ?? rawColor).toLowerCase() !== themeHex
