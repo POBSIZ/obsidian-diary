@@ -9,15 +9,20 @@ English documentation: [docs/en/README.md](https://github.com/POBSIZ/obsidian-di
 | 항목 | 값 |
 | --- | --- |
 | 플러그인 ID | `diary` |
-| 현재 버전 | `1.1.1` |
+| 현재 버전 | `1.2.1` |
 | 최소 Obsidian 버전 | `1.7.2` |
 | 지원 플랫폼 | 데스크톱 / 모바일 (`isDesktopOnly: false`) |
 | 기본 언어 | `en` |
 | 기본 플래너 폴더 | `Planner` |
 
+## 최신 버전
+
+- `1.2.1`: 현재 유지보수 릴리스입니다. Obsidian 커뮤니티 플러그인 lint 호환성과 번들된 공휴일 의존성 정리를 포함하며, 사용자 워크플로는 `1.2.0`과 같습니다.
+- `1.2.0`: 오른쪽 사이드바 플래너를 도입했습니다. 자동 사이드바 생성, **Open monthly planner in sidebar** 명령, 연간/월간 그리드/월간 목록 사이드 리프 전환을 포함합니다.
+
 ## 스크린샷
 
-아래 이미지는 README 설명을 위해 새 데모 vault에 샘플 플래너 노트를 만든 뒤 캡처했습니다. 모바일 이미지는 데모 vault에서 모바일 렌더링 분기를 사용해 모바일 폭으로 촬영했습니다.
+아래 이미지는 README 설명을 위해 새 데모 vault에 샘플 플래너 노트를 만든 뒤 캡처했습니다. 모바일 이미지는 데모 vault에서 모바일 렌더링 분기를 사용해 모바일 폭으로 촬영했습니다. 오른쪽 사이드바 플래너는 같은 월간 그리드를 compact 모드로 사용하므로, 전체 크기 월간 그리드 스크린샷을 대표 이미지로 유지합니다.
 
 ### 데스크톱
 
@@ -38,6 +43,7 @@ English documentation: [docs/en/README.md](https://github.com/POBSIZ/obsidian-di
 - **연간 플래너**: `12개월 x 31일` 표로 한 해의 날짜 노트와 기간 노트를 한눈에 봅니다.
 - **월간 그리드 플래너**: 한 달 달력을 크게 보고 날짜별 칩, 기간 막대, 공휴일을 확인합니다.
 - **월간 목록 플래너**: 하루씩 세로로 훑으며 일정이 많은 달을 검토하고, `전체`, `노트 있음`, `오늘 이후` 필터로 범위를 좁힙니다.
+- **오른쪽 사이드바 플래너**: 메인 작업 영역에는 노트를 열어 둔 채, 오른쪽 사이드바에 compact 월간 플래너를 계속 표시합니다.
 - **플랜 노트 패널**: 연간 노트(`YYYY.md`)와 월간 노트(`YYYY-MM.md`)를 플래너 상단에서 만들고 미리 봅니다.
 - **날짜/기간 노트**: 날짜 파일명과 기간 파일명을 기준으로 노트를 플래너 칩으로 표시합니다. 기본값은 vault 전체 스캔이며, 설정에서 플래너 폴더 안으로만 제한할 수 있습니다.
 - **색상, todo, 완료 상태**: frontmatter의 `color`, `todo`, `completed` 값을 칩 스타일과 라벨에 반영합니다.
@@ -53,11 +59,11 @@ English documentation: [docs/en/README.md](https://github.com/POBSIZ/obsidian-di
 2. `main.js`, `manifest.json`, `styles.css`를 vault의 `Vault/.obsidian/plugins/diary/` 폴더에 복사합니다.
 3. Obsidian에서 **Settings → Community plugins**를 엽니다.
 4. Restricted mode가 켜져 있다면 신뢰하는 vault에서만 끄고, **Diary**를 활성화합니다.
-5. 왼쪽 리본 아이콘 또는 커맨드 팔레트에서 플래너를 엽니다.
+5. 왼쪽 리본 아이콘 또는 커맨드 팔레트에서 플래너를 엽니다. 월간 리본 아이콘은 오른쪽 사이드바 플래너를 엽니다.
 
 ## 빠른 시작
 
-1. **Open monthly planner** 명령을 실행합니다.
+1. 사이드 플래너는 **Open monthly planner in sidebar**, 전체 작업 영역 탭은 **Open monthly planner** 명령을 실행합니다.
 2. 상단의 파일 추가 버튼을 선택하거나 날짜 셀을 선택합니다.
 3. **Single date** 또는 **Range**를 고릅니다.
 4. 폴더, 날짜, 파일 이름, 색상, todo 여부, 알림 시간을 입력합니다.
@@ -69,14 +75,15 @@ English documentation: [docs/en/README.md](https://github.com/POBSIZ/obsidian-di
 
 리본 아이콘:
 
-- `calendar-range`: 연간 플래너 열기
-- `calendar-days`: 월간 그리드 플래너 열기
-- `list-ordered`: 월간 목록 플래너 열기
+- `calendar-range`: 메인 작업 영역에 연간 플래너 열기
+- `calendar-days`: 오른쪽 사이드바의 월간 플래너 열기 또는 다시 보이기
+- `list-ordered`: 메인 작업 영역에 월간 목록 플래너 열기
 
 커맨드 팔레트:
 
 - `Open yearly planner`
 - `Open monthly planner`
+- `Open monthly planner in sidebar`
 - `Open monthly list planner`
 
 각 플래너 헤더의 반복 아이콘을 선택하면 같은 리프에서 다음 순서로 전환됩니다.
@@ -86,6 +93,17 @@ Yearly -> Monthly Grid -> Monthly List -> Yearly
 ```
 
 이전/다음 버튼으로 연도나 월을 이동하고, 달력 아이콘으로 현재 연도/월로 돌아갑니다. 연도 또는 월 표시 텍스트를 선택하면 직접 값을 입력할 수 있습니다.
+
+## 오른쪽 사이드바 플래너
+
+Diary는 워크스페이스가 준비되면 오른쪽 사이드바에 compact 월간 플래너를 하나 만듭니다. **Open monthly planner in sidebar** 명령이나 월간 리본 아이콘으로 다시 표시할 수 있습니다.
+
+사이드 플래너는 보조 뷰로 동작합니다.
+
+- compact 월간 레이아웃과 일자 요약 시트를 사용합니다.
+- 사이드바에서 플래너 노트를 선택하면 파일은 메인 작업 영역에 열려, 사이드바 플래너가 계속 보입니다.
+- 레이아웃 전환 버튼으로 같은 사이드 리프 안에서 연간, 월간 그리드, 월간 목록을 순환합니다.
+- 이전 버전에서 생긴 오른쪽 사이드바 월간 플래너가 있으면 하나의 사이드 플래너만 남도록 정리합니다.
 
 ## 월간 목록 필터
 
@@ -281,6 +299,7 @@ npm test
 
 - 플러그인이 보이지 않으면 `main.js`, `manifest.json`, `styles.css`가 `Vault/.obsidian/plugins/diary/` 바로 아래에 있는지 확인합니다.
 - 명령이 보이지 않으면 **Settings → Community plugins**에서 **Diary**가 활성화되어 있는지 확인합니다.
+- 사이드바 플래너가 보이지 않으면 **Open monthly planner in sidebar** 명령을 실행하거나 플러그인을 활성화한 뒤 Obsidian을 다시 로드합니다.
 - 칩이 표시되지 않으면 파일명이 `YYYY-MM-DD` 또는 `YYYY-MM-DD--YYYY-MM-DD` 규칙을 따르는지 확인합니다.
 - 모바일에서 표 하단이 가려지면 **Mobile bottom padding** 값을 키웁니다.
 - 알림이 오지 않으면 Obsidian이 열려 있는지, 노트의 이벤트 날짜가 오늘인지, `notify_minutes` 값이 `0-1439` 범위인지 확인합니다.

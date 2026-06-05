@@ -9,15 +9,20 @@ Diary is an Obsidian community plugin that turns Markdown files in your vault in
 | Item | Value |
 | --- | --- |
 | Plugin ID | `diary` |
-| Current version | `1.1.1` |
+| Current version | `1.2.1` |
 | Minimum Obsidian version | `1.7.2` |
 | Supported platforms | Desktop / mobile (`isDesktopOnly: false`) |
 | Default language | `en` |
 | Default planner folder | `Planner` |
 
+## Latest Version
+
+- `1.2.1`: Current maintenance release with Obsidian community-plugin lint compatibility and bundled holiday dependency maintenance. User workflows are unchanged from `1.2.0`.
+- `1.2.0`: Introduced the right sidebar planner, automatic sidebar setup, the **Open monthly planner in sidebar** command, and side-leaf switching between yearly, monthly grid, and monthly list layouts.
+
 ## Screenshots
 
-The images below were captured from a fresh demo vault with sample planner notes created for this README. The mobile images were captured at a mobile viewport width in the demo vault with the plugin's mobile rendering path enabled.
+The images below were captured from a fresh demo vault with sample planner notes created for this README. The mobile images were captured at a mobile viewport width in the demo vault with the plugin's mobile rendering path enabled. The right sidebar planner uses the same monthly grid in compact mode, so the full-size monthly grid screenshot remains the canonical visual reference.
 
 ### Desktop
 
@@ -38,6 +43,7 @@ The images below were captured from a fresh demo vault with sample planner notes
 - **Yearly planner**: View date notes and range notes in a `12 months x 31 days` table.
 - **Monthly grid planner**: Inspect one month in a large calendar grid with chips, range bars, and holidays.
 - **Monthly list planner**: Review busy months in a day-by-day vertical list with `All`, `With notes`, and `Upcoming` filters.
+- **Right sidebar planner**: Keep a compact monthly planner open in the right sidebar while notes remain open in the main workspace.
 - **Plan note panel**: Create and preview yearly notes (`YYYY.md`) and monthly notes (`YYYY-MM.md`) above the planner.
 - **Date and range notes**: Display notes as planner chips based on single-date and date-range filenames. Diary scans the whole vault by default, or only the planner folder when configured.
 - **Color, todo, and completion state**: Reflect `color`, `todo`, and `completed` frontmatter in chip styling and labels.
@@ -53,11 +59,11 @@ The images below were captured from a fresh demo vault with sample planner notes
 2. Copy `main.js`, `manifest.json`, and `styles.css` into `Vault/.obsidian/plugins/diary/`.
 3. In Obsidian, open **Settings → Community plugins**.
 4. If Restricted mode is enabled, turn it off only for vaults you trust, then enable **Diary**.
-5. Open a planner from the left ribbon icons or the command palette.
+5. Open a planner from the left ribbon icons or the command palette. The monthly ribbon icon opens the right sidebar planner.
 
 ## Quick Start
 
-1. Run the **Open monthly planner** command.
+1. Run the **Open monthly planner in sidebar** command for the side planner, or **Open monthly planner** for a full workspace tab.
 2. Select the add-file button in the header or select a date cell.
 3. Choose **Single date** or **Range**.
 4. Enter the folder, dates, filename, color, todo state, and reminder time.
@@ -69,14 +75,15 @@ Created notes are ordinary Markdown files. They remain in your vault even if the
 
 Ribbon icons:
 
-- `calendar-range`: open yearly planner
-- `calendar-days`: open monthly grid planner
-- `list-ordered`: open monthly list planner
+- `calendar-range`: open yearly planner in the main workspace
+- `calendar-days`: open or reveal the monthly planner in the right sidebar
+- `list-ordered`: open monthly list planner in the main workspace
 
 Command palette:
 
 - `Open yearly planner`
 - `Open monthly planner`
+- `Open monthly planner in sidebar`
 - `Open monthly list planner`
 
 Select the repeat icon in any planner header to cycle the same leaf through this order.
@@ -86,6 +93,17 @@ Yearly -> Monthly Grid -> Monthly List -> Yearly
 ```
 
 Use previous/next buttons to move through years or months, and the calendar icon to return to the current year or month. Select the year or month label to type a specific value.
+
+## Right Sidebar Planner
+
+Diary creates one compact monthly planner in the right sidebar when the workspace is ready. Use **Open monthly planner in sidebar** or the monthly ribbon icon to reveal it again.
+
+The side planner is designed as a companion view:
+
+- It uses the compact monthly layout and day summary sheet.
+- Selecting a planner note from the sidebar opens the file in the main workspace, so the sidebar remains available.
+- The switch-layout button cycles the side leaf through yearly, monthly grid, and monthly list views.
+- Diary keeps only one planner sidebar leaf and cleans up older right-sidebar monthly planner leaves from previous versions.
 
 ## Monthly List Filters
 
@@ -281,6 +299,7 @@ npm test
 
 - If the plugin is missing, make sure `main.js`, `manifest.json`, and `styles.css` are directly inside `Vault/.obsidian/plugins/diary/`.
 - If commands are missing, confirm that **Diary** is enabled in **Settings → Community plugins**.
+- If the sidebar planner is missing, run **Open monthly planner in sidebar** or reload Obsidian after enabling the plugin.
 - If chips do not appear, confirm that filenames follow `YYYY-MM-DD` or `YYYY-MM-DD--YYYY-MM-DD` rules.
 - If mobile content is covered at the bottom, increase **Mobile bottom padding**.
 - If a reminder does not appear, confirm that Obsidian is open, the event date is today, and `notify_minutes` is within `0-1439`.
