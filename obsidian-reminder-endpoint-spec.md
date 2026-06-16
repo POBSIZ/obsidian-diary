@@ -1,7 +1,7 @@
 # Obsidian Reminder Plugin → External Endpoint 연동 문서
 
 > [!info] 현재 상태
-> `Diary 1.2.1` 기준으로 이 문서는 향후 외부 endpoint 연동을 위한 설계 메모입니다. 현재 배포된 플러그인은 `notify_minutes` frontmatter를 읽어 Obsidian이 열려 있는 동안 로컬 Notice만 표시하며, reminder 데이터를 네트워크로 전송하거나 endpoint 설정을 노출하지 않습니다.
+> `Diary 1.3.2` 기준으로 이 문서는 향후 외부 endpoint 연동을 위한 설계 메모입니다. 현재 배포된 플러그인은 `notify_minutes` frontmatter를 읽어 Obsidian이 열려 있는 동안 로컬 Notice만 표시하며, reminder 데이터를 네트워크로 전송하거나 endpoint 설정을 노출하지 않습니다.
 
 ## 목표
 향후 Obsidian 플러그인에서 리마인더가 생성/수정/삭제될 때 외부 endpoint로 이벤트를 보내고, 실제 예약/발송은 OpenClaw 쪽에서 처리한다.
@@ -10,6 +10,8 @@
 - Obsidian/iCloud 파일 전체 스캔 제거
 - 앱 외부에서 안정적으로 알림 예약 유지
 - Obsidian 앱이 꺼져 있어도 알림 발송 가능하게 설계
+
+현재 플러그인에는 이 기능의 settings, command, network request가 없다. 구현 전까지 이 문서는 release note나 README에서 "미래 설계"로만 연결한다.
 
 ---
 
@@ -207,6 +209,12 @@ interface ReminderPluginSettings {
 - `timezone = "Asia/Seoul"`
 - `debounceMs = 1000`
 
+보안/개인정보 기본값:
+- endpoint 연동은 기본 비활성화
+- 토큰이 비어 있으면 전송하지 않음
+- note body 전송은 별도 opt-in이 있을 때만 허용
+- README와 settings 설명에 외부로 전송되는 필드를 명시
+
 ---
 
 ## 플러그인 동작 규칙
@@ -224,6 +232,12 @@ interface ReminderPluginSettings {
 - `notify_minutes` 삭제
 - note 삭제
 - reminder 기능 비활성화
+
+### 전송하지 않아야 하는 경우
+- endpoint 기능이 settings에서 꺼져 있음
+- endpoint URL 또는 token이 비어 있음
+- 사용자가 note body 전송에 opt-in하지 않았는데 body payload가 필요한 요청
+- vault 초기 로딩 중 대량 `create` 이벤트가 발생한 상태
 
 ---
 

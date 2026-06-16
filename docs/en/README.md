@@ -9,7 +9,7 @@ Diary is an Obsidian community plugin that turns Markdown files in your vault in
 | Item | Value |
 | --- | --- |
 | Plugin ID | `diary` |
-| Current version | `1.2.1` |
+| Current version | `1.3.2` |
 | Minimum Obsidian version | `1.7.2` |
 | Supported platforms | Desktop / mobile (`isDesktopOnly: false`) |
 | Default language | `en` |
@@ -17,7 +17,10 @@ Diary is an Obsidian community plugin that turns Markdown files in your vault in
 
 ## Latest Version
 
-- `1.2.1`: Current maintenance release with Obsidian community-plugin lint compatibility and bundled holiday dependency maintenance. User workflows are unchanged from `1.2.0`.
+- `1.3.2`: Current maintenance release with documentation, agent guidance, ESLint config typing, and TypeScript lib target cleanup.
+- `1.3.1`: Release with pinned Obsidian typings, dependency lockfile maintenance, ESLint compatibility updates, and recurrence chip styling cleanup.
+- `1.3.0`: Added recurring events and alternate calendar labels across yearly, monthly grid, monthly list, and sidebar planner views.
+- `1.2.1`: Maintenance release with Obsidian community-plugin lint compatibility and bundled holiday dependency maintenance. User workflows are unchanged from `1.2.0`.
 - `1.2.0`: Introduced the right sidebar planner, automatic sidebar setup, the **Open monthly planner in sidebar** command, and side-leaf switching between yearly, monthly grid, and monthly list layouts.
 
 ## Screenshots
@@ -40,11 +43,11 @@ The images below were captured from a fresh demo vault with sample planner notes
 
 ## Key Features
 
-- **Yearly planner**: View date notes and range notes in a `12 months x 31 days` table.
+- **Yearly planner**: View date notes and range notes in a `12 months x 31 days` table. Expanded month-cell widths are saved across reloads.
 - **Monthly grid planner**: Inspect one month in a large calendar grid with chips, range bars, holidays, and a configurable alternate calendar label.
 - **Monthly list planner**: Review busy months in a day-by-day vertical list with `All`, `With notes`, and `Upcoming` filters.
 - **Right sidebar planner**: Keep a compact monthly planner open in the right sidebar while notes remain open in the main workspace.
-- **Plan note panel**: Create and preview yearly notes (`YYYY.md`) and monthly notes (`YYYY-MM.md`) above the planner.
+- **Plan note panel**: Create and preview yearly notes (`YYYY.md`) and monthly notes (`YYYY-MM.md`) above the planner. Preview expanded/collapsed state is saved, with a separate mobile state that starts collapsed.
 - **Date and range notes**: Display notes as planner chips based on single-date and date-range filenames. Diary scans the whole vault by default, or only the planner folder when configured.
 - **Recurring events**: Repeat a note daily, monthly, or yearly, choose a Gregorian or alternate-calendar basis, and let Diary create only the occurrences that fall inside the planner range you are viewing.
 - **Color, todo, and completion state**: Reflect `color`, `todo`, and `completed` frontmatter in chip styling and labels.
@@ -146,6 +149,7 @@ Use the plan note panel above each planner to create yearly or monthly planning 
 - Yearly plan note: `{plannerFolder}/{year}.md`
 - Monthly plan note: `{plannerFolder}/{year}-{month}.md`
 - The panel can be collapsed or expanded, and that state is saved in plugin data.
+- Desktop and mobile keep separate panel state: desktop defaults expanded, while mobile defaults collapsed until you expand it.
 - If the plan note already exists, Diary shows a preview and an open button.
 
 ## Editing Notes
@@ -214,6 +218,8 @@ Paste rules:
 | Mobile bottom padding | Bottom padding for mobile planners so content is not covered by Obsidian mobile controls. |
 | Mobile cell width | Month cell width for the mobile yearly planner. `0` uses the default. |
 
+Diary also stores UI-only state in plugin data: plan note preview expansion, mobile plan note preview expansion, and expanded yearly month-cell widths.
+
 ## Frontmatter Reference
 
 | Key | Description |
@@ -248,6 +254,7 @@ Single date:
 ```text
 2026-05-19.md
 2026-05-19-mobile-qa.md
+2026-05-19-mobile QA.md
 ```
 
 Range:
@@ -255,6 +262,7 @@ Range:
 ```text
 2026-05-21--2026-05-24.md
 2026-05-21--2026-05-24-family-trip.md
+2026-05-21--2026-05-24-family trip.md
 ```
 
 Plan notes:
@@ -271,7 +279,11 @@ Display title priority:
 3. First Markdown heading
 4. File basename
 
+When you create or edit planner note titles, spaces in the visible title are preserved in the filename suffix. Diary no longer rewrites those spaces to hyphens.
+
 ## Development
+
+Use npm for this repository. The CI build matrix currently validates Node.js `20.x` and `22.x`; local development also works on the current LTS release.
 
 ```bash
 npm install
@@ -302,6 +314,7 @@ npm test
 - Release assets: `main.js`, `manifest.json`, `styles.css`
 - Use `npm version patch|minor|major --no-git-tag-version` so `package.json`, `package-lock.json`, `manifest.json`, and `versions.json` stay in sync.
 - The GitHub release tag must exactly match the `manifest.json` version and should not have a leading `v`.
+- This repository publishes release assets as individual files, and the release workflow generates build provenance attestation for `main.js`, `manifest.json`, and `styles.css`.
 
 ## Privacy And Network
 

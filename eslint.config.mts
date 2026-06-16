@@ -1,8 +1,12 @@
-import tseslint from "typescript-eslint";
+import tseslint, { type InfiniteDepthConfigWithExtends } from "typescript-eslint";
 import obsidianmd from "eslint-plugin-obsidianmd";
 import globals from "globals";
 import { globalIgnores } from "eslint/config";
 import { fileURLToPath } from "node:url";
+
+const obsidianRecommendedConfig = Array.from(
+	(obsidianmd.configs?.recommended ?? []) as Iterable<InfiniteDepthConfigWithExtends>,
+);
 
 export default tseslint.config(
 	{
@@ -12,14 +16,14 @@ export default tseslint.config(
 			},
 			parserOptions: {
 				projectService: {
-					allowDefaultProject: ["eslint.config.js", "manifest.json"],
+					allowDefaultProject: ["eslint.config.mts", "manifest.json"],
 				},
 				tsconfigRootDir: fileURLToPath(new URL(".", import.meta.url)),
 				extraFileExtensions: [".json"],
 			},
 		},
 	},
-	...(obsidianmd.configs?.recommended as any[]),
+	...obsidianRecommendedConfig,
 	{
 		rules: {
 			"@typescript-eslint/no-redundant-type-constituents": "off",

@@ -11,7 +11,7 @@ Diary는 Obsidian vault 안의 Markdown 파일을 날짜 기반 플래너로 보
 | Item | Value |
 | --- | --- |
 | Plugin ID | `diary` |
-| Version | `1.2.1` |
+| Version | `1.3.2` |
 | Minimum Obsidian version | `1.7.2` |
 | Platforms | Desktop and mobile (`isDesktopOnly: false`) |
 | Default language | `en` |
@@ -19,7 +19,10 @@ Diary는 Obsidian vault 안의 Markdown 파일을 날짜 기반 플래너로 보
 
 ## Latest Version
 
-- `1.2.1`: current maintenance release with Obsidian community-plugin lint compatibility and bundled holiday dependency maintenance. User workflows are unchanged from `1.2.0`.
+- `1.3.2`: current maintenance release with documentation, agent guidance, ESLint config typing, and TypeScript lib target cleanup.
+- `1.3.1`: release with pinned Obsidian typings, dependency lockfile maintenance, ESLint compatibility updates, and recurrence chip styling cleanup.
+- `1.3.0`: added recurring events and alternate calendar labels across yearly, monthly grid, monthly list, and sidebar planner views.
+- `1.2.1`: maintenance release with Obsidian community-plugin lint compatibility and bundled holiday dependency maintenance. User workflows are unchanged from `1.2.0`.
 - `1.2.0`: added the right sidebar planner, including automatic sidebar setup, a dedicated **Open monthly planner in sidebar** command, and side-leaf layout switching.
 
 ## Screenshots
@@ -44,8 +47,9 @@ grid in compact form.
 - Monthly grid planner: one-month calendar view with date chips, range bars, holidays, a configurable alternate calendar label, and mobile pinch zoom.
 - Monthly list planner: day-by-day list for dense monthly review, with `All`, `With notes`, and `Upcoming` filters.
 - Sidebar planner: a compact monthly planner opens in the right sidebar by default, can be revealed from the ribbon or command palette, and can cycle through yearly, monthly grid, and monthly list layouts in the same side leaf.
-- Date notes and range notes: recognized by `YYYY-MM-DD` and `YYYY-MM-DD--YYYY-MM-DD` filenames. By default Diary scans the entire vault, with an optional planner-folder-only scope.
-- Plan notes: yearly `{plannerFolder}/{year}.md` and monthly `{plannerFolder}/{year}-{month}.md` notes.
+- Date notes and range notes: recognized by `YYYY-MM-DD` and `YYYY-MM-DD--YYYY-MM-DD` filenames. By default Diary scans the entire vault, with an optional planner-folder-only scope. Title suffixes can keep visible spaces.
+- Plan notes: yearly `{plannerFolder}/{year}.md` and monthly `{plannerFolder}/{year}-{month}.md` notes, with persisted preview state on desktop and separate mobile state.
+- Remembered yearly cell width: expanded month-cell widths are saved across reloads.
 - Chip metadata: `color`, `todo`, `completed`, `notify_minutes`, `title`, `date_start`, `date_end`, and recurrence frontmatter.
 - Recurring events: repeat a note daily, monthly, or yearly with a Gregorian or alternate-calendar basis. Diary materializes only the occurrences inside the planner range you are currently viewing.
 - Desktop workflows: right-sidebar companion planner, drag range selection, chip drag-to-move, keyboard activation, internal planner copy/paste/delete/undo.
