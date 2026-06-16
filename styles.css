@@ -1138,7 +1138,6 @@ available in the app when your plugin is enabled.
 }
 
 .planner-recurrence-occurrence {
-	border-style: dashed !important;
 	background: color-mix(
 		in srgb,
 		var(--interactive-accent) 8%,
@@ -3043,6 +3042,13 @@ body.-is-mobile .monthly-planner-weekend-label {
 	.monthly-planner-range-run-start.monthly-planner-range-run-end {
 	margin-left: 0;
 	margin-right: 0;
+}
+
+.yearly-planner-cell-file.planner-recurrence-occurrence,
+.yearly-planner-cell-range-bar.planner-recurrence-occurrence,
+.monthly-planner-cell-file.planner-recurrence-occurrence,
+.monthly-planner-range-bar.planner-recurrence-occurrence {
+	border-style: dashed;
 }
 
 .monthly-list-planner-files {
