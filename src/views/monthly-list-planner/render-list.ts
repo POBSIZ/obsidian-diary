@@ -9,9 +9,16 @@ import { t } from "../../i18n";
 import { getDayOfWeek, getDaysInMonth } from "../../utils/date";
 import type { HolidayData } from "../../utils/holidays";
 import {
+	formatAlternateCalendarAria,
+	getAlternateCalendarLabel,
+	type AlternateCalendarSelection,
+} from "../../utils/alternate-calendars";
+import {
 	getFileTitle,
 	getFilesForDate,
 	getChipColor,
+	isRecurrenceOccurrenceFile,
+	isRecurrenceSourceFile,
 	isTodoCompleted,
 	isTodoFile,
 	type PlannerFileScope,
@@ -31,6 +38,7 @@ export function renderMonthlyListBody(
 		plannerFiles: TFile[];
 		locale: string;
 		holidaysData: HolidayData | null;
+		alternateCalendarId: AlternateCalendarSelection;
 		filter: MonthlyListFilter;
 	},
 ): void {
@@ -43,6 +51,7 @@ export function renderMonthlyListBody(
 		plannerFiles,
 		locale,
 		holidaysData,
+		alternateCalendarId,
 		filter,
 	} = ctx;
 	const daysInMonth = getDaysInMonth(year, month);
@@ -61,6 +70,13 @@ export function renderMonthlyListBody(
 			month === now.getMonth() + 1 &&
 			day === now.getDate();
 		const dateKey = `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+		const alternateCalendarLabel = getAlternateCalendarLabel(
+			year,
+			month,
+			day,
+			alternateCalendarId,
+			locale,
+		);
 		const isHoliday = holidaysData?.dates.has(dateKey) ?? false;
 		const holidayNames = holidaysData?.names.get(dateKey) ?? [];
 		const { singleFiles, rangeFiles } = getFilesForDate(
@@ -101,6 +117,7 @@ export function renderMonthlyListBody(
 		dayBlock.setAttribute("role", "button");
 		dayBlock.ariaLabel = t("a11y.monthlyListDate", {
 			date: dateKey,
+			calendars: formatAlternateCalendarAria(alternateCalendarLabel),
 			notes: singleFiles.length,
 			ranges: rangeFiles.length,
 			holidays: holidayNames.length,
@@ -116,6 +133,16 @@ export function renderMonthlyListBody(
 			cls: "monthly-list-planner-day-weekday",
 			text: wk,
 		});
+		if (alternateCalendarLabel) {
+			const labelsEl = dateLine.createSpan({
+				cls: "monthly-list-planner-alt-calendar-labels",
+			});
+			labelsEl.setAttribute("aria-hidden", "true");
+			labelsEl.createSpan({
+				cls: "monthly-list-planner-alt-calendar-label",
+				text: alternateCalendarLabel.text,
+			});
+		}
 		if (isSaturday || isSunday) {
 			dateLine.createSpan({
 				cls: "monthly-list-planner-weekend-label",
@@ -147,6 +174,11 @@ export function renderMonthlyListBody(
 				const chipColor = getChipColor(app, file);
 				if (chipColor) {
 					barEl.style.setProperty("--range-color", chipColor);
+				}
+				if (isRecurrenceSourceFile(app, file)) {
+					barEl.addClass("planner-recurrence-source");
+				} else if (isRecurrenceOccurrenceFile(app, file)) {
+					barEl.addClass("planner-recurrence-occurrence");
 				}
 				const title = getFileTitle(app, file);
 				const displayTitle = isTodoCompleted(app, file)
@@ -194,6 +226,11 @@ export function renderMonthlyListBody(
 				const chipColor = getChipColor(app, file);
 				if (chipColor) {
 					linkEl.style.borderLeftColor = chipColor;
+				}
+				if (isRecurrenceSourceFile(app, file)) {
+					linkEl.addClass("planner-recurrence-source");
+				} else if (isRecurrenceOccurrenceFile(app, file)) {
+					linkEl.addClass("planner-recurrence-occurrence");
 				}
 			}
 		}

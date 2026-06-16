@@ -10,6 +10,7 @@ import type {
 } from "./types";
 import {
 	renderYearlyPlannerHeader,
+	createMonthHeaderCell,
 	createPlannerCell,
 	getMonthLabels,
 } from "./render";
@@ -32,6 +33,10 @@ import {
 	getYearNoteFilePath,
 } from "./file-utils";
 import {
+	materializeRecurrencesForRange,
+	type RecurrenceMaterializeRange,
+} from "../../utils/recurrence";
+import {
 	renderPlanNotePanel,
 	syncPlanNotePanelExpandedState,
 } from "../plan-note-panel";
@@ -51,6 +56,9 @@ import {
 export type { YearlyPlannerState } from "./types";
 
 const YEARLY_PLANNER_COMPACT_LAYOUT_MAX_WIDTH = 768;
+const YEARLY_PLANNER_EXPANDED_CELL_WIDTH_REM = 11;
+const YEARLY_PLANNER_DEFAULT_DESKTOP_CELL_WIDTH_REM = 5.25;
+const YEARLY_PLANNER_DAY_COLUMN_WIDTH_REM = 3;
 
 export class YearlyPlannerView
 	extends ItemView
@@ -60,10 +68,12 @@ export class YearlyPlannerView
 	dragState: DragState | null = null;
 	chipDragState: ChipDragState | null = null;
 	clipboardSelection = new Set<string>();
+	private monthCellWidths = new Map<number, number>();
 	private interactionHandler: PlannerInteractionHandler;
 	private clipboardKeydownRegistered = false;
 	private compactLayout = Platform.isMobile;
 	private resizeObserver: ResizeObserver | null = null;
+	private materializeInFlightKey: string | null = null;
 	/** LIFO stack of paths created by each Cmd/Ctrl+V paste (for Cmd/Ctrl+Z undo). */
 	private pasteUndoBatches: string[][] = [];
 	private boundClipboardKeydown = (e: KeyboardEvent) => {
@@ -89,7 +99,11 @@ export class YearlyPlannerView
 	}
 
 	getState(): YearlyPlannerState {
-		return { year: this.year };
+		return {
+			year: this.year,
+			cellWidthExpanded: this.areAllMonthCellWidthsExpanded(),
+			monthCellWidths: this.serializeMonthCellWidths(),
+		};
 	}
 
 	async setState(
@@ -98,8 +112,9 @@ export class YearlyPlannerView
 	): Promise<void> {
 		if (state?.year) {
 			this.year = state.year;
-			this.render();
 		}
+		this.syncMonthCellWidthsFromSettings();
+		this.render();
 		await super.setState(state, result);
 	}
 
@@ -126,6 +141,120 @@ export class YearlyPlannerView
 
 	isRangeBarInteractionEnabled(): boolean {
 		return true;
+	}
+
+	private hasExpandedMonthCells(): boolean {
+		return this.monthCellWidths.size > 0;
+	}
+
+	private syncMonthCellWidthsFromSettings(): void {
+		this.monthCellWidths = this.normalizeMonthCellWidths(
+			this.plugin.getYearlyPlannerExpandedMonths(),
+		);
+	}
+
+	private areAllMonthCellWidthsExpanded(): boolean {
+		if (this.monthCellWidths.size !== 12) return false;
+		for (let month = 1; month <= 12; month++) {
+			if (
+				this.monthCellWidths.get(month) !==
+				YEARLY_PLANNER_EXPANDED_CELL_WIDTH_REM
+			) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	private serializeMonthCellWidths(): Record<string, number> | undefined {
+		if (this.monthCellWidths.size === 0) return undefined;
+		const state: Record<string, number> = {};
+		for (const [month, width] of this.monthCellWidths.entries()) {
+			state[String(month)] = width;
+		}
+		return state;
+	}
+
+	private normalizeMonthCellWidths(value: unknown): Map<number, number> {
+		const widths = new Map<number, number>();
+		if (Array.isArray(value)) {
+			for (const monthValue of value) {
+				const month = Number(monthValue);
+				if (Number.isInteger(month) && month >= 1 && month <= 12) {
+					widths.set(month, YEARLY_PLANNER_EXPANDED_CELL_WIDTH_REM);
+				}
+			}
+			return widths;
+		}
+		if (!value || typeof value !== "object") return widths;
+		for (const [monthKey, widthValue] of Object.entries(value)) {
+			const month = Number(monthKey);
+			const width = Number(widthValue);
+			if (
+				Number.isInteger(month) &&
+				month >= 1 &&
+				month <= 12 &&
+				Number.isFinite(width)
+			) {
+				widths.set(month, YEARLY_PLANNER_EXPANDED_CELL_WIDTH_REM);
+			}
+		}
+		return widths;
+	}
+
+	private setAllMonthCellWidths(width: number): void {
+		for (let month = 1; month <= 12; month++) {
+			this.monthCellWidths.set(month, width);
+		}
+	}
+
+	private getExpandedMonths(): number[] {
+		return Array.from(this.monthCellWidths.keys()).sort((a, b) => a - b);
+	}
+
+	private persistMonthCellWidths(): void {
+		void this.plugin.setYearlyPlannerExpandedMonths(this.getExpandedMonths());
+	}
+
+	private toggleAllMonthCellWidths(): void {
+		if (this.hasExpandedMonthCells()) {
+			this.monthCellWidths.clear();
+		} else {
+			this.setAllMonthCellWidths(YEARLY_PLANNER_EXPANDED_CELL_WIDTH_REM);
+		}
+		this.persistMonthCellWidths();
+		this.render();
+	}
+
+	private toggleMonthCellWidth(month: number): void {
+		if (month < 1 || month > 12) return;
+		if (this.monthCellWidths.has(month)) {
+			this.monthCellWidths.delete(month);
+		} else {
+			this.monthCellWidths.set(month, YEARLY_PLANNER_EXPANDED_CELL_WIDTH_REM);
+		}
+		this.persistMonthCellWidths();
+		this.render();
+	}
+
+	private getBaseMonthCellWidthRem(): number {
+		if (!this.compactLayout) return YEARLY_PLANNER_DEFAULT_DESKTOP_CELL_WIDTH_REM;
+		const configured = this.plugin.settings.mobileCellWidth ?? 0;
+		return configured > 0 ? configured : 4.5;
+	}
+
+	private getEffectiveMonthCellWidths(): number[] | null {
+		if (!this.hasExpandedMonthCells()) return null;
+		const base = this.getBaseMonthCellWidthRem();
+		return Array.from({ length: 12 }, (_, index) => {
+			const month = index + 1;
+			return this.monthCellWidths.get(month) ?? base;
+		});
+	}
+
+	private applyCellWidth(el: HTMLElement, widthRem: number): void {
+		el.style.minWidth = `${widthRem}rem`;
+		el.style.width = `${widthRem}rem`;
 	}
 
 	/** Update chip-drag state without full render: add chip-dragging class and drop-target. */
@@ -158,6 +287,7 @@ export class YearlyPlannerView
 	render(): void {
 		const { contentEl } = this;
 		this.compactLayout = this.shouldUseCompactLayout();
+		this.syncMonthCellWidthsFromSettings();
 		const scrollEl = contentEl.querySelector<HTMLElement>(
 			".yearly-planner-scroll",
 		);
@@ -179,6 +309,10 @@ export class YearlyPlannerView
 		contentEl.toggleClass(
 			"yearly-planner-container-compact",
 			this.compactLayout,
+		);
+		contentEl.toggleClass(
+			"yearly-planner-has-expanded-months",
+			this.hasExpandedMonthCells(),
 		);
 		if (this.chipDragState) {
 			contentEl.addClass("yearly-planner-chip-dragging");
@@ -260,6 +394,29 @@ export class YearlyPlannerView
 		});
 	}
 
+	private queueMaterializeVisibleRecurrences(
+		range: RecurrenceMaterializeRange,
+		plannerFiles: TFile[],
+	): void {
+		const key = `${range.start}|${range.end}`;
+		if (this.materializeInFlightKey === key) return;
+		this.materializeInFlightKey = key;
+		void (async () => {
+			try {
+				const result = await materializeRecurrencesForRange({
+					app: this.app,
+					plannerFiles,
+					range,
+				});
+				if (result.created > 0 || result.updated > 0) this.render();
+			} finally {
+				if (this.materializeInFlightKey === key) {
+					this.materializeInFlightKey = null;
+				}
+			}
+		})();
+	}
+
 	private renderHeader(contentEl: HTMLElement): void {
 		const locale = this.plugin.settings.locale ?? "en";
 		renderYearlyPlannerHeader(
@@ -289,6 +446,8 @@ export class YearlyPlannerView
 				onCyclePlannerView: () => {
 					void this.plugin.cyclePlannerView(this.leaf);
 				},
+				hasExpandedMonthCells: this.hasExpandedMonthCells(),
+				onToggleAllCellWidths: () => this.toggleAllMonthCellWidths(),
 				onYearClick: (year) => {
 					this.year = year;
 					this.render();
@@ -342,13 +501,31 @@ export class YearlyPlannerView
 		const table = tableParent.createEl("table", {
 			cls: "yearly-planner-table",
 		});
+		const monthCellWidths = this.getEffectiveMonthCellWidths();
+		if (monthCellWidths) {
+			const tableWidth =
+				YEARLY_PLANNER_DAY_COLUMN_WIDTH_REM +
+				monthCellWidths.reduce((sum, width) => sum + width, 0);
+			table.style.width = `${tableWidth}rem`;
+			table.style.minWidth = `${tableWidth}rem`;
+		}
 
 		const monthLabels = getMonthLabels(this.plugin.settings.locale ?? "en");
 		const thead = table.createEl("thead");
 		const headerRow = thead.createEl("tr");
-		headerRow.createEl("th", { cls: "yearly-planner-corner" });
+		const corner = headerRow.createEl("th", { cls: "yearly-planner-corner" });
+		if (monthCellWidths) {
+			this.applyCellWidth(corner, YEARLY_PLANNER_DAY_COLUMN_WIDTH_REM);
+		}
 		for (let m = 0; m < 12; m++) {
-			headerRow.createEl("th", { text: monthLabels[m] });
+			const month = m + 1;
+			const monthLabel = monthLabels[m] ?? String(month);
+			createMonthHeaderCell(headerRow, month, monthLabel, {
+				widthRem: monthCellWidths?.[m],
+				isExpanded: this.monthCellWidths.has(month),
+				onToggleWidth: (targetMonth) =>
+					this.toggleMonthCellWidth(targetMonth),
+			});
 		}
 
 		const tbody = table.createEl("tbody");
@@ -363,6 +540,13 @@ export class YearlyPlannerView
 			this.app,
 			folder,
 			plannerFileScope,
+		);
+		this.queueMaterializeVisibleRecurrences(
+			{
+				start: `${this.year}-01-01`,
+				end: `${this.year}-12-31`,
+			},
+			plannerFiles,
 		);
 		const ranges = getRangesForYear(
 			this.app,
@@ -382,15 +566,27 @@ export class YearlyPlannerView
 			chipDragState: this.chipDragState,
 			clipboardSelection: this.clipboardSelection,
 			holidaysData,
+			alternateCalendarId: this.plugin.settings.alternateCalendarId ?? "",
 			locale: this.plugin.settings.locale ?? "en",
 			rangeLaneMap,
 		};
 
 		for (let day = 1; day <= 31; day++) {
 			const row = tbody.createEl("tr");
-			row.createEl("th", { text: String(day) });
+			const dayHeader = row.createEl("th", { text: String(day) });
+			if (monthCellWidths) {
+				this.applyCellWidth(
+					dayHeader,
+					YEARLY_PLANNER_DAY_COLUMN_WIDTH_REM,
+				);
+			}
 			for (let month = 1; month <= 12; month++) {
-				createPlannerCell(row, day, month, cellCtx);
+				const cell = createPlannerCell(row, day, month, cellCtx);
+				if (monthCellWidths) {
+					const monthWidth =
+						monthCellWidths[month - 1] ?? this.getBaseMonthCellWidthRem();
+					this.applyCellWidth(cell, monthWidth);
+				}
 			}
 		}
 		scrollContainer.addEventListener(
@@ -430,7 +626,14 @@ export class YearlyPlannerView
 			bounds,
 			defaultFolder,
 			plannerFileScope: this.plugin.settings.plannerFileScope ?? "vault",
-			createSingleDateFile: (folder, basename, color, todo, notifyMinutes) =>
+			createSingleDateFile: (
+				folder,
+				basename,
+				color,
+				todo,
+				notifyMinutes,
+				recurrence,
+			) =>
 				createSingleDateFileOp(
 					this.app,
 					folder,
@@ -438,8 +641,16 @@ export class YearlyPlannerView
 					color,
 					todo,
 					notifyMinutes,
+					recurrence,
 				),
-			createRangeFile: (folder, basename, color, todo, notifyMinutes) =>
+			createRangeFile: (
+				folder,
+				basename,
+				color,
+				todo,
+				notifyMinutes,
+				recurrence,
+			) =>
 				createRangeFileOp(
 					this.app,
 					folder,
@@ -447,6 +658,7 @@ export class YearlyPlannerView
 					color,
 					todo,
 					notifyMinutes,
+					recurrence,
 				),
 			onCreated: () => this.render(),
 			openCreatedFile: (file) =>

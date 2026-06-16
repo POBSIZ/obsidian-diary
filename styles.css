@@ -293,7 +293,8 @@ available in the app when your plugin is enabled.
 
 .yearly-planner-create-file-row.is-hidden,
 .yearly-planner-folder-other-row.is-hidden,
-.yearly-planner-completed-row.is-hidden {
+.yearly-planner-completed-row.is-hidden,
+.yearly-planner-repeat-control-row.is-hidden {
 	display: none;
 }
 
@@ -326,7 +327,8 @@ available in the app when your plugin is enabled.
 .yearly-planner-folder-select,
 .yearly-planner-folder-input,
 .yearly-planner-date-input,
-.yearly-planner-filename-input {
+.yearly-planner-filename-input,
+.yearly-planner-repeat-select {
 	box-sizing: border-box;
 	padding: 0 0.5rem;
 	font-size: 1rem;
@@ -363,6 +365,31 @@ available in the app when your plugin is enabled.
 .yearly-planner-folder-select {
 	min-width: 0;
 	padding: 0rem 2em 0rem 0.4rem;
+}
+
+.yearly-planner-repeat-row label {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.35rem;
+	color: var(--text-normal);
+}
+
+.yearly-planner-repeat-select {
+	min-height: 2.25rem;
+}
+
+.yearly-planner-file-options-repeat-actions {
+	padding: 0.65rem;
+	border: var(--planner-border-width-thin) solid
+		var(--background-modifier-border);
+	border-radius: var(--planner-radius-sm);
+	background: var(--background-secondary);
+}
+
+.yearly-planner-file-options-repeat-action-buttons {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.4rem;
 }
 
 .yearly-planner-color-row {
@@ -540,8 +567,88 @@ available in the app when your plugin is enabled.
 	font-weight: var(--table-header-weight, 600);
 }
 
+.yearly-planner-month-header {
+	padding: 0.2rem 0.25rem;
+}
+
+.yearly-planner-month-header-content {
+	position: relative;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 0;
+	min-height: 1.45rem;
+}
+
+.yearly-planner-month-header-label {
+	display: block;
+	min-width: 0;
+	max-width: 100%;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.yearly-planner-month-header-expanded
+	.yearly-planner-month-header-label {
+	color: var(--text-accent);
+}
+
+.yearly-planner-month-width-controls {
+	position: absolute;
+	right: 0;
+	top: 50%;
+	display: inline-flex;
+	align-items: center;
+	gap: 0.05rem;
+	padding: 0.05rem;
+	border-radius: var(--planner-radius-xs);
+	background: color-mix(
+		in srgb,
+		var(--background-secondary) 88%,
+		transparent
+	);
+	opacity: 0;
+	transform: translateY(-50%);
+	transition: opacity 0.12s ease;
+}
+
+.yearly-planner-month-header:hover .yearly-planner-month-width-controls,
+.yearly-planner-month-header:focus-within .yearly-planner-month-width-controls,
+.yearly-planner-month-header-expanded
+	.yearly-planner-month-width-controls {
+	opacity: 1;
+}
+
+.yearly-planner-month-width-btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 1.15rem;
+	height: 1.15rem;
+	min-width: 1.15rem;
+	min-height: 1.15rem;
+	padding: 0;
+	border: 1px solid var(--background-modifier-border);
+	border-radius: var(--planner-radius-xs);
+	background: var(--background-modifier-form-field);
+	color: var(--text-muted);
+	cursor: pointer;
+}
+
+.yearly-planner-month-width-btn:hover,
+.yearly-planner-month-width-btn:focus-visible {
+	color: var(--text-accent);
+	background: var(--background-modifier-hover);
+}
+
+.yearly-planner-month-width-btn svg {
+	width: 0.72rem;
+	height: 0.72rem;
+}
+
 /* Sticky headers: month row (top) and day column (left) - fixed when scrolling */
-/* z-index must exceed .yearly-planner-cell-files (1000) so headers are not obscured by file backgrounds */
+/* z-index must exceed in-cell overlays so headers are not obscured by file backgrounds */
 /* Use --background-secondary (skip --table-header-background which can be transparent in some themes) */
 .yearly-planner-table thead th {
 	min-width: 3rem;
@@ -600,6 +707,10 @@ available in the app when your plugin is enabled.
 	cursor: pointer;
 	transition: background-color 0.15s ease;
 	position: relative;
+}
+
+.yearly-planner-table tbody td.yearly-planner-cell-has-alt-calendar {
+	padding-top: 1.05rem;
 }
 
 /* Range bars: lane-based right border (always visible) */
@@ -703,7 +814,7 @@ available in the app when your plugin is enabled.
 	align-items: stretch;
 	justify-content: flex-end;
 	position: relative;
-	z-index: 1000;
+	z-index: 20;
 	width: 100%;
 	min-width: 0;
 }
@@ -776,7 +887,38 @@ available in the app when your plugin is enabled.
 	/* Keep holiday left border when weekend overlaps */
 }
 
-/* Above chip (1000) but below sticky th (1001); same as chip so DOM order puts it on top */
+.yearly-planner-alt-calendar-labels {
+	position: absolute;
+	top: 0.16rem;
+	left: 0.25rem;
+	display: flex;
+	flex-direction: column;
+	gap: 0.06rem;
+	max-width: calc(100% - 2.1rem);
+	pointer-events: none;
+	z-index: 30;
+}
+
+.yearly-planner-alt-calendar-label {
+	display: block;
+	box-sizing: border-box;
+	max-width: 100%;
+	color: var(--text-muted);
+	font-size: 0.55em;
+	line-height: 1;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	padding: 0.02rem 0.15rem;
+	border-radius: 2px;
+	background: color-mix(
+		in srgb,
+		var(--background-primary) 78%,
+		transparent
+	);
+}
+
+/* Above in-cell chips, below sticky headers */
 .yearly-planner-weekend-label {
 	position: absolute;
 	top: 0.1rem;
@@ -784,7 +926,7 @@ available in the app when your plugin is enabled.
 	font-size: 0.55em;
 	color: var(--text-muted);
 	pointer-events: none;
-	z-index: 1000;
+	z-index: 30;
 }
 
 .yearly-planner-cell-saturday:not(.yearly-planner-cell-invalid)
@@ -869,7 +1011,7 @@ available in the app when your plugin is enabled.
 	justify-content: center;
 	min-height: 100%;
 	position: relative;
-	z-index: 1000;
+	z-index: 20;
 	width: 100%;
 	min-width: 0;
 }
@@ -988,6 +1130,27 @@ available in the app when your plugin is enabled.
 .yearly-planner-cell-range-bar.yearly-planner-cell-clipboard-selected {
 	outline: 2px solid var(--text-accent);
 	outline-offset: 1px;
+}
+
+.planner-recurrence-source {
+	box-shadow: inset 0 0 0 1px
+		color-mix(in srgb, var(--interactive-accent) 45%, transparent);
+}
+
+.planner-recurrence-occurrence {
+	border-style: dashed !important;
+	background: color-mix(
+		in srgb,
+		var(--interactive-accent) 8%,
+		var(--background-primary)
+	);
+}
+
+.monthly-planner-range-bar.planner-recurrence-occurrence,
+.monthly-list-planner-range-bar.planner-recurrence-occurrence {
+	outline: 1px dashed
+		color-mix(in srgb, var(--interactive-accent) 60%, transparent);
+	outline-offset: -2px;
 }
 
 .yearly-planner-holiday-modal-date {
@@ -1381,6 +1544,34 @@ body.-is-mobile .yearly-planner-table tbody td {
 	overflow-y: visible;
 }
 
+body.is-mobile .yearly-planner-month-header-content,
+body.-is-mobile .yearly-planner-month-header-content,
+.yearly-planner-container.yearly-planner-container-compact
+	.yearly-planner-month-header-content {
+	flex-direction: column;
+	gap: 0.08rem;
+	min-height: 2.35rem;
+}
+
+body.is-mobile .yearly-planner-month-width-controls,
+body.-is-mobile .yearly-planner-month-width-controls,
+.yearly-planner-container.yearly-planner-container-compact
+	.yearly-planner-month-width-controls {
+	position: static;
+	opacity: 0.82;
+	transform: none;
+}
+
+body.is-mobile .yearly-planner-month-width-btn,
+body.-is-mobile .yearly-planner-month-width-btn,
+.yearly-planner-container.yearly-planner-container-compact
+	.yearly-planner-month-width-btn {
+	width: 1.05rem;
+	height: 1.05rem;
+	min-width: 1.05rem;
+	min-height: 1.05rem;
+}
+
 /* Mobile: bottom padding so table is not covered by tools tab (configurable in settings) */
 body.is-mobile .yearly-planner-scroll,
 body.-is-mobile .yearly-planner-scroll {
@@ -1699,6 +1890,27 @@ body.-is-mobile .yearly-planner-file-preview {
 	font-size: 0.9em;
 	text-align: left;
 	margin-bottom: 0.2rem;
+}
+
+.monthly-planner-alt-calendar-labels {
+	display: flex;
+	flex-direction: column;
+	gap: 0.06rem;
+	align-items: flex-start;
+	margin-top: -0.12rem;
+	margin-bottom: 0.08rem;
+	min-width: 0;
+}
+
+.monthly-planner-alt-calendar-label {
+	color: var(--text-faint);
+	font-size: 0.62em;
+	line-height: 1.1;
+	text-align: left;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	max-width: 100%;
 }
 
 .monthly-planner-cell-today {
@@ -2022,10 +2234,29 @@ body.-is-mobile .yearly-planner-file-preview {
 	gap: 0.5rem;
 }
 
+.monthly-planner-day-summary-title-block {
+	display: flex;
+	flex-direction: column;
+	gap: 0.12rem;
+	min-width: 0;
+}
+
 .monthly-planner-day-summary-title {
 	font-size: 0.8rem;
 	font-weight: 600;
 	color: var(--text-normal);
+}
+
+.monthly-planner-day-summary-alt-calendar-labels {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.12rem 0.45rem;
+}
+
+.monthly-planner-day-summary-alt-calendar-label {
+	color: var(--text-muted);
+	font-size: 0.72rem;
+	line-height: 1.2;
 }
 
 .monthly-planner-day-summary-close {
@@ -2240,6 +2471,19 @@ body.-is-mobile .monthly-planner-cell-day {
 	margin-bottom: 0.1rem;
 }
 
+body.is-mobile .monthly-planner-alt-calendar-labels,
+body.-is-mobile .monthly-planner-alt-calendar-labels {
+	gap: 0.04rem;
+	margin-top: -0.05rem;
+	margin-bottom: 0.02rem;
+}
+
+body.is-mobile .monthly-planner-alt-calendar-label,
+body.-is-mobile .monthly-planner-alt-calendar-label {
+	font-size: 0.56em;
+	line-height: 1;
+}
+
 body.is-mobile .monthly-planner-cell-active-date,
 body.-is-mobile .monthly-planner-cell-active-date {
 	box-shadow: inset 0 0 0 2px var(--text-accent);
@@ -2440,6 +2684,19 @@ body.-is-mobile .monthly-planner-weekend-label {
 	.monthly-planner-cell-day {
 	font-size: 0.75em;
 	margin-bottom: 0.1rem;
+}
+
+.monthly-planner-container.monthly-planner-container-compact
+	.monthly-planner-alt-calendar-labels {
+	gap: 0.04rem;
+	margin-top: -0.05rem;
+	margin-bottom: 0.02rem;
+}
+
+.monthly-planner-container.monthly-planner-container-compact
+	.monthly-planner-alt-calendar-label {
+	font-size: 0.56em;
+	line-height: 1;
 }
 
 .monthly-planner-container.monthly-planner-container-compact
@@ -2705,6 +2962,21 @@ body.-is-mobile .monthly-planner-weekend-label {
 	font-size: 0.82rem;
 	color: var(--text-muted);
 	font-weight: 500;
+}
+
+.monthly-list-planner-alt-calendar-labels {
+	display: inline-flex;
+	flex-wrap: wrap;
+	gap: 0.18rem 0.4rem;
+	align-items: baseline;
+	min-width: 0;
+}
+
+.monthly-list-planner-alt-calendar-label {
+	font-size: 0.72rem;
+	color: var(--text-faint);
+	font-weight: 500;
+	white-space: nowrap;
 }
 
 .monthly-list-planner-weekend-label {

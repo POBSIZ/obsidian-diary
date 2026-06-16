@@ -1,6 +1,11 @@
 import { App, TFile, WorkspaceLeaf } from "obsidian";
 import { parseRangeBasename } from "../../utils/range";
 import { getFilePath } from "./file-utils";
+import {
+	buildRecurrenceSourceFrontmatter,
+	serializeYamlFrontmatter,
+	type RecurrenceFormValue,
+} from "../../utils/recurrence";
 
 const pad = (n: number) => String(n).padStart(2, "0");
 
@@ -161,6 +166,7 @@ export async function createRangeFile(
 	color?: string,
 	todo?: boolean,
 	notifyMinutes?: number | null,
+	recurrence?: RecurrenceFormValue | null,
 ): Promise<TFile> {
 	const cleanBasename = basename.trim().replace(/\.md$/i, "");
 	const parsed = parseRangeBasename(cleanBasename);
@@ -182,27 +188,28 @@ export async function createRangeFile(
 		await app.vault.createFolder(dir);
 	}
 	const heading = suffix !== undefined ? suffix : `${startStr} ~ ${endStr}`;
-	const colorLine = color?.trim()
-		? `color: "${color.trim().replace(/"/g, '\\"')}"\n`
-		: "";
-	const todoLine = todo ? "todo: true\ncompleted: false\n" : "";
 	const hasNotify =
 		notifyMinutes != null &&
 		Number.isFinite(notifyMinutes) &&
 		notifyMinutes >= 0 &&
 		notifyMinutes <= 1439;
-	const notifyLine = hasNotify
-		? `notify_minutes: ${Math.round(notifyMinutes)}\n`
-		: "";
-	const content = `---
-date_start: ${startStr}
-date_end: ${endStr}
-${colorLine}${todoLine}${notifyLine}
----
-
-# ${heading}
-
-`;
+	const frontmatter: Record<string, unknown> = {
+		date_start: startStr,
+		date_end: endStr,
+	};
+	if (color?.trim()) frontmatter.color = color.trim();
+	if (todo) {
+		frontmatter.todo = true;
+		frontmatter.completed = false;
+	}
+	if (hasNotify) frontmatter.notify_minutes = Math.round(notifyMinutes);
+	if (recurrence?.enabled) {
+		Object.assign(
+			frontmatter,
+			buildRecurrenceSourceFrontmatter(recurrence, startStr),
+		);
+	}
+	const content = `${serializeYamlFrontmatter(frontmatter)}\n\n# ${heading}\n\n`;
 	return app.vault.create(path, content);
 }
 
@@ -231,6 +238,7 @@ export async function createSingleDateFile(
 	color?: string,
 	todo?: boolean,
 	notifyMinutes?: number | null,
+	recurrence?: RecurrenceFormValue | null,
 ): Promise<TFile> {
 	const trimmed = (folder || "Planner").trim();
 	const cleanBasename = basename.trim().replace(/\.md$/i, "") || "untitled";
@@ -254,24 +262,23 @@ export async function createSingleDateFile(
 		Number.isFinite(notifyMinutes) &&
 		notifyMinutes >= 0 &&
 		notifyMinutes <= 1439;
-	const needsFrontmatter = color?.trim() || todo || hasNotify;
-	const lines: string[] = [];
-	if (needsFrontmatter) {
-		lines.push("---");
-		if (color?.trim()) {
-			lines.push(`color: "${color.trim().replace(/"/g, '\\"')}"`);
-		}
-		if (todo) {
-			lines.push("todo: true");
-			lines.push("completed: false");
-		}
-		if (hasNotify) {
-			lines.push(`notify_minutes: ${Math.round(notifyMinutes)}`);
-		}
-		lines.push("---");
-		lines.push("");
+	const frontmatter: Record<string, unknown> = {};
+	if (color?.trim()) frontmatter.color = color.trim();
+	if (todo) {
+		frontmatter.todo = true;
+		frontmatter.completed = false;
 	}
-	const content = `${lines.join("\n")}# ${heading}\n\n`;
+	if (hasNotify) frontmatter.notify_minutes = Math.round(notifyMinutes);
+	if (recurrence?.enabled && parsed?.date) {
+		Object.assign(
+			frontmatter,
+			buildRecurrenceSourceFrontmatter(recurrence, parsed.date),
+		);
+	}
+	const hasFrontmatter = Object.keys(frontmatter).length > 0;
+	const content = `${
+		hasFrontmatter ? `${serializeYamlFrontmatter(frontmatter)}\n\n` : ""
+	}# ${heading}\n\n`;
 	return app.vault.create(path, content);
 }
 
@@ -348,8 +355,7 @@ export async function updateFileNotifyMinutes(
 function sanitizePlannerBasenameSuffix(raw: string): string {
 	return raw
 		.replace(/[\\/:*?"<>|#\n\r\t]/g, "")
-		.trim()
-		.replace(/\s+/g, "-");
+		.trim();
 }
 
 /**
@@ -403,9 +409,9 @@ async function renamePlannerFileIfNeeded(
 	file: TFile,
 	newBasename: string,
 ): Promise<TFile> {
-	if (file.basename === newBasename) return file;
 	const folder = file.parent?.path ?? "";
 	const newPath = folder ? `${folder}/${newBasename}` : newBasename;
+	if (newPath === file.path) return file;
 	if (app.vault.getAbstractFileByPath(newPath) && newPath !== file.path) {
 		const err = new Error("PLANNER_RENAME_CONFLICT");
 		(err as Error & { code?: string }).code = "PLANNER_RENAME_CONFLICT";

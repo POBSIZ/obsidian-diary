@@ -15,6 +15,8 @@ import {
 	getChipColor,
 	getFileTitle,
 	getFilesForDate,
+	isRecurrenceOccurrenceFile,
+	isRecurrenceSourceFile,
 	isTodoCompleted,
 	isTodoFile,
 	getRangeLaneMap,
@@ -44,7 +46,12 @@ import {
 import { CreateFileModal, FileOptionsModal } from "../yearly-planner/modals";
 import { getSelectionBounds } from "../yearly-planner/selection";
 import { getHolidaysForYear } from "../../utils/holidays";
-import { getMonthCalendarCells } from "../../utils/date";
+import { getDaysInMonth, getMonthCalendarCells } from "../../utils/date";
+import { getAlternateCalendarLabel } from "../../utils/alternate-calendars";
+import {
+	materializeRecurrencesForRange,
+	type RecurrenceMaterializeRange,
+} from "../../utils/recurrence";
 import { PinchZoomController } from "./pinch-zoom";
 import {
 	copyPlannerSelectionToClipboard,
@@ -77,6 +84,7 @@ export class MonthlyPlannerView
 	private pinchZoomScale = 1;
 	private compactLayout = Platform.isMobile;
 	private resizeObserver: ResizeObserver | null = null;
+	private materializeInFlightKey: string | null = null;
 	private selectedDate: MonthlyPlannerSelectedDate | null = null;
 	private daySummaryOpen = false;
 	private clipboardKeydownRegistered = false;
@@ -347,6 +355,29 @@ export class MonthlyPlannerView
 		});
 	}
 
+	private queueMaterializeVisibleRecurrences(
+		range: RecurrenceMaterializeRange,
+		plannerFiles: TFile[],
+	): void {
+		const key = `${range.start}|${range.end}`;
+		if (this.materializeInFlightKey === key) return;
+		this.materializeInFlightKey = key;
+		void (async () => {
+			try {
+				const result = await materializeRecurrencesForRange({
+					app: this.app,
+					plannerFiles,
+					range,
+				});
+				if (result.created > 0 || result.updated > 0) this.render();
+			} finally {
+				if (this.materializeInFlightKey === key) {
+					this.materializeInFlightKey = null;
+				}
+			}
+		})();
+	}
+
 	private renderHeader(contentEl: HTMLElement): void {
 		const locale = this.plugin.settings.locale ?? "en";
 		const monthLabel = getMonthLabel(locale, this.month);
@@ -500,6 +531,15 @@ export class MonthlyPlannerView
 			folder,
 			plannerFileScope,
 		);
+		this.queueMaterializeVisibleRecurrences(
+			{
+				start: `${this.year}-${String(this.month).padStart(2, "0")}-01`,
+				end: `${this.year}-${String(this.month).padStart(2, "0")}-${String(
+					getDaysInMonth(this.year, this.month),
+				).padStart(2, "0")}`,
+			},
+			plannerFiles,
+		);
 		const rangeLaneMap = getRangeLaneMap(
 			getRangesForYear(
 				this.app,
@@ -518,6 +558,7 @@ export class MonthlyPlannerView
 			chipDragState: this.chipDragState,
 			clipboardSelection: this.clipboardSelection,
 			holidaysData,
+			alternateCalendarId: this.plugin.settings.alternateCalendarId ?? "",
 			locale,
 			rangeLaneMap,
 			selectedDate: this.daySummaryOpen ? this.selectedDate : null,
@@ -572,7 +613,14 @@ export class MonthlyPlannerView
 			bounds,
 			defaultFolder,
 			plannerFileScope: this.plugin.settings.plannerFileScope ?? "vault",
-			createSingleDateFile: (folder, basename, color, todo, notifyMinutes) =>
+			createSingleDateFile: (
+				folder,
+				basename,
+				color,
+				todo,
+				notifyMinutes,
+				recurrence,
+			) =>
 				createSingleDateFileOp(
 					this.app,
 					folder,
@@ -580,8 +628,16 @@ export class MonthlyPlannerView
 					color,
 					todo,
 					notifyMinutes,
+					recurrence,
 				),
-			createRangeFile: (folder, basename, color, todo, notifyMinutes) =>
+			createRangeFile: (
+				folder,
+				basename,
+				color,
+				todo,
+				notifyMinutes,
+				recurrence,
+			) =>
 				createRangeFileOp(
 					this.app,
 					folder,
@@ -589,6 +645,7 @@ export class MonthlyPlannerView
 					color,
 					todo,
 					notifyMinutes,
+					recurrence,
 				),
 			onCreated: () => this.render(),
 			openCreatedFile: (file) =>
@@ -620,18 +677,38 @@ export class MonthlyPlannerView
 	private renderMobileDaySummary(contentEl: HTMLElement): void {
 		if (!this.daySummaryOpen || !this.selectedDate) return;
 		const { year, month, day } = this.selectedDate;
+		const dateKey = `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+		const alternateCalendarLabel = getAlternateCalendarLabel(
+			year,
+			month,
+			day,
+			this.plugin.settings.alternateCalendarId ?? "",
+			this.plugin.settings.locale ?? "en",
+		);
 		const sheet = contentEl.createDiv({
 			cls: "monthly-planner-day-summary-sheet",
 		});
 		const header = sheet.createDiv({
 			cls: "monthly-planner-day-summary-header",
 		});
-		header.createDiv({
+		const titleBlock = header.createDiv({
+			cls: "monthly-planner-day-summary-title-block",
+		});
+		titleBlock.createDiv({
 			cls: "monthly-planner-day-summary-title",
 			text: t("monthlyDaySheet.title", {
 				date: this.formatDaySummaryDate(year, month, day),
 			}),
 		});
+		if (alternateCalendarLabel) {
+			const labelsEl = titleBlock.createDiv({
+				cls: "monthly-planner-day-summary-alt-calendar-labels",
+			});
+			labelsEl.createSpan({
+				cls: "monthly-planner-day-summary-alt-calendar-label",
+				text: alternateCalendarLabel.text,
+			});
+		}
 		const closeBtn = header.createEl("button", {
 			cls: "monthly-planner-day-summary-close",
 			text: "×",
@@ -650,7 +727,6 @@ export class MonthlyPlannerView
 			day,
 			this.plugin.settings.plannerFileScope ?? "vault",
 		);
-		const dateKey = `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
 		const { showHolidays, holidayCountry } = this.plugin.settings;
 		const holidayNames =
 			showHolidays && holidayCountry
@@ -663,6 +739,7 @@ export class MonthlyPlannerView
 				text: this.getDisplayTitle(file),
 				color: getChipColor(this.app, file),
 				onClick: () => this.openFileOptionsModal(file),
+				extraClass: this.getRecurrenceChipClass(file),
 			});
 		}
 
@@ -672,6 +749,7 @@ export class MonthlyPlannerView
 				text: this.getDisplayTitle(file),
 				color: getChipColor(this.app, file),
 				onClick: () => this.openFileOptionsModal(file),
+				extraClass: this.getRecurrenceChipClass(file),
 			});
 		}
 
@@ -770,6 +848,14 @@ export class MonthlyPlannerView
 			return `${TODO_CHIP_EMOJI_INCOMPLETE} ${title}`;
 		}
 		return title;
+	}
+
+	private getRecurrenceChipClass(file: TFile): string | undefined {
+		if (isRecurrenceSourceFile(this.app, file)) return "planner-recurrence-source";
+		if (isRecurrenceOccurrenceFile(this.app, file)) {
+			return "planner-recurrence-occurrence";
+		}
+		return undefined;
 	}
 
 	private formatDaySummaryDate(year: number, month: number, day: number): string {

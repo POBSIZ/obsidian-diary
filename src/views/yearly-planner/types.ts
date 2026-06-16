@@ -2,6 +2,8 @@ import type { TFile } from "obsidian";
 
 export interface YearlyPlannerState extends Record<string, unknown> {
 	year: number;
+	cellWidthExpanded?: boolean;
+	monthCellWidths?: Record<string, number>;
 }
 
 export interface DragState {

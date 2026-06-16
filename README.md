@@ -41,12 +41,13 @@ grid in compact form.
 ## What It Does
 
 - Yearly planner: `12 months x 31 days` overview.
-- Monthly grid planner: one-month calendar view with date chips, range bars, holidays, and mobile pinch zoom.
+- Monthly grid planner: one-month calendar view with date chips, range bars, holidays, a configurable alternate calendar label, and mobile pinch zoom.
 - Monthly list planner: day-by-day list for dense monthly review, with `All`, `With notes`, and `Upcoming` filters.
 - Sidebar planner: a compact monthly planner opens in the right sidebar by default, can be revealed from the ribbon or command palette, and can cycle through yearly, monthly grid, and monthly list layouts in the same side leaf.
 - Date notes and range notes: recognized by `YYYY-MM-DD` and `YYYY-MM-DD--YYYY-MM-DD` filenames. By default Diary scans the entire vault, with an optional planner-folder-only scope.
 - Plan notes: yearly `{plannerFolder}/{year}.md` and monthly `{plannerFolder}/{year}-{month}.md` notes.
-- Chip metadata: `color`, `todo`, `completed`, `notify_minutes`, `title`, `date_start`, and `date_end` frontmatter.
+- Chip metadata: `color`, `todo`, `completed`, `notify_minutes`, `title`, `date_start`, `date_end`, and recurrence frontmatter.
+- Recurring events: repeat a note daily, monthly, or yearly with a Gregorian or alternate-calendar basis. Diary materializes only the occurrences inside the planner range you are currently viewing.
 - Desktop workflows: right-sidebar companion planner, drag range selection, chip drag-to-move, keyboard activation, internal planner copy/paste/delete/undo.
 - Mobile workflows: tap a day to open the day summary sheet, create notes from the sheet, pinch zoom the monthly grid, and adjust mobile spacing in settings.
 
@@ -55,7 +56,7 @@ grid in compact form.
 1. Enable **Diary** in **Settings → Community plugins**.
 2. Run **Open monthly planner in sidebar**, **Open monthly planner**, **Open yearly planner**, or **Open monthly list planner** from the command palette.
 3. Select a date cell or the add-file button.
-4. Choose **Single date** or **Range**, then set the folder, dates, filename, color, todo state, and reminder time.
+4. Choose **Single date** or **Range**, then set the folder, dates, filename, color, todo state, reminder time, and optional repeat frequency/calendar.
 5. Select **Create**. Diary creates an ordinary Markdown note and renders it in the planner.
 
 한국어 빠른 사용법:
@@ -63,7 +64,7 @@ grid in compact form.
 1. **Settings → Community plugins**에서 **Diary**를 활성화합니다.
 2. 커맨드 팔레트에서 **Open monthly planner in sidebar**, **Open monthly planner**, **Open yearly planner**, **Open monthly list planner** 중 하나를 실행합니다.
 3. 날짜 셀 또는 파일 추가 버튼을 선택합니다.
-4. **Single date** 또는 **Range**를 고르고 폴더, 날짜, 파일명, 색상, todo 여부, 알림 시간을 입력합니다.
+4. **Single date** 또는 **Range**를 고르고 폴더, 날짜, 파일명, 색상, todo 여부, 알림 시간, 반복 주기/역법을 입력합니다.
 5. **Create**를 선택하면 Markdown 노트가 생성되고 플래너에 표시됩니다.
 
 ## Install

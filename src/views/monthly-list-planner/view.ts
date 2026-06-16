@@ -30,6 +30,11 @@ import {
 	type MonthlyListFilter,
 	renderMonthlyListBody,
 } from "./render-list";
+import { getDaysInMonth } from "../../utils/date";
+import {
+	materializeRecurrencesForRange,
+	type RecurrenceMaterializeRange,
+} from "../../utils/recurrence";
 
 const MONTHLY_LIST_PLANNER_COMPACT_LAYOUT_MAX_WIDTH = 560;
 
@@ -46,6 +51,7 @@ export class MonthlyListPlannerView extends ItemView {
 	private listFilter: MonthlyListFilter = "all";
 	private compactLayout = Platform.isMobile;
 	private resizeObserver: ResizeObserver | null = null;
+	private materializeInFlightKey: string | null = null;
 
 	constructor(
 		leaf: WorkspaceLeaf,
@@ -411,6 +417,29 @@ export class MonthlyListPlannerView extends ItemView {
 		});
 	}
 
+	private queueMaterializeVisibleRecurrences(
+		range: RecurrenceMaterializeRange,
+		plannerFiles: TFile[],
+	): void {
+		const key = `${range.start}|${range.end}`;
+		if (this.materializeInFlightKey === key) return;
+		this.materializeInFlightKey = key;
+		void (async () => {
+			try {
+				const result = await materializeRecurrencesForRange({
+					app: this.app,
+					plannerFiles,
+					range,
+				});
+				if (result.created > 0 || result.updated > 0) this.render();
+			} finally {
+				if (this.materializeInFlightKey === key) {
+					this.materializeInFlightKey = null;
+				}
+			}
+		})();
+	}
+
 	private renderListFilters(contentEl: HTMLElement): void {
 		const filterBar = contentEl.createDiv({
 			cls: "monthly-list-planner-filter-bar",
@@ -504,7 +533,14 @@ export class MonthlyListPlannerView extends ItemView {
 			bounds,
 			defaultFolder,
 			plannerFileScope: this.plugin.settings.plannerFileScope ?? "vault",
-			createSingleDateFile: (folder, basename, color, todo, notifyMinutes) =>
+			createSingleDateFile: (
+				folder,
+				basename,
+				color,
+				todo,
+				notifyMinutes,
+				recurrence,
+			) =>
 				createSingleDateFileOp(
 					this.app,
 					folder,
@@ -512,8 +548,16 @@ export class MonthlyListPlannerView extends ItemView {
 					color,
 					todo,
 					notifyMinutes,
+					recurrence,
 				),
-			createRangeFile: (folder, basename, color, todo, notifyMinutes) =>
+			createRangeFile: (
+				folder,
+				basename,
+				color,
+				todo,
+				notifyMinutes,
+				recurrence,
+			) =>
 				createRangeFileOp(
 					this.app,
 					folder,
@@ -521,6 +565,7 @@ export class MonthlyListPlannerView extends ItemView {
 					color,
 					todo,
 					notifyMinutes,
+					recurrence,
 				),
 			onCreated: () => this.render(),
 			openCreatedFile: (file) =>
@@ -604,19 +649,30 @@ export class MonthlyListPlannerView extends ItemView {
 				: null;
 		const folder = this.plugin.settings.plannerFolder || "Planner";
 		const plannerFileScope = this.plugin.settings.plannerFileScope ?? "vault";
+		const plannerFiles = getPlannerMarkdownFiles(
+			this.app,
+			folder,
+			plannerFileScope,
+		);
+		this.queueMaterializeVisibleRecurrences(
+			{
+				start: `${this.year}-${String(this.month).padStart(2, "0")}-01`,
+				end: `${this.year}-${String(this.month).padStart(2, "0")}-${String(
+					getDaysInMonth(this.year, this.month),
+				).padStart(2, "0")}`,
+			},
+			plannerFiles,
+		);
 		renderMonthlyListBody(inner, {
 			year: this.year,
 			month: this.month,
 			app: this.app,
 			folder,
 			plannerFileScope,
-			plannerFiles: getPlannerMarkdownFiles(
-				this.app,
-				folder,
-				plannerFileScope,
-			),
+			plannerFiles,
 			locale,
 			holidaysData,
+			alternateCalendarId: this.plugin.settings.alternateCalendarId ?? "",
 			filter: this.listFilter,
 		});
 	}

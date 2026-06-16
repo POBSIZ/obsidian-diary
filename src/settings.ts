@@ -1,6 +1,12 @@
 import { App, PluginSettingTab, Setting } from "obsidian";
 import { setLocale, t } from "./i18n";
 import DiaryObsidian from "./main";
+import {
+	ALTERNATE_CALENDAR_OPTIONS,
+	type AlternateCalendarId,
+	type AlternateCalendarSelection,
+	normalizeAlternateCalendarId,
+} from "./utils/alternate-calendars";
 import type { PlannerFileScope } from "./views/yearly-planner/file-utils";
 
 export interface DiaryObsidianSettings {
@@ -10,6 +16,11 @@ export interface DiaryObsidianSettings {
 	dateFormat: string;
 	showHolidays: boolean;
 	holidayCountry: string;
+	alternateCalendarId: AlternateCalendarSelection;
+	/** Legacy migration field from an interim multi-calendar toggle build. */
+	enabledAlternateCalendars?: AlternateCalendarId[];
+	/** Legacy migration field from the earlier single Korean-lunar toggle. */
+	showLunarDates?: boolean;
 	/** Mobile only: bottom padding (rem) so table isn't covered by Obsidian tools tab. 0 = use default. */
 	mobileBottomPadding: number;
 	/** Mobile only: month cell width (rem). 0 = use default. */
@@ -18,6 +29,8 @@ export interface DiaryObsidianSettings {
 	planNotePanelExpanded?: boolean;
 	/** Mobile-only plan note expanded state. Defaults collapsed until toggled on mobile. */
 	mobilePlanNotePanelExpanded?: boolean;
+	/** Month columns expanded in the yearly planner. Persists across reloads. */
+	yearlyPlannerExpandedMonths: number[];
 }
 
 export const DEFAULT_SETTINGS: DiaryObsidianSettings = {
@@ -27,10 +40,12 @@ export const DEFAULT_SETTINGS: DiaryObsidianSettings = {
 	dateFormat: "YYYY-MM-DD",
 	showHolidays: true,
 	holidayCountry: "KR",
+	alternateCalendarId: "",
 	mobileBottomPadding: 3.5,
 	mobileCellWidth: 4.5,
 	planNotePanelExpanded: true,
 	mobilePlanNotePanelExpanded: false,
+	yearlyPlannerExpandedMonths: [],
 };
 
 export class DiaryObsidianSettingTab extends PluginSettingTab {
@@ -141,6 +156,33 @@ export class DiaryObsidianSettingTab extends PluginSettingTab {
 						await this.plugin.saveSettings();
 					}),
 			);
+
+		const locale = this.plugin.settings.locale ?? "en";
+
+		new Setting(containerEl)
+			.setName(t("settings.alternateCalendar"))
+			.setDesc(t("settings.alternateCalendarDesc"))
+			.addDropdown((dropdown) => {
+				dropdown.addOption("", t("settings.alternateCalendarNone"));
+				for (const option of ALTERNATE_CALENDAR_OPTIONS) {
+					dropdown.addOption(option.id, option.text[locale].name);
+				}
+				return dropdown
+					.setValue(
+						normalizeAlternateCalendarId(
+							this.plugin.settings.alternateCalendarId,
+							this.plugin.settings.enabledAlternateCalendars,
+							this.plugin.settings.showLunarDates,
+						),
+					)
+					.onChange(async (value) => {
+						this.plugin.settings.alternateCalendarId =
+							normalizeAlternateCalendarId(value);
+						delete this.plugin.settings.enabledAlternateCalendars;
+						delete this.plugin.settings.showLunarDates;
+						await this.plugin.saveSettings();
+					});
+			});
 
 		new Setting(containerEl)
 			.setName(t("settings.mobileBottomPadding"))

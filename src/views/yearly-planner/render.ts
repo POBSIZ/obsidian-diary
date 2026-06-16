@@ -11,11 +11,18 @@ import {
 import { getDaysInMonth, getDayOfWeek } from "../../utils/date";
 import type { ChipDragState, DragState } from "./types";
 import type { HolidayData } from "../../utils/holidays";
+import {
+	formatAlternateCalendarAria,
+	getAlternateCalendarLabel,
+	type AlternateCalendarSelection,
+} from "../../utils/alternate-calendars";
 import { YearInputModal } from "./modals";
 import {
 	getFilesForDate,
 	getFileTitle,
 	getChipColor,
+	isRecurrenceOccurrenceFile,
+	isRecurrenceSourceFile,
 	isTodoCompleted,
 	isTodoFile,
 	type PlannerFileScope,
@@ -35,6 +42,8 @@ export interface HeaderCallbacks {
 	onAddFile?: () => void;
 	/** Yearly → monthly grid → list → yearly */
 	onCyclePlannerView?: () => void;
+	hasExpandedMonthCells?: boolean;
+	onToggleAllCellWidths?: () => void;
 }
 
 export function renderYearlyPlannerHeader(
@@ -103,6 +112,21 @@ export function renderYearlyPlannerHeader(
 		});
 	}
 
+	if (callbacks.onToggleAllCellWidths) {
+		const expanded = callbacks.hasExpandedMonthCells ?? false;
+		secondaryActions.push({
+			icon: expanded ? "minimize-2" : "maximize-2",
+			label: expanded
+				? t("header.collapseYearlyCells")
+				: t("header.expandYearlyCells"),
+			title: expanded
+				? t("header.collapseYearlyCellsHint")
+				: t("header.expandYearlyCellsHint"),
+			onClick: callbacks.onToggleAllCellWidths,
+			extraClass: "yearly-planner-year-btn--cell-width",
+		});
+	}
+
 	if (callbacks.onAddFile) {
 		secondaryActions.push({
 			icon: "file-plus",
@@ -116,6 +140,57 @@ export function renderYearlyPlannerHeader(
 		"yearly-planner-year-btn",
 		secondaryActions,
 	);
+}
+
+export interface MonthHeaderOptions {
+	widthRem?: number;
+	isExpanded?: boolean;
+	onToggleWidth?: (month: number) => void;
+}
+
+export function createMonthHeaderCell(
+	row: HTMLTableRowElement,
+	month: number,
+	label: string,
+	options: MonthHeaderOptions,
+): HTMLTableCellElement {
+	const th = row.createEl("th", {
+		cls: [
+			"yearly-planner-month-header",
+			options.isExpanded && "yearly-planner-month-header-expanded",
+		]
+			.filter(Boolean)
+			.join(" "),
+	});
+	th.dataset.month = String(month);
+	if (typeof options.widthRem === "number") {
+		th.style.minWidth = `${options.widthRem}rem`;
+		th.style.width = `${options.widthRem}rem`;
+	}
+
+	const content = th.createDiv({
+		cls: "yearly-planner-month-header-content",
+	});
+	content.createSpan({
+		cls: "yearly-planner-month-header-label",
+		text: label,
+	});
+
+	if (!options.onToggleWidth) return th;
+
+	const controls = content.createDiv({
+		cls: "yearly-planner-month-width-controls",
+	});
+	const expanded = options.isExpanded ?? false;
+	createMonthWidthButton(controls, {
+		icon: expanded ? "minimize-2" : "maximize-2",
+		label: expanded
+			? t("header.collapseMonthCellWidth", { month: label })
+			: t("header.expandMonthCellWidth", { month: label }),
+		onClick: () => options.onToggleWidth?.(month),
+	});
+
+	return th;
 }
 
 interface HeaderAction {
@@ -139,6 +214,25 @@ function createHeaderIconButton(
 	btn.ariaLabel = action.label;
 	if (action.title) btn.title = action.title;
 	btn.onclick = action.onClick;
+	return btn;
+}
+
+function createMonthWidthButton(
+	parent: HTMLElement,
+	action: HeaderAction,
+): HTMLButtonElement {
+	const btn = parent.createEl("button", {
+		cls: "yearly-planner-month-width-btn",
+		attr: { type: "button" },
+	});
+	setIcon(btn, action.icon);
+	btn.ariaLabel = action.label;
+	btn.title = action.label;
+	btn.onclick = (e) => {
+		e.preventDefault();
+		e.stopPropagation();
+		action.onClick();
+	};
 	return btn;
 }
 
@@ -191,6 +285,7 @@ export interface CreateCellContext {
 	chipDragState: ChipDragState | null;
 	clipboardSelection: Set<string>;
 	holidaysData: HolidayData | null;
+	alternateCalendarId: AlternateCalendarSelection;
 	locale: string;
 	rangeLaneMap: Map<string, number>;
 }
@@ -200,7 +295,7 @@ export function createPlannerCell(
 	day: number,
 	month: number,
 	ctx: CreateCellContext,
-): HTMLTableCellElement | null {
+): HTMLTableCellElement {
 	const daysInMonth = getDaysInMonth(ctx.year, month);
 	const isValid = day <= daysInMonth;
 	const isSelected = isDateInSelection(ctx.year, month, day, ctx.dragState);
@@ -240,13 +335,20 @@ export function createPlannerCell(
 			.join(" "),
 	});
 
-	if (!isValid) return null;
+	if (!isValid) return cell;
 
 	cell.dataset.year = String(ctx.year);
 	cell.dataset.month = String(month);
 	cell.dataset.day = String(day);
 	cell.tabIndex = 0;
 	cell.setAttribute("role", "button");
+	const alternateCalendarLabel = getAlternateCalendarLabel(
+		ctx.year,
+		month,
+		day,
+		ctx.alternateCalendarId,
+		ctx.locale,
+	);
 
 	const { singleFiles, rangeFiles } = getFilesForDate(
 		ctx.app,
@@ -291,6 +393,11 @@ export function createPlannerCell(
 			if (chipColor) {
 				bar.style.borderRightColor = chipColor;
 			}
+			if (isRecurrenceSourceFile(ctx.app, file)) {
+				bar.addClass("planner-recurrence-source");
+			} else if (isRecurrenceOccurrenceFile(ctx.app, file)) {
+				bar.addClass("planner-recurrence-occurrence");
+			}
 			if (ctx.clipboardSelection.has(makeFileSelectionKey(file.path))) {
 				bar.addClass("yearly-planner-cell-clipboard-selected");
 			}
@@ -305,10 +412,23 @@ export function createPlannerCell(
 	const allFiles = [...singleFiles, ...startDateRangeFiles];
 	cell.ariaLabel = t("a11y.yearlyDateCell", {
 		date: dateKey,
+		calendars: formatAlternateCalendarAria(alternateCalendarLabel),
 		notes: allFiles.length,
 		ranges: rangeFiles.length,
 		holidays: holidayNames.length,
 	});
+
+	if (alternateCalendarLabel) {
+		cell.addClass("yearly-planner-cell-has-alt-calendar");
+		const labelsEl = cell.createDiv({
+			cls: "yearly-planner-alt-calendar-labels",
+		});
+		labelsEl.setAttribute("aria-hidden", "true");
+		labelsEl.createSpan({
+			cls: "yearly-planner-alt-calendar-label",
+			text: alternateCalendarLabel.text,
+		});
+	}
 
 	if (allFiles.length > 0) {
 		const listEl = cell.createDiv({ cls: "yearly-planner-cell-files" });
@@ -342,6 +462,11 @@ export function createPlannerCell(
 				if (chipColor) {
 					linkEl.dataset.rangeColor = chipColor;
 				}
+			}
+			if (isRecurrenceSourceFile(ctx.app, file)) {
+				linkEl.addClass("planner-recurrence-source");
+			} else if (isRecurrenceOccurrenceFile(ctx.app, file)) {
+				linkEl.addClass("planner-recurrence-occurrence");
 			}
 			if (ctx.clipboardSelection.has(makeFileSelectionKey(file.path))) {
 				linkEl.addClass("yearly-planner-cell-clipboard-selected");

@@ -12,6 +12,7 @@ import {
 } from "../yearly-planner/selection";
 import { HolidayInfoModal } from "../yearly-planner/modals";
 import { moveFileToDate } from "../yearly-planner/file-operations";
+import { isRecurrenceOccurrenceFile } from "../yearly-planner/file-utils";
 import { t } from "../../i18n";
 import type {
 	ChipDragState,
@@ -369,6 +370,7 @@ export class MonthlyInteractionHandler {
 			if (path) {
 				const file = this.view.app.vault.getAbstractFileByPath(path);
 				if (file instanceof TFile) {
+					if (isRecurrenceOccurrenceFile(this.view.app, file)) return;
 					const cell = chipOrBar.closest?.(
 						"td[data-year][data-month][data-day]:not(.monthly-planner-cell-invalid)",
 					);

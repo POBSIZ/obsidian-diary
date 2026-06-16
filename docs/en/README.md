@@ -1,6 +1,6 @@
 # Diary (English)
 
-Diary is an Obsidian community plugin that turns Markdown files in your vault into date-based planner views. It helps you move between a yearly overview, a monthly grid, and a monthly list while managing single-date notes, range notes, monthly/yearly plan notes, holidays, todo state, and local reminders.
+Diary is an Obsidian community plugin that turns Markdown files in your vault into date-based planner views. It helps you move between a yearly overview, a monthly grid, and a monthly list while managing single-date notes, range notes, monthly/yearly plan notes, holidays, a configurable alternate calendar label, todo state, and local reminders.
 
 한국어 문서: [docs/ko/README.md](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/ko/README.md)
 
@@ -41,13 +41,15 @@ The images below were captured from a fresh demo vault with sample planner notes
 ## Key Features
 
 - **Yearly planner**: View date notes and range notes in a `12 months x 31 days` table.
-- **Monthly grid planner**: Inspect one month in a large calendar grid with chips, range bars, and holidays.
+- **Monthly grid planner**: Inspect one month in a large calendar grid with chips, range bars, holidays, and a configurable alternate calendar label.
 - **Monthly list planner**: Review busy months in a day-by-day vertical list with `All`, `With notes`, and `Upcoming` filters.
 - **Right sidebar planner**: Keep a compact monthly planner open in the right sidebar while notes remain open in the main workspace.
 - **Plan note panel**: Create and preview yearly notes (`YYYY.md`) and monthly notes (`YYYY-MM.md`) above the planner.
 - **Date and range notes**: Display notes as planner chips based on single-date and date-range filenames. Diary scans the whole vault by default, or only the planner folder when configured.
+- **Recurring events**: Repeat a note daily, monthly, or yearly, choose a Gregorian or alternate-calendar basis, and let Diary create only the occurrences that fall inside the planner range you are viewing.
 - **Color, todo, and completion state**: Reflect `color`, `todo`, and `completed` frontmatter in chip styling and labels.
 - **Holiday overlays**: Show country-specific public holidays and select holiday badges to see their names.
+- **Alternate calendar label**: Optionally show one compact alternate calendar label at a time, including Korean lunar, Chinese lunar, Dangi, Hebrew, Islamic, Persian, Indian national, Buddhist, Japanese era, Minguo, Coptic, and Ethiopic calendars.
 - **Local reminders**: Notes with `notify_minutes` show an Obsidian Notice on the event date while Obsidian is open.
 - **Planner clipboard**: On desktop, copy, paste, delete, and undo pasted planner notes from selected dates or chips.
 - **Keyboard and accessibility support**: Date cells, chips, range bars, holiday badges, planner labels, and monthly list rows expose keyboard activation and accessible labels.
@@ -126,6 +128,7 @@ Select a date cell or the add-file button, then use **Single date**.
 - Set a color to display a chip border or mobile dot.
 - Enable **Todo file** to show todo state on the chip.
 - Set **Reminder time** to save `notify_minutes` frontmatter.
+- Enable **Repeat**, then choose **Daily**, **Monthly**, or **Yearly** and a calendar basis. Occurrences are created lazily for the currently visible year or month; Diary updates files from the same `recurrence_id` series and skips unrelated existing notes.
 
 ### Range Notes
 
@@ -207,6 +210,7 @@ Paste rules:
 | Date format | Stored date format setting. Planner filenames currently use the `YYYY-MM-DD` rule. |
 | Show holidays | Turns holiday rendering on or off. |
 | Holiday country | Holiday country. Supports `KR`, `US`, `JP`, `CN`, `GB`, `DE`, `FR`, `AU`, `CA`, `TW`, and `None`. |
+| Alternate calendar | Selects one supported alternate calendar label for yearly, monthly grid, monthly list, and sidebar planner views. Default: `None`. |
 | Mobile bottom padding | Bottom padding for mobile planners so content is not covered by Obsidian mobile controls. |
 | Mobile cell width | Month cell width for the mobile yearly planner. `0` uses the default. |
 
@@ -221,8 +225,19 @@ Paste rules:
 | `date_start` | Start date automatically saved for range notes. |
 | `date_end` | End date automatically saved for range notes. |
 | `title` | Display title fallback when the title cannot be derived from the filename. |
+| `recurrence_id` | Stable series ID shared by a repeat source and generated occurrences. |
+| `recurrence_role` | `source` for the repeat definition, `occurrence` for generated notes. |
+| `recurrence_calendar` | Calendar basis: `gregorian` or one of the supported alternate calendar IDs. |
+| `recurrence_rule` | Simple frequency rule: `FREQ=DAILY`, `FREQ=MONTHLY`, or `FREQ=YEARLY`. |
+| `recurrence_anchor_date` | Gregorian source date used as the start of the series. |
+| `recurrence_anchor_year/month/day` | Calendar-basis anchor fields used for alternate-calendar matching. |
+| `recurrence_exdates` | Gregorian occurrence dates skipped from the series. |
+| `recurrence_source_path` | Source note path stored on generated occurrences. |
+| `recurrence_occurrence_date` | Gregorian date represented by a generated occurrence note. |
 
 Reminders are not scheduled OS notifications. While Obsidian is open, Diary checks about every 15 seconds and shows an Obsidian Notice during the matching minute on the event date.
+
+Recurring occurrence generation is idempotent. If the target file already belongs to the same `recurrence_id`, Diary refreshes its series metadata; if the path is an ordinary note or another series, Diary leaves it untouched.
 
 ## Filename Rules
 
@@ -292,7 +307,7 @@ npm test
 
 - Planner features operate on local Markdown files inside the vault.
 - Diary has no hidden telemetry or analytics.
-- Holiday calculation uses the bundled dependency and does not send vault content to external services for planner rendering.
+- Holiday and alternate calendar calculation use bundled or browser-provided data and do not send vault content to external services for planner rendering.
 - `obsidian-reminder-endpoint-spec.md` is a future external endpoint design note. The released plugin currently does not send reminder data over the network.
 
 ## Troubleshooting

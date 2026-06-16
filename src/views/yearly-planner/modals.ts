@@ -8,6 +8,20 @@ import {
 	WorkspaceLeaf,
 } from "obsidian";
 import { getLocale, t } from "../../i18n";
+import { ALTERNATE_CALENDAR_OPTIONS } from "../../utils/alternate-calendars";
+import {
+	RECURRENCE_GREGORIAN,
+	buildRecurrenceRuleFromForm,
+	getSimpleRecurrenceFrequency,
+	getRecurrenceOccurrenceInfo,
+	getRecurrenceRole,
+	getRecurrenceSourceDefinition,
+	normalizeRecurrenceCalendar,
+	addRecurrenceExdate,
+	applyRecurrenceSourceFrontmatter,
+	detachRecurrenceOccurrence as detachRecurrenceOccurrenceFile,
+	type RecurrenceFormValue,
+} from "../../utils/recurrence";
 import {
 	getAllFolderPaths,
 	getChipColor,
@@ -162,6 +176,7 @@ export type CreateSingleDateFileWithFolderFn = (
 	color?: string,
 	todo?: boolean,
 	notifyMinutes?: number | null,
+	recurrence?: RecurrenceFormValue | null,
 ) => Promise<TFile>;
 
 export type CreateRangeFileWithFolderFn = (
@@ -170,6 +185,7 @@ export type CreateRangeFileWithFolderFn = (
 	color?: string,
 	todo?: boolean,
 	notifyMinutes?: number | null,
+	recurrence?: RecurrenceFormValue | null,
 ) => Promise<TFile>;
 
 function formatHolidayDate(dateStr: string): string {
@@ -312,6 +328,10 @@ export class CreateFileModal extends Modal {
 	private colorPresets: { hex: string }[] = [];
 	private todoCheckbox!: HTMLInputElement;
 	private notifyTimeInput!: HTMLInputElement;
+	private repeatCheckbox!: HTMLInputElement;
+	private repeatRows: HTMLElement[] = [];
+	private recurrenceCalendarSelect!: HTMLSelectElement;
+	private recurrenceFrequencySelect!: HTMLSelectElement;
 	private rangeRow!: HTMLElement;
 	private singleModeBtn!: HTMLButtonElement;
 	private rangeModeBtn!: HTMLButtonElement;
@@ -560,6 +580,8 @@ export class CreateFileModal extends Modal {
 			text: t("modal.notifyTimeDesc"),
 		});
 
+		this.createRecurrenceControls(form);
+
 		this.syncFilename();
 		this.updateModeUI();
 		this.createErrorEl = this.contentEl.createDiv({
@@ -618,6 +640,99 @@ export class CreateFileModal extends Modal {
 			return t("modal.invalidRangeFileName");
 		}
 		return null;
+	}
+
+	private createRecurrenceControls(form: HTMLElement): void {
+		const repeatRow = form.createDiv({
+			cls: "yearly-planner-create-file-row yearly-planner-repeat-row",
+		});
+		this.repeatCheckbox = repeatRow.createEl("input", {
+			type: "checkbox",
+			cls: "yearly-planner-repeat-checkbox",
+		});
+		const repeatLabel = repeatRow.createEl("label");
+		repeatLabel.appendChild(this.repeatCheckbox);
+		repeatLabel.appendText(` ${t("modal.repeatEvent")}`);
+		this.repeatCheckbox.onchange = () => this.updateRecurrenceVisibility();
+
+		this.recurrenceCalendarSelect = this.createRecurrenceSelectRow(
+			form,
+			t("modal.repeatCalendar"),
+			(select) => {
+				select.createEl("option", {
+					value: RECURRENCE_GREGORIAN,
+					text: t("modal.repeatCalendarGregorian"),
+				});
+				const locale = getLocale();
+				for (const option of ALTERNATE_CALENDAR_OPTIONS) {
+					select.createEl("option", {
+						value: option.id,
+						text: option.text[locale].name,
+					});
+				}
+				select.value = RECURRENCE_GREGORIAN;
+			},
+		);
+		this.recurrenceFrequencySelect = this.createRecurrenceSelectRow(
+			form,
+			t("modal.repeatFrequency"),
+			(select) => {
+				for (const value of ["DAILY", "MONTHLY", "YEARLY"]) {
+					select.createEl("option", {
+						value,
+						text: t(`modal.repeatFreq${value}`),
+					});
+				}
+				select.value = "YEARLY";
+			},
+		);
+
+		const hintRow = form.createDiv({
+			cls: "yearly-planner-create-file-row yearly-planner-repeat-control-row",
+		});
+		hintRow.createDiv({
+			cls: "yearly-planner-create-file-hint",
+			text: t("modal.repeatDesc"),
+		});
+		this.repeatRows.push(hintRow);
+		this.updateRecurrenceVisibility();
+	}
+
+	private createRecurrenceSelectRow(
+		form: HTMLElement,
+		label: string,
+		configure: (select: HTMLSelectElement) => void,
+	): HTMLSelectElement {
+		const row = form.createDiv({
+			cls: "yearly-planner-create-file-row yearly-planner-repeat-control-row",
+		});
+		row.createEl("label", { text: label });
+		const select = row.createEl("select", {
+			cls: "yearly-planner-repeat-select",
+		});
+		configure(select);
+		this.repeatRows.push(row);
+		return select;
+	}
+
+	private updateRecurrenceVisibility(): void {
+		const enabled = this.repeatCheckbox?.checked ?? false;
+		for (const row of this.repeatRows) {
+			row.toggleClass("is-hidden", !enabled);
+		}
+	}
+
+	private getRecurrenceValue(): RecurrenceFormValue | null {
+		if (!this.repeatCheckbox.checked) return null;
+		return {
+			enabled: true,
+			calendar: normalizeRecurrenceCalendar(
+				this.recurrenceCalendarSelect.value,
+			),
+			rule: buildRecurrenceRuleFromForm({
+				frequency: this.recurrenceFrequencySelect.value,
+			}),
+		};
 	}
 
 	private setColorFromPreset(hex: string): void {
@@ -718,6 +833,7 @@ export class CreateFileModal extends Modal {
 					color,
 					todo,
 					notifyMinutes,
+					this.getRecurrenceValue(),
 				);
 				this.options.onCreated();
 				this.close();
@@ -743,6 +859,7 @@ export class CreateFileModal extends Modal {
 					color,
 					todo,
 					notifyMinutes,
+					this.getRecurrenceValue(),
 				);
 				this.options.onCreated();
 				this.close();
@@ -849,6 +966,7 @@ export class DeleteConfirmModal extends Modal {
 
 export class FileOptionsModal extends Modal {
 	private titleInput!: HTMLInputElement;
+	private initialTitle = "";
 	private colorInput!: HTMLInputElement;
 	private colorPickerInput!: HTMLInputElement;
 	private colorPresetBtns: HTMLButtonElement[] = [];
@@ -857,6 +975,9 @@ export class FileOptionsModal extends Modal {
 	private notifyTimeInput!: HTMLInputElement;
 	private completedCheckbox!: HTMLInputElement;
 	private completedRow!: HTMLElement;
+	private sourceRepeatCheckbox?: HTMLInputElement;
+	private sourceRecurrenceCalendarSelect?: HTMLSelectElement;
+	private sourceRecurrenceFrequencySelect?: HTMLSelectElement;
 	private previewComponent: Component | null = null;
 	private startDateInput?: HTMLInputElement;
 	private endDateInput?: HTMLInputElement;
@@ -902,7 +1023,8 @@ export class FileOptionsModal extends Modal {
 			type: "text",
 			cls: "yearly-planner-filename-input",
 		});
-		this.titleInput.value = getFileTitle(this.app, this.file);
+		this.initialTitle = getFileTitle(this.app, this.file);
+		this.titleInput.value = this.initialTitle;
 		this.titleInput.placeholder = t("modal.displayTitle");
 		this.titleInput.addEventListener("input", () =>
 			this.updateFileOptionsState(),
@@ -1043,6 +1165,8 @@ export class FileOptionsModal extends Modal {
 			text: t("modal.notifyTimeDesc"),
 		});
 
+		this.createFileOptionsRecurrenceSection(form);
+
 		const previewWrap = this.contentEl.createDiv({
 			cls: "yearly-planner-file-preview-wrap",
 		});
@@ -1131,6 +1255,152 @@ export class FileOptionsModal extends Modal {
 
 	private updateCompletedRowVisibility(): void {
 		this.completedRow.toggleClass("is-hidden", !this.todoCheckbox.checked);
+	}
+
+	private createFileOptionsRecurrenceSection(form: HTMLElement): void {
+		const role = getRecurrenceRole(this.app, this.file);
+		if (role === "occurrence") {
+			this.createOccurrenceActionSection(form);
+			return;
+		}
+		const source = getRecurrenceSourceDefinition(this.app, this.file);
+		const section = form.createDiv({
+			cls: "yearly-planner-create-file-row yearly-planner-repeat-row yearly-planner-file-options-repeat-row",
+		});
+		this.sourceRepeatCheckbox = section.createEl("input", {
+			type: "checkbox",
+			cls: "yearly-planner-repeat-checkbox",
+		});
+		this.sourceRepeatCheckbox.checked = Boolean(source);
+		const label = section.createEl("label");
+		label.appendChild(this.sourceRepeatCheckbox);
+		label.appendText(` ${t("modal.repeatEvent")}`);
+
+		const calendarRow = form.createDiv({
+			cls: "yearly-planner-create-file-row yearly-planner-repeat-control-row",
+		});
+		calendarRow.createEl("label", { text: t("modal.repeatCalendar") });
+		this.sourceRecurrenceCalendarSelect = calendarRow.createEl("select", {
+			cls: "yearly-planner-repeat-select",
+		});
+		this.sourceRecurrenceCalendarSelect.createEl("option", {
+			value: RECURRENCE_GREGORIAN,
+			text: t("modal.repeatCalendarGregorian"),
+		});
+		const locale = getLocale();
+		for (const option of ALTERNATE_CALENDAR_OPTIONS) {
+			this.sourceRecurrenceCalendarSelect.createEl("option", {
+				value: option.id,
+				text: option.text[locale].name,
+			});
+		}
+		this.sourceRecurrenceCalendarSelect.value =
+			source?.calendar ?? RECURRENCE_GREGORIAN;
+
+		const frequencyRow = form.createDiv({
+			cls: "yearly-planner-create-file-row yearly-planner-repeat-control-row",
+		});
+		frequencyRow.createEl("label", { text: t("modal.repeatFrequency") });
+		this.sourceRecurrenceFrequencySelect = frequencyRow.createEl("select", {
+			cls: "yearly-planner-repeat-select",
+		});
+		for (const value of ["DAILY", "MONTHLY", "YEARLY"]) {
+			this.sourceRecurrenceFrequencySelect.createEl("option", {
+				value,
+				text: t(`modal.repeatFreq${value}`),
+			});
+		}
+		this.sourceRecurrenceFrequencySelect.value = source
+			? getSimpleRecurrenceFrequency(source.rule)
+			: "YEARLY";
+
+		const toggleRows = () => {
+			const enabled = this.sourceRepeatCheckbox?.checked ?? false;
+			calendarRow.toggleClass("is-hidden", !enabled);
+			frequencyRow.toggleClass("is-hidden", !enabled);
+		};
+		this.sourceRepeatCheckbox.onchange = toggleRows;
+		toggleRows();
+	}
+
+	private createOccurrenceActionSection(form: HTMLElement): void {
+		const info = getRecurrenceOccurrenceInfo(this.app, this.file);
+		const section = form.createDiv({
+			cls: "yearly-planner-create-file-row yearly-planner-file-options-repeat-actions",
+		});
+		section.createEl("label", { text: t("modal.repeatSeries") });
+		const actions = section.createDiv({
+			cls: "yearly-planner-file-options-repeat-action-buttons",
+		});
+		const openSourceBtn = actions.createEl("button", {
+			text: t("modal.openRepeatSource"),
+			attr: { type: "button" },
+		});
+		openSourceBtn.disabled = !info?.sourcePath;
+		openSourceBtn.onclick = () => void this.openRecurrenceSource();
+
+		const skipBtn = actions.createEl("button", {
+			text: t("modal.skipRepeatOccurrence"),
+			attr: { type: "button" },
+		});
+		skipBtn.disabled = !info?.sourcePath || !info?.occurrenceDate;
+		skipBtn.onclick = () => void this.skipRecurrenceOccurrence();
+
+		const detachBtn = actions.createEl("button", {
+			text: t("modal.detachRepeatOccurrence"),
+			attr: { type: "button" },
+		});
+		detachBtn.onclick = () => void this.detachRecurrenceOccurrence();
+	}
+
+	private getRecurrenceFormValue(): RecurrenceFormValue | null {
+		if (!this.sourceRepeatCheckbox?.checked) return null;
+		return {
+			enabled: true,
+			calendar: normalizeRecurrenceCalendar(
+				this.sourceRecurrenceCalendarSelect?.value,
+			),
+			rule: buildRecurrenceRuleFromForm({
+				frequency: this.sourceRecurrenceFrequencySelect?.value ?? "YEARLY",
+			}),
+		};
+	}
+
+	private getRecurrenceAnchorDate(file: TFile): string | null {
+		if (this.singleDateInput?.value) return this.singleDateInput.value;
+		if (this.startDateInput?.value) return this.startDateInput.value;
+		return (
+			getRecurrenceSourceDefinition(this.app, file)?.anchorDate ??
+			getSingleDateFromFilename(file.basename)
+		);
+	}
+
+	private async openRecurrenceSource(): Promise<void> {
+		const info = getRecurrenceOccurrenceInfo(this.app, this.file);
+		if (!info?.sourcePath) return;
+		const source = this.app.vault.getAbstractFileByPath(info.sourcePath);
+		if (source instanceof TFile) {
+			if (this.openFile) await this.openFile(source);
+			else await this.leaf.openFile(source);
+		}
+		this.close();
+	}
+
+	private async skipRecurrenceOccurrence(): Promise<void> {
+		const info = getRecurrenceOccurrenceInfo(this.app, this.file);
+		if (!info?.sourcePath || !info.occurrenceDate) return;
+		const source = this.app.vault.getAbstractFileByPath(info.sourcePath);
+		if (!(source instanceof TFile)) return;
+		await addRecurrenceExdate(this.app, source, info.occurrenceDate);
+		await this.app.fileManager.trashFile(this.file);
+		this.close();
+		this.onClosed();
+	}
+
+	private async detachRecurrenceOccurrence(): Promise<void> {
+		await detachRecurrenceOccurrenceFile(this.app, this.file);
+		this.close();
+		this.onClosed();
 	}
 
 	private updateFileOptionsState(): void {
@@ -1228,11 +1498,13 @@ export class FileOptionsModal extends Modal {
 		const todo = this.todoCheckbox.checked;
 		const completed = this.completedCheckbox.checked;
 		try {
-			fileToUpdate = await updateFileTitle(
-				this.app,
-				fileToUpdate,
-				this.titleInput.value,
-			);
+			if (this.titleInput.value !== this.initialTitle) {
+				fileToUpdate = await updateFileTitle(
+					this.app,
+					fileToUpdate,
+					this.titleInput.value,
+				);
+			}
 			await updateFileColor(this.app, fileToUpdate, color);
 			await updateFileTodoStatus(this.app, fileToUpdate, todo, completed);
 			await updateFileNotifyMinutes(
@@ -1240,6 +1512,26 @@ export class FileOptionsModal extends Modal {
 				fileToUpdate,
 				parseTimeValueToNotifyMinutes(this.notifyTimeInput.value),
 			);
+			if (this.sourceRepeatCheckbox) {
+				const existingSource = getRecurrenceSourceDefinition(
+					this.app,
+					fileToUpdate,
+				);
+				const anchorDate = this.getRecurrenceAnchorDate(fileToUpdate);
+				if (anchorDate) {
+					await this.app.fileManager.processFrontMatter(
+						fileToUpdate,
+						(frontmatter: Record<string, unknown>) => {
+							applyRecurrenceSourceFrontmatter(
+								frontmatter,
+								this.getRecurrenceFormValue(),
+								anchorDate,
+								existingSource?.id,
+							);
+						},
+					);
+				}
+			}
 			this.onClosed();
 			this.close();
 		} catch (err) {

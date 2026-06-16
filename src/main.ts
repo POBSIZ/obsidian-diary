@@ -5,6 +5,7 @@ import {
 	DiaryObsidianSettings,
 	DiaryObsidianSettingTab,
 } from "./settings";
+import { normalizeAlternateCalendarId } from "./utils/alternate-calendars";
 import {
 	VIEW_TYPE_YEARLY_PLANNER,
 	VIEW_TYPE_YEARLY_SIDEBAR_PLANNER,
@@ -26,6 +27,18 @@ const SIDEBAR_PLANNER_VIEW_TYPES = [
 	VIEW_TYPE_MONTHLY_SIDEBAR_PLANNER,
 	VIEW_TYPE_MONTHLY_LIST_SIDEBAR_PLANNER,
 ] as const;
+
+function normalizeYearlyPlannerExpandedMonths(months: unknown): number[] {
+	if (!Array.isArray(months)) return [];
+	const normalized = new Set<number>();
+	for (const value of months) {
+		const month = Number(value);
+		if (Number.isInteger(month) && month >= 1 && month <= 12) {
+			normalized.add(month);
+		}
+	}
+	return Array.from(normalized).sort((a, b) => a - b);
+}
 
 export default class DiaryObsidian extends Plugin {
 	settings: DiaryObsidianSettings;
@@ -319,10 +332,28 @@ export default class DiaryObsidian extends Plugin {
 			DEFAULT_SETTINGS,
 			(await this.loadData()) as Partial<DiaryObsidianSettings>,
 		);
+		const legacyEnabledAlternateCalendars =
+			this.settings.enabledAlternateCalendars;
+		const legacyShowLunarDates = this.settings.showLunarDates;
+		this.settings.alternateCalendarId = normalizeAlternateCalendarId(
+			this.settings.alternateCalendarId,
+			legacyEnabledAlternateCalendars,
+			legacyShowLunarDates,
+		);
+		this.settings.yearlyPlannerExpandedMonths =
+			normalizeYearlyPlannerExpandedMonths(
+				this.settings.yearlyPlannerExpandedMonths,
+			);
+		delete this.settings.enabledAlternateCalendars;
+		delete this.settings.showLunarDates;
 	}
 
 	async saveSettings() {
 		setLocale(this.settings.locale ?? "en");
+		this.settings.yearlyPlannerExpandedMonths =
+			normalizeYearlyPlannerExpandedMonths(
+				this.settings.yearlyPlannerExpandedMonths,
+			);
 		await this.saveData(this.settings);
 		this.refreshYearlyPlannerViews();
 		this.refreshMonthlyPlannerViews();
@@ -345,6 +376,18 @@ export default class DiaryObsidian extends Plugin {
 			return this.settings.mobilePlanNotePanelExpanded ?? false;
 		}
 		return this.settings.planNotePanelExpanded ?? true;
+	}
+
+	getYearlyPlannerExpandedMonths(): number[] {
+		return normalizeYearlyPlannerExpandedMonths(
+			this.settings.yearlyPlannerExpandedMonths,
+		);
+	}
+
+	async setYearlyPlannerExpandedMonths(months: Iterable<number>): Promise<void> {
+		this.settings.yearlyPlannerExpandedMonths =
+			normalizeYearlyPlannerExpandedMonths(Array.from(months));
+		await this.saveSettings();
 	}
 
 	refreshYearlyPlannerViews(): void {

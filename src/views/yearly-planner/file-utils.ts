@@ -1,6 +1,7 @@
 import { App, TFile, TFolder } from "obsidian";
 import { getDaysInMonth } from "../../utils/date";
 import { parseRangeBasename, isDateInRange } from "../../utils/range";
+import { getRecurrenceRole } from "../../utils/recurrence";
 import type { RangeRunPosition } from "./types";
 
 const pad = (n: number) => String(n).padStart(2, "0");
@@ -305,6 +306,14 @@ export function isTodoCompleted(app: App, file: TFile): boolean {
 	if (typeof raw === "string" && raw.trim().toLowerCase() === "true")
 		return true;
 	return false;
+}
+
+export function isRecurrenceSourceFile(app: App, file: TFile): boolean {
+	return getRecurrenceRole(app, file) === "source";
+}
+
+export function isRecurrenceOccurrenceFile(app: App, file: TFile): boolean {
+	return getRecurrenceRole(app, file) === "occurrence";
 }
 
 /**

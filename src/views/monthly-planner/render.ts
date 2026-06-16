@@ -14,9 +14,16 @@ import { getDayOfWeek } from "../../utils/date";
 import type { ChipDragState, DragState } from "../yearly-planner/types";
 import type { HolidayData } from "../../utils/holidays";
 import {
+	formatAlternateCalendarAria,
+	getAlternateCalendarLabel,
+	type AlternateCalendarSelection,
+} from "../../utils/alternate-calendars";
+import {
 	getFilesForDate,
 	getFileTitle,
 	getChipColor,
+	isRecurrenceOccurrenceFile,
+	isRecurrenceSourceFile,
 	isTodoCompleted,
 	isTodoFile,
 	type PlannerFileScope,
@@ -211,6 +218,7 @@ export interface CreateMonthlyCellContext {
 	chipDragState: ChipDragState | null;
 	clipboardSelection: Set<string>;
 	holidaysData: HolidayData | null;
+	alternateCalendarId: AlternateCalendarSelection;
 	locale: string;
 	rangeLaneMap: Map<string, number>;
 	selectedDate: MonthlyPlannerSelectedDate | null;
@@ -277,6 +285,23 @@ export function createMonthlyCell(
 	const inner = cell.createDiv({ cls: "monthly-planner-cell-inner" });
 	const dayNumEl = inner.createDiv({ cls: "monthly-planner-cell-day" });
 	dayNumEl.textContent = String(day);
+	const alternateCalendarLabel = getAlternateCalendarLabel(
+		year,
+		month,
+		day,
+		ctx.alternateCalendarId,
+		ctx.locale,
+	);
+	if (alternateCalendarLabel) {
+		const labelsEl = inner.createDiv({
+			cls: "monthly-planner-alt-calendar-labels",
+		});
+		labelsEl.setAttribute("aria-hidden", "true");
+		labelsEl.createSpan({
+			cls: "monthly-planner-alt-calendar-label",
+			text: alternateCalendarLabel.text,
+		});
+	}
 
 	const { singleFiles, rangeFiles } = getFilesForDate(
 		ctx.app,
@@ -294,6 +319,7 @@ export function createMonthlyCell(
 			: [];
 	cell.ariaLabel = t("a11y.monthlyDateCell", {
 		date: dateKey,
+		calendars: formatAlternateCalendarAria(alternateCalendarLabel),
 		notes: singleFiles.length,
 		ranges: rangeFiles.length,
 		holidays: holidayNames.length,
@@ -347,6 +373,11 @@ export function createMonthlyCell(
 			const chipColor = getChipColor(ctx.app, file);
 			if (chipColor) {
 				barEl.style.setProperty("--range-color", chipColor);
+			}
+			if (isRecurrenceSourceFile(ctx.app, file)) {
+				barEl.addClass("planner-recurrence-source");
+			} else if (isRecurrenceOccurrenceFile(ctx.app, file)) {
+				barEl.addClass("planner-recurrence-occurrence");
 			}
 			if (ctx.clipboardSelection.has(makeFileSelectionKey(file.path))) {
 				barEl.addClass("monthly-planner-cell-clipboard-selected");
@@ -414,6 +445,11 @@ export function createMonthlyCell(
 			const chipColor = getChipColor(ctx.app, file);
 			if (chipColor) {
 				linkEl.style.borderLeftColor = chipColor;
+			}
+			if (isRecurrenceSourceFile(ctx.app, file)) {
+				linkEl.addClass("planner-recurrence-source");
+			} else if (isRecurrenceOccurrenceFile(ctx.app, file)) {
+				linkEl.addClass("planner-recurrence-occurrence");
 			}
 			if (ctx.clipboardSelection.has(makeFileSelectionKey(file.path))) {
 				linkEl.addClass("monthly-planner-cell-clipboard-selected");
