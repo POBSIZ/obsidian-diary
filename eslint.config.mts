@@ -18,6 +18,7 @@ export default tseslint.config(
 				projectService: {
 					allowDefaultProject: ["eslint.config.mts", "manifest.json"],
 				},
+				project: ["./tsconfig.json"],
 				tsconfigRootDir: fileURLToPath(new URL(".", import.meta.url)),
 				extraFileExtensions: [".json"],
 			},
