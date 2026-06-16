@@ -9,7 +9,7 @@ English documentation: [docs/en/README.md](https://github.com/POBSIZ/obsidian-di
 | 항목 | 값 |
 | --- | --- |
 | 플러그인 ID | `diary` |
-| 현재 버전 | `1.3.2` |
+| 현재 버전 | `1.3.3` |
 | 최소 Obsidian 버전 | `1.7.2` |
 | 지원 플랫폼 | 데스크톱 / 모바일 (`isDesktopOnly: false`) |
 | 기본 언어 | `en` |
@@ -17,7 +17,8 @@ English documentation: [docs/en/README.md](https://github.com/POBSIZ/obsidian-di
 
 ## 최신 버전
 
-- `1.3.2`: 현재 유지보수 릴리스입니다. 문서, 에이전트 가이드, ESLint config 타입, TypeScript lib target 정리를 포함합니다.
+- `1.3.3`: 현재 유지보수 릴리스입니다. 커뮤니티 플러그인 source validation을 위해 타입 기반 ESLint 안전성 검사를 더 엄격하게 적용합니다.
+- `1.3.2`: 유지보수 릴리스입니다. 문서, 에이전트 가이드, ESLint config 타입, TypeScript lib target 정리를 포함합니다.
 - `1.3.1`: 고정된 Obsidian 타입 패키지, 의존성 lockfile 정리, ESLint 호환성 업데이트, 반복 칩 스타일 정리를 포함합니다.
 - `1.3.0`: 연간/월간 그리드/월간 목록/사이드바 플래너 전반에 반복 이벤트와 보조 역법 라벨을 추가했습니다.
 - `1.2.1`: 유지보수 릴리스입니다. Obsidian 커뮤니티 플러그인 lint 호환성과 번들된 공휴일 의존성 정리를 포함하며, 사용자 워크플로는 `1.2.0`과 같습니다.
