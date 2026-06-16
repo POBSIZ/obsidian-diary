@@ -11,7 +11,7 @@ Diary는 Obsidian vault 안의 Markdown 파일을 날짜 기반 플래너로 보
 | Item | Value |
 | --- | --- |
 | Plugin ID | `diary` |
-| Version | `1.3.3` |
+| Version | `1.3.4` |
 | Minimum Obsidian version | `1.7.2` |
 | Platforms | Desktop and mobile (`isDesktopOnly: false`) |
 | Default language | `en` |
@@ -19,7 +19,8 @@ Diary는 Obsidian vault 안의 Markdown 파일을 날짜 기반 플래너로 보
 
 ## Latest Version
 
-- `1.3.3`: current maintenance release with stricter type-aware ESLint safety checks enabled for community-plugin source validation.
+- `1.3.4`: current maintenance release with explicit TypeScript project wiring for typed ESLint checks and pinned lint tooling for reproducible source validation.
+- `1.3.3`: maintenance release with stricter type-aware ESLint safety checks enabled for community-plugin source validation.
 - `1.3.2`: maintenance release with documentation, agent guidance, ESLint config typing, and TypeScript lib target cleanup.
 - `1.3.1`: release with pinned Obsidian typings, dependency lockfile maintenance, ESLint compatibility updates, and recurrence chip styling cleanup.
 - `1.3.0`: added recurring events and alternate calendar labels across yearly, monthly grid, monthly list, and sidebar planner views.

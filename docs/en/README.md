@@ -9,7 +9,7 @@ Diary is an Obsidian community plugin that turns Markdown files in your vault in
 | Item | Value |
 | --- | --- |
 | Plugin ID | `diary` |
-| Current version | `1.3.3` |
+| Current version | `1.3.4` |
 | Minimum Obsidian version | `1.7.2` |
 | Supported platforms | Desktop / mobile (`isDesktopOnly: false`) |
 | Default language | `en` |
@@ -17,7 +17,8 @@ Diary is an Obsidian community plugin that turns Markdown files in your vault in
 
 ## Latest Version
 
-- `1.3.3`: Current maintenance release with stricter type-aware ESLint safety checks enabled for community-plugin source validation.
+- `1.3.4`: Current maintenance release with explicit TypeScript project wiring for typed ESLint checks and pinned lint tooling for reproducible source validation.
+- `1.3.3`: Maintenance release with stricter type-aware ESLint safety checks enabled for community-plugin source validation.
 - `1.3.2`: Maintenance release with documentation, agent guidance, ESLint config typing, and TypeScript lib target cleanup.
 - `1.3.1`: Release with pinned Obsidian typings, dependency lockfile maintenance, ESLint compatibility updates, and recurrence chip styling cleanup.
 - `1.3.0`: Added recurring events and alternate calendar labels across yearly, monthly grid, monthly list, and sidebar planner views.
