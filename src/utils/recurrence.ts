@@ -174,9 +174,7 @@ export function normalizeSimpleRecurrenceFrequency(
 }
 
 export function getRecurrenceRole(app: App, file: TFile): RecurrenceRole | null {
-	const fm = app.metadataCache.getFileCache(file)?.frontmatter as
-		| Record<string, unknown>
-		| undefined;
+	const fm = app.metadataCache.getFileCache(file)?.frontmatter;
 	const role = fm?.recurrence_role;
 	return role === "source" || role === "occurrence" ? role : null;
 }
@@ -478,9 +476,7 @@ function findExistingSeriesOccurrence(
 	occurrenceDate: string,
 ): TFile | null {
 	for (const file of plannerFiles) {
-		const fm = app.metadataCache.getFileCache(file)?.frontmatter as
-			| Record<string, unknown>
-			| undefined;
+		const fm = app.metadataCache.getFileCache(file)?.frontmatter;
 		if (
 			fm?.recurrence_role === "occurrence" &&
 			fm.recurrence_id === recurrenceId &&
