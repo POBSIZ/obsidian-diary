@@ -29,6 +29,7 @@ export interface YearlyPlannerViewDelegate {
 	updateChipDragDropTarget(): void;
 	openCreateFileModal(bounds: SelectionBounds | null): void;
 	openFileOptionsModal(file: TFile): void;
+	openExternalEventModal(eventId: string): void;
 	isRangeBarInteractionEnabled(): boolean;
 }
 
@@ -229,7 +230,7 @@ export class PlannerInteractionHandler {
 		const target = e.target;
 		if (!(target instanceof HTMLElement)) return;
 		const directTarget = target.closest(
-			".yearly-planner-cell-file, .yearly-planner-cell-range-bar, .yearly-planner-cell-holiday-badge",
+			".yearly-planner-cell-file, .yearly-planner-cell-range-bar, .yearly-planner-cell-holiday-badge, .planner-external-event-chip, .planner-external-event-range",
 		);
 		if (directTarget instanceof HTMLElement) {
 			const rect = directTarget.getBoundingClientRect();
@@ -275,6 +276,20 @@ export class PlannerInteractionHandler {
 		const rangeBar = (el as HTMLElement).closest?.(
 			".yearly-planner-cell-range-bar[data-path]",
 		);
+		const externalEventEl = (el as HTMLElement).closest?.(
+			"[data-external-event-id]",
+		);
+		if (externalEventEl) {
+			const eventId = (externalEventEl as HTMLElement).dataset
+				.externalEventId;
+			if (eventId) {
+				e.preventDefault();
+				e.stopPropagation();
+				e.stopImmediatePropagation?.();
+				this.view.openExternalEventModal(eventId);
+			}
+			return;
+		}
 		const canInteractWithRangeBar =
 			this.view.isRangeBarInteractionEnabled();
 		if (rangeBar && !canInteractWithRangeBar) {
@@ -464,6 +479,10 @@ export class PlannerInteractionHandler {
 			".yearly-planner-cell-holiday-badge",
 		);
 		if (onHoliday) return;
+		const onExternalEvent = (el as HTMLElement).closest?.(
+			"[data-external-event-id]",
+		);
+		if (onExternalEvent) return;
 
 		if (chipOrBar && Platform.isDesktop) {
 			const path = chipOrBar.dataset.path;

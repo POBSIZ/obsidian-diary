@@ -11,10 +11,12 @@ import {
 	normalizeCustomCalendarProfiles,
 } from "./utils/custom-calendars";
 import {
+	DEFAULT_EXTERNAL_CALENDAR_REFRESH_MINUTES,
 	fetchExternalCalendarCache,
 	getExternalCalendarCache,
 	normalizeExternalCalendarCaches,
 	normalizeExternalCalendarSettings,
+	type ExternalCalendarSettings,
 } from "./utils/external-calendars";
 import {
 	VIEW_TYPE_YEARLY_PLANNER,
@@ -53,6 +55,8 @@ function normalizeYearlyPlannerExpandedMonths(months: unknown): number[] {
 export default class DiaryObsidian extends Plugin {
 	settings: DiaryObsidianSettings;
 	settingTab?: DiaryObsidianSettingTab;
+	private readonly externalCalendarRefreshInFlight = new Set<string>();
+	private didRefreshExternalCalendarsOnStartup = false;
 
 	async onload() {
 		await this.loadSettings();
@@ -131,6 +135,7 @@ export default class DiaryObsidian extends Plugin {
 				active: false,
 				reveal: false,
 			});
+			void this.refreshExternalCalendarsOnStartup();
 		});
 
 		this.settingTab = new DiaryObsidianSettingTab(this.app, this);
@@ -167,6 +172,11 @@ export default class DiaryObsidian extends Plugin {
 					this.refreshMonthlyPlannerViews();
 					this.refreshMonthlyListPlannerViews();
 				}
+			}, 60_000),
+		);
+		this.registerInterval(
+			window.setInterval(() => {
+				void this.refreshDueExternalCalendars();
 			}, 60_000),
 		);
 	}
@@ -363,19 +373,37 @@ export default class DiaryObsidian extends Plugin {
 		) {
 			this.settings.selectedCustomCalendarId = "";
 		}
-			if (this.settings.selectedCustomCalendarId) {
-				this.settings.alternateCalendarId = "";
-			}
-			this.settings.externalCalendars = normalizeExternalCalendarSettings(
-				this.settings.externalCalendars,
-			);
-			this.settings.externalCalendarCaches = normalizeExternalCalendarCaches(
-				this.settings.externalCalendarCaches,
-				this.settings.externalCalendars,
-			);
-			this.settings.yearlyPlannerExpandedMonths =
-				normalizeYearlyPlannerExpandedMonths(
-					this.settings.yearlyPlannerExpandedMonths,
+		if (this.settings.selectedCustomCalendarId) {
+			this.settings.alternateCalendarId = "";
+		}
+		const shouldMigrateExternalCalendarRefresh =
+			this.settings.externalCalendarAutoRefreshMigrated !== true;
+		const shouldMigrateExternalCalendarYearlyVisibility =
+			this.settings.externalCalendarYearlyVisibilityMigrated !== true;
+		this.settings.externalCalendars = normalizeExternalCalendarSettings(
+			this.settings.externalCalendars,
+			{
+				defaultRefreshMinutes: shouldMigrateExternalCalendarRefresh
+					? DEFAULT_EXTERNAL_CALENDAR_REFRESH_MINUTES
+					: null,
+			},
+		);
+		if (shouldMigrateExternalCalendarYearlyVisibility) {
+			this.settings.externalCalendars =
+				this.settings.externalCalendars.map((calendar) => ({
+					...calendar,
+					showInYearly: true,
+				}));
+		}
+		this.settings.externalCalendarAutoRefreshMigrated = true;
+		this.settings.externalCalendarYearlyVisibilityMigrated = true;
+		this.settings.externalCalendarCaches = normalizeExternalCalendarCaches(
+			this.settings.externalCalendarCaches,
+			this.settings.externalCalendars,
+		);
+		this.settings.yearlyPlannerExpandedMonths =
+			normalizeYearlyPlannerExpandedMonths(
+				this.settings.yearlyPlannerExpandedMonths,
 			);
 		delete this.settings.enabledAlternateCalendars;
 		delete this.settings.showLunarDates;
@@ -405,22 +433,110 @@ export default class DiaryObsidian extends Plugin {
 	}
 
 	async refreshExternalCalendar(calendarId: string): Promise<boolean> {
-		const calendar = this.settings.externalCalendars.find(
-			(item) => item.id === calendarId,
+		const results = await this.refreshExternalCalendars([calendarId]);
+		return results.get(calendarId) ?? false;
+	}
+
+	async refreshAllExternalCalendars(): Promise<{
+		refreshed: number;
+		failed: number;
+	}> {
+		const enabledIds = this.settings.externalCalendars
+			.filter((calendar) => calendar.enabled)
+			.map((calendar) => calendar.id);
+		const results = await this.refreshExternalCalendars(enabledIds);
+		return Array.from(results.values()).reduce(
+			(counts, ok) => {
+				if (ok) counts.refreshed += 1;
+				else counts.failed += 1;
+				return counts;
+			},
+			{ refreshed: 0, failed: 0 },
 		);
-		if (!calendar) return false;
-		const cache = await fetchExternalCalendarCache(
-			calendar,
-			getExternalCalendarCache(this.settings, calendar.id),
+	}
+
+	private async refreshDueExternalCalendars(): Promise<void> {
+		const now = Date.now();
+		const dueIds = this.settings.externalCalendars
+			.filter((calendar) => this.isExternalCalendarRefreshDue(calendar, now))
+			.map((calendar) => calendar.id);
+		if (dueIds.length === 0) return;
+		await this.refreshExternalCalendars(dueIds);
+	}
+
+	private async refreshExternalCalendarsOnStartup(): Promise<void> {
+		if (this.didRefreshExternalCalendarsOnStartup) return;
+		this.didRefreshExternalCalendarsOnStartup = true;
+		const startupIds = this.settings.externalCalendars
+			.filter(
+				(calendar) =>
+					calendar.enabled &&
+					calendar.refreshMinutes != null,
+			)
+			.map((calendar) => calendar.id);
+		if (startupIds.length === 0) return;
+		await this.refreshExternalCalendars(startupIds);
+	}
+
+	private isExternalCalendarRefreshDue(
+		calendar: ExternalCalendarSettings,
+		now: number,
+	): boolean {
+		if (!calendar.enabled || calendar.refreshMinutes == null) return false;
+		if (this.externalCalendarRefreshInFlight.has(calendar.id)) return false;
+		const cache = getExternalCalendarCache(this.settings, calendar.id);
+		if (!cache) return true;
+		const lastAttempt =
+			cache.lastError?.occurredAt ?? cache.fetchedAt;
+		const lastAttemptMs = Date.parse(lastAttempt);
+		if (!Number.isFinite(lastAttemptMs)) return true;
+		return now - lastAttemptMs >= calendar.refreshMinutes * 60_000;
+	}
+
+	private async refreshExternalCalendars(
+		calendarIds: string[],
+	): Promise<Map<string, boolean>> {
+		const results = new Map<string, boolean>();
+		const requestedIds = Array.from(new Set(calendarIds));
+		const calendars = requestedIds
+			.map((id) =>
+				this.settings.externalCalendars.find((calendar) => calendar.id === id),
+			)
+			.filter((calendar): calendar is ExternalCalendarSettings =>
+				Boolean(calendar),
+			)
+			.filter((calendar) => !this.externalCalendarRefreshInFlight.has(calendar.id));
+		if (calendars.length === 0) return results;
+		for (const calendar of calendars) {
+			this.externalCalendarRefreshInFlight.add(calendar.id);
+		}
+		const caches = await Promise.all(
+			calendars.map(async (calendar) => {
+				try {
+					return {
+						calendarId: calendar.id,
+						cache: await fetchExternalCalendarCache(
+							calendar,
+							getExternalCalendarCache(this.settings, calendar.id),
+						),
+					};
+				} finally {
+					this.externalCalendarRefreshInFlight.delete(calendar.id);
+				}
+			}),
 		);
+		const refreshedIds = new Set(caches.map((item) => item.calendarId));
 		this.settings.externalCalendarCaches = [
 			...this.settings.externalCalendarCaches.filter(
-				(item) => item.calendarId !== calendar.id,
+				(item) => !refreshedIds.has(item.calendarId),
 			),
-			cache,
+			...caches.map((item) => item.cache),
 		];
+		for (const item of caches) {
+			results.set(item.calendarId, !item.cache.lastError);
+		}
 		await this.saveSettings();
-		return !cache.lastError;
+		return results;
 	}
 
 	/** Toggle plan note panel expanded state and persist. */

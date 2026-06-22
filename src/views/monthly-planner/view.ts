@@ -99,6 +99,7 @@ export class MonthlyPlannerView
 	private daySummaryOpen = false;
 	private clipboardKeydownRegistered = false;
 	private pasteUndoBatches: string[][] = [];
+	private visibleExternalEventsById = new Map<string, ExternalCalendarEvent>();
 	private boundClipboardKeydown = (e: KeyboardEvent) => {
 		this.handleClipboardKeydown(e);
 	};
@@ -563,6 +564,7 @@ export class MonthlyPlannerView
 			this.compactLayout ? "sidebar" : "monthly",
 			plannerFiles,
 		);
+		this.visibleExternalEventsById = createExternalEventLookup(externalEvents);
 		const rangeLaneMap = getRangeLaneMap(
 			getRangesForYear(
 				this.app,
@@ -689,9 +691,9 @@ export class MonthlyPlannerView
 	}
 
 	openExternalEventModal(eventId: string): void {
-		const event = this.getVisibleExternalEvents().find(
-			(item) => item.id === eventId,
-		);
+		const event =
+			this.visibleExternalEventsById.get(eventId) ??
+			this.getVisibleExternalEvents().find((item) => item.id === eventId);
 		if (!event) return;
 		new ExternalEventModal(this.app, {
 			event,
@@ -706,8 +708,9 @@ export class MonthlyPlannerView
 				this.render();
 			},
 			onRefresh: async () => {
-				await this.plugin.refreshExternalCalendar(event.calendarId);
+				const ok = await this.plugin.refreshExternalCalendar(event.calendarId);
 				this.render();
+				return ok;
 			},
 		}).open();
 	}
@@ -1126,4 +1129,10 @@ export class MonthlyPlannerView
 			}
 		})();
 	}
+}
+
+function createExternalEventLookup(
+	events: ExternalCalendarEvent[],
+): Map<string, ExternalCalendarEvent> {
+	return new Map(events.map((event) => [event.id, event]));
 }

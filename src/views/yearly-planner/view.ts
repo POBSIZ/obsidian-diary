@@ -38,6 +38,12 @@ import {
 } from "../../utils/recurrence";
 import { getCalendarOverlayConfig } from "../../utils/calendar-overlays";
 import {
+	getExternalCalendarName,
+	getExternalEventsForRange,
+	type ExternalCalendarEvent,
+} from "../../utils/external-calendars";
+import { ExternalEventModal } from "../external-event-modal";
+import {
 	renderPlanNotePanel,
 	syncPlanNotePanelExpandedState,
 } from "../plan-note-panel";
@@ -75,6 +81,7 @@ export class YearlyPlannerView
 	private compactLayout = Platform.isMobile;
 	private resizeObserver: ResizeObserver | null = null;
 	private materializeInFlightKey: string | null = null;
+	private visibleExternalEventsById = new Map<string, ExternalCalendarEvent>();
 	/** LIFO stack of paths created by each Cmd/Ctrl+V paste (for Cmd/Ctrl+Z undo). */
 	private pasteUndoBatches: string[][] = [];
 	private boundClipboardKeydown = (e: KeyboardEvent) => {
@@ -549,6 +556,18 @@ export class YearlyPlannerView
 			},
 			plannerFiles,
 		);
+		const visibleRange = {
+			start: `${this.year}-01-01`,
+			end: `${this.year}-12-31`,
+		};
+		const externalEvents = getExternalEventsForRange(
+			this.app,
+			this.plugin.settings,
+			visibleRange,
+			"yearly",
+			plannerFiles,
+		);
+		this.visibleExternalEventsById = createExternalEventLookup(externalEvents);
 		const ranges = getRangesForYear(
 			this.app,
 			this.year,
@@ -568,6 +587,7 @@ export class YearlyPlannerView
 			clipboardSelection: this.clipboardSelection,
 			holidaysData,
 			calendarOverlay: getCalendarOverlayConfig(this.plugin.settings),
+			externalEvents,
 			rangeLaneMap,
 		};
 
@@ -678,6 +698,31 @@ export class YearlyPlannerView
 		).open();
 	}
 
+	openExternalEventModal(eventId: string): void {
+		const event =
+			this.visibleExternalEventsById.get(eventId) ??
+			this.getVisibleExternalEvents().find((item) => item.id === eventId);
+		if (!event) return;
+		new ExternalEventModal(this.app, {
+			event,
+			calendarName: getExternalCalendarName(
+				this.plugin.settings,
+				event.calendarId,
+			),
+			folder: this.plugin.settings.plannerFolder || "Planner",
+			locale: this.plugin.settings.locale ?? "en",
+			onCreated: async (file) => {
+				await this.plugin.openPlannerFile(this.leaf, file);
+				this.render();
+			},
+			onRefresh: async () => {
+				const ok = await this.plugin.refreshExternalCalendar(event.calendarId);
+				this.render();
+				return ok;
+			},
+		}).open();
+	}
+
 	private shouldUseCompactLayout(): boolean {
 		if (Platform.isMobile) return true;
 		if (this.isInSidebar()) return true;
@@ -719,6 +764,26 @@ export class YearlyPlannerView
 		if (leafEl instanceof HTMLElement) {
 			this.resizeObserver.observe(leafEl);
 		}
+	}
+
+	private getVisibleExternalEvents(): ExternalCalendarEvent[] {
+		const folder = this.plugin.settings.plannerFolder || "Planner";
+		const plannerFileScope = this.plugin.settings.plannerFileScope ?? "vault";
+		const plannerFiles = getPlannerMarkdownFiles(
+			this.app,
+			folder,
+			plannerFileScope,
+		);
+		return getExternalEventsForRange(
+			this.app,
+			this.plugin.settings,
+			{
+				start: `${this.year}-01-01`,
+				end: `${this.year}-12-31`,
+			},
+			"yearly",
+			plannerFiles,
+		);
 	}
 
 	private handleClipboardKeydown(e: KeyboardEvent): void {
@@ -859,4 +924,10 @@ export class YearlyPlannerView
 			}
 		})();
 	}
+}
+
+function createExternalEventLookup(
+	events: ExternalCalendarEvent[],
+): Map<string, ExternalCalendarEvent> {
+	return new Map(events.map((event) => [event.id, event]));
 }

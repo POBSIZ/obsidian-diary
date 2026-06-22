@@ -6,9 +6,11 @@ export function getTopmostPlannerElementAt(
 ): Element | null {
 	const elements = contentEl.ownerDocument.elementsFromPoint(clientX, clientY);
 	for (const el of elements) {
-		if (!contentEl.contains(el as Node)) break;
+		if (!contentEl.contains(el as Node)) continue;
 		const he = el as HTMLElement;
+		if (he.closest?.(".yearly-planner-table th")) return null;
 		if (
+			he.closest?.("[data-external-event-id]") ||
 			he.closest?.(".yearly-planner-cell-file[data-path]") ||
 			he.closest?.(".yearly-planner-cell-range-bar[data-path]") ||
 			he.closest?.(".yearly-planner-cell-holiday-badge") ||
@@ -28,7 +30,7 @@ export function getChipOrBarAt(
 ): HTMLElement | null {
 	const elements = contentEl.ownerDocument.elementsFromPoint(clientX, clientY);
 	for (const el of elements) {
-		if (!contentEl.contains(el as Node)) break;
+		if (!contentEl.contains(el as Node)) continue;
 		const chip = (el as HTMLElement).closest?.(
 			".yearly-planner-cell-file[data-path], .yearly-planner-cell-range-bar[data-path]",
 		);

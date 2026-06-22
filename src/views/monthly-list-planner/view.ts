@@ -59,6 +59,7 @@ export class MonthlyListPlannerView extends ItemView {
 	private compactLayout = Platform.isMobile;
 	private resizeObserver: ResizeObserver | null = null;
 	private materializeInFlightKey: string | null = null;
+	private visibleExternalEventsById = new Map<string, ExternalCalendarEvent>();
 
 	constructor(
 		leaf: WorkspaceLeaf,
@@ -178,7 +179,7 @@ export class MonthlyListPlannerView extends ItemView {
 			clientY,
 		);
 		for (const el of elements) {
-			if (!this.contentEl.contains(el)) break;
+			if (!this.contentEl.contains(el)) continue;
 			const h = el as HTMLElement;
 
 			const externalEventEl = h.closest?.("[data-external-event-id]");
@@ -604,9 +605,9 @@ export class MonthlyListPlannerView extends ItemView {
 	}
 
 	private openExternalEventModal(eventId: string): void {
-		const event = this.getVisibleExternalEvents().find(
-			(item) => item.id === eventId,
-		);
+		const event =
+			this.visibleExternalEventsById.get(eventId) ??
+			this.getVisibleExternalEvents().find((item) => item.id === eventId);
 		if (!event) return;
 		new ExternalEventModal(this.app, {
 			event,
@@ -621,8 +622,9 @@ export class MonthlyListPlannerView extends ItemView {
 				this.render();
 			},
 			onRefresh: async () => {
-				await this.plugin.refreshExternalCalendar(event.calendarId);
+				const ok = await this.plugin.refreshExternalCalendar(event.calendarId);
 				this.render();
+				return ok;
 			},
 		}).open();
 	}
@@ -714,6 +716,7 @@ export class MonthlyListPlannerView extends ItemView {
 			this.compactLayout ? "sidebar" : "monthlyList",
 			plannerFiles,
 		);
+		this.visibleExternalEventsById = createExternalEventLookup(externalEvents);
 		renderMonthlyListBody(inner, {
 			year: this.year,
 			month: this.month,
@@ -792,4 +795,10 @@ export class MonthlyListPlannerView extends ItemView {
 			this.resizeObserver.observe(leafEl);
 		}
 	}
+}
+
+function createExternalEventLookup(
+	events: ExternalCalendarEvent[],
+): Map<string, ExternalCalendarEvent> {
+	return new Map(events.map((event) => [event.id, event]));
 }

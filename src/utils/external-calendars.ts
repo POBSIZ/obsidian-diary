@@ -97,6 +97,7 @@ interface MutableEvent {
 	recurrence?: ExternalCalendarRecurrence;
 }
 
+export const DEFAULT_EXTERNAL_CALENDAR_REFRESH_MINUTES = 60;
 const DEFAULT_EXTERNAL_CALENDAR_COLOR = "#3b82f6";
 const MAX_ICS_BYTES = 5 * 1024 * 1024;
 
@@ -110,7 +111,10 @@ export function getDefaultExternalCalendarColor(): string {
 	return DEFAULT_EXTERNAL_CALENDAR_COLOR;
 }
 
-export function normalizeExternalCalendarSettings(value: unknown): ExternalCalendarSettings[] {
+export function normalizeExternalCalendarSettings(
+	value: unknown,
+	options: { defaultRefreshMinutes?: number | null } = {},
+): ExternalCalendarSettings[] {
 	if (!Array.isArray(value)) return [];
 	const normalized: ExternalCalendarSettings[] = [];
 	const seen = new Set<string>();
@@ -127,9 +131,12 @@ export function normalizeExternalCalendarSettings(value: unknown): ExternalCalen
 			url,
 			color: normalizeString(item.color) || DEFAULT_EXTERNAL_CALENDAR_COLOR,
 			enabled: item.enabled !== false,
-			refreshMinutes: normalizeRefreshMinutes(item.refreshMinutes),
+			refreshMinutes:
+				normalizeRefreshMinutes(item.refreshMinutes) ??
+				options.defaultRefreshMinutes ??
+				null,
 			includeDescriptions: item.includeDescriptions === true,
-			showInYearly: item.showInYearly === true,
+			showInYearly: item.showInYearly !== false,
 			showInMonthly: item.showInMonthly !== false,
 			showInMonthlyList: item.showInMonthlyList !== false,
 			showInSidebar: item.showInSidebar !== false,

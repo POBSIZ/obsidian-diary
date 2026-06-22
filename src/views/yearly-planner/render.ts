@@ -16,6 +16,11 @@ import {
 	getCalendarOverlayLabel,
 	type CalendarOverlayConfig,
 } from "../../utils/calendar-overlays";
+import {
+	getExternalEventsForDate,
+	getExternalEventTimeLabel,
+	type ExternalCalendarEvent,
+} from "../../utils/external-calendars";
 import { YearInputModal } from "./modals";
 import {
 	getFilesForDate,
@@ -286,6 +291,7 @@ export interface CreateCellContext {
 	clipboardSelection: Set<string>;
 	holidaysData: HolidayData | null;
 	calendarOverlay: CalendarOverlayConfig;
+	externalEvents: ExternalCalendarEvent[];
 	rangeLaneMap: Map<string, number>;
 }
 
@@ -357,17 +363,27 @@ export function createPlannerCell(
 		ctx.plannerFileScope,
 		ctx.plannerFiles,
 	);
+	const externalDateEvents = getExternalEventsForDate(
+		ctx.externalEvents,
+		dateKey,
+	);
 	const holidayNames =
 		isHoliday && ctx.holidaysData?.names.has(dateKey)
 			? (ctx.holidaysData.names.get(dateKey) ?? [])
 			: [];
 
-	if (rangeFiles.length > 0) {
+	if (externalDateEvents.summaryEvents.length > 0) {
+		cell.dataset.hasExternal = "true";
+	}
+
+	if (rangeFiles.length > 0 || externalDateEvents.rangeEvents.length > 0) {
 		const basenames = rangeFiles.map((r) => r.file.basename);
-		cell.dataset.rangeBasenames = basenames.join(",");
-		cell.dataset.rangeLanes = rangeFiles
-			.map((r) => ctx.rangeLaneMap.get(r.file.basename) ?? 0)
-			.join(",");
+		if (basenames.length > 0) {
+			cell.dataset.rangeBasenames = basenames.join(",");
+			cell.dataset.rangeLanes = rangeFiles
+				.map((r) => ctx.rangeLaneMap.get(r.file.basename) ?? 0)
+				.join(",");
+		}
 
 		const barsContainer = cell.createDiv({
 			cls: "yearly-planner-cell-range-bars",
@@ -400,6 +416,30 @@ export function createPlannerCell(
 				bar.addClass("yearly-planner-cell-clipboard-selected");
 			}
 		}
+		const laneIndices = rangeFiles.map(
+			({ file }) => ctx.rangeLaneMap.get(file.basename) ?? 0,
+		);
+		const maxLane = laneIndices.length > 0 ? Math.max(...laneIndices) : -1;
+		const externalStartLane = maxLane + 1;
+		externalDateEvents.rangeEvents.forEach(({ event }, index) => {
+			const lane = externalStartLane + index;
+			const bar = barsContainer.createDiv({
+				cls: "yearly-planner-cell-range-bar planner-external-event-range yearly-planner-external-event-range",
+			});
+			bar.tabIndex = 0;
+			bar.setAttribute("role", "button");
+			bar.dataset.lane = String(lane);
+			bar.dataset.externalEventId = event.id;
+			bar.ariaLabel = t("a11y.openExternalEvent", {
+				title: event.title,
+			});
+			bar.title = event.title;
+			(bar as HTMLElement).style.right = `${lane * 4}px`;
+			if (event.color) {
+				bar.style.borderRightColor = event.color;
+				bar.style.setProperty("--range-color", event.color);
+			}
+		});
 	}
 
 	if (isHoliday && ctx.holidaysData?.names.has(dateKey)) {
@@ -411,8 +451,8 @@ export function createPlannerCell(
 	cell.ariaLabel = t("a11y.yearlyDateCell", {
 		date: dateKey,
 		calendars: formatCalendarOverlayAria(alternateCalendarLabel),
-		notes: allFiles.length,
-		ranges: rangeFiles.length,
+		notes: allFiles.length + externalDateEvents.singleEvents.length,
+		ranges: rangeFiles.length + externalDateEvents.rangeEvents.length,
 		holidays: holidayNames.length,
 	});
 
@@ -428,7 +468,7 @@ export function createPlannerCell(
 		});
 	}
 
-	if (allFiles.length > 0) {
+	if (allFiles.length > 0 || externalDateEvents.singleEvents.length > 0) {
 		const listEl = cell.createDiv({ cls: "yearly-planner-cell-files" });
 		for (const file of allFiles) {
 			const linkEl = listEl.createDiv({
@@ -468,6 +508,28 @@ export function createPlannerCell(
 			}
 			if (ctx.clipboardSelection.has(makeFileSelectionKey(file.path))) {
 				linkEl.addClass("yearly-planner-cell-clipboard-selected");
+			}
+		}
+		for (const event of externalDateEvents.singleEvents) {
+			const chipEl = listEl.createDiv({
+				cls: "yearly-planner-cell-file planner-external-event-chip yearly-planner-external-event-chip",
+			});
+			chipEl.tabIndex = 0;
+			chipEl.setAttribute("role", "button");
+			chipEl.dataset.externalEventId = event.id;
+			const timeLabel = getExternalEventTimeLabel(
+				event,
+				ctx.calendarOverlay.locale,
+			);
+			chipEl.textContent = timeLabel
+				? `${timeLabel} ${event.title}`
+				: event.title;
+			chipEl.title = event.title;
+			chipEl.ariaLabel = t("a11y.openExternalEvent", {
+				title: event.title,
+			});
+			if (event.color) {
+				chipEl.style.borderLeftColor = event.color;
 			}
 		}
 	}

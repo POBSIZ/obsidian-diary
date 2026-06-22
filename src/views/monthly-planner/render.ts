@@ -628,7 +628,10 @@ function createMobileExternalSummary(
 	events: ExternalCalendarEvent[],
 ): void {
 	const summaryEl = getOrCreateMobileSummaryContainer(inner);
-	const groupedByColor = new Map<string, { color: string | null; count: number }>();
+	const groupedByColor = new Map<
+		string,
+		{ color: string | null; count: number; event: ExternalCalendarEvent }
+	>();
 	for (const event of events) {
 		const color = event.color ?? null;
 		const colorKey = color ?? "__external__";
@@ -637,12 +640,18 @@ function createMobileExternalSummary(
 			prev.count += 1;
 			continue;
 		}
-		groupedByColor.set(colorKey, { color, count: 1 });
+		groupedByColor.set(colorKey, { color, count: 1, event });
 	}
 
-	for (const { color, count } of groupedByColor.values()) {
+	for (const { color, count, event } of groupedByColor.values()) {
 		const groupEl = summaryEl.createDiv({
 			cls: "monthly-planner-mobile-single-group planner-external-event-mobile-group",
+		});
+		groupEl.tabIndex = 0;
+		groupEl.setAttribute("role", "button");
+		groupEl.dataset.externalEventId = event.id;
+		groupEl.ariaLabel = t("a11y.openExternalEvent", {
+			title: event.title,
 		});
 		const dotEl = groupEl.createSpan({
 			cls: "monthly-planner-mobile-single-dot planner-external-event-mobile-dot",
