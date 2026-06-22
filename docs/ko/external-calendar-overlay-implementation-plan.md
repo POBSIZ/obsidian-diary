@@ -1,6 +1,8 @@
 # 외부 캘린더 오버레이 구현 계획서
 
-이 문서는 Diary에 Google Calendar, Outlook, Apple Calendar, `webcal://`, `.ics` 같은 외부 캘린더를 불러와 플래너에 표시하는 기능의 실제 구현 계획이다. 핵심 방향은 **외부 일정은 먼저 읽기 전용 overlay로만 보여주고, 사용자가 선택한 일정만 Markdown 노트로 승격한다**는 것이다.
+이 문서는 Diary에 Google Calendar, Outlook, Apple Calendar, `webcal://`, `.ics` 같은 외부 캘린더를 불러와 플래너에 표시하는 기능의 실제 구현 계획과 현재 적용 상태를 정리한다. 핵심 방향은 **외부 일정은 먼저 읽기 전용 overlay로만 보여주고, 사용자가 선택한 일정만 Markdown 노트로 승격한다**는 것이다.
+
+현재 상태: `1.4.0` 기준으로 사용자가 추가한 `webcal://` 또는 `https://` `.ics` feed를 읽기 전용 overlay로 표시하고, 외부 일정 상세 모달에서 선택한 일정만 Markdown 노트로 만들 수 있다. OAuth, CalDAV 쓰기, 외부 원본 이벤트 수정은 아직 비목표다.
 
 ## 목표
 
@@ -160,7 +162,7 @@ planner-external-event-error
 diary_external_calendar: "work"
 diary_external_event_uid: "abc123@example.com"
 diary_external_event_instance: "2026-06-22T09:00:00+09:00"
-diary_external_event_source: "sha256:8f2715..."
+diary_external_event_source: "work|abc123@example.com|2026-06-22T09:00:00+09:00"
 diary_external_event_linked_at: "2026-06-22T10:20:00+09:00"
 title: "Design review"
 color: "#3b82f6"
@@ -398,13 +400,15 @@ calendarId | uid | instanceId
 - `npm run lint`
 - 기존 날짜 칩, 기간 막대, 반복 발생분, 공휴일 표시가 이전과 동일
 
-### 1단계: 단일 feed 읽기 전용 MVP
+### 1단계: feed 읽기 전용 MVP
 
-- 설정에서 하나의 `.ics` URL을 추가한다.
-- **Refresh now**로 수동 fetch한다.
-- 월간 그리드, 월간 목록, 일자 요약 시트, 사이드바에 외부 item을 표시한다.
+- 설정에서 `webcal://` 또는 `https://` `.ics` URL을 추가한다.
+- **Refresh now** 또는 선택한 자동 새로고침 주기로 fetch한다.
+- 연간 플래너, 월간 그리드, 월간 목록, 일자 요약 시트, 사이드바에 외부 item을 표시한다.
 - 외부 item은 클릭 시 상세 모달만 연다.
 - Markdown 파일은 만들지 않는다.
+
+상태: `1.4.0` 기준 적용됨. 여러 feed, feed별 색상, 표시 위치, description 포함 여부, 수동/주기 새로고침, URL 검증을 지원한다.
 
 검증:
 
@@ -427,6 +431,8 @@ calendarId | uid | instanceId
 - timed 일정은 시작 날짜 노트가 됨
 - 같은 외부 이벤트에서 노트를 만든 뒤 overlay가 중복 표시되지 않음
 - 생성된 노트는 플러그인을 꺼도 일반 Markdown 파일로 남음
+
+상태: `1.4.0` 기준 적용됨. 생성된 노트에는 `diary_external_calendar`, `diary_external_event_uid`, `diary_external_event_instance`, `diary_external_event_source`, `diary_external_event_linked_at` frontmatter를 저장한다.
 
 ### 3단계: 반복, timezone, cache 안정화
 

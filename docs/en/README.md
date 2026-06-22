@@ -1,6 +1,6 @@
 # Diary (English)
 
-Diary is an Obsidian community plugin that turns Markdown files in your vault into date-based planner views. It helps you move between a yearly overview, a monthly grid, and a monthly list while managing single-date notes, range notes, monthly/yearly plan notes, holidays, a configurable alternate calendar label, todo state, and local reminders.
+Diary is an Obsidian community plugin that turns Markdown files in your vault into date-based planner views. It helps you move between a yearly overview, a monthly grid, and a monthly list while managing single-date notes, range notes, monthly/yearly plan notes, holidays, one calendar overlay label, opt-in external calendar overlays, todo state, and local reminders.
 
 한국어 문서: [docs/ko/README.md](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/ko/README.md)
 
@@ -9,7 +9,7 @@ Diary is an Obsidian community plugin that turns Markdown files in your vault in
 | Item | Value |
 | --- | --- |
 | Plugin ID | `diary` |
-| Current version | `1.3.4` |
+| Current version | `1.4.0` |
 | Minimum Obsidian version | `1.7.2` |
 | Supported platforms | Desktop / mobile (`isDesktopOnly: false`) |
 | Default language | `en` |
@@ -17,7 +17,10 @@ Diary is an Obsidian community plugin that turns Markdown files in your vault in
 
 ## Latest Version
 
-- `1.3.4`: Current maintenance release with explicit TypeScript project wiring for typed ESLint checks and pinned lint tooling for reproducible source validation.
+- `1.4.0`: Adds custom calendar overlay controls and opt-in external calendar feeds. External `webcal://` or `https://` `.ics` events render as read-only planner overlays until you choose one and create a Markdown note.
+- `1.3.6`: Maintenance release that stabilizes typed community-plugin audit checks.
+- `1.3.5`: Maintenance release that aligns Obsidian plugin lint and release validation.
+- `1.3.4`: Maintenance release with explicit TypeScript project wiring for typed ESLint checks and pinned lint tooling for reproducible source validation.
 - `1.3.3`: Maintenance release with stricter type-aware ESLint safety checks enabled for community-plugin source validation.
 - `1.3.2`: Maintenance release with documentation, agent guidance, ESLint config typing, and TypeScript lib target cleanup.
 - `1.3.1`: Release with pinned Obsidian typings, dependency lockfile maintenance, ESLint compatibility updates, and recurrence chip styling cleanup.
@@ -46,7 +49,7 @@ The images below were captured from a fresh demo vault with sample planner notes
 ## Key Features
 
 - **Yearly planner**: View date notes and range notes in a `12 months x 31 days` table. Expanded month-cell widths are saved across reloads.
-- **Monthly grid planner**: Inspect one month in a large calendar grid with chips, range bars, holidays, and a configurable alternate calendar label.
+- **Monthly grid planner**: Inspect one month in a large calendar grid with chips, range bars, holidays, calendar overlay labels, and external calendar overlays.
 - **Monthly list planner**: Review busy months in a day-by-day vertical list with `All`, `With notes`, and `Upcoming` filters.
 - **Right sidebar planner**: Keep a compact monthly planner open in the right sidebar while notes remain open in the main workspace.
 - **Plan note panel**: Create and preview yearly notes (`YYYY.md`) and monthly notes (`YYYY-MM.md`) above the planner. Preview expanded/collapsed state is saved, with a separate mobile state that starts collapsed.
@@ -56,6 +59,7 @@ The images below were captured from a fresh demo vault with sample planner notes
 - **Holiday overlays**: Show country-specific public holidays and select holiday badges to see their names.
 - **Alternate calendar label**: Optionally show one compact alternate calendar label at a time, including Korean lunar, Chinese lunar, Dangi, Hebrew, Islamic, Persian, Indian national, Buddhist, Japanese era, Minguo, Coptic, and Ethiopic calendars.
 - **Custom calendar overlay**: Create local fantasy or campaign calendar profiles with custom months, weekdays, and simple leap rules. Diary shows the custom date as an overlay label while keeping normal `YYYY-MM-DD` note files.
+- **External calendar overlays**: Add `webcal://` or `https://` `.ics` feeds, refresh them manually or on an interval, and show events as read-only chips/ranges in yearly, monthly grid, monthly list, side planner, and day summary surfaces. Select an external event only when you want to create a normal Markdown note for it.
 - **Local reminders**: Notes with `notify_minutes` show an Obsidian Notice on the event date while Obsidian is open.
 - **Planner clipboard**: On desktop, copy, paste, delete, and undo pasted planner notes from selected dates or chips.
 - **Keyboard and accessibility support**: Date cells, chips, range bars, holiday badges, planner labels, and monthly list rows expose keyboard activation and accessible labels.
@@ -74,7 +78,7 @@ The images below were captured from a fresh demo vault with sample planner notes
 1. Run the **Open monthly planner in sidebar** command for the side planner, or **Open monthly planner** for a full workspace tab.
 2. Select the add-file button in the header or select a date cell.
 3. Choose **Single date** or **Range**.
-4. Enter the folder, dates, filename, color, todo state, and reminder time.
+4. Enter the folder, dates, filename, color, todo state, reminder time, and optional repeat settings.
 5. Select **Create**. Diary creates a Markdown note and displays it as a chip or range bar in the planner.
 
 Created notes are ordinary Markdown files. They remain in your vault even if the plugin is disabled.
@@ -122,6 +126,17 @@ The monthly list has three filters:
 - **Upcoming**: show today and future dates in the selected month.
 
 When the monthly list opens on the current month, Diary scrolls today's row into view. The current-month button also returns to today.
+
+## External Calendar Feeds
+
+Use **Settings → Diary → External calendars** to add a published `webcal://` URL or an `https://` `.ics` URL.
+
+- Feed URLs are stored in local plugin data and may sync with your vault, so treat secret iCal URLs like access tokens.
+- Diary rejects local/private network calendar URLs.
+- Choose the feed name, color, description inclusion, refresh interval, and which planner surfaces show it.
+- External events are read-only planner overlays with a separate dashed/ghost style. They do not support drag, clipboard, todo, or color-edit actions.
+- Selecting an external event opens a details modal with **Create Markdown note**, **Refresh calendar**, and **Copy details** actions.
+- When you create a Markdown note from an external event, Diary stores linking frontmatter and hides the duplicate overlay for that event.
 
 ## Creating Notes
 
@@ -219,6 +234,7 @@ Paste rules:
 | Holiday country | Holiday country. Supports `KR`, `US`, `JP`, `CN`, `GB`, `DE`, `FR`, `AU`, `CA`, `TW`, and `None`. |
 | Calendar overlay | Selects one built-in alternate calendar or one custom calendar profile for yearly, monthly grid, monthly list, day summary, and sidebar planner views. Default: `None`. |
 | Custom calendars | Local fantasy/campaign calendar profiles. Each profile can define month lengths, weekday names, an epoch mapping, a label format, and a simple leap rule. |
+| External calendars | Opt-in `webcal://` or `https://` `.ics` feeds shown as read-only overlays. Each feed has an enabled state, color, refresh interval, description toggle, and per-view visibility settings. |
 | Mobile bottom padding | Bottom padding for mobile planners so content is not covered by Obsidian mobile controls. |
 | Mobile cell width | Month cell width for the mobile yearly planner. `0` uses the default. |
 
@@ -244,6 +260,11 @@ Diary also stores UI-only state in plugin data: plan note preview expansion, mob
 | `recurrence_exdates` | Gregorian occurrence dates skipped from the series. |
 | `recurrence_source_path` | Source note path stored on generated occurrences. |
 | `recurrence_occurrence_date` | Gregorian date represented by a generated occurrence note. |
+| `diary_external_calendar` | External calendar feed ID saved on a Markdown note created from an external event. |
+| `diary_external_event_uid` | External event UID used to link the created note back to the feed event. |
+| `diary_external_event_instance` | External event instance key, usually the event start date/time. |
+| `diary_external_event_source` | Stable link key used for duplicate overlay suppression. |
+| `diary_external_event_linked_at` | ISO timestamp for when Diary created the Markdown note from the external event. |
 
 Reminders are not scheduled OS notifications. While Obsidian is open, Diary checks about every 15 seconds and shows an Obsidian Notice during the matching minute on the event date.
 
@@ -324,8 +345,9 @@ npm test
 
 - Planner features operate on local Markdown files inside the vault.
 - Diary has no hidden telemetry or analytics.
-- Holiday and alternate calendar calculation use bundled or browser-provided data and do not send vault content to external services for planner rendering.
-- `obsidian-reminder-endpoint-spec.md` is a future external endpoint design note. The released plugin currently does not send reminder data over the network.
+- Holiday and calendar-overlay calculation use bundled, browser-provided, or locally saved profile data and do not send vault content to external services for planner rendering.
+- External calendar feeds are opt-in. Diary fetches only the feed URL you add, stores fetched event cache in plugin data, and does not create Markdown files unless you select **Create Markdown note**.
+- `obsidian-reminder-endpoint-spec.md` is a future reminder endpoint design note. The released plugin currently does not send reminder data over the network.
 
 ## Troubleshooting
 

@@ -6,7 +6,7 @@
 - Source entry point: `src/main.ts`; esbuild bundles it to top-level `main.js`, which Obsidian loads.
 - Required release artifacts: `main.js`, `manifest.json`, and optional `styles.css`.
 - Current plugin ID: `diary`.
-- Current plugin version: `1.3.4`.
+- Current plugin version: `1.4.0`.
 - Current minimum Obsidian version: `1.7.2`.
 
 ## Environment & tooling
