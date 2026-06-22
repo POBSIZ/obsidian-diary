@@ -1152,6 +1152,279 @@ available in the app when your plugin is enabled.
 	outline-offset: -2px;
 }
 
+.diary-external-calendar-settings {
+	margin: 1rem 0;
+	border: 1px solid var(--background-modifier-border);
+	border-radius: var(--planner-radius-sm);
+	background: var(--background-secondary);
+}
+
+.diary-external-calendar-settings-summary,
+.diary-external-calendar-feed-summary {
+	display: flex;
+	align-items: center;
+	gap: 0.65rem;
+	list-style: none;
+	cursor: pointer;
+}
+
+.diary-external-calendar-settings-summary::-webkit-details-marker,
+.diary-external-calendar-feed-summary::-webkit-details-marker {
+	display: none;
+}
+
+.diary-external-calendar-settings-summary::before,
+.diary-external-calendar-feed-summary::before {
+	content: "";
+	flex: 0 0 auto;
+	width: 0.45rem;
+	height: 0.45rem;
+	border-right: 2px solid var(--text-muted);
+	border-bottom: 2px solid var(--text-muted);
+	transform: rotate(-45deg);
+	transition: transform 0.12s ease;
+}
+
+.diary-external-calendar-settings[open]
+	> .diary-external-calendar-settings-summary::before,
+.diary-external-calendar-feed[open]
+	> .diary-external-calendar-feed-summary::before {
+	transform: rotate(45deg);
+}
+
+.diary-external-calendar-settings-summary {
+	justify-content: space-between;
+	padding: 0.85rem 0.9rem;
+}
+
+.diary-external-calendar-settings-title-block,
+.diary-external-calendar-feed-title-block {
+	display: grid;
+	flex: 1 1 auto;
+	min-width: 0;
+	gap: 0.18rem;
+}
+
+.diary-external-calendar-settings-title {
+	color: var(--text-normal);
+	font-weight: var(--font-semibold, 600);
+}
+
+.diary-external-calendar-settings-desc,
+.diary-external-calendar-feed-status {
+	color: var(--text-muted);
+	font-size: var(--font-ui-smaller);
+	line-height: 1.35;
+}
+
+.diary-external-calendar-settings-meta {
+	display: flex;
+	flex: 0 0 auto;
+	align-items: center;
+	justify-content: flex-end;
+	gap: 0.35rem;
+	flex-wrap: wrap;
+	max-width: 45%;
+}
+
+.diary-external-calendar-settings-pill,
+.diary-external-calendar-feed-state {
+	display: inline-flex;
+	align-items: center;
+	min-height: 1.45rem;
+	padding: 0.15rem 0.45rem;
+	border: 1px solid var(--background-modifier-border);
+	border-radius: 999px;
+	background: var(--background-primary);
+	color: var(--text-muted);
+	font-size: var(--font-ui-smaller);
+	line-height: 1.2;
+	white-space: nowrap;
+}
+
+.diary-external-calendar-settings-pill-error,
+.diary-external-calendar-feed.has-error .diary-external-calendar-feed-state {
+	border-color: color-mix(in srgb, var(--text-error) 45%, transparent);
+	color: var(--text-error);
+}
+
+.diary-external-calendar-settings-body {
+	padding: 0.75rem 0.9rem 0.9rem;
+	border-top: 1px solid var(--background-modifier-border);
+}
+
+.diary-external-calendar-settings-body > .diary-setting-description {
+	margin-bottom: 0.65rem;
+}
+
+.diary-external-calendar-settings-body > .setting-item {
+	padding-inline: 0;
+}
+
+.diary-external-calendar-feed {
+	margin-bottom: 0.5rem;
+	border: 1px solid var(--background-modifier-border);
+	border-radius: var(--planner-radius-sm);
+	background: var(--background-primary);
+}
+
+.diary-external-calendar-feed.is-disabled {
+	opacity: 0.72;
+}
+
+.diary-external-calendar-feed-summary {
+	padding: 0.65rem 0.7rem;
+}
+
+.diary-external-calendar-feed-swatch {
+	flex: 0 0 auto;
+	width: 0.75rem;
+	height: 0.75rem;
+	border: 1px solid var(--background-modifier-border);
+	border-radius: 50%;
+	box-shadow: inset 0 0 0 1px color-mix(in srgb, white 35%, transparent);
+}
+
+.diary-external-calendar-feed-title {
+	overflow: hidden;
+	color: var(--text-normal);
+	font-weight: var(--font-semibold, 600);
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.diary-external-calendar-feed-body {
+	padding: 0 0.7rem 0.7rem;
+	border-top: 1px solid var(--background-modifier-border);
+}
+
+.diary-external-calendar-feed-url {
+	margin-top: 0.65rem;
+	padding: 0.45rem 0.55rem;
+	border-radius: var(--planner-radius-sm);
+	background: var(--background-secondary);
+	color: var(--text-muted);
+	font-family: var(--font-monospace);
+	font-size: var(--font-ui-smaller);
+	overflow-wrap: anywhere;
+}
+
+.diary-external-calendar-feed-controls {
+	padding: 0.6rem 0 0;
+	border-top: none;
+}
+
+.diary-external-calendar-feed-controls > .setting-item {
+	padding: 0;
+	border-top: none;
+}
+
+.diary-external-calendar-feed-controls .setting-item-control {
+	flex-wrap: wrap;
+	gap: 0.35rem;
+}
+
+@media (max-width: 600px) {
+	.diary-external-calendar-settings-summary {
+		align-items: flex-start;
+		flex-wrap: wrap;
+	}
+
+	.diary-external-calendar-settings-meta {
+		width: 100%;
+		max-width: none;
+		justify-content: flex-start;
+		padding-left: 1.1rem;
+	}
+
+	.diary-external-calendar-feed-summary {
+		align-items: flex-start;
+		flex-wrap: wrap;
+	}
+
+	.diary-external-calendar-feed-state {
+		margin-left: 1.1rem;
+	}
+}
+
+.planner-external-event-chip {
+	background:
+		linear-gradient(
+			90deg,
+			color-mix(in srgb, var(--background-secondary) 78%, transparent),
+			color-mix(in srgb, var(--background-secondary) 92%, transparent)
+		);
+	border: var(--planner-border-width-thin, 1px) dashed
+		color-mix(in srgb, var(--text-muted) 55%, transparent);
+	border-left: var(--planner-border-width-accent, 4px) solid
+		var(--interactive-accent);
+	color: var(--text-muted);
+	font-style: italic;
+}
+
+.planner-external-event-chip::before {
+	content: "";
+	display: inline-block;
+	width: 0.45em;
+	height: 0.45em;
+	margin-right: 0.25em;
+	border: 1px solid currentColor;
+	border-radius: 50%;
+	opacity: 0.75;
+	vertical-align: 0.05em;
+}
+
+.planner-external-event-range {
+	opacity: 0.82;
+	border-style: dashed;
+	background:
+		repeating-linear-gradient(
+			135deg,
+			color-mix(in srgb, var(--range-color) 14%, transparent) 0,
+			color-mix(in srgb, var(--range-color) 14%, transparent) 6px,
+			color-mix(in srgb, var(--background-primary) 82%, transparent) 6px,
+			color-mix(in srgb, var(--background-primary) 82%, transparent) 12px
+		);
+}
+
+.planner-external-event-range .monthly-planner-range-label {
+	color: color-mix(in srgb, var(--range-color) 70%, var(--text-muted));
+	font-style: italic;
+}
+
+.planner-external-event-mobile-group .planner-external-event-mobile-dot {
+	border: 1px dashed var(--background-modifier-border);
+	opacity: 0.82;
+}
+
+.planner-external-event-modal .planner-external-event-details {
+	display: grid;
+	gap: 0.35rem;
+	margin: 0.75rem 0;
+}
+
+.planner-external-event-detail-row {
+	display: grid;
+	grid-template-columns: minmax(5rem, 0.35fr) 1fr;
+	gap: 0.5rem;
+	align-items: baseline;
+}
+
+.planner-external-event-detail-label {
+	color: var(--text-muted);
+	font-size: 0.85em;
+}
+
+.planner-external-event-description {
+	max-height: 14rem;
+	overflow: auto;
+	white-space: pre-wrap;
+	background: var(--background-secondary);
+	border: 1px solid var(--background-modifier-border);
+	border-radius: var(--planner-radius-sm);
+	padding: 0.75rem;
+}
+
 .yearly-planner-holiday-modal-date {
 	font-size: 1.1em;
 	font-weight: 600;

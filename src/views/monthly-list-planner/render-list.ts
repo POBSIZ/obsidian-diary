@@ -9,10 +9,15 @@ import { t } from "../../i18n";
 import { getDayOfWeek, getDaysInMonth } from "../../utils/date";
 import type { HolidayData } from "../../utils/holidays";
 import {
-	formatAlternateCalendarAria,
-	getAlternateCalendarLabel,
-	type AlternateCalendarSelection,
-} from "../../utils/alternate-calendars";
+	formatCalendarOverlayAria,
+	getCalendarOverlayLabel,
+	type CalendarOverlayConfig,
+} from "../../utils/calendar-overlays";
+import {
+	getExternalEventTimeLabel,
+	getExternalEventsForDate,
+	type ExternalCalendarEvent,
+} from "../../utils/external-calendars";
 import {
 	getFileTitle,
 	getFilesForDate,
@@ -38,7 +43,8 @@ export function renderMonthlyListBody(
 		plannerFiles: TFile[];
 		locale: string;
 		holidaysData: HolidayData | null;
-		alternateCalendarId: AlternateCalendarSelection;
+		calendarOverlay: CalendarOverlayConfig;
+		externalEvents: ExternalCalendarEvent[];
 		filter: MonthlyListFilter;
 	},
 ): void {
@@ -51,7 +57,8 @@ export function renderMonthlyListBody(
 		plannerFiles,
 		locale,
 		holidaysData,
-		alternateCalendarId,
+		calendarOverlay,
+		externalEvents,
 		filter,
 	} = ctx;
 	const daysInMonth = getDaysInMonth(year, month);
@@ -70,12 +77,11 @@ export function renderMonthlyListBody(
 			month === now.getMonth() + 1 &&
 			day === now.getDate();
 		const dateKey = `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
-		const alternateCalendarLabel = getAlternateCalendarLabel(
+		const alternateCalendarLabel = getCalendarOverlayLabel(
 			year,
 			month,
 			day,
-			alternateCalendarId,
-			locale,
+			calendarOverlay,
 		);
 		const isHoliday = holidaysData?.dates.has(dateKey) ?? false;
 		const holidayNames = holidaysData?.names.get(dateKey) ?? [];
@@ -88,6 +94,7 @@ export function renderMonthlyListBody(
 			plannerFileScope,
 			plannerFiles,
 		);
+		const externalDateEvents = getExternalEventsForDate(externalEvents, dateKey);
 		const hasNotes = singleFiles.length > 0 || rangeFiles.length > 0;
 		const dateIsUpcoming =
 			year > now.getFullYear() ||
@@ -117,7 +124,7 @@ export function renderMonthlyListBody(
 		dayBlock.setAttribute("role", "button");
 		dayBlock.ariaLabel = t("a11y.monthlyListDate", {
 			date: dateKey,
-			calendars: formatAlternateCalendarAria(alternateCalendarLabel),
+			calendars: formatCalendarOverlayAria(alternateCalendarLabel),
 			notes: singleFiles.length,
 			ranges: rangeFiles.length,
 			holidays: holidayNames.length,
@@ -200,6 +207,40 @@ export function renderMonthlyListBody(
 			}
 		}
 
+		if (externalDateEvents.rangeEvents.length > 0) {
+			const rangeWrap =
+				body.querySelector<HTMLElement>(".monthly-list-planner-ranges") ??
+				body.createDiv({ cls: "monthly-list-planner-ranges" });
+			for (const { event, runPos } of externalDateEvents.rangeEvents) {
+				const barClasses = [
+					"monthly-planner-range-bar",
+					"monthly-list-planner-range-bar",
+					"planner-external-event-range",
+					runPos.runStart && "monthly-planner-range-run-start",
+					runPos.runEnd && "monthly-planner-range-run-end",
+					!runPos.runStart &&
+						!runPos.runEnd &&
+						"monthly-planner-range-run-mid",
+				]
+					.filter(Boolean)
+					.join(" ");
+				const barEl = rangeWrap.createDiv({ cls: barClasses });
+				barEl.tabIndex = 0;
+				barEl.setAttribute("role", "button");
+				barEl.dataset.externalEventId = event.id;
+				if (event.color) {
+					barEl.style.setProperty("--range-color", event.color);
+				}
+				barEl.createSpan({
+					cls: "monthly-planner-range-label",
+					text: event.title,
+				});
+				barEl.ariaLabel = t("a11y.openExternalEvent", {
+					title: event.title,
+				});
+			}
+		}
+
 		if (singleFiles.length > 0) {
 			const listEl = body.createDiv({ cls: "monthly-list-planner-files" });
 			for (const file of singleFiles) {
@@ -235,6 +276,33 @@ export function renderMonthlyListBody(
 			}
 		}
 
+		if (externalDateEvents.singleEvents.length > 0) {
+			const listEl =
+				body.querySelector<HTMLElement>(".monthly-list-planner-files") ??
+				body.createDiv({ cls: "monthly-list-planner-files" });
+			for (const event of externalDateEvents.singleEvents) {
+				const chipEl = listEl.createDiv({
+					cls: "monthly-planner-cell-file monthly-list-planner-cell-file planner-external-event-chip",
+				});
+				chipEl.tabIndex = 0;
+				chipEl.setAttribute("role", "button");
+				chipEl.dataset.externalEventId = event.id;
+				const timeLabel = getExternalEventTimeLabel(
+					event,
+					calendarOverlay.locale,
+				);
+				chipEl.textContent = timeLabel
+					? `${timeLabel} ${event.title}`
+					: event.title;
+				chipEl.ariaLabel = t("a11y.openExternalEvent", {
+					title: event.title,
+				});
+				if (event.color) {
+					chipEl.style.borderLeftColor = event.color;
+				}
+			}
+		}
+
 		if (isHoliday && holidayNames.length > 0) {
 			const holidaysContainer = body.createDiv({
 				cls: "monthly-planner-cell-holidays",
@@ -256,7 +324,12 @@ export function renderMonthlyListBody(
 			badge.dataset.holidayNames = JSON.stringify(holidayNames);
 		}
 
-		if (rangeFiles.length === 0 && singleFiles.length === 0 && holidayNames.length === 0) {
+		if (
+			rangeFiles.length === 0 &&
+			singleFiles.length === 0 &&
+			externalDateEvents.summaryEvents.length === 0 &&
+			holidayNames.length === 0
+		) {
 			body.createDiv({
 				cls: "monthly-list-planner-empty",
 				text: t("view.monthlyListEmptyDay"),

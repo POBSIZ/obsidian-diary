@@ -10,6 +10,10 @@ import {
 import { getLocale, t } from "../../i18n";
 import { ALTERNATE_CALENDAR_OPTIONS } from "../../utils/alternate-calendars";
 import {
+	getCalendarOverlayLabel,
+	type CalendarOverlayConfig,
+} from "../../utils/calendar-overlays";
+import {
 	RECURRENCE_GREGORIAN,
 	buildRecurrenceRuleFromForm,
 	getSimpleRecurrenceFrequency,
@@ -296,6 +300,21 @@ function isValidDateStr(str: string): boolean {
 	);
 }
 
+function formatOverlayPreview(
+	dateStr: string,
+	calendarOverlay: CalendarOverlayConfig,
+): string | null {
+	const parsed = parseDateStr(dateStr);
+	if (!parsed) return null;
+	const label = getCalendarOverlayLabel(
+		parsed.year,
+		parsed.month,
+		parsed.day,
+		calendarOverlay,
+	);
+	return label?.fullText ?? null;
+}
+
 function getSingleDateFromFilename(filename: string): string | null {
 	const m = filename.match(/^(\d{4}-\d{2}-\d{2})(?:-.+)?$/);
 	if (!m) return null;
@@ -306,6 +325,7 @@ export interface CreateFileModalOptions {
 	bounds: SelectionBounds | null;
 	defaultFolder: string;
 	plannerFileScope: PlannerFileScope;
+	calendarOverlay: CalendarOverlayConfig;
 	createSingleDateFile: CreateSingleDateFileWithFolderFn;
 	createRangeFile: CreateRangeFileWithFolderFn;
 	onCreated: () => void;
@@ -332,6 +352,7 @@ export class CreateFileModal extends Modal {
 	private repeatRows: HTMLElement[] = [];
 	private recurrenceCalendarSelect!: HTMLSelectElement;
 	private recurrenceFrequencySelect!: HTMLSelectElement;
+	private calendarPreviewEl!: HTMLElement;
 	private rangeRow!: HTMLElement;
 	private singleModeBtn!: HTMLButtonElement;
 	private rangeModeBtn!: HTMLButtonElement;
@@ -475,6 +496,7 @@ export class CreateFileModal extends Modal {
 		this.startDateInput.value = startStr;
 		this.startDateInput.oninput = () => {
 			this.syncFilename();
+			this.updateCalendarPreview();
 			this.updateCreateState();
 		};
 
@@ -489,8 +511,13 @@ export class CreateFileModal extends Modal {
 		this.endDateInput.value = endStr;
 		this.endDateInput.oninput = () => {
 			this.syncFilename();
+			this.updateCalendarPreview();
 			this.updateCreateState();
 		};
+
+		this.calendarPreviewEl = form.createDiv({
+			cls: "yearly-planner-create-file-row yearly-planner-calendar-preview-row",
+		});
 
 		const filenameRow = form.createDiv({
 			cls: "yearly-planner-create-file-row",
@@ -583,6 +610,7 @@ export class CreateFileModal extends Modal {
 		this.createRecurrenceControls(form);
 
 		this.syncFilename();
+		this.updateCalendarPreview();
 		this.updateModeUI();
 		this.createErrorEl = this.contentEl.createDiv({
 			cls: "yearly-planner-modal-error",
@@ -621,6 +649,28 @@ export class CreateFileModal extends Modal {
 		if (!this.createErrorEl) return;
 		this.createErrorEl.setText(error ?? "");
 		this.createErrorEl.toggleClass("is-hidden", !error);
+	}
+
+	private updateCalendarPreview(): void {
+		if (!this.calendarPreviewEl) return;
+		const startLabel = formatOverlayPreview(
+			this.startDateInput.value,
+			this.options.calendarOverlay,
+		);
+		const endLabel =
+			this.mode === "range"
+				? formatOverlayPreview(
+						this.endDateInput.value,
+						this.options.calendarOverlay,
+					)
+				: null;
+		const text = endLabel
+			? `${t("modal.calendarPreview")}: ${startLabel ?? "-"} → ${endLabel}`
+			: startLabel
+				? `${t("modal.calendarPreview")}: ${startLabel}`
+				: "";
+		this.calendarPreviewEl.setText(text);
+		this.calendarPreviewEl.toggleClass("is-hidden", !text);
 	}
 
 	private getCreateValidationError(): string | null {
@@ -772,6 +822,7 @@ export class CreateFileModal extends Modal {
 		this.mode = mode;
 		this.updateModeUI();
 		this.syncFilename();
+		this.updateCalendarPreview();
 		this.updateCreateState();
 	}
 
@@ -799,6 +850,7 @@ export class CreateFileModal extends Modal {
 		if (m) {
 			this.startDateInput.value = m[1] ?? "";
 			this.endDateInput.value = m[2] ?? "";
+			this.updateCalendarPreview();
 		}
 	}
 
@@ -982,6 +1034,7 @@ export class FileOptionsModal extends Modal {
 	private startDateInput?: HTMLInputElement;
 	private endDateInput?: HTMLInputElement;
 	private singleDateInput?: HTMLInputElement;
+	private calendarPreviewEl?: HTMLElement;
 	private applyBtn!: HTMLButtonElement;
 	private fileOptionsErrorEl!: HTMLElement;
 
@@ -991,6 +1044,7 @@ export class FileOptionsModal extends Modal {
 		private leaf: WorkspaceLeaf,
 		private onClosed: () => void,
 		private openFile?: (file: TFile) => void | Promise<void>,
+		private calendarOverlay?: CalendarOverlayConfig,
 	) {
 		super(app);
 	}
@@ -1049,7 +1103,7 @@ export class FileOptionsModal extends Modal {
 			});
 			this.startDateInput.value = rangeParsed.start;
 			this.startDateInput.addEventListener("input", () =>
-				this.updateFileOptionsState(),
+				this.updateDateRelatedFileOptionsState(),
 			);
 			const endRow = form.createDiv({
 				cls: "yearly-planner-create-file-row",
@@ -1061,7 +1115,7 @@ export class FileOptionsModal extends Modal {
 			});
 			this.endDateInput.value = rangeParsed.end;
 			this.endDateInput.addEventListener("input", () =>
-				this.updateFileOptionsState(),
+				this.updateDateRelatedFileOptionsState(),
 			);
 		} else if (singleParsed) {
 			const dateRow = form.createDiv({
@@ -1074,8 +1128,15 @@ export class FileOptionsModal extends Modal {
 			});
 			this.singleDateInput.value = singleParsed.date;
 			this.singleDateInput.addEventListener("input", () =>
-				this.updateFileOptionsState(),
+				this.updateDateRelatedFileOptionsState(),
 			);
+		}
+
+		if (this.singleDateInput || this.startDateInput) {
+			this.calendarPreviewEl = form.createDiv({
+				cls: "yearly-planner-create-file-row yearly-planner-calendar-preview-row",
+			});
+			this.updateCalendarPreview();
 		}
 
 		this.colorPresets = getChipColorPresets(this.contentEl.ownerDocument);
@@ -1217,6 +1278,29 @@ export class FileOptionsModal extends Modal {
 		this.updateFileOptionsState();
 		this.titleInput.focus();
 		this.titleInput.select();
+	}
+
+	private updateDateRelatedFileOptionsState(): void {
+		this.updateCalendarPreview();
+		this.updateFileOptionsState();
+	}
+
+	private updateCalendarPreview(): void {
+		if (!this.calendarPreviewEl || !this.calendarOverlay) return;
+		const startValue =
+			this.singleDateInput?.value ?? this.startDateInput?.value ?? "";
+		const startLabel = formatOverlayPreview(startValue, this.calendarOverlay);
+		const endLabel =
+			this.startDateInput && this.endDateInput
+				? formatOverlayPreview(this.endDateInput.value, this.calendarOverlay)
+				: null;
+		const text = endLabel
+			? `${t("modal.calendarPreview")}: ${startLabel ?? "-"} → ${endLabel}`
+			: startLabel
+				? `${t("modal.calendarPreview")}: ${startLabel}`
+				: "";
+		this.calendarPreviewEl.setText(text);
+		this.calendarPreviewEl.toggleClass("is-hidden", !text);
 	}
 
 	private async openPlannerFile(): Promise<void> {

@@ -125,6 +125,27 @@ declare module "obsidian" {
 		trashFile(file: TFile): Promise<void>;
 	}
 
+	export interface RequestUrlParam {
+		url: string;
+		method?: string;
+		headers?: Record<string, string>;
+		body?: string | ArrayBuffer;
+		throw?: boolean;
+		contentType?: string;
+	}
+
+	export interface RequestUrlResponse {
+		status: number;
+		headers: Record<string, string>;
+		text: string;
+		arrayBuffer: ArrayBuffer;
+		json: unknown;
+	}
+
+	export function requestUrl(
+		request: RequestUrlParam | string,
+	): Promise<RequestUrlResponse>;
+
 	export interface Workspace {
 		containerEl: HTMLElement;
 		rootSplit: unknown;
@@ -238,10 +259,20 @@ declare module "obsidian" {
 		setName(name: string | DocumentFragment): this;
 		setDesc(desc: string | DocumentFragment): this;
 		setHeading(): this;
+		addButton(callback: (button: ButtonComponent) => unknown): this;
 		addDropdown(callback: (dropdown: DropdownComponent) => unknown): this;
 		addText(callback: (text: TextComponent) => unknown): this;
 		addToggle(callback: (toggle: ToggleComponent) => unknown): this;
 		addSlider(callback: (slider: SliderComponent) => unknown): this;
+	}
+
+	export class ButtonComponent {
+		buttonEl: HTMLButtonElement;
+		setButtonText(text: string): this;
+		setCta(): this;
+		setWarning(): this;
+		setDisabled(disabled: boolean): this;
+		onClick(callback: (evt: MouseEvent) => unknown): this;
 	}
 
 	export class DropdownComponent {
@@ -259,6 +290,7 @@ declare module "obsidian" {
 	}
 
 	export class ToggleComponent {
+		toggleEl: HTMLInputElement;
 		setValue(value: boolean): this;
 		onChange(callback: (value: boolean) => unknown): this;
 	}

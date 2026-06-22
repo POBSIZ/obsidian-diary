@@ -9,6 +9,7 @@ export function getTopmostMonthlyElementAt(
 		if (!contentEl.contains(el as Node)) continue;
 		const he = el as HTMLElement;
 		if (
+			he.closest?.("[data-external-event-id]") ||
 			he.closest?.(".monthly-planner-range-bar[data-path]") ||
 			he.closest?.(".monthly-planner-cell-file[data-path]") ||
 			he.closest?.(".monthly-planner-cell-holiday-badge") ||

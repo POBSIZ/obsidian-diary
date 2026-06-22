@@ -36,6 +36,7 @@ import {
 	materializeRecurrencesForRange,
 	type RecurrenceMaterializeRange,
 } from "../../utils/recurrence";
+import { getCalendarOverlayConfig } from "../../utils/calendar-overlays";
 import {
 	renderPlanNotePanel,
 	syncPlanNotePanelExpandedState,
@@ -566,8 +567,7 @@ export class YearlyPlannerView
 			chipDragState: this.chipDragState,
 			clipboardSelection: this.clipboardSelection,
 			holidaysData,
-			alternateCalendarId: this.plugin.settings.alternateCalendarId ?? "",
-			locale: this.plugin.settings.locale ?? "en",
+			calendarOverlay: getCalendarOverlayConfig(this.plugin.settings),
 			rangeLaneMap,
 		};
 
@@ -626,6 +626,7 @@ export class YearlyPlannerView
 			bounds,
 			defaultFolder,
 			plannerFileScope: this.plugin.settings.plannerFileScope ?? "vault",
+			calendarOverlay: getCalendarOverlayConfig(this.plugin.settings),
 			createSingleDateFile: (
 				folder,
 				basename,
@@ -673,6 +674,7 @@ export class YearlyPlannerView
 			this.leaf,
 			() => this.render(),
 			(openFile) => this.plugin.openPlannerFile(this.leaf, openFile),
+			getCalendarOverlayConfig(this.plugin.settings),
 		).open();
 	}
 

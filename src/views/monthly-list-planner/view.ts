@@ -35,6 +35,13 @@ import {
 	materializeRecurrencesForRange,
 	type RecurrenceMaterializeRange,
 } from "../../utils/recurrence";
+import { getCalendarOverlayConfig } from "../../utils/calendar-overlays";
+import {
+	getExternalCalendarName,
+	getExternalEventsForRange,
+	type ExternalCalendarEvent,
+} from "../../utils/external-calendars";
+import { ExternalEventModal } from "../external-event-modal";
 
 const MONTHLY_LIST_PLANNER_COMPACT_LAYOUT_MAX_WIDTH = 560;
 
@@ -174,6 +181,17 @@ export class MonthlyListPlannerView extends ItemView {
 			if (!this.contentEl.contains(el)) break;
 			const h = el as HTMLElement;
 
+			const externalEventEl = h.closest?.("[data-external-event-id]");
+			if (externalEventEl) {
+				const eventId = (externalEventEl as HTMLElement).dataset
+					.externalEventId;
+				if (eventId) {
+					e.preventDefault();
+					this.openExternalEventModal(eventId);
+				}
+				return;
+			}
+
 			const rangeBar = h.closest?.(".monthly-planner-range-bar[data-path]");
 			if (rangeBar && !this.isRangeBarInteractionEnabled()) {
 				const dayBlock = (rangeBar as HTMLElement).closest(
@@ -279,7 +297,7 @@ export class MonthlyListPlannerView extends ItemView {
 		const target = e.target;
 		if (!(target instanceof HTMLElement)) return;
 		const directTarget = target.closest(
-			".monthly-planner-cell-file, .monthly-planner-range-bar, .monthly-planner-cell-holiday-badge",
+			".monthly-planner-cell-file, .monthly-planner-range-bar, .monthly-planner-cell-holiday-badge, .planner-external-event-chip, .planner-external-event-range",
 		);
 		if (directTarget instanceof HTMLElement) {
 			const rect = directTarget.getBoundingClientRect();
@@ -533,6 +551,7 @@ export class MonthlyListPlannerView extends ItemView {
 			bounds,
 			defaultFolder,
 			plannerFileScope: this.plugin.settings.plannerFileScope ?? "vault",
+			calendarOverlay: getCalendarOverlayConfig(this.plugin.settings),
 			createSingleDateFile: (
 				folder,
 				basename,
@@ -580,7 +599,32 @@ export class MonthlyListPlannerView extends ItemView {
 			this.leaf,
 			() => this.render(),
 			(openFile) => this.plugin.openPlannerFile(this.leaf, openFile),
+			getCalendarOverlayConfig(this.plugin.settings),
 		).open();
+	}
+
+	private openExternalEventModal(eventId: string): void {
+		const event = this.getVisibleExternalEvents().find(
+			(item) => item.id === eventId,
+		);
+		if (!event) return;
+		new ExternalEventModal(this.app, {
+			event,
+			calendarName: getExternalCalendarName(
+				this.plugin.settings,
+				event.calendarId,
+			),
+			folder: this.plugin.settings.plannerFolder || "Planner",
+			locale: this.plugin.settings.locale ?? "en",
+			onCreated: async (file) => {
+				await this.plugin.openPlannerFile(this.leaf, file);
+				this.render();
+			},
+			onRefresh: async () => {
+				await this.plugin.refreshExternalCalendar(event.calendarId);
+				this.render();
+			},
+		}).open();
 	}
 
 	private renderList(contentEl: HTMLElement): void {
@@ -663,6 +707,13 @@ export class MonthlyListPlannerView extends ItemView {
 			},
 			plannerFiles,
 		);
+		const externalEvents = getExternalEventsForRange(
+			this.app,
+			this.plugin.settings,
+			this.getVisibleRange(),
+			this.compactLayout ? "sidebar" : "monthlyList",
+			plannerFiles,
+		);
 		renderMonthlyListBody(inner, {
 			year: this.year,
 			month: this.month,
@@ -672,9 +723,31 @@ export class MonthlyListPlannerView extends ItemView {
 			plannerFiles,
 			locale,
 			holidaysData,
-			alternateCalendarId: this.plugin.settings.alternateCalendarId ?? "",
+			calendarOverlay: getCalendarOverlayConfig(this.plugin.settings),
+			externalEvents,
 			filter: this.listFilter,
 		});
+	}
+
+	private getVisibleExternalEvents(): ExternalCalendarEvent[] {
+		const folder = this.plugin.settings.plannerFolder || "Planner";
+		const plannerFileScope = this.plugin.settings.plannerFileScope ?? "vault";
+		return getExternalEventsForRange(
+			this.app,
+			this.plugin.settings,
+			this.getVisibleRange(),
+			this.compactLayout ? "sidebar" : "monthlyList",
+			getPlannerMarkdownFiles(this.app, folder, plannerFileScope),
+		);
+	}
+
+	private getVisibleRange(): { start: string; end: string } {
+		return {
+			start: `${this.year}-${String(this.month).padStart(2, "0")}-01`,
+			end: `${this.year}-${String(this.month).padStart(2, "0")}-${String(
+				getDaysInMonth(this.year, this.month),
+			).padStart(2, "0")}`,
+		};
 	}
 
 	private shouldUseCompactLayout(): boolean {

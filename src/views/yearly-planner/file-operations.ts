@@ -6,6 +6,14 @@ import {
 	serializeYamlFrontmatter,
 	type RecurrenceFormValue,
 } from "../../utils/recurrence";
+import {
+	getExternalEventDateRangeLabel,
+	getExternalEventEndDate,
+	getExternalEventLinkKey,
+	getExternalEventStartDate,
+	getExternalEventTimeLabel,
+	type ExternalCalendarEvent,
+} from "../../utils/external-calendars";
 
 const pad = (n: number) => String(n).padStart(2, "0");
 
@@ -356,6 +364,81 @@ function sanitizePlannerBasenameSuffix(raw: string): string {
 	return raw
 		.replace(/[\\/:*?"<>|#\n\r\t]/g, "")
 		.trim();
+}
+
+export async function createExternalEventFile(
+	app: App,
+	folder: string,
+	event: ExternalCalendarEvent,
+	calendarName: string,
+	locale: string,
+): Promise<TFile> {
+	const trimmed = (folder || "Planner").trim();
+	const startDate = getExternalEventStartDate(event);
+	const endDate = getExternalEventEndDate(event);
+	const suffix = sanitizePlannerBasenameSuffix(event.title) || "external";
+	const isRange = event.allDay && startDate < endDate;
+	const baseName = isRange
+		? `${startDate}--${endDate}-${suffix}`
+		: `${startDate}-${suffix}`;
+	const path = await getAvailableExternalEventPath(app, trimmed, baseName);
+	const dir = path.split("/").slice(0, -1).join("/");
+	if (dir && !app.vault.getAbstractFileByPath(dir)) {
+		await app.vault.createFolder(dir);
+	}
+	const frontmatter: Record<string, unknown> = {
+		diary_external_calendar: event.calendarId,
+		diary_external_event_uid: event.uid,
+		diary_external_event_instance: event.instanceId,
+		diary_external_event_source: getExternalEventLinkKey(event),
+		diary_external_event_linked_at: new Date().toISOString(),
+		title: event.title,
+		color: event.color,
+	};
+	if (isRange) {
+		frontmatter.date_start = startDate;
+		frontmatter.date_end = endDate;
+	}
+	const content = `${serializeYamlFrontmatter(frontmatter)}\n\n# ${event.title}\n\n${formatExternalEventBody(
+		event,
+		calendarName,
+		locale,
+	)}`;
+	return app.vault.create(path, content);
+}
+
+async function getAvailableExternalEventPath(
+	app: App,
+	folder: string,
+	baseName: string,
+): Promise<string> {
+	let candidate = folder ? `${folder}/${baseName}.md` : `${baseName}.md`;
+	let counter = 2;
+	while (app.vault.getAbstractFileByPath(candidate)) {
+		candidate = folder
+			? `${folder}/${baseName}-${counter}.md`
+			: `${baseName}-${counter}.md`;
+		counter++;
+	}
+	return candidate;
+}
+
+function formatExternalEventBody(
+	event: ExternalCalendarEvent,
+	calendarName: string,
+	locale: string,
+): string {
+	const lines = [
+		`- Source calendar: ${calendarName}`,
+		`- Date: ${getExternalEventDateRangeLabel(event)}`,
+	];
+	const time = getExternalEventTimeLabel(event, locale);
+	if (time) lines.push(`- Time: ${time}`);
+	if (event.location) lines.push(`- Location: ${event.location}`);
+	if (event.descriptionText) {
+		lines.push("", "## External description", "", event.descriptionText);
+	}
+	return `${lines.join("\n")}\n`;
 }
 
 /**

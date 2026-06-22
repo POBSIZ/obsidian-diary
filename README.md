@@ -54,6 +54,7 @@ grid in compact form.
 - Remembered yearly cell width: expanded month-cell widths are saved across reloads.
 - Chip metadata: `color`, `todo`, `completed`, `notify_minutes`, `title`, `date_start`, `date_end`, and recurrence frontmatter.
 - Recurring events: repeat a note daily, monthly, or yearly with a Gregorian or alternate-calendar basis. Diary materializes only the occurrences inside the planner range you are currently viewing.
+- Custom calendar overlays: create local fantasy/campaign calendar profiles and show one custom label in planner cells while keeping normal `YYYY-MM-DD` files.
 - Desktop workflows: right-sidebar companion planner, drag range selection, chip drag-to-move, keyboard activation, internal planner copy/paste/delete/undo.
 - Mobile workflows: tap a day to open the day summary sheet, create notes from the sheet, pinch zoom the monthly grid, and adjust mobile spacing in settings.
 

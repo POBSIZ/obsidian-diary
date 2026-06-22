@@ -12,10 +12,10 @@ import { getDaysInMonth, getDayOfWeek } from "../../utils/date";
 import type { ChipDragState, DragState } from "./types";
 import type { HolidayData } from "../../utils/holidays";
 import {
-	formatAlternateCalendarAria,
-	getAlternateCalendarLabel,
-	type AlternateCalendarSelection,
-} from "../../utils/alternate-calendars";
+	formatCalendarOverlayAria,
+	getCalendarOverlayLabel,
+	type CalendarOverlayConfig,
+} from "../../utils/calendar-overlays";
 import { YearInputModal } from "./modals";
 import {
 	getFilesForDate,
@@ -285,8 +285,7 @@ export interface CreateCellContext {
 	chipDragState: ChipDragState | null;
 	clipboardSelection: Set<string>;
 	holidaysData: HolidayData | null;
-	alternateCalendarId: AlternateCalendarSelection;
-	locale: string;
+	calendarOverlay: CalendarOverlayConfig;
 	rangeLaneMap: Map<string, number>;
 }
 
@@ -342,12 +341,11 @@ export function createPlannerCell(
 	cell.dataset.day = String(day);
 	cell.tabIndex = 0;
 	cell.setAttribute("role", "button");
-	const alternateCalendarLabel = getAlternateCalendarLabel(
+	const alternateCalendarLabel = getCalendarOverlayLabel(
 		ctx.year,
 		month,
 		day,
-		ctx.alternateCalendarId,
-		ctx.locale,
+		ctx.calendarOverlay,
 	);
 
 	const { singleFiles, rangeFiles } = getFilesForDate(
@@ -412,7 +410,7 @@ export function createPlannerCell(
 	const allFiles = [...singleFiles, ...startDateRangeFiles];
 	cell.ariaLabel = t("a11y.yearlyDateCell", {
 		date: dateKey,
-		calendars: formatAlternateCalendarAria(alternateCalendarLabel),
+		calendars: formatCalendarOverlayAria(alternateCalendarLabel),
 		notes: allFiles.length,
 		ranges: rangeFiles.length,
 		holidays: holidayNames.length,
@@ -497,7 +495,7 @@ export function createPlannerCell(
 
 	if (isValid && (isSaturday || isSunday)) {
 		const weekendLabels =
-			ctx.locale === "ko" ? WEEKEND_LABELS_KO : WEEKEND_LABELS_EN;
+			ctx.calendarOverlay.locale === "ko" ? WEEKEND_LABELS_KO : WEEKEND_LABELS_EN;
 		const label = isSaturday ? weekendLabels.sat : weekendLabels.sun;
 		const labelEl = cell.createSpan({
 			cls: "yearly-planner-weekend-label",

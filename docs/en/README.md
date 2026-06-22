@@ -55,6 +55,7 @@ The images below were captured from a fresh demo vault with sample planner notes
 - **Color, todo, and completion state**: Reflect `color`, `todo`, and `completed` frontmatter in chip styling and labels.
 - **Holiday overlays**: Show country-specific public holidays and select holiday badges to see their names.
 - **Alternate calendar label**: Optionally show one compact alternate calendar label at a time, including Korean lunar, Chinese lunar, Dangi, Hebrew, Islamic, Persian, Indian national, Buddhist, Japanese era, Minguo, Coptic, and Ethiopic calendars.
+- **Custom calendar overlay**: Create local fantasy or campaign calendar profiles with custom months, weekdays, and simple leap rules. Diary shows the custom date as an overlay label while keeping normal `YYYY-MM-DD` note files.
 - **Local reminders**: Notes with `notify_minutes` show an Obsidian Notice on the event date while Obsidian is open.
 - **Planner clipboard**: On desktop, copy, paste, delete, and undo pasted planner notes from selected dates or chips.
 - **Keyboard and accessibility support**: Date cells, chips, range bars, holiday badges, planner labels, and monthly list rows expose keyboard activation and accessible labels.
@@ -216,7 +217,8 @@ Paste rules:
 | Date format | Stored date format setting. Planner filenames currently use the `YYYY-MM-DD` rule. |
 | Show holidays | Turns holiday rendering on or off. |
 | Holiday country | Holiday country. Supports `KR`, `US`, `JP`, `CN`, `GB`, `DE`, `FR`, `AU`, `CA`, `TW`, and `None`. |
-| Alternate calendar | Selects one supported alternate calendar label for yearly, monthly grid, monthly list, and sidebar planner views. Default: `None`. |
+| Calendar overlay | Selects one built-in alternate calendar or one custom calendar profile for yearly, monthly grid, monthly list, day summary, and sidebar planner views. Default: `None`. |
+| Custom calendars | Local fantasy/campaign calendar profiles. Each profile can define month lengths, weekday names, an epoch mapping, a label format, and a simple leap rule. |
 | Mobile bottom padding | Bottom padding for mobile planners so content is not covered by Obsidian mobile controls. |
 | Mobile cell width | Month cell width for the mobile yearly planner. `0` uses the default. |
 

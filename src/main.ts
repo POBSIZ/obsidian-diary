@@ -7,6 +7,16 @@ import {
 } from "./settings";
 import { normalizeAlternateCalendarId } from "./utils/alternate-calendars";
 import {
+	clearCustomCalendarCaches,
+	normalizeCustomCalendarProfiles,
+} from "./utils/custom-calendars";
+import {
+	fetchExternalCalendarCache,
+	getExternalCalendarCache,
+	normalizeExternalCalendarCaches,
+	normalizeExternalCalendarSettings,
+} from "./utils/external-calendars";
+import {
 	VIEW_TYPE_YEARLY_PLANNER,
 	VIEW_TYPE_YEARLY_SIDEBAR_PLANNER,
 	VIEW_TYPE_MONTHLY_PLANNER,
@@ -42,6 +52,7 @@ function normalizeYearlyPlannerExpandedMonths(months: unknown): number[] {
 
 export default class DiaryObsidian extends Plugin {
 	settings: DiaryObsidianSettings;
+	settingTab?: DiaryObsidianSettingTab;
 
 	async onload() {
 		await this.loadSettings();
@@ -122,7 +133,8 @@ export default class DiaryObsidian extends Plugin {
 			});
 		});
 
-		this.addSettingTab(new DiaryObsidianSettingTab(this.app, this));
+		this.settingTab = new DiaryObsidianSettingTab(this.app, this);
+		this.addSettingTab(this.settingTab);
 
 		registerPlannerReminders(this);
 
@@ -340,9 +352,30 @@ export default class DiaryObsidian extends Plugin {
 			legacyEnabledAlternateCalendars,
 			legacyShowLunarDates,
 		);
-		this.settings.yearlyPlannerExpandedMonths =
-			normalizeYearlyPlannerExpandedMonths(
-				this.settings.yearlyPlannerExpandedMonths,
+		this.settings.customCalendarProfiles = normalizeCustomCalendarProfiles(
+			this.settings.customCalendarProfiles,
+		);
+		if (
+			this.settings.selectedCustomCalendarId &&
+			!this.settings.customCalendarProfiles.some(
+				(profile) => profile.id === this.settings.selectedCustomCalendarId,
+			)
+		) {
+			this.settings.selectedCustomCalendarId = "";
+		}
+			if (this.settings.selectedCustomCalendarId) {
+				this.settings.alternateCalendarId = "";
+			}
+			this.settings.externalCalendars = normalizeExternalCalendarSettings(
+				this.settings.externalCalendars,
+			);
+			this.settings.externalCalendarCaches = normalizeExternalCalendarCaches(
+				this.settings.externalCalendarCaches,
+				this.settings.externalCalendars,
+			);
+			this.settings.yearlyPlannerExpandedMonths =
+				normalizeYearlyPlannerExpandedMonths(
+					this.settings.yearlyPlannerExpandedMonths,
 			);
 		delete this.settings.enabledAlternateCalendars;
 		delete this.settings.showLunarDates;
@@ -350,6 +383,17 @@ export default class DiaryObsidian extends Plugin {
 
 	async saveSettings() {
 		setLocale(this.settings.locale ?? "en");
+		this.settings.customCalendarProfiles = normalizeCustomCalendarProfiles(
+			this.settings.customCalendarProfiles,
+		);
+		this.settings.externalCalendars = normalizeExternalCalendarSettings(
+			this.settings.externalCalendars,
+		);
+		this.settings.externalCalendarCaches = normalizeExternalCalendarCaches(
+			this.settings.externalCalendarCaches,
+			this.settings.externalCalendars,
+		);
+		clearCustomCalendarCaches();
 		this.settings.yearlyPlannerExpandedMonths =
 			normalizeYearlyPlannerExpandedMonths(
 				this.settings.yearlyPlannerExpandedMonths,
@@ -358,6 +402,25 @@ export default class DiaryObsidian extends Plugin {
 		this.refreshYearlyPlannerViews();
 		this.refreshMonthlyPlannerViews();
 		this.refreshMonthlyListPlannerViews();
+	}
+
+	async refreshExternalCalendar(calendarId: string): Promise<boolean> {
+		const calendar = this.settings.externalCalendars.find(
+			(item) => item.id === calendarId,
+		);
+		if (!calendar) return false;
+		const cache = await fetchExternalCalendarCache(
+			calendar,
+			getExternalCalendarCache(this.settings, calendar.id),
+		);
+		this.settings.externalCalendarCaches = [
+			...this.settings.externalCalendarCaches.filter(
+				(item) => item.calendarId !== calendar.id,
+			),
+			cache,
+		];
+		await this.saveSettings();
+		return !cache.lastError;
 	}
 
 	/** Toggle plan note panel expanded state and persist. */

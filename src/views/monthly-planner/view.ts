@@ -47,7 +47,17 @@ import { CreateFileModal, FileOptionsModal } from "../yearly-planner/modals";
 import { getSelectionBounds } from "../yearly-planner/selection";
 import { getHolidaysForYear } from "../../utils/holidays";
 import { getDaysInMonth, getMonthCalendarCells } from "../../utils/date";
-import { getAlternateCalendarLabel } from "../../utils/alternate-calendars";
+import {
+	getCalendarOverlayConfig,
+	getCalendarOverlayLabel,
+} from "../../utils/calendar-overlays";
+import {
+	getExternalCalendarName,
+	getExternalEventsForDate,
+	getExternalEventsForRange,
+	type ExternalCalendarEvent,
+} from "../../utils/external-calendars";
+import { ExternalEventModal } from "../external-event-modal";
 import {
 	materializeRecurrencesForRange,
 	type RecurrenceMaterializeRange,
@@ -540,6 +550,19 @@ export class MonthlyPlannerView
 			},
 			plannerFiles,
 		);
+		const visibleRange = {
+			start: `${this.year}-${String(this.month).padStart(2, "0")}-01`,
+			end: `${this.year}-${String(this.month).padStart(2, "0")}-${String(
+				getDaysInMonth(this.year, this.month),
+			).padStart(2, "0")}`,
+		};
+		const externalEvents = getExternalEventsForRange(
+			this.app,
+			this.plugin.settings,
+			visibleRange,
+			this.compactLayout ? "sidebar" : "monthly",
+			plannerFiles,
+		);
 		const rangeLaneMap = getRangeLaneMap(
 			getRangesForYear(
 				this.app,
@@ -558,8 +581,8 @@ export class MonthlyPlannerView
 			chipDragState: this.chipDragState,
 			clipboardSelection: this.clipboardSelection,
 			holidaysData,
-			alternateCalendarId: this.plugin.settings.alternateCalendarId ?? "",
-			locale,
+			calendarOverlay: getCalendarOverlayConfig(this.plugin.settings),
+			externalEvents,
 			rangeLaneMap,
 			selectedDate: this.daySummaryOpen ? this.selectedDate : null,
 			isCompactLayout: this.compactLayout,
@@ -613,6 +636,7 @@ export class MonthlyPlannerView
 			bounds,
 			defaultFolder,
 			plannerFileScope: this.plugin.settings.plannerFileScope ?? "vault",
+			calendarOverlay: getCalendarOverlayConfig(this.plugin.settings),
 			createSingleDateFile: (
 				folder,
 				basename,
@@ -660,7 +684,32 @@ export class MonthlyPlannerView
 			this.leaf,
 			() => this.render(),
 			(openFile) => this.plugin.openPlannerFile(this.leaf, openFile),
+			getCalendarOverlayConfig(this.plugin.settings),
 		).open();
+	}
+
+	openExternalEventModal(eventId: string): void {
+		const event = this.getVisibleExternalEvents().find(
+			(item) => item.id === eventId,
+		);
+		if (!event) return;
+		new ExternalEventModal(this.app, {
+			event,
+			calendarName: getExternalCalendarName(
+				this.plugin.settings,
+				event.calendarId,
+			),
+			folder: this.plugin.settings.plannerFolder || "Planner",
+			locale: this.plugin.settings.locale ?? "en",
+			onCreated: async (file) => {
+				await this.plugin.openPlannerFile(this.leaf, file);
+				this.render();
+			},
+			onRefresh: async () => {
+				await this.plugin.refreshExternalCalendar(event.calendarId);
+				this.render();
+			},
+		}).open();
 	}
 
 	openDaySummaryPanel(year: number, month: number, day: number): void {
@@ -678,12 +727,11 @@ export class MonthlyPlannerView
 		if (!this.daySummaryOpen || !this.selectedDate) return;
 		const { year, month, day } = this.selectedDate;
 		const dateKey = `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
-		const alternateCalendarLabel = getAlternateCalendarLabel(
+		const alternateCalendarLabel = getCalendarOverlayLabel(
 			year,
 			month,
 			day,
-			this.plugin.settings.alternateCalendarId ?? "",
-			this.plugin.settings.locale ?? "en",
+			getCalendarOverlayConfig(this.plugin.settings),
 		);
 		const sheet = contentEl.createDiv({
 			cls: "monthly-planner-day-summary-sheet",
@@ -727,6 +775,21 @@ export class MonthlyPlannerView
 			day,
 			this.plugin.settings.plannerFileScope ?? "vault",
 		);
+		const plannerFiles = getPlannerMarkdownFiles(
+			this.app,
+			this.plugin.settings.plannerFolder || "Planner",
+			this.plugin.settings.plannerFileScope ?? "vault",
+		);
+		const externalDateEvents = getExternalEventsForDate(
+			getExternalEventsForRange(
+				this.app,
+				this.plugin.settings,
+				{ start: dateKey, end: dateKey },
+				"sidebar",
+				plannerFiles,
+			),
+			dateKey,
+		);
 		const { showHolidays, holidayCountry } = this.plugin.settings;
 		const holidayNames =
 			showHolidays && holidayCountry
@@ -753,6 +816,16 @@ export class MonthlyPlannerView
 			});
 		}
 
+		for (const event of externalDateEvents.summaryEvents) {
+			this.createDaySummaryChip({
+				container: body,
+				text: event.title,
+				color: event.color ?? null,
+				onClick: () => this.openExternalEventModal(event.id),
+				extraClass: "planner-external-event-chip",
+			});
+		}
+
 		for (const holidayName of holidayNames) {
 			this.createDaySummaryChip({
 				container: body,
@@ -764,10 +837,11 @@ export class MonthlyPlannerView
 		}
 
 		if (
-			singleFiles.length === 0 &&
-			rangeFiles.length === 0 &&
-			holidayNames.length === 0
-		) {
+				singleFiles.length === 0 &&
+				rangeFiles.length === 0 &&
+				externalDateEvents.summaryEvents.length === 0 &&
+				holidayNames.length === 0
+			) {
 			body.createDiv({
 				cls: "monthly-planner-day-summary-empty",
 				text: t("monthlyDaySheet.empty"),
@@ -837,6 +911,28 @@ export class MonthlyPlannerView
 		if (leafEl instanceof HTMLElement) {
 			this.resizeObserver.observe(leafEl);
 		}
+	}
+
+	private getVisibleExternalEvents(): ExternalCalendarEvent[] {
+		const folder = this.plugin.settings.plannerFolder || "Planner";
+		const plannerFileScope = this.plugin.settings.plannerFileScope ?? "vault";
+		const plannerFiles = getPlannerMarkdownFiles(
+			this.app,
+			folder,
+			plannerFileScope,
+		);
+		return getExternalEventsForRange(
+			this.app,
+			this.plugin.settings,
+			{
+				start: `${this.year}-${String(this.month).padStart(2, "0")}-01`,
+				end: `${this.year}-${String(this.month).padStart(2, "0")}-${String(
+					getDaysInMonth(this.year, this.month),
+				).padStart(2, "0")}`,
+			},
+			this.compactLayout ? "sidebar" : "monthly",
+			plannerFiles,
+		);
 	}
 
 	private getDisplayTitle(file: TFile): string {

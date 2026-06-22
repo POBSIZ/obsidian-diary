@@ -14,10 +14,10 @@ import { getDayOfWeek } from "../../utils/date";
 import type { ChipDragState, DragState } from "../yearly-planner/types";
 import type { HolidayData } from "../../utils/holidays";
 import {
-	formatAlternateCalendarAria,
-	getAlternateCalendarLabel,
-	type AlternateCalendarSelection,
-} from "../../utils/alternate-calendars";
+	formatCalendarOverlayAria,
+	getCalendarOverlayLabel,
+	type CalendarOverlayConfig,
+} from "../../utils/calendar-overlays";
 import {
 	getFilesForDate,
 	getFileTitle,
@@ -36,6 +36,11 @@ import {
 import type { CalendarCell } from "../../utils/date";
 import { MonthYearInputModal } from "./modals";
 import type { MonthlyPlannerSelectedDate } from "./types";
+import {
+	getExternalEventTimeLabel,
+	getExternalEventsForDate,
+	type ExternalCalendarEvent,
+} from "../../utils/external-calendars";
 
 export interface MonthlyHeaderCallbacks {
 	onPrev: () => void;
@@ -218,8 +223,8 @@ export interface CreateMonthlyCellContext {
 	chipDragState: ChipDragState | null;
 	clipboardSelection: Set<string>;
 	holidaysData: HolidayData | null;
-	alternateCalendarId: AlternateCalendarSelection;
-	locale: string;
+	calendarOverlay: CalendarOverlayConfig;
+	externalEvents: ExternalCalendarEvent[];
 	rangeLaneMap: Map<string, number>;
 	selectedDate: MonthlyPlannerSelectedDate | null;
 	isCompactLayout: boolean;
@@ -285,12 +290,11 @@ export function createMonthlyCell(
 	const inner = cell.createDiv({ cls: "monthly-planner-cell-inner" });
 	const dayNumEl = inner.createDiv({ cls: "monthly-planner-cell-day" });
 	dayNumEl.textContent = String(day);
-	const alternateCalendarLabel = getAlternateCalendarLabel(
+	const alternateCalendarLabel = getCalendarOverlayLabel(
 		year,
 		month,
 		day,
-		ctx.alternateCalendarId,
-		ctx.locale,
+		ctx.calendarOverlay,
 	);
 	if (alternateCalendarLabel) {
 		const labelsEl = inner.createDiv({
@@ -312,6 +316,10 @@ export function createMonthlyCell(
 		ctx.plannerFileScope,
 		ctx.plannerFiles,
 	);
+	const externalDateEvents = getExternalEventsForDate(
+		ctx.externalEvents,
+		dateKey,
+	);
 	const isCompactLayout = ctx.isCompactLayout;
 	const holidayNames =
 		isHoliday && ctx.holidaysData?.names.has(dateKey)
@@ -319,13 +327,16 @@ export function createMonthlyCell(
 			: [];
 	cell.ariaLabel = t("a11y.monthlyDateCell", {
 		date: dateKey,
-		calendars: formatAlternateCalendarAria(alternateCalendarLabel),
+		calendars: formatCalendarOverlayAria(alternateCalendarLabel),
 		notes: singleFiles.length,
 		ranges: rangeFiles.length,
 		holidays: holidayNames.length,
 	});
 
-	if (rangeFiles.length > 0 && singleFiles.length > 0) {
+	if (
+		(rangeFiles.length + externalDateEvents.rangeEvents.length > 0) &&
+		(singleFiles.length + externalDateEvents.singleEvents.length > 0)
+	) {
 		cell.dataset.hasBoth = "true";
 	}
 	if (isHoliday && ctx.holidaysData?.names.has(dateKey)) {
@@ -333,7 +344,7 @@ export function createMonthlyCell(
 	}
 
 	/* Range bars: lane index from getRangeLaneMap (overlap-based, same as yearly); data-range-stack holds lane 0–9 */
-	if (rangeFiles.length > 0) {
+	if (rangeFiles.length > 0 || externalDateEvents.rangeEvents.length > 0) {
 		const rangeContainer = inner.createDiv({
 			cls: "monthly-planner-range-bars",
 		});
@@ -344,9 +355,17 @@ export function createMonthlyCell(
 			({ file }) => ctx.rangeLaneMap.get(file.basename) ?? 0,
 		);
 		const maxLane = Math.max(0, ...laneIndices);
-		const requiredSlots = maxLane + 1;
+		const externalStartLane = rangeFiles.length > 0 ? maxLane + 1 : 0;
+		const requiredSlots =
+			externalStartLane + externalDateEvents.rangeEvents.length;
 		rangeContainer.dataset.rangeCount = String(
-			Math.min(Math.max(requiredSlots, rangeFiles.length), 10),
+			Math.min(
+				Math.max(
+					requiredSlots,
+					rangeFiles.length + externalDateEvents.rangeEvents.length,
+				),
+				10,
+			),
 		);
 		rangeFiles.forEach(({ file, runPos, isFirst }) => {
 			const barClasses = [
@@ -407,15 +426,59 @@ export function createMonthlyCell(
 				});
 			}
 		});
+		externalDateEvents.rangeEvents.forEach(
+			({ event, runPos, isFirst }, index) => {
+				const barClasses = [
+					"monthly-planner-range-bar",
+					"planner-external-event-range",
+					runPos.runStart && "monthly-planner-range-run-start",
+					runPos.runEnd && "monthly-planner-range-run-end",
+					!runPos.runStart &&
+						!runPos.runEnd &&
+						"monthly-planner-range-run-mid",
+				]
+					.filter(Boolean)
+					.join(" ");
+				const barEl = rangeContainer.createDiv({ cls: barClasses });
+				barEl.tabIndex = 0;
+				barEl.setAttribute("role", "button");
+				if (isCompactLayout) {
+					barEl.addClass("monthly-planner-range-bar-mobile");
+				}
+				barEl.dataset.externalEventId = event.id;
+				barEl.dataset.rangeStack = String(
+					Math.min(externalStartLane + index, 9),
+				);
+				if (event.color) {
+					barEl.style.setProperty("--range-color", event.color);
+				}
+				if (isFirst) {
+					barEl.createSpan({
+						cls: "monthly-planner-range-label",
+						text: event.title,
+					});
+				}
+				barEl.ariaLabel = t("a11y.openExternalEvent", {
+					title: event.title,
+				});
+			},
+		);
 	}
 
 	if (singleFiles.length > 0 && isCompactLayout) {
 		createMobileSingleFileSummary(inner, ctx.app, singleFiles);
 	}
+	if (externalDateEvents.singleEvents.length > 0 && isCompactLayout) {
+		createMobileExternalSummary(inner, externalDateEvents.singleEvents);
+	}
 	if (isCompactLayout) {
 		createMobileEntryCount(
 			inner,
-			singleFiles.length + rangeFiles.length + holidayNames.length,
+			singleFiles.length +
+				rangeFiles.length +
+				externalDateEvents.singleEvents.length +
+				externalDateEvents.rangeEvents.length +
+				holidayNames.length,
 		);
 	}
 
@@ -457,6 +520,33 @@ export function createMonthlyCell(
 		}
 	}
 
+	if (externalDateEvents.singleEvents.length > 0 && !isCompactLayout) {
+		const listEl =
+			inner.querySelector<HTMLElement>(".monthly-planner-cell-files") ??
+			inner.createDiv({ cls: "monthly-planner-cell-files" });
+		for (const event of externalDateEvents.singleEvents) {
+			const chipEl = listEl.createDiv({
+				cls: "monthly-planner-cell-file planner-external-event-chip",
+			});
+			chipEl.tabIndex = 0;
+			chipEl.setAttribute("role", "button");
+			chipEl.dataset.externalEventId = event.id;
+			const timeLabel = getExternalEventTimeLabel(
+				event,
+				ctx.calendarOverlay.locale,
+			);
+			chipEl.textContent = timeLabel
+				? `${timeLabel} ${event.title}`
+				: event.title;
+			chipEl.ariaLabel = t("a11y.openExternalEvent", {
+				title: event.title,
+			});
+			if (event.color) {
+				chipEl.style.borderLeftColor = event.color;
+			}
+		}
+	}
+
 	if (isHoliday && ctx.holidaysData?.names.has(dateKey) && isCompactLayout) {
 		createMobileHolidaySummary(inner, holidayNames);
 	}
@@ -484,7 +574,7 @@ export function createMonthlyCell(
 
 	if (isSaturday || isSunday) {
 		const weekendLabels =
-			ctx.locale === "ko" ? WEEKEND_LABELS_KO : WEEKEND_LABELS_EN;
+			ctx.calendarOverlay.locale === "ko" ? WEEKEND_LABELS_KO : WEEKEND_LABELS_EN;
 		const label = isSaturday ? weekendLabels.sat : weekendLabels.sun;
 		const labelEl = inner.createSpan({
 			cls: "monthly-planner-weekend-label",
@@ -520,6 +610,42 @@ function createMobileSingleFileSummary(
 		});
 		const dotEl = groupEl.createSpan({
 			cls: "monthly-planner-mobile-single-dot",
+		});
+		if (color) {
+			dotEl.style.setProperty("--monthly-mobile-dot-color", color);
+		}
+		if (count > 1) {
+			groupEl.createSpan({
+				cls: "monthly-planner-mobile-single-plus",
+				text: `+${count - 1}`,
+			});
+		}
+	}
+}
+
+function createMobileExternalSummary(
+	inner: HTMLElement,
+	events: ExternalCalendarEvent[],
+): void {
+	const summaryEl = getOrCreateMobileSummaryContainer(inner);
+	const groupedByColor = new Map<string, { color: string | null; count: number }>();
+	for (const event of events) {
+		const color = event.color ?? null;
+		const colorKey = color ?? "__external__";
+		const prev = groupedByColor.get(colorKey);
+		if (prev) {
+			prev.count += 1;
+			continue;
+		}
+		groupedByColor.set(colorKey, { color, count: 1 });
+	}
+
+	for (const { color, count } of groupedByColor.values()) {
+		const groupEl = summaryEl.createDiv({
+			cls: "monthly-planner-mobile-single-group planner-external-event-mobile-group",
+		});
+		const dotEl = groupEl.createSpan({
+			cls: "monthly-planner-mobile-single-dot planner-external-event-mobile-dot",
 		});
 		if (color) {
 			dotEl.style.setProperty("--monthly-mobile-dot-color", color);

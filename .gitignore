@@ -1,5 +1,5 @@
 # vscode
-.vscode 
+.vscode
 
 # Intellij
 *.iml
@@ -23,6 +23,9 @@ data.json
 
 # Exclude Cursor plans
 .cursor
+
+# Local planning and idea documents that should not ship with releases
+docs/ideas/
 
 # Local backup of incomplete nested .git (see repo setup)
 .git.broken
