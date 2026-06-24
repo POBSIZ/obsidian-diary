@@ -1535,12 +1535,144 @@ available in the app when your plugin is enabled.
 }
 
 .diary-calendar-action-button {
+	position: relative;
+	overflow: hidden;
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
 	gap: 0.35rem;
 	margin: 0;
 	min-height: 2.25rem;
+	transition:
+		transform 90ms ease,
+		background-color 140ms ease,
+		border-color 140ms ease,
+		box-shadow 140ms ease,
+		color 140ms ease,
+		opacity 140ms ease;
+	will-change: transform;
+}
+
+.diary-calendar-action-button::after {
+	position: absolute;
+	inset: 1px;
+	border-radius: inherit;
+	background: color-mix(
+		in srgb,
+		var(--interactive-accent) 24%,
+		transparent
+	);
+	content: "";
+	opacity: 0;
+	pointer-events: none;
+	transition: opacity 90ms ease;
+}
+
+.diary-calendar-action-icon,
+.diary-calendar-action-label {
+	position: relative;
+	z-index: 1;
+}
+
+.diary-calendar-action-icon {
+	transition:
+		transform 90ms ease,
+		opacity 90ms ease;
+}
+
+.diary-calendar-action-button:hover:not(:disabled),
+.diary-calendar-action-button:focus-visible {
+	border-color: color-mix(
+		in srgb,
+		var(--interactive-accent) 58%,
+		var(--background-modifier-border)
+	);
+	box-shadow: 0 0 0 2px
+		color-mix(in srgb, var(--interactive-accent) 14%, transparent);
+}
+
+.diary-calendar-action-button:active:not(:disabled),
+.diary-calendar-action-button.is-pressed:not(:disabled),
+.diary-calendar-action-button.is-loading {
+	transform: translateY(2px) scale(0.965);
+	border-color: color-mix(
+		in srgb,
+		var(--interactive-accent) 72%,
+		var(--background-modifier-border)
+	);
+	background: color-mix(
+		in srgb,
+		var(--interactive-accent) 18%,
+		var(--background-primary)
+	);
+	box-shadow:
+		inset 0 1px 4px color-mix(in srgb, var(--background-modifier-border) 70%, transparent),
+		0 0 0 2px color-mix(in srgb, var(--interactive-accent) 18%, transparent);
+	filter: saturate(1.08);
+	outline: 1px solid
+		color-mix(in srgb, var(--interactive-accent) 44%, transparent);
+	outline-offset: -2px;
+}
+
+.diary-calendar-action-button:active:not(:disabled)::after,
+.diary-calendar-action-button.is-pressed:not(:disabled)::after {
+	opacity: 1;
+}
+
+.diary-calendar-action-button.mod-cta:active:not(:disabled),
+.diary-calendar-action-button.mod-cta.is-pressed:not(:disabled) {
+	background: color-mix(
+		in srgb,
+		var(--interactive-accent) 86%,
+		var(--background-primary)
+	);
+	box-shadow:
+		inset 0 1px 5px color-mix(in srgb, black 24%, transparent),
+		0 0 0 2px color-mix(in srgb, var(--interactive-accent) 24%, transparent);
+	color: var(--text-on-accent);
+}
+
+.diary-calendar-action-button.mod-cta:active:not(:disabled)::after,
+.diary-calendar-action-button.mod-cta.is-pressed:not(:disabled)::after {
+	background: color-mix(in srgb, white 18%, transparent);
+}
+
+.diary-calendar-action-button.is-pressed .diary-calendar-action-icon {
+	transform: scale(0.92);
+	opacity: 0.9;
+}
+
+.diary-calendar-action-button.is-loading {
+	cursor: progress;
+	opacity: 0.82;
+}
+
+.diary-calendar-action-button.is-loading .diary-calendar-action-icon {
+	animation: diary-calendar-action-spin 820ms linear infinite;
+}
+
+.diary-calendar-action-button.is-complete {
+	border-color: color-mix(
+		in srgb,
+		var(--interactive-success, var(--interactive-accent)) 62%,
+		var(--background-modifier-border)
+	);
+	background: color-mix(
+		in srgb,
+		var(--interactive-success, var(--interactive-accent)) 16%,
+		var(--background-primary)
+	);
+	color: var(--text-normal);
+}
+
+@keyframes diary-calendar-action-spin {
+	from {
+		transform: rotate(0deg);
+	}
+
+	to {
+		transform: rotate(360deg);
+	}
 }
 
 .diary-external-calendar-feed {

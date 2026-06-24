@@ -80,7 +80,7 @@ export class ExternalEventModal extends Modal {
 			t("externalEvent.createMarkdown"),
 			{ cta: true },
 		);
-		createBtn.onclick = () => void this.createMarkdownNote();
+		createBtn.onclick = () => void this.createMarkdownNote(createBtn);
 		if (this.options.onRefresh) {
 			const refreshBtn = this.createActionButton(
 				actions,
@@ -94,7 +94,7 @@ export class ExternalEventModal extends Modal {
 			"copy",
 			t("externalEvent.copyDetails"),
 		);
-		copyBtn.onclick = () => void this.copyDetails();
+		copyBtn.onclick = () => void this.copyDetails(copyBtn);
 		const closeBtn = this.createActionButton(actions, "x", t("modal.cancel"));
 		closeBtn.onclick = () => this.close();
 	}
@@ -106,7 +106,9 @@ export class ExternalEventModal extends Modal {
 		options: { cta?: boolean } = {},
 	): HTMLButtonElement {
 		const button = container.createEl("button", {
-			cls: options.cta ? "mod-cta diary-calendar-action-button" : "diary-calendar-action-button",
+			cls: options.cta
+				? "mod-cta diary-calendar-action-button"
+				: "diary-calendar-action-button",
 			attr: { type: "button" },
 		});
 		button.ariaLabel = text;
@@ -114,7 +116,63 @@ export class ExternalEventModal extends Modal {
 		const iconEl = button.createSpan({ cls: "diary-calendar-action-icon" });
 		setIcon(iconEl, icon);
 		button.createSpan({ cls: "diary-calendar-action-label", text });
+		this.attachPressFeedback(button);
 		return button;
+	}
+
+	private attachPressFeedback(button: HTMLButtonElement): void {
+		let releaseTimer: number | null = null;
+		const press = () => {
+			if (button.disabled) return;
+			if (releaseTimer != null) {
+				window.clearTimeout(releaseTimer);
+				releaseTimer = null;
+			}
+			button.addClass("is-pressed");
+		};
+		const release = () => {
+			if (releaseTimer != null) window.clearTimeout(releaseTimer);
+			releaseTimer = window.setTimeout(() => {
+				button.removeClass("is-pressed");
+				releaseTimer = null;
+			}, 120);
+		};
+
+		button.addEventListener("pointerdown", press);
+		button.addEventListener("pointerup", release);
+		button.addEventListener("pointercancel", release);
+		button.addEventListener("pointerleave", release);
+		button.addEventListener("keydown", (event) => {
+			if (event.key === "Enter" || event.key === " ") press();
+		});
+		button.addEventListener("keyup", release);
+		button.addEventListener("blur", () => {
+			if (releaseTimer != null) {
+				window.clearTimeout(releaseTimer);
+				releaseTimer = null;
+			}
+			button.removeClass("is-pressed");
+		});
+	}
+
+	private setButtonBusy(button: HTMLButtonElement, busy: boolean): void {
+		button.disabled = busy;
+		button.toggleClass("is-loading", busy);
+		if (busy) {
+			button.removeClass("is-complete");
+			button.setAttribute("aria-busy", "true");
+		} else {
+			button.removeAttribute("aria-busy");
+		}
+	}
+
+	private markButtonComplete(button: HTMLButtonElement): void {
+		for (const el of Array.from(
+			this.contentEl.querySelectorAll(".diary-calendar-action-button.is-complete"),
+		)) {
+			el.removeClass("is-complete");
+		}
+		button.addClass("is-complete");
 	}
 
 	private createDetail(container: HTMLElement, label: string, value: string): void {
@@ -131,7 +189,8 @@ export class ExternalEventModal extends Modal {
 		});
 	}
 
-	private async createMarkdownNote(): Promise<void> {
+	private async createMarkdownNote(button: HTMLButtonElement): Promise<void> {
+		this.setButtonBusy(button, true);
 		try {
 			const file = await createExternalEventFile(
 				this.app,
@@ -144,23 +203,27 @@ export class ExternalEventModal extends Modal {
 			new Notice(t("externalEvent.createSuccess"));
 			this.close();
 		} catch (error) {
+			const message =
+				error instanceof Error
+					? error.message
+					: t("modal.failedToCreateFile");
 			new Notice(
 				t("externalEvent.createFailed", {
-					message:
-						error instanceof Error
-							? error.message
-							: t("modal.failedToCreateFile"),
+					message,
 				}),
 			);
+		} finally {
+			this.setButtonBusy(button, false);
 		}
 	}
 
 	private async refreshCalendar(button: HTMLButtonElement): Promise<void> {
 		if (!this.options.onRefresh) return;
-		button.disabled = true;
+		this.setButtonBusy(button, true);
 		try {
 			const ok = await this.options.onRefresh();
 			if (typeof ok === "boolean") {
+				if (ok) this.markButtonComplete(button);
 				new Notice(
 					ok
 						? t("settings.externalCalendarRefreshSuccess")
@@ -168,11 +231,12 @@ export class ExternalEventModal extends Modal {
 				);
 			}
 		} finally {
-			button.disabled = false;
+			this.setButtonBusy(button, false);
 		}
 	}
 
-	private async copyDetails(): Promise<void> {
+	private async copyDetails(button: HTMLButtonElement): Promise<void> {
+		this.setButtonBusy(button, true);
 		const { event, calendarName, locale } = this.options;
 		const lines = [
 			event.title,
@@ -187,7 +251,14 @@ export class ExternalEventModal extends Modal {
 		if (event.descriptionText) {
 			lines.push("", event.descriptionText);
 		}
-		await navigator.clipboard.writeText(lines.join("\n"));
-		new Notice(t("externalEvent.copySuccess"));
+		try {
+			await navigator.clipboard.writeText(lines.join("\n"));
+			this.markButtonComplete(button);
+			new Notice(t("externalEvent.copySuccess"));
+		} catch {
+			// Press/busy state is the only in-modal feedback for this action.
+		} finally {
+			this.setButtonBusy(button, false);
+		}
 	}
 }

@@ -378,6 +378,10 @@ export class MonthlyInteractionHandler {
 			".monthly-planner-cell-holiday-badge",
 		);
 		if (onHoliday) return;
+		const onExternalEvent = (el as HTMLElement).closest?.(
+			"[data-external-event-id]",
+		);
+		if (onExternalEvent) return;
 
 		const chipOrBar = getChipOrBarAt(this.view.contentEl, clientX, clientY);
 		if (chipOrBar && Platform.isDesktop) {
