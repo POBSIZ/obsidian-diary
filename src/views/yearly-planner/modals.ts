@@ -557,8 +557,9 @@ export class CreateFileModal extends Modal {
 				attr: { type: "button" },
 			});
 			btn.style.backgroundColor = preset.hex;
-			btn.ariaLabel = preset.hex;
-			btn.title = preset.hex;
+			const label = t("modal.colorPresetLabel", { color: preset.hex });
+			btn.ariaLabel = label;
+			btn.title = label;
 			btn.onclick = () => this.setColorFromPreset(preset.hex);
 			this.colorPresetBtns.push(btn);
 		});
@@ -1158,8 +1159,9 @@ export class FileOptionsModal extends Modal {
 				attr: { type: "button" },
 			});
 			btn.style.backgroundColor = preset.hex;
-			btn.ariaLabel = preset.hex;
-			btn.title = preset.hex;
+			const label = t("modal.colorPresetLabel", { color: preset.hex });
+			btn.ariaLabel = label;
+			btn.title = label;
 			btn.onclick = () => this.setColorFromPreset(preset.hex);
 			this.colorPresetBtns.push(btn);
 		});

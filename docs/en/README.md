@@ -9,7 +9,7 @@ Diary is an Obsidian community plugin that turns Markdown files in your vault in
 | Item | Value |
 | --- | --- |
 | Plugin ID | `diary` |
-| Current version | `1.4.0` |
+| Current version | `1.4.2` |
 | Minimum Obsidian version | `1.7.2` |
 | Supported platforms | Desktop / mobile (`isDesktopOnly: false`) |
 | Default language | `en` |
@@ -17,6 +17,8 @@ Diary is an Obsidian community plugin that turns Markdown files in your vault in
 
 ## Latest Version
 
+- `1.4.2`: Narrows Diary styles to plugin surfaces and adds localized labels for color preset buttons.
+- `1.4.1`: Polishes external calendar event actions and modal feedback.
 - `1.4.0`: Adds custom calendar overlay controls and opt-in external calendar feeds. External `webcal://` or `https://` `.ics` events render as read-only planner overlays until you choose one and create a Markdown note.
 - `1.3.6`: Maintenance release that stabilizes typed community-plugin audit checks.
 - `1.3.5`: Maintenance release that aligns Obsidian plugin lint and release validation.

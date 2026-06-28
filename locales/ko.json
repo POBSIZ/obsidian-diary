@@ -79,6 +79,7 @@
 	"modal.completed": "완료",
 	"modal.pickColor": "색상 선택",
 	"modal.chipColorTitle": "칩 색상 (hex, rgb 또는 색상 이름)",
+	"modal.colorPresetLabel": "칩 색상 {color} 사용",
 	"modal.enterYear": "연도 입력",
 	"modal.enterMonthYear": "월·연도 입력",
 	"modal.month": "월",

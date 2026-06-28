@@ -3,7 +3,25 @@ This CSS file is included with your plugin, and
 available in the app when your plugin is enabled.
 */
 
-* {
+:where(
+		.yearly-planner-container,
+		.monthly-planner-container,
+		.monthly-list-planner-container,
+		.yearly-planner-modal-content,
+		.diary-calendar-overlay-settings-mount,
+		.diary-external-calendar-settings-mount,
+		.diary-calendar-settings-panel
+	),
+:where(
+		.yearly-planner-container,
+		.monthly-planner-container,
+		.monthly-list-planner-container,
+		.yearly-planner-modal-content,
+		.diary-calendar-overlay-settings-mount,
+		.diary-external-calendar-settings-mount,
+		.diary-calendar-settings-panel
+	)
+	* {
 	box-sizing: border-box;
 }
 

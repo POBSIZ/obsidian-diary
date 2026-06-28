@@ -79,6 +79,7 @@
 	"modal.completed": "Completed",
 	"modal.pickColor": "Pick color",
 	"modal.chipColorTitle": "Chip color (hex, rgb, or color name)",
+	"modal.colorPresetLabel": "Use chip color {color}",
 	"modal.enterYear": "Enter year",
 	"modal.enterMonthYear": "Enter month and year",
 	"modal.month": "Month",

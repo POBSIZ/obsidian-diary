@@ -11,7 +11,7 @@ Diary는 Obsidian vault 안의 Markdown 파일을 날짜 기반 플래너로 보
 | Item | Value |
 | --- | --- |
 | Plugin ID | `diary` |
-| Version | `1.4.0` |
+| Version | `1.4.2` |
 | Minimum Obsidian version | `1.7.2` |
 | Platforms | Desktop and mobile (`isDesktopOnly: false`) |
 | Default language | `en` |
@@ -19,6 +19,8 @@ Diary는 Obsidian vault 안의 Markdown 파일을 날짜 기반 플래너로 보
 
 ## Latest Version
 
+- `1.4.2`: narrows Diary styles to plugin surfaces and adds localized labels for color preset buttons.
+- `1.4.1`: polishes external calendar event actions and modal feedback.
 - `1.4.0`: adds custom calendar overlay controls and opt-in external calendar feeds. External `webcal://` or `https://` `.ics` events render as read-only planner overlays until you choose one and create a Markdown note.
 - `1.3.6`: maintenance release that stabilizes typed community-plugin audit checks.
 - `1.3.5`: maintenance release that aligns Obsidian plugin lint and release validation.

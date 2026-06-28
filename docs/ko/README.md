@@ -9,7 +9,7 @@ English documentation: [docs/en/README.md](https://github.com/POBSIZ/obsidian-di
 | 항목 | 값 |
 | --- | --- |
 | 플러그인 ID | `diary` |
-| 현재 버전 | `1.4.0` |
+| 현재 버전 | `1.4.2` |
 | 최소 Obsidian 버전 | `1.7.2` |
 | 지원 플랫폼 | 데스크톱 / 모바일 (`isDesktopOnly: false`) |
 | 기본 언어 | `en` |
@@ -17,6 +17,8 @@ English documentation: [docs/en/README.md](https://github.com/POBSIZ/obsidian-di
 
 ## 최신 버전
 
+- `1.4.2`: Diary 스타일 적용 범위를 플러그인 화면으로 좁히고 색상 preset 버튼에 현지화된 라벨을 추가한 릴리스입니다.
+- `1.4.1`: 외부 캘린더 일정 액션과 모달 피드백을 다듬은 릴리스입니다.
 - `1.4.0`: 커스텀 캘린더 오버레이 설정과 사용자가 추가하는 외부 캘린더 feed를 지원합니다. 외부 `webcal://` 또는 `https://` `.ics` 일정은 사용자가 Markdown 노트로 만들기 전까지 읽기 전용 오버레이로 표시됩니다.
 - `1.3.6`: 타입 기반 커뮤니티 플러그인 audit 검사를 안정화한 유지보수 릴리스입니다.
 - `1.3.5`: Obsidian 플러그인 lint와 릴리스 검증 흐름을 맞춘 유지보수 릴리스입니다.
