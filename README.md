@@ -11,7 +11,7 @@ Diary는 Obsidian vault 안의 Markdown 파일을 날짜 기반 플래너로 보
 | Item | Value |
 | --- | --- |
 | Plugin ID | `diary` |
-| Version | `1.5.0` |
+| Version | `1.6.0` |
 | Minimum Obsidian version | `1.7.2` |
 | Platforms | Desktop and mobile (`isDesktopOnly: false`) |
 | Default language | `en` |
@@ -19,6 +19,7 @@ Diary는 Obsidian vault 안의 Markdown 파일을 날짜 기반 플래너로 보
 
 ## Latest Version
 
+- `1.6.0`: adds full documentation for every supported UI language, Spain holiday support, and localized alternate calendar option text.
 - `1.5.0`: adds German, Spanish, French, Japanese, Simplified Chinese, Traditional Chinese, and Korean UI language support alongside English.
 - `1.4.2`: narrows Diary styles to planner, settings, and modal surfaces and adds localized labels for color preset buttons.
 - `1.4.1`: polishes external calendar event actions, press feedback, and success/error notices.

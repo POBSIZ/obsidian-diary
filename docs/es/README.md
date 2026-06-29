@@ -9,7 +9,7 @@ Documentación completa: [English](https://github.com/POBSIZ/obsidian-diary/blob
 | Elemento | Valor |
 | --- | --- |
 | ID del plugin | `diary` |
-| Versión actual | `1.5.0` |
+| Versión actual | `1.6.0` |
 | Versión mínima de Obsidian | `1.7.2` |
 | Plataformas | Escritorio / móvil (`isDesktopOnly: false`) |
 | Idioma predeterminado | `en` |
@@ -17,6 +17,7 @@ Documentación completa: [English](https://github.com/POBSIZ/obsidian-diary/blob
 
 ## Última versión
 
+- `1.6.0`: Añade documentación completa para todos los idiomas de interfaz, festivos de España y textos localizados para las opciones de calendarios alternativos.
 - `1.5.0`: Añade soporte de interfaz para alemán, español, francés, japonés, chino simplificado, chino tradicional y coreano, además del inglés.
 - `1.4.2`: Limita los estilos de Diary a planificadores, ajustes y modales, y añade etiquetas localizadas para los botones de colores predefinidos.
 - `1.4.1`: Pule las acciones de eventos de calendarios externos, la respuesta al pulsar y los avisos de éxito o error.
