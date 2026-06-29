@@ -279,8 +279,7 @@ interface CalendarOverlayLabel {
 
 - `src/utils/recurrence.ts`
 - `src/views/yearly-planner/modals.ts`
-- `locales/en.json`
-- `locales/ko.json`
+- `locales/*.json`
 - `docs/en/README.md`
 - `docs/ko/README.md`
 
@@ -311,7 +310,7 @@ recurrence_anchor_day: 12
    - built-in 보조 역법과 custom profile의 공통 라벨 resolver
 3. `src/settings.ts`
    - custom calendar settings 필드, 편집 모달, preview
-4. `locales/en.json`, `locales/ko.json`
+4. `locales/*.json`
    - settings, validation, modal copy
 5. `src/views/*/render*.ts`
    - overlay resolver로 라벨 표시 경로 교체

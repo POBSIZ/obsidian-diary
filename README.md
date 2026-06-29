@@ -4,7 +4,7 @@ Diary is an Obsidian community plugin for date-based planning in Markdown.
 
 Diary는 Obsidian vault 안의 Markdown 파일을 날짜 기반 플래너로 보여주는 커뮤니티 플러그인입니다.
 
-📖 Full documentation: [English](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/en/README.md) | [한국어](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/ko/README.md)
+📖 Full documentation: [English](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/en/README.md) | [Deutsch](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/de/README.md) | [Español](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/es/README.md) | [Français](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/fr/README.md) | [日本語](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/ja/README.md) | [简体中文](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/zh-CN/README.md) | [繁體中文](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/zh-TW/README.md) | [한국어](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/ko/README.md)
 
 ## Snapshot
 
@@ -125,6 +125,7 @@ npm test
 - `src/views/planner-clipboard.ts`: multi-select copy/paste/delete/undo flow.
 - `src/planner-reminders.ts`: runtime reminders based on `notify_minutes`.
 - `src/i18n.ts`, `locales/*`: English, German, Spanish, French, Japanese, Simplified Chinese, Traditional Chinese, and Korean localization.
+- `docs/*/README.md`: full documentation for each supported UI language.
 - `styles.css`: shared styling tokens and per-view UI styles.
 
 ## Release

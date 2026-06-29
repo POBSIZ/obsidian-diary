@@ -2,7 +2,7 @@
 
 Diary is an Obsidian community plugin that turns Markdown files in your vault into date-based planner views. It helps you move between a yearly overview, a monthly grid, and a monthly list while managing single-date notes, range notes, monthly/yearly plan notes, holidays, one calendar overlay label, opt-in external calendar overlays, todo state, and local reminders.
 
-한국어 문서: [docs/ko/README.md](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/ko/README.md)
+Full documentation: [English](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/en/README.md) | [Deutsch](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/de/README.md) | [Español](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/es/README.md) | [Français](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/fr/README.md) | [日本語](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/ja/README.md) | [简体中文](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/zh-CN/README.md) | [繁體中文](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/zh-TW/README.md) | [한국어](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/ko/README.md)
 
 ## Current Info
 
@@ -60,8 +60,8 @@ The images below were captured from a fresh demo vault with sample planner notes
 - **Date and range notes**: Display notes as planner chips based on single-date and date-range filenames. Diary scans the whole vault by default, or only the planner folder when configured.
 - **Recurring events**: Repeat a note daily, monthly, or yearly, choose a Gregorian or alternate-calendar basis, and let Diary create only the occurrences that fall inside the planner range you are viewing.
 - **Color, todo, and completion state**: Reflect `color`, `todo`, and `completed` frontmatter in chip styling and labels.
-- **Holiday overlays**: Show country-specific public holidays and select holiday badges to see their names.
-- **Alternate calendar label**: Optionally show one compact alternate calendar label at a time, including Korean lunar, Chinese lunar, Dangi, Hebrew, Islamic, Persian, Indian national, Buddhist, Japanese era, Minguo, Coptic, and Ethiopic calendars.
+- **Holiday overlays**: Show country-specific public holidays for the supported UI-language regions and select holiday badges to see their names.
+- **Alternate calendar label**: Optionally show one compact alternate calendar label at a time, including Korean lunar, Chinese lunar, Dangi, Hebrew, Islamic, Persian, Indian national, Buddhist, Japanese era, Minguo, Coptic, and Ethiopic calendars, with localized option text in every supported UI language.
 - **Custom calendar overlay**: Create local fantasy or campaign calendar profiles with custom months, weekdays, and simple leap rules. Diary shows the custom date as an overlay label while keeping normal `YYYY-MM-DD` note files.
 - **External calendar overlays**: Add `webcal://` or `https://` `.ics` feeds, refresh them manually or on an interval, and show events as read-only chips/ranges in yearly, monthly grid, monthly list, side planner, and day summary surfaces. Select an external event only when you want to create a normal Markdown note for it.
 - **Scoped styling**: Diary's CSS is limited to planner views, settings panels, and plugin modals so it does not restyle ordinary vault content.
@@ -238,7 +238,7 @@ Paste rules:
 | Planner note scan scope | Controls whether Diary finds planner notes across the entire vault or only inside **Planner folder** and its subfolders. Default: `Entire vault`. |
 | Date format | Stored date format setting. Planner filenames currently use the `YYYY-MM-DD` rule. |
 | Show holidays | Turns holiday rendering on or off. |
-| Holiday country | Holiday country. Supports `KR`, `US`, `JP`, `CN`, `GB`, `DE`, `FR`, `AU`, `CA`, `TW`, and `None`. |
+| Holiday country | Holiday country. Supports `KR`, `US`, `JP`, `CN`, `GB`, `DE`, `ES`, `FR`, `AU`, `CA`, `TW`, and `None`. |
 | Calendar overlay | Selects one built-in alternate calendar or one custom calendar profile for yearly, monthly grid, monthly list, day summary, and sidebar planner views. Default: `None`. |
 | Custom calendars | Local fantasy/campaign calendar profiles. Each profile can define month lengths, weekday names, an epoch mapping, a label format, and a simple leap rule. |
 | External calendars | Opt-in `webcal://` or `https://` `.ics` feeds shown as read-only overlays. Each feed has an enabled state, color, refresh interval, description toggle, and per-view visibility settings. |

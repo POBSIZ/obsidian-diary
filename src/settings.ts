@@ -198,6 +198,7 @@ export class DiaryObsidianSettingTab extends PluginSettingTab {
 					.addOption("CN", t("country.CN"))
 					.addOption("GB", t("country.GB"))
 					.addOption("DE", t("country.DE"))
+					.addOption("ES", t("country.ES"))
 					.addOption("FR", t("country.FR"))
 					.addOption("AU", t("country.AU"))
 					.addOption("CA", t("country.CA"))

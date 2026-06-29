@@ -377,7 +377,7 @@ calendarId | uid | instanceId
     - 외부 item 클릭/키보드 실행 라우팅
 12. `styles.css`
     - external chip/range/linked/error 스타일
-13. `locales/en.json`, `locales/ko.json`
+13. `locales/*.json`
     - 설정, 모달, 오류, 개인정보 안내 문구
 14. `docs/en/README.md`, `docs/ko/README.md`
     - 기능이 출시될 때만 사용자 문서 업데이트
