@@ -3,6 +3,7 @@ import { getLocale, t } from "../i18n";
 import type DiaryObsidian from "../main";
 import {
 	ALTERNATE_CALENDAR_OPTIONS,
+	getAlternateCalendarOptionText,
 	normalizeAlternateCalendarId,
 	type AlternateCalendarOption,
 } from "../utils/alternate-calendars";
@@ -113,7 +114,7 @@ function renderCalendarOverlaySettingsContent(
 			for (const option of ALTERNATE_CALENDAR_OPTIONS) {
 				dropdown.addOption(
 					`${OVERLAY_BUILTIN_PREFIX}${option.id}`,
-					option.text[locale].name,
+					getAlternateCalendarOptionText(option, locale).name,
 				);
 			}
 			for (const profile of plugin.settings.customCalendarProfiles) {
@@ -146,11 +147,12 @@ function renderCalendarOverlaySettingsContent(
 		});
 
 	if (selectedBuiltin) {
+		const text = getAlternateCalendarOptionText(selectedBuiltin, locale);
 		body.createDiv({
 			cls: "diary-calendar-settings-note",
 			text: t("settings.calendarOverlayBuiltinDesc", {
-				name: selectedBuiltin.text[locale].name,
-				description: selectedBuiltin.text[locale].description,
+				name: text.name,
+				description: text.description,
 			}),
 		});
 	}
@@ -206,13 +208,15 @@ function formatProfileDescription(profile: CustomCalendarProfile): string {
 function getOverlaySummaryText(
 	selectedCustomProfile: CustomCalendarProfile | undefined,
 	selectedBuiltin: AlternateCalendarOption | undefined,
-	locale: "en" | "ko",
+	locale: string,
 ): string {
 	if (selectedCustomProfile) {
 		return `${t("settings.calendarOverlayCustomPill")}: ${selectedCustomProfile.name}`;
 	}
 	if (selectedBuiltin) {
-		return `${t("settings.calendarOverlayBuiltinPill")}: ${selectedBuiltin.text[locale].name}`;
+		return `${t("settings.calendarOverlayBuiltinPill")}: ${
+			getAlternateCalendarOptionText(selectedBuiltin, locale).name
+		}`;
 	}
 	return t("settings.calendarOverlayNonePill");
 }

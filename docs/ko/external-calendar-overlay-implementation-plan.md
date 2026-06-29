@@ -2,7 +2,7 @@
 
 이 문서는 Diary에 Google Calendar, Outlook, Apple Calendar, `webcal://`, `.ics` 같은 외부 캘린더를 불러와 플래너에 표시하는 기능의 실제 구현 계획과 현재 적용 상태를 정리한다. 핵심 방향은 **외부 일정은 먼저 읽기 전용 overlay로만 보여주고, 사용자가 선택한 일정만 Markdown 노트로 승격한다**는 것이다.
 
-현재 상태: `1.4.0` 기준으로 사용자가 추가한 `webcal://` 또는 `https://` `.ics` feed를 읽기 전용 overlay로 표시하고, 외부 일정 상세 모달에서 선택한 일정만 Markdown 노트로 만들 수 있다. OAuth, CalDAV 쓰기, 외부 원본 이벤트 수정은 아직 비목표다.
+현재 상태: `1.5.0` 기준으로 사용자가 추가한 `webcal://` 또는 `https://` `.ics` feed를 읽기 전용 overlay로 표시하고, 외부 일정 상세 모달에서 선택한 일정만 Markdown 노트로 만들 수 있다. 새 feed는 기본 60분 자동 새로고침과 전체 planner surface 표시가 켜진 상태로 추가되며, 사용자가 수동 새로고침이나 화면별 숨김으로 바꿀 수 있다. OAuth, CalDAV 쓰기, 외부 원본 이벤트 수정은 아직 비목표다.
 
 ## 목표
 
@@ -21,7 +21,7 @@
 - 외부 캘린더 원본 이벤트 수정/삭제
 - 외부 이벤트 전체를 자동으로 Markdown 파일로 가져오기
 - 외부 이벤트 description을 Markdown이나 HTML로 렌더링하기
-- Obsidian 시작 직후 자동 네트워크 fetch 실행
+- 사용자가 feed를 추가하지 않았거나 수동 새로고침만 선택한 feed에 대한 자동 네트워크 fetch 실행
 - 외부 캘린더를 반복 이벤트의 source note처럼 취급하기
 
 ## 핵심 제품 원칙
@@ -52,7 +52,7 @@
   - 이름
   - `webcal://` 또는 `https://...ics` URL
   - 색상
-  - 표시 범위: `월간/목록/사이드바`, 후속으로 `연간`
+  - 표시 범위: `연간/월간/목록/사이드바`
   - description 포함 여부
   - 수동 새로고침만 사용할지, 주기 새로고침을 켤지
 
@@ -60,12 +60,12 @@ feed 추가 모달에는 짧은 개인정보 안내를 둔다.
 
 > Google Calendar의 secret iCal URL은 링크를 아는 사람이 캘린더를 읽을 수 있습니다. Diary는 URL을 로컬 plugin data에 저장하며, vault sync 설정에 따라 다른 기기로 동기화될 수 있습니다.
 
-초기 MVP에서는 기본값을 보수적으로 둔다.
+현재 feed 추가 기본값은 다음과 같다.
 
 - `enabled`: true
-- `refreshMinutes`: null
+- `refreshMinutes`: 60
 - `includeDescriptions`: false
-- `showInYearly`: false
+- `showInYearly`: true
 - `showInMonthly`: true
 - `showInMonthlyList`: true
 - `showInSidebar`: true
@@ -120,7 +120,7 @@ planner-external-event-error
 
 ### 외부 일정 모달
 
-외부 chip/range를 선택하면 `ExternalCalendarEventModal`을 연다.
+외부 chip/range를 선택하면 `ExternalEventModal`을 연다.
 
 표시 정보:
 
@@ -139,11 +139,7 @@ planner-external-event-error
 - **Refresh calendar**
 - **Close**
 
-이미 연결된 Markdown 노트가 있으면 액션을 바꾼다.
-
-- **Open linked note**
-- **Create another note**는 보조 액션으로 둔다.
-- 기본 플래너 표시에서는 linked 외부 overlay를 숨기거나 작은 linked mark로 축약한다.
+현재 구현은 연결된 Markdown 노트가 있으면 기본 플래너 표시에서 해당 외부 overlay를 숨기고 Markdown chip을 우선한다. linked overlay를 별도 mark로 다시 표시하거나 **Open linked note** 액션을 제공하는 것은 후속 UX 옵션이다.
 
 ### Markdown 노트 생성 흐름
 
@@ -275,22 +271,22 @@ src/utils/ical-events.ts
 
 ### Fetch와 cache
 
-MVP는 수동 새로고침만 제공한다.
+Fetch는 수동 새로고침과 자동 새로고침이 같은 검증/cache 경로를 사용한다.
 
-1. 사용자가 **Refresh now**를 누른다.
+1. 사용자가 **Refresh now**를 누르거나 자동 새로고침 대상 feed가 due 상태가 된다.
 2. URL을 검증한다.
 3. `webcal://`은 `https://`로 정규화한다.
-4. 최대 크기와 timeout을 적용해 `.ics`를 가져온다.
+4. 최대 크기를 적용해 `.ics`를 가져온다.
 5. iCalendar parser로 `VEVENT`만 읽는다.
 6. 이벤트를 normalized cache로 저장한다.
 7. 활성 플래너를 refresh한다.
 
-후속 단계에서만 주기 새로고침을 추가한다.
+현재 구현된 주기 새로고침 정책:
 
 - workspace ready 이후에만 시작
-- feed마다 interval 등록
-- plugin unload에서 interval 정리
-- Obsidian이 foreground일 때만 refresh
+- 수동만이 아닌 feed는 startup에 한 번 새로고침한다.
+- 이후 플러그인의 60초 interval에서 feed별 `refreshMinutes`가 지난 항목만 새로고침한다.
+- refresh in-flight set으로 같은 feed의 중복 fetch를 막는다.
 
 ### 파싱 범위
 
@@ -315,8 +311,8 @@ MVP에서 읽는 필드:
 시간 처리:
 
 - all-day `DTEND`는 iCalendar 규칙상 exclusive end이므로 하루를 빼서 표시 종료일을 계산한다.
-- timezone이 있는 timed event는 Obsidian 실행 환경의 timezone으로 표시한다.
-- timezone 파싱이 불완전한 이벤트는 원본 시간 문자열을 보존하고 모달에 경고를 표시한다.
+- UTC `Z` timed event는 ISO timestamp로 정규화하고, timezone이 없는 floating timed event는 원본 날짜/시간 문자열을 보존한다.
+- `TZID`별 timezone 변환과 모달 경고는 아직 후속 안정화 범위다.
 
 ### 중복 방지
 
@@ -330,8 +326,8 @@ calendarId | uid | instanceId
 
 1. 연결된 Markdown 노트가 있으면 Markdown chip을 우선 표시한다.
 2. 기본값으로 같은 외부 overlay는 숨긴다.
-3. 설정에서 **Show linked external events**를 켜면 linked mark가 붙은 외부 chip을 같이 보여준다.
-4. 외부 이벤트 시간이 바뀌어 instance key가 달라진 경우 모달에서 "May be moved in source calendar" 상태를 보여준다.
+3. linked mark 표시나 **Show linked external events** 설정은 아직 제공하지 않는다.
+4. 외부 이벤트 시간이 바뀌어 instance key가 달라진 경우 별도 "moved in source calendar" 상태를 보여주는 기능은 후속 범위다.
 
 ### 상호작용 제한
 
@@ -405,10 +401,10 @@ calendarId | uid | instanceId
 - 설정에서 `webcal://` 또는 `https://` `.ics` URL을 추가한다.
 - **Refresh now** 또는 선택한 자동 새로고침 주기로 fetch한다.
 - 연간 플래너, 월간 그리드, 월간 목록, 일자 요약 시트, 사이드바에 외부 item을 표시한다.
-- 외부 item은 클릭 시 상세 모달만 연다.
-- Markdown 파일은 만들지 않는다.
+- 외부 item은 클릭 시 상세 모달을 연다.
+- Markdown 파일은 자동으로 만들지 않는다. 파일 생성은 2단계의 명시적 액션으로 분리한다.
 
-상태: `1.4.0` 기준 적용됨. 여러 feed, feed별 색상, 표시 위치, description 포함 여부, 수동/주기 새로고침, URL 검증을 지원한다.
+상태: `1.5.0` 기준 적용됨. 여러 feed, feed별 색상, 표시 위치, description 포함 여부, 수동/주기 새로고침, startup refresh, URL 검증을 지원한다.
 
 검증:
 
@@ -432,7 +428,7 @@ calendarId | uid | instanceId
 - 같은 외부 이벤트에서 노트를 만든 뒤 overlay가 중복 표시되지 않음
 - 생성된 노트는 플러그인을 꺼도 일반 Markdown 파일로 남음
 
-상태: `1.4.0` 기준 적용됨. 생성된 노트에는 `diary_external_calendar`, `diary_external_event_uid`, `diary_external_event_instance`, `diary_external_event_source`, `diary_external_event_linked_at` frontmatter를 저장한다.
+상태: `1.5.0` 기준 적용됨. 생성된 노트에는 `diary_external_calendar`, `diary_external_event_uid`, `diary_external_event_instance`, `diary_external_event_source`, `diary_external_event_linked_at` frontmatter를 저장한다. 모달 액션 버튼은 아이콘+텍스트, 눌림, loading, 완료 상태 피드백을 제공한다.
 
 ### 3단계: 반복, timezone, cache 안정화
 
@@ -441,18 +437,22 @@ calendarId | uid | instanceId
 - 여러 feed를 지원한다.
 - feed별 오류 상태와 마지막 성공 시각을 표시한다.
 
+상태: `1.5.0` 기준 부분 적용됨. `RRULE`/`EXDATE`/`RDATE`, cancelled event 숨김, `ETag`/`Last-Modified`, 오류 cache 유지, feed별 오류/새로고침 상태 표시는 구현되어 있다. `TZID`별 timezone 변환은 아직 남아 있다.
+
 검증:
 
 - 매주 반복 일정이 현재 월에만 필요한 occurrence로 표시됨
 - cancelled event는 기본 숨김 처리됨
-- timezone이 있는 일정이 로컬 표시 시간으로 안정적으로 보임
+- UTC `Z` 일정과 timezone 없는 timed 일정이 안정적으로 표시됨
 - fetch 실패가 기존 cache를 즉시 지우지 않음
 
 ### 4단계: 연간 플래너와 주기 새로고침
 
-- 연간 플래너에는 title chip을 모두 넣기보다 count 또는 작은 external marker를 우선한다.
+- 연간 플래너에는 현재 외부 chip/range와 overflow summary count를 함께 사용한다. 향후 과밀한 vault에서는 더 작은 external marker 옵션을 검토한다.
 - 사용자가 원하면 연간 셀에서도 외부 item 목록을 일자 요약으로 확인할 수 있게 한다.
-- 명시적으로 켠 feed에 한해 주기 새로고침을 제공한다.
+- 사용자가 추가하고 활성화한 feed에 한해 주기 새로고침을 제공한다.
+
+상태: `1.5.0` 기준 적용됨. feed 표시 범위에 연간 플래너가 포함되고, 주기 새로고침은 feed별 `refreshMinutes`로 제어된다.
 
 검증:
 
@@ -466,11 +466,11 @@ calendarId | uid | instanceId
 - `webcal://`은 `https://`로 변환한다.
 - `javascript:`, `data:`, `file:`, `ftp:` URL은 거부한다.
 - localhost, private IP, link-local IP는 기본 거부한다.
-- redirect 횟수를 제한한다.
-- fetch timeout과 최대 다운로드 크기를 둔다.
+- 최대 다운로드 크기를 둔다.
 - attachment, alarm, HTML, remote image는 렌더링하지 않는다.
 - description은 plain text로만 표시한다.
 - feed URL은 secret일 수 있음을 설정과 문서에서 안내한다.
+- redirect 횟수 제한과 fetch timeout은 후속 hardening 항목이다.
 
 ## 수용 기준
 

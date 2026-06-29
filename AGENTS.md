@@ -4,9 +4,9 @@
 
 - Target: Obsidian Community Plugin (TypeScript → bundled JavaScript).
 - Source entry point: `src/main.ts`; esbuild bundles it to top-level `main.js`, which Obsidian loads.
-- Required release artifacts: `main.js`, `manifest.json`, and optional `styles.css`.
+- Release artifacts for this repo: `main.js`, `manifest.json`, and `styles.css`.
 - Current plugin ID: `diary`.
-- Current plugin version: `1.4.0`.
+- Current plugin version: `1.5.0`.
 - Current minimum Obsidian version: `1.7.2`.
 
 ## Environment & tooling
@@ -68,6 +68,7 @@ npm run lint
 - **Do not commit build artifacts**: Never commit `node_modules/`, `main.js`, or other generated files to version control.
 - Keep the plugin small. Avoid large dependencies. Prefer browser-compatible packages.
 - Generated output should be placed at the plugin root or `dist/` depending on your build setup. Release artifacts must end up at the top level of the plugin folder in the vault (`main.js`, `manifest.json`, `styles.css`).
+- `styles.css` is part of the current release asset set. Keep Diary CSS scoped to planner, settings, and modal surfaces so it does not restyle unrelated vault content.
 
 ## Manifest rules (`manifest.json`)
 
@@ -90,11 +91,12 @@ npm run lint
 - Repository verification:
 
 ```bash
-npm run build
 npm run lint
+npm run build
+git diff --check
 ```
 
-- Manual install for testing: copy `main.js`, `manifest.json`, `styles.css` (if any) to:
+- Manual install for testing: copy `main.js`, `manifest.json`, and `styles.css` to:
   ```
   <Vault>/.obsidian/plugins/<plugin-id>/
   ```

@@ -9,7 +9,7 @@ Diary is an Obsidian community plugin that turns Markdown files in your vault in
 | Item | Value |
 | --- | --- |
 | Plugin ID | `diary` |
-| Current version | `1.4.2` |
+| Current version | `1.5.0` |
 | Minimum Obsidian version | `1.7.2` |
 | Supported platforms | Desktop / mobile (`isDesktopOnly: false`) |
 | Default language | `en` |
@@ -17,8 +17,9 @@ Diary is an Obsidian community plugin that turns Markdown files in your vault in
 
 ## Latest Version
 
-- `1.4.2`: Narrows Diary styles to plugin surfaces and adds localized labels for color preset buttons.
-- `1.4.1`: Polishes external calendar event actions and modal feedback.
+- `1.5.0`: Adds German, Spanish, French, Japanese, Simplified Chinese, Traditional Chinese, and Korean UI language support alongside English.
+- `1.4.2`: Narrows Diary styles to planner, settings, and modal surfaces and adds localized labels for color preset buttons.
+- `1.4.1`: Polishes external calendar event actions, press feedback, and success/error notices.
 - `1.4.0`: Adds custom calendar overlay controls and opt-in external calendar feeds. External `webcal://` or `https://` `.ics` events render as read-only planner overlays until you choose one and create a Markdown note.
 - `1.3.6`: Maintenance release that stabilizes typed community-plugin audit checks.
 - `1.3.5`: Maintenance release that aligns Obsidian plugin lint and release validation.
@@ -51,6 +52,7 @@ The images below were captured from a fresh demo vault with sample planner notes
 ## Key Features
 
 - **Yearly planner**: View date notes and range notes in a `12 months x 31 days` table. Expanded month-cell widths are saved across reloads.
+- **Localized UI**: Switch Diary between English, German, Spanish, French, Japanese, Simplified Chinese, Traditional Chinese, and Korean.
 - **Monthly grid planner**: Inspect one month in a large calendar grid with chips, range bars, holidays, calendar overlay labels, and external calendar overlays.
 - **Monthly list planner**: Review busy months in a day-by-day vertical list with `All`, `With notes`, and `Upcoming` filters.
 - **Right sidebar planner**: Keep a compact monthly planner open in the right sidebar while notes remain open in the main workspace.
@@ -62,6 +64,7 @@ The images below were captured from a fresh demo vault with sample planner notes
 - **Alternate calendar label**: Optionally show one compact alternate calendar label at a time, including Korean lunar, Chinese lunar, Dangi, Hebrew, Islamic, Persian, Indian national, Buddhist, Japanese era, Minguo, Coptic, and Ethiopic calendars.
 - **Custom calendar overlay**: Create local fantasy or campaign calendar profiles with custom months, weekdays, and simple leap rules. Diary shows the custom date as an overlay label while keeping normal `YYYY-MM-DD` note files.
 - **External calendar overlays**: Add `webcal://` or `https://` `.ics` feeds, refresh them manually or on an interval, and show events as read-only chips/ranges in yearly, monthly grid, monthly list, side planner, and day summary surfaces. Select an external event only when you want to create a normal Markdown note for it.
+- **Scoped styling**: Diary's CSS is limited to planner views, settings panels, and plugin modals so it does not restyle ordinary vault content.
 - **Local reminders**: Notes with `notify_minutes` show an Obsidian Notice on the event date while Obsidian is open.
 - **Planner clipboard**: On desktop, copy, paste, delete, and undo pasted planner notes from selected dates or chips.
 - **Keyboard and accessibility support**: Date cells, chips, range bars, holiday badges, planner labels, and monthly list rows expose keyboard activation and accessible labels.
@@ -136,8 +139,9 @@ Use **Settings → Diary → External calendars** to add a published `webcal://`
 - Feed URLs are stored in local plugin data and may sync with your vault, so treat secret iCal URLs like access tokens.
 - Diary rejects local/private network calendar URLs.
 - Choose the feed name, color, description inclusion, refresh interval, and which planner surfaces show it.
+- New feeds default to a 60-minute auto refresh and visibility in yearly, monthly grid, monthly list, and sidebar surfaces; you can switch refresh to manual only or hide a feed from individual views.
 - External events are read-only planner overlays with a separate dashed/ghost style. They do not support drag, clipboard, todo, or color-edit actions.
-- Selecting an external event opens a details modal with **Create Markdown note**, **Refresh calendar**, and **Copy details** actions.
+- Selecting an external event opens a details modal with **Create Markdown note**, **Refresh calendar**, and **Copy details** actions, with localized labels plus pressed/loading/completed feedback.
 - When you create a Markdown note from an external event, Diary stores linking frontmatter and hides the duplicate overlay for that event.
 
 ## Creating Notes
@@ -192,6 +196,7 @@ On desktop, drag a date chip or range bar to another date to move it. Range note
 
 - Press `Enter` or `Space` on a focused date cell, planner chip, range bar, holiday badge, monthly list row, year label, or month label to activate it.
 - Planner controls use button roles, state labels, and `aria-label` text for screen readers.
+- Color preset buttons in create/edit modals expose localized `aria-label` and `title` text.
 - Monthly list filters expose tab-style selected state with `aria-selected`.
 - Modal validation messages are announced with polite live regions.
 
@@ -228,7 +233,7 @@ Paste rules:
 
 | Setting | Description |
 | --- | --- |
-| Language | Plugin UI language. Default: `en`. Supports `en` and `ko`. |
+| Language | Plugin UI language. Default: `en`. Supports `en`, `de`, `es`, `fr`, `ja`, `zh-CN`, `zh-TW`, and `ko`. |
 | Planner folder | Default folder for new planner notes and plan notes. Also used when scan scope is set to planner folder only. Default: `Planner`. |
 | Planner note scan scope | Controls whether Diary finds planner notes across the entire vault or only inside **Planner folder** and its subfolders. Default: `Entire vault`. |
 | Date format | Stored date format setting. Planner filenames currently use the `YYYY-MM-DD` rule. |

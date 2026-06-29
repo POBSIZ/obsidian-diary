@@ -2,10 +2,8 @@ import { App, TFile } from "obsidian";
 import {
 	TODO_CHIP_EMOJI_COMPLETED,
 	TODO_CHIP_EMOJI_INCOMPLETE,
-	WEEKEND_LABELS_EN,
-	WEEKEND_LABELS_KO,
 } from "../../constants";
-import { t } from "../../i18n";
+import { getWeekendLabels, t } from "../../i18n";
 import { getDayOfWeek, getDaysInMonth } from "../../utils/date";
 import type { HolidayData } from "../../utils/holidays";
 import {
@@ -63,7 +61,7 @@ export function renderMonthlyListBody(
 	} = ctx;
 	const daysInMonth = getDaysInMonth(year, month);
 	const weekdayShort = getWeekdayLabels(locale);
-	const weekendL = locale === "ko" ? WEEKEND_LABELS_KO : WEEKEND_LABELS_EN;
+	const weekendL = getWeekendLabels(locale);
 	const now = new Date();
 	let renderedDays = 0;
 

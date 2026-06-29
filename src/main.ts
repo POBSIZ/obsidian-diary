@@ -1,5 +1,5 @@
 import { Platform, Plugin, TFile, WorkspaceLeaf } from "obsidian";
-import { setLocale, t } from "./i18n";
+import { normalizeLocale, setLocale, t } from "./i18n";
 import {
 	DEFAULT_SETTINGS,
 	DiaryObsidianSettings,
@@ -354,6 +354,7 @@ export default class DiaryObsidian extends Plugin {
 			DEFAULT_SETTINGS,
 			(await this.loadData()) as Partial<DiaryObsidianSettings>,
 		);
+		this.settings.locale = normalizeLocale(this.settings.locale);
 		const legacyEnabledAlternateCalendars =
 			this.settings.enabledAlternateCalendars;
 		const legacyShowLunarDates = this.settings.showLunarDates;
@@ -410,6 +411,7 @@ export default class DiaryObsidian extends Plugin {
 	}
 
 	async saveSettings() {
+		this.settings.locale = normalizeLocale(this.settings.locale);
 		setLocale(this.settings.locale ?? "en");
 		this.settings.customCalendarProfiles = normalizeCustomCalendarProfiles(
 			this.settings.customCalendarProfiles,

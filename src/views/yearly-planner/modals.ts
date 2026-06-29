@@ -7,8 +7,11 @@ import {
 	TFile,
 	WorkspaceLeaf,
 } from "obsidian";
-import { getLocale, t } from "../../i18n";
-import { ALTERNATE_CALENDAR_OPTIONS } from "../../utils/alternate-calendars";
+import { formatDateForLocale, getLocale, t } from "../../i18n";
+import {
+	ALTERNATE_CALENDAR_OPTIONS,
+	getAlternateCalendarOptionText,
+} from "../../utils/alternate-calendars";
 import {
 	getCalendarOverlayLabel,
 	type CalendarOverlayConfig,
@@ -196,19 +199,10 @@ function formatHolidayDate(dateStr: string): string {
 	const m = dateStr.match(/^(\d{4})-(\d{2})-(\d{2})$/);
 	if (!m) return dateStr;
 	const [, y, month, day] = m;
+	const yearNum = parseInt(y ?? "", 10);
 	const monthNum = parseInt(month ?? "1", 10);
 	const dayNum = parseInt(day ?? "1", 10);
-	return getLocale() === "ko"
-		? t("dateFormat.ko", {
-				year: y ?? "",
-				month: monthNum,
-				day: dayNum,
-			})
-		: t("dateFormat.en", {
-				year: y ?? "",
-				month: monthNum,
-				day: dayNum,
-			});
+	return formatDateForLocale(yearNum, monthNum, dayNum, getLocale());
 }
 
 export class HolidayInfoModal extends Modal {
@@ -715,12 +709,12 @@ export class CreateFileModal extends Modal {
 					text: t("modal.repeatCalendarGregorian"),
 				});
 				const locale = getLocale();
-				for (const option of ALTERNATE_CALENDAR_OPTIONS) {
-					select.createEl("option", {
-						value: option.id,
-						text: option.text[locale].name,
-					});
-				}
+					for (const option of ALTERNATE_CALENDAR_OPTIONS) {
+						select.createEl("option", {
+							value: option.id,
+							text: getAlternateCalendarOptionText(option, locale).name,
+						});
+					}
 				select.value = RECURRENCE_GREGORIAN;
 			},
 		);
@@ -1374,12 +1368,12 @@ export class FileOptionsModal extends Modal {
 			text: t("modal.repeatCalendarGregorian"),
 		});
 		const locale = getLocale();
-		for (const option of ALTERNATE_CALENDAR_OPTIONS) {
-			this.sourceRecurrenceCalendarSelect.createEl("option", {
-				value: option.id,
-				text: option.text[locale].name,
-			});
-		}
+			for (const option of ALTERNATE_CALENDAR_OPTIONS) {
+				this.sourceRecurrenceCalendarSelect.createEl("option", {
+					value: option.id,
+					text: getAlternateCalendarOptionText(option, locale).name,
+				});
+			}
 		this.sourceRecurrenceCalendarSelect.value =
 			source?.calendar ?? RECURRENCE_GREGORIAN;
 

@@ -11,7 +11,7 @@ Diary는 Obsidian vault 안의 Markdown 파일을 날짜 기반 플래너로 보
 | Item | Value |
 | --- | --- |
 | Plugin ID | `diary` |
-| Version | `1.4.2` |
+| Version | `1.5.0` |
 | Minimum Obsidian version | `1.7.2` |
 | Platforms | Desktop and mobile (`isDesktopOnly: false`) |
 | Default language | `en` |
@@ -19,8 +19,9 @@ Diary는 Obsidian vault 안의 Markdown 파일을 날짜 기반 플래너로 보
 
 ## Latest Version
 
-- `1.4.2`: narrows Diary styles to plugin surfaces and adds localized labels for color preset buttons.
-- `1.4.1`: polishes external calendar event actions and modal feedback.
+- `1.5.0`: adds German, Spanish, French, Japanese, Simplified Chinese, Traditional Chinese, and Korean UI language support alongside English.
+- `1.4.2`: narrows Diary styles to planner, settings, and modal surfaces and adds localized labels for color preset buttons.
+- `1.4.1`: polishes external calendar event actions, press feedback, and success/error notices.
 - `1.4.0`: adds custom calendar overlay controls and opt-in external calendar feeds. External `webcal://` or `https://` `.ics` events render as read-only planner overlays until you choose one and create a Markdown note.
 - `1.3.6`: maintenance release that stabilizes typed community-plugin audit checks.
 - `1.3.5`: maintenance release that aligns Obsidian plugin lint and release validation.
@@ -51,6 +52,7 @@ grid in compact form.
 ## What It Does
 
 - Yearly planner: `12 months x 31 days` overview.
+- Localized UI: switch Diary between English, German, Spanish, French, Japanese, Simplified Chinese, Traditional Chinese, and Korean.
 - Monthly grid planner: one-month calendar view with date chips, range bars, holidays, calendar overlay labels, external calendar overlays, and mobile pinch zoom.
 - Monthly list planner: day-by-day list for dense monthly review, with `All`, `With notes`, and `Upcoming` filters.
 - Sidebar planner: a compact monthly planner opens in the right sidebar by default, can be revealed from the ribbon or command palette, and can cycle through yearly, monthly grid, and monthly list layouts in the same side leaf.
@@ -61,6 +63,7 @@ grid in compact form.
 - Recurring events: repeat a note daily, monthly, or yearly with a Gregorian or alternate-calendar basis. Diary materializes only the occurrences inside the planner range you are currently viewing.
 - Custom calendar overlays: create local fantasy/campaign calendar profiles and show one custom label in planner cells while keeping normal `YYYY-MM-DD` files.
 - External calendar overlays: add opt-in `webcal://` or `https://` `.ics` feeds, refresh them manually or on an interval, and show events as read-only chips/ranges. Select an external event only when you want to create a normal Markdown note for it.
+- Scoped styling: Diary's CSS is limited to planner views, settings panels, and plugin modals so it does not restyle ordinary vault content.
 - Desktop workflows: right-sidebar companion planner, drag range selection, chip drag-to-move, keyboard activation, internal planner copy/paste/delete/undo.
 - Mobile workflows: tap a day to open the day summary sheet, create notes from the sheet, pinch zoom the monthly grid, and adjust mobile spacing in settings.
 
@@ -121,7 +124,7 @@ npm test
 - `src/views/*/sidebar-view.ts`: compact side-leaf variants for planner views.
 - `src/views/planner-clipboard.ts`: multi-select copy/paste/delete/undo flow.
 - `src/planner-reminders.ts`: runtime reminders based on `notify_minutes`.
-- `src/i18n.ts`, `locales/*`: English and Korean localization.
+- `src/i18n.ts`, `locales/*`: English, German, Spanish, French, Japanese, Simplified Chinese, Traditional Chinese, and Korean localization.
 - `styles.css`: shared styling tokens and per-view UI styles.
 
 ## Release

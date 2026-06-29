@@ -1,5 +1,11 @@
 import { App, Modal, Notice, PluginSettingTab, Setting, setIcon } from "obsidian";
-import { setLocale, t } from "./i18n";
+import {
+	LOCALE_OPTIONS,
+	normalizeLocale,
+	setLocale,
+	t,
+	type Locale,
+} from "./i18n";
 import DiaryObsidian from "./main";
 import {
 	type AlternateCalendarId,
@@ -18,7 +24,7 @@ import {
 import type { PlannerFileScope } from "./views/yearly-planner/file-utils";
 
 export interface DiaryObsidianSettings {
-	locale: "en" | "ko";
+	locale: Locale;
 	plannerFolder: string;
 	plannerFileScope: PlannerFileScope;
 	dateFormat: string;
@@ -110,19 +116,19 @@ export class DiaryObsidianSettingTab extends PluginSettingTab {
 		new Setting(containerEl)
 			.setName(t("settings.language"))
 			.setDesc(t("settings.languageDesc"))
-			.addDropdown((dropdown) =>
-				dropdown
-					.addOption("en", "English")
-					.addOption("ko", "한국어")
-					.setValue(this.plugin.settings.locale ?? "en")
+			.addDropdown((dropdown) => {
+				for (const option of LOCALE_OPTIONS) {
+					dropdown.addOption(option.value, option.label);
+				}
+				return dropdown
+					.setValue(normalizeLocale(this.plugin.settings.locale))
 					.onChange(async (value) => {
-						this.plugin.settings.locale =
-							value === "ko" ? "ko" : "en";
+						this.plugin.settings.locale = normalizeLocale(value);
 						setLocale(this.plugin.settings.locale);
 						await this.plugin.saveSettings();
 						this.display();
-					}),
-			);
+					});
+			});
 
 		new Setting(containerEl)
 			.setName(t("settings.plannerFolder"))

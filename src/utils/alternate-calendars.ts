@@ -1,4 +1,6 @@
 import KoreanLunarCalendar from "korean-lunar-calendar";
+import { getIntlLocaleTag, normalizeLocale } from "../i18n";
+import type { Locale } from "../i18n";
 
 export type AlternateCalendarId =
 	| "korean-lunar"
@@ -24,10 +26,12 @@ interface CalendarOptionText {
 	description: string;
 }
 
+type AlternateCalendarTextLocale = "en" | "ko" | "de";
+
 export interface AlternateCalendarOption {
 	id: AlternateCalendarId;
 	intlCalendar?: string;
-	text: Record<"en" | "ko", CalendarOptionText>;
+	text: Record<AlternateCalendarTextLocale, CalendarOptionText>;
 }
 
 export interface AlternateCalendarLabel {
@@ -60,6 +64,11 @@ export const ALTERNATE_CALENDAR_OPTIONS: readonly AlternateCalendarOption[] = [
 				shortName: "음력",
 				description: "한국천문연구원 기준의 한국식 음력입니다.",
 			},
+			de: {
+				name: "Koreanischer Mondkalender",
+				shortName: "Koreanisch",
+				description: "Koreanischer Mondkalender auf Basis der KARI-Daten.",
+			},
 		},
 	},
 	{
@@ -75,6 +84,11 @@ export const ALTERNATE_CALENDAR_OPTIONS: readonly AlternateCalendarOption[] = [
 				name: "중국식 음력",
 				shortName: "중국",
 				description: "브라우저 Intl 데이터의 중국식 음력입니다.",
+			},
+			de: {
+				name: "Chinesischer Mondkalender",
+				shortName: "Chinesisch",
+				description: "Chinesischer Mondkalender aus den Intl-Daten des Browsers.",
 			},
 		},
 	},
@@ -92,6 +106,11 @@ export const ALTERNATE_CALENDAR_OPTIONS: readonly AlternateCalendarOption[] = [
 				shortName: "단기",
 				description: "브라우저 Intl 데이터의 단기 달력입니다.",
 			},
+			de: {
+				name: "Dangi",
+				shortName: "Dangi",
+				description: "Koreanischer Dangi-Kalender aus den Intl-Daten des Browsers.",
+			},
 		},
 	},
 	{
@@ -107,6 +126,11 @@ export const ALTERNATE_CALENDAR_OPTIONS: readonly AlternateCalendarOption[] = [
 				name: "히브리력",
 				shortName: "히브리",
 				description: "브라우저 Intl 데이터의 히브리력입니다.",
+			},
+			de: {
+				name: "Hebräisch",
+				shortName: "Hebräisch",
+				description: "Hebräischer Kalender aus den Intl-Daten des Browsers.",
 			},
 		},
 	},
@@ -124,6 +148,11 @@ export const ALTERNATE_CALENDAR_OPTIONS: readonly AlternateCalendarOption[] = [
 				shortName: "이슬람",
 				description: "브라우저 Intl 데이터의 이슬람력입니다.",
 			},
+			de: {
+				name: "Islamisch",
+				shortName: "Islamisch",
+				description: "Islamischer Kalender aus den Intl-Daten des Browsers.",
+			},
 		},
 	},
 	{
@@ -139,6 +168,12 @@ export const ALTERNATE_CALENDAR_OPTIONS: readonly AlternateCalendarOption[] = [
 				name: "이슬람 시민력",
 				shortName: "시민력",
 				description: "브라우저 Intl 데이터의 표 형식 이슬람 시민력입니다.",
+			},
+			de: {
+				name: "Islamischer Zivilkalender",
+				shortName: "Zivil",
+				description:
+					"Tabellarischer islamischer Zivilkalender aus den Intl-Daten des Browsers.",
 			},
 		},
 	},
@@ -156,6 +191,11 @@ export const ALTERNATE_CALENDAR_OPTIONS: readonly AlternateCalendarOption[] = [
 				shortName: "움알쿠라",
 				description: "브라우저 Intl 데이터의 움 알쿠라력입니다.",
 			},
+			de: {
+				name: "Islamisch Umm al-Qura",
+				shortName: "Umm al-Qura",
+				description: "Umm-al-Qura-Kalender aus den Intl-Daten des Browsers.",
+			},
 		},
 	},
 	{
@@ -171,6 +211,11 @@ export const ALTERNATE_CALENDAR_OPTIONS: readonly AlternateCalendarOption[] = [
 				name: "페르시아력",
 				shortName: "페르시아",
 				description: "브라우저 Intl 데이터의 페르시아력입니다.",
+			},
+			de: {
+				name: "Persisch",
+				shortName: "Persisch",
+				description: "Persischer Kalender aus den Intl-Daten des Browsers.",
 			},
 		},
 	},
@@ -188,6 +233,12 @@ export const ALTERNATE_CALENDAR_OPTIONS: readonly AlternateCalendarOption[] = [
 				shortName: "인도",
 				description: "브라우저 Intl 데이터의 인도 국민력입니다.",
 			},
+			de: {
+				name: "Indischer Nationalkalender",
+				shortName: "Indisch",
+				description:
+					"Indischer Nationalkalender aus den Intl-Daten des Browsers.",
+			},
 		},
 	},
 	{
@@ -203,6 +254,11 @@ export const ALTERNATE_CALENDAR_OPTIONS: readonly AlternateCalendarOption[] = [
 				name: "불기",
 				shortName: "불기",
 				description: "브라우저 Intl 데이터의 불교 달력입니다.",
+			},
+			de: {
+				name: "Buddhistisch",
+				shortName: "Buddhistisch",
+				description: "Buddhistischer Kalender aus den Intl-Daten des Browsers.",
 			},
 		},
 	},
@@ -220,6 +276,12 @@ export const ALTERNATE_CALENDAR_OPTIONS: readonly AlternateCalendarOption[] = [
 				shortName: "일본",
 				description: "브라우저 Intl 데이터의 일본 연호 달력입니다.",
 			},
+			de: {
+				name: "Japanische Ära",
+				shortName: "Japanisch",
+				description:
+					"Japanischer Ära-Kalender aus den Intl-Daten des Browsers.",
+			},
 		},
 	},
 	{
@@ -235,6 +297,12 @@ export const ALTERNATE_CALENDAR_OPTIONS: readonly AlternateCalendarOption[] = [
 				name: "민국력",
 				shortName: "민국",
 				description: "브라우저 Intl 데이터의 중화민국 달력입니다.",
+			},
+			de: {
+				name: "Minguo",
+				shortName: "Minguo",
+				description:
+					"Kalender der Republik China aus den Intl-Daten des Browsers.",
 			},
 		},
 	},
@@ -252,6 +320,11 @@ export const ALTERNATE_CALENDAR_OPTIONS: readonly AlternateCalendarOption[] = [
 				shortName: "콥트",
 				description: "브라우저 Intl 데이터의 콥트력입니다.",
 			},
+			de: {
+				name: "Koptisch",
+				shortName: "Koptisch",
+				description: "Koptischer Kalender aus den Intl-Daten des Browsers.",
+			},
 		},
 	},
 	{
@@ -267,6 +340,11 @@ export const ALTERNATE_CALENDAR_OPTIONS: readonly AlternateCalendarOption[] = [
 				name: "에티오피아력",
 				shortName: "에티오피아",
 				description: "브라우저 Intl 데이터의 에티오피아력입니다.",
+			},
+			de: {
+				name: "Äthiopisch",
+				shortName: "Äthiopisch",
+				description: "Äthiopischer Kalender aus den Intl-Daten des Browsers.",
 			},
 		},
 	},
@@ -327,6 +405,7 @@ export function getAlternateCalendarLabel(
 ): AlternateCalendarLabel | null {
 	if (!id) return null;
 	const resolvedLocale = resolveLocale(locale);
+	const textLocale = resolveTextLocale(resolvedLocale);
 	const option = optionsById.get(id);
 	if (!option) return null;
 	const text =
@@ -336,9 +415,16 @@ export function getAlternateCalendarLabel(
 	if (!text) return null;
 	return {
 		id,
-		name: option.text[resolvedLocale].name,
+		name: option.text[textLocale].name,
 		text,
 	};
+}
+
+export function getAlternateCalendarOptionText(
+	option: AlternateCalendarOption,
+	locale: string,
+): CalendarOptionText {
+	return option.text[resolveTextLocale(locale)];
 }
 
 export function formatAlternateCalendarAria(
@@ -391,7 +477,7 @@ function formatIntlCalendarLabel(
 	year: number,
 	month: number,
 	day: number,
-	locale: "en" | "ko",
+	locale: Locale,
 ): string {
 	if (!option.intlCalendar) return "";
 	if (!isValidSolarDate(year, month, day)) return "";
@@ -401,18 +487,19 @@ function formatIntlCalendarLabel(
 
 	const formatter = getFormatter(locale, option.intlCalendar);
 	const date = new Date(year, month - 1, day);
+	const textLocale = resolveTextLocale(locale);
 	const label = formatter
-		? `${option.text[locale].shortName} ${normalizeFormattedDate(formatter.format(date))}`
+		? `${option.text[textLocale].shortName} ${normalizeFormattedDate(formatter.format(date))}`
 		: "";
 	intlLabelCache.set(cacheKey, label || null);
 	return label;
 }
 
 function getFormatter(
-	locale: "en" | "ko",
+	locale: Locale,
 	intlCalendar: string,
 ): Intl.DateTimeFormat | null {
-	const localeTag = locale === "ko" ? "ko-KR" : "en-US";
+	const localeTag = getIntlLocaleTag(locale);
 	const cacheKey = `${localeTag}|${intlCalendar}`;
 	if (formatterCache.has(cacheKey)) return formatterCache.get(cacheKey) ?? null;
 
@@ -441,8 +528,13 @@ function normalizeFormattedDate(formatted: string): string {
 		.trim();
 }
 
-function resolveLocale(locale: string): "en" | "ko" {
-	return locale === "ko" ? "ko" : "en";
+function resolveLocale(locale: string): Locale {
+	return normalizeLocale(locale);
+}
+
+function resolveTextLocale(locale: string): AlternateCalendarTextLocale {
+	if (locale === "ko" || locale === "de") return locale;
+	return "en";
 }
 
 function isSupportedKoreanLunarSolarDate(

@@ -61,6 +61,82 @@ const DAY_MS = 86_400_000;
 const DEFAULT_MONTH_COUNT = 13;
 const DEFAULT_DAYS_PER_MONTH = 28;
 const yearCache = new Map<string, YearInfo>();
+const DEFAULT_CUSTOM_CALENDAR_TEXT: Record<
+	string,
+	{
+		name: string;
+		shortName: string;
+		monthName: (month: number) => string;
+		monthShortName: (month: number) => string;
+		weekdays: readonly string[];
+		weekdayShortName: (name: string) => string;
+	}
+> = {
+	en: {
+		name: "Custom fantasy calendar",
+		shortName: "Custom",
+		monthName: (month) => `Moon ${month}`,
+		monthShortName: (month) => `M${month}`,
+		weekdays: ["First", "Second", "Third", "Fourth", "Fifth", "Sixth", "Seventh"],
+		weekdayShortName: (name) => name.slice(0, 3),
+	},
+	de: {
+		name: "Eigener Fantasy-Kalender",
+		shortName: "Eigen",
+		monthName: (month) => `Mond ${month}`,
+		monthShortName: (month) => `M${month}`,
+		weekdays: ["Erster", "Zweiter", "Dritter", "Vierter", "Fünfter", "Sechster", "Siebter"],
+		weekdayShortName: (name) => name.slice(0, 2),
+	},
+	es: {
+		name: "Calendario fantástico personalizado",
+		shortName: "Personal",
+		monthName: (month) => `Luna ${month}`,
+		monthShortName: (month) => `L${month}`,
+		weekdays: ["Primero", "Segundo", "Tercero", "Cuarto", "Quinto", "Sexto", "Séptimo"],
+		weekdayShortName: (name) => name.slice(0, 3),
+	},
+	fr: {
+		name: "Calendrier fantastique personnalisé",
+		shortName: "Perso",
+		monthName: (month) => `Lune ${month}`,
+		monthShortName: (month) => `L${month}`,
+		weekdays: ["Premier", "Deuxième", "Troisième", "Quatrième", "Cinquième", "Sixième", "Septième"],
+		weekdayShortName: (name) => name.slice(0, 3),
+	},
+	ja: {
+		name: "カスタムファンタジーカレンダー",
+		shortName: "カスタム",
+		monthName: (month) => `月 ${month}`,
+		monthShortName: (month) => `${month}月`,
+		weekdays: ["第1日", "第2日", "第3日", "第4日", "第5日", "第6日", "第7日"],
+		weekdayShortName: (name) => name,
+	},
+	"zh-CN": {
+		name: "自定义奇幻日历",
+		shortName: "自定义",
+		monthName: (month) => `月 ${month}`,
+		monthShortName: (month) => `${month}月`,
+		weekdays: ["第一日", "第二日", "第三日", "第四日", "第五日", "第六日", "第七日"],
+		weekdayShortName: (name) => name.slice(0, 2),
+	},
+	"zh-TW": {
+		name: "自訂奇幻曆",
+		shortName: "自訂",
+		monthName: (month) => `月 ${month}`,
+		monthShortName: (month) => `${month}月`,
+		weekdays: ["第一日", "第二日", "第三日", "第四日", "第五日", "第六日", "第七日"],
+		weekdayShortName: (name) => name.slice(0, 2),
+	},
+	ko: {
+		name: "커스텀 판타지 캘린더",
+		shortName: "커스텀",
+		monthName: (month) => `${month}월`,
+		monthShortName: (month) => `${month}월`,
+		weekdays: ["첫째", "둘째", "셋째", "넷째", "다섯째", "여섯째", "일곱째"],
+		weekdayShortName: (name) => name.slice(0, 1),
+	},
+};
 
 interface YearInfo {
 	monthLengths: number[];
@@ -88,28 +164,26 @@ export function createCustomCalendarId(): string {
 export function createDefaultCustomCalendarProfile(
 	locale: string,
 ): CustomCalendarProfile {
-	const isKo = locale === "ko";
+	const text =
+		DEFAULT_CUSTOM_CALENDAR_TEXT[locale] ?? DEFAULT_CUSTOM_CALENDAR_TEXT.en!;
 	const months = Array.from({ length: DEFAULT_MONTH_COUNT }, (_, index) => {
 		const month = index + 1;
 		return {
 			id: `m${month}`,
-			name: isKo ? `${month}월` : `Moon ${month}`,
-			shortName: isKo ? `${month}월` : `M${month}`,
+			name: text.monthName(month),
+			shortName: text.monthShortName(month),
 			days: DEFAULT_DAYS_PER_MONTH,
 		};
 	});
-	const weekdays = (isKo
-		? ["첫째", "둘째", "셋째", "넷째", "다섯째", "여섯째", "일곱째"]
-		: ["First", "Second", "Third", "Fourth", "Fifth", "Sixth", "Seventh"]
-	).map((name, index) => ({
+	const weekdays = text.weekdays.map((name, index) => ({
 		id: `w${index + 1}`,
 		name,
-		shortName: isKo ? name.slice(0, 1) : name.slice(0, 3),
+		shortName: text.weekdayShortName(name),
 	}));
 	return {
 		id: createCustomCalendarId(),
-		name: isKo ? "커스텀 판타지 캘린더" : "Custom fantasy calendar",
-		shortName: isKo ? "커스텀" : "Custom",
+		name: text.name,
+		shortName: text.shortName,
 		revision: 1,
 		epoch: {
 			gregorianDate: new Date().toISOString().slice(0, 10),

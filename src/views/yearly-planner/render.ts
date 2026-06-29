@@ -1,10 +1,10 @@
 import { App, TFile, setIcon } from "obsidian";
-import { t } from "../../i18n";
 import {
-	MONTH_LABELS_KO,
-	MONTH_LABELS_EN,
-	WEEKEND_LABELS_KO,
-	WEEKEND_LABELS_EN,
+	getMonthLabels as getLocalizedMonthLabels,
+	getWeekendLabels,
+	t,
+} from "../../i18n";
+import {
 	TODO_CHIP_EMOJI_COMPLETED,
 	TODO_CHIP_EMOJI_INCOMPLETE,
 } from "../../constants";
@@ -556,8 +556,7 @@ export function createPlannerCell(
 	}
 
 	if (isValid && (isSaturday || isSunday)) {
-		const weekendLabels =
-			ctx.calendarOverlay.locale === "ko" ? WEEKEND_LABELS_KO : WEEKEND_LABELS_EN;
+		const weekendLabels = getWeekendLabels(ctx.calendarOverlay.locale);
 		const label = isSaturday ? weekendLabels.sat : weekendLabels.sun;
 		const labelEl = cell.createSpan({
 			cls: "yearly-planner-weekend-label",
@@ -570,5 +569,5 @@ export function createPlannerCell(
 }
 
 export function getMonthLabels(locale: string): readonly string[] {
-	return locale === "ko" ? [...MONTH_LABELS_KO] : [...MONTH_LABELS_EN];
+	return getLocalizedMonthLabels(locale);
 }

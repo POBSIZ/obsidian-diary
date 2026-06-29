@@ -1,5 +1,5 @@
 import { ItemView, Notice, Platform, TFile, WorkspaceLeaf } from "obsidian";
-import { t } from "../../i18n";
+import { formatDateForLocale, t } from "../../i18n";
 import DiaryObsidian from "../../main";
 import {
 	TODO_CHIP_EMOJI_COMPLETED,
@@ -959,10 +959,7 @@ export class MonthlyPlannerView
 
 	private formatDaySummaryDate(year: number, month: number, day: number): string {
 		const locale = this.plugin.settings.locale ?? "en";
-		if (locale === "ko") {
-			return `${year}년 ${month}월 ${day}일`;
-		}
-		return `${month}/${day}/${year}`;
+		return formatDateForLocale(year, month, day, locale);
 	}
 
 	private createDaySummaryChip(opts: {
