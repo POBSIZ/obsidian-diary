@@ -35,6 +35,7 @@ export interface MonthlyPlannerViewDelegate {
 	openFileOptionsModal(file: TFile): void;
 	openExternalEventModal(eventId: string): void;
 	openDaySummaryPanel(year: number, month: number, day: number): void;
+	openDailyPlanner(year: number, month: number, day: number): void;
 	isCompactLayout(): boolean;
 	isRangeBarInteractionEnabled(): boolean;
 }
@@ -88,6 +89,16 @@ export class MonthlyInteractionHandler {
 		if (e.key !== "Enter" && e.key !== " ") return;
 		const target = e.target;
 		if (!(target instanceof HTMLElement)) return;
+		const dailyTarget = target.closest<HTMLElement>("[data-daily-date]");
+		if (dailyTarget?.dataset.dailyDate) {
+			const [year, month, day] = dailyTarget.dataset.dailyDate
+				.split("-")
+				.map(Number);
+			if (year == null || month == null || day == null) return;
+			e.preventDefault();
+			this.view.openDailyPlanner(year, month, day);
+			return;
+		}
 		const directTarget = target.closest(
 			".monthly-planner-cell-file, .monthly-planner-range-bar, .monthly-planner-cell-holiday-badge, .planner-external-event-chip, .planner-external-event-range",
 		);
@@ -131,6 +142,17 @@ export class MonthlyInteractionHandler {
 			clientY,
 		);
 		if (!el || !this.view.contentEl.contains(el as Node)) return;
+		const dailyDate = (el as HTMLElement).closest?.("[data-daily-date]");
+		if (dailyDate instanceof HTMLElement) {
+			const parts = dailyDate.dataset.dailyDate?.split("-").map(Number);
+			if (parts?.[0] && parts[1] && parts[2]) {
+				e.preventDefault();
+				e.stopPropagation();
+				e.stopImmediatePropagation?.();
+				this.view.openDailyPlanner(parts[0], parts[1], parts[2]);
+			}
+			return;
+		}
 
 		const rangeBar = (el as HTMLElement).closest?.(
 			".monthly-planner-range-bar[data-path]",

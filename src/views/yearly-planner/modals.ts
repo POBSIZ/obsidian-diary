@@ -19,6 +19,7 @@ import {
 import {
 	RECURRENCE_GREGORIAN,
 	buildRecurrenceRuleFromForm,
+	getRecurrenceInterval,
 	getSimpleRecurrenceFrequency,
 	getRecurrenceOccurrenceInfo,
 	getRecurrenceRole,
@@ -34,8 +35,10 @@ import {
 	getChipColor,
 	getFileTitle,
 	getNotifyMinutes,
+	getPlannerTimeRange,
 	isTodoCompleted,
 	isTodoFile,
+	type PlannerTimeRange,
 	type PlannerFileScope,
 } from "./file-utils";
 import {
@@ -44,6 +47,7 @@ import {
 	parseSingleDateBasename,
 	updateFileColor,
 	updateFileNotifyMinutes,
+	updateFileTimeRange,
 	updateFileTitle,
 	updateFileTodoStatus,
 } from "./file-operations";
@@ -183,6 +187,7 @@ export type CreateSingleDateFileWithFolderFn = (
 	color?: string,
 	todo?: boolean,
 	notifyMinutes?: number | null,
+	timeRange?: PlannerTimeRange | null,
 	recurrence?: RecurrenceFormValue | null,
 ) => Promise<TFile>;
 
@@ -192,6 +197,7 @@ export type CreateRangeFileWithFolderFn = (
 	color?: string,
 	todo?: boolean,
 	notifyMinutes?: number | null,
+	timeRange?: PlannerTimeRange | null,
 	recurrence?: RecurrenceFormValue | null,
 ) => Promise<TFile>;
 
@@ -265,6 +271,11 @@ function parseTimeValueToNotifyMinutes(value: string): number | null {
 	return h * 60 + min;
 }
 
+function normalizeTimeValue(value: string): string | null {
+	const minutes = parseTimeValueToNotifyMinutes(value);
+	return minutes == null ? null : notifyMinutesToTimeValue(minutes);
+}
+
 function toDateStr(year: number, month: number, day: number): string {
 	return `${year}-${pad(month)}-${pad(day)}`;
 }
@@ -294,6 +305,11 @@ function isValidDateStr(str: string): boolean {
 	);
 }
 
+function isValidRecurrenceInterval(value: string): boolean {
+	const parsed = Number(value);
+	return Number.isInteger(parsed) && parsed >= 1 && parsed <= 999;
+}
+
 function formatOverlayPreview(
 	dateStr: string,
 	calendarOverlay: CalendarOverlayConfig,
@@ -320,6 +336,8 @@ export interface CreateFileModalOptions {
 	defaultFolder: string;
 	plannerFileScope: PlannerFileScope;
 	calendarOverlay: CalendarOverlayConfig;
+	defaultStartTime?: string;
+	defaultEndTime?: string;
 	createSingleDateFile: CreateSingleDateFileWithFolderFn;
 	createRangeFile: CreateRangeFileWithFolderFn;
 	onCreated: () => void;
@@ -341,11 +359,15 @@ export class CreateFileModal extends Modal {
 	private colorPresetBtns: HTMLButtonElement[] = [];
 	private colorPresets: { hex: string }[] = [];
 	private todoCheckbox!: HTMLInputElement;
+	private startTimeInput!: HTMLInputElement;
+	private endTimeInput!: HTMLInputElement;
 	private notifyTimeInput!: HTMLInputElement;
 	private repeatCheckbox!: HTMLInputElement;
 	private repeatRows: HTMLElement[] = [];
 	private recurrenceCalendarSelect!: HTMLSelectElement;
 	private recurrenceFrequencySelect!: HTMLSelectElement;
+	private recurrenceIntervalInput!: HTMLInputElement;
+	private recurrenceUntilDateInput!: HTMLInputElement;
 	private calendarPreviewEl!: HTMLElement;
 	private rangeRow!: HTMLElement;
 	private singleModeBtn!: HTMLButtonElement;
@@ -588,6 +610,36 @@ export class CreateFileModal extends Modal {
 		todoLabel.appendChild(this.todoCheckbox);
 		todoLabel.appendText(` ${t("modal.todoFile")}`);
 
+		const startTimeRow = form.createDiv({
+			cls: "yearly-planner-create-file-row",
+		});
+		startTimeRow.createEl("label", { text: t("modal.startTime") });
+		this.startTimeInput = startTimeRow.createEl("input", {
+			type: "time",
+			cls: "yearly-planner-date-input",
+		});
+		this.startTimeInput.value = this.options.defaultStartTime ?? "";
+		this.startTimeInput.addEventListener("input", () =>
+			this.updateCreateState(),
+		);
+
+		const endTimeRow = form.createDiv({
+			cls: "yearly-planner-create-file-row",
+		});
+		endTimeRow.createEl("label", { text: t("modal.endTime") });
+		this.endTimeInput = endTimeRow.createEl("input", {
+			type: "time",
+			cls: "yearly-planner-date-input",
+		});
+		this.endTimeInput.value = this.options.defaultEndTime ?? "";
+		this.endTimeInput.addEventListener("input", () =>
+			this.updateCreateState(),
+		);
+		endTimeRow.createDiv({
+			cls: "yearly-planner-create-file-hint",
+			text: t("modal.eventTimeDesc"),
+		});
+
 		const notifyRow = form.createDiv({
 			cls: "yearly-planner-create-file-row",
 		});
@@ -673,6 +725,21 @@ export class CreateFileModal extends Modal {
 		const filename = this.filenameInput.value.trim().replace(/\.md$/i, "");
 		if (!folder) return t("modal.folderRequired");
 		if (!filename) return t("modal.fileNameRequired");
+		const timeError = this.getTimeRangeValidationError();
+		if (timeError) return timeError;
+		if (
+			this.repeatCheckbox?.checked &&
+			!isValidRecurrenceInterval(this.recurrenceIntervalInput?.value ?? "")
+		) {
+			return t("modal.repeatIntervalInvalid");
+		}
+		if (
+			this.repeatCheckbox?.checked &&
+			this.recurrenceUntilDateInput?.value &&
+			this.recurrenceUntilDateInput.value < this.startDateInput.value
+		) {
+			return t("modal.repeatUntilBeforeStart");
+		}
 		if (this.mode === "single") {
 			const dateStr = getSingleDateFromFilename(filename);
 			if (!dateStr || !isValidDateStr(dateStr)) {
@@ -687,6 +754,25 @@ export class CreateFileModal extends Modal {
 		return null;
 	}
 
+	private getTimeRangeValidationError(): string | null {
+		const startTime = normalizeTimeValue(this.startTimeInput?.value ?? "");
+		const endTime = normalizeTimeValue(this.endTimeInput?.value ?? "");
+		if (endTime && !startTime) return t("modal.endTimeRequiresStart");
+		const isSameDay =
+			this.mode === "single" ||
+			this.startDateInput.value === this.endDateInput.value;
+		if (isSameDay && startTime && endTime && endTime < startTime) {
+			return t("modal.endTimeBeforeStart");
+		}
+		return null;
+	}
+
+	private getTimeRangeValue(): PlannerTimeRange | null {
+		const startTime = normalizeTimeValue(this.startTimeInput.value);
+		const endTime = normalizeTimeValue(this.endTimeInput.value);
+		return startTime || endTime ? { startTime, endTime } : null;
+	}
+
 	private createRecurrenceControls(form: HTMLElement): void {
 		const repeatRow = form.createDiv({
 			cls: "yearly-planner-create-file-row yearly-planner-repeat-row",
@@ -698,7 +784,10 @@ export class CreateFileModal extends Modal {
 		const repeatLabel = repeatRow.createEl("label");
 		repeatLabel.appendChild(this.repeatCheckbox);
 		repeatLabel.appendText(` ${t("modal.repeatEvent")}`);
-		this.repeatCheckbox.onchange = () => this.updateRecurrenceVisibility();
+		this.repeatCheckbox.onchange = () => {
+			this.updateRecurrenceVisibility();
+			this.updateCreateState();
+		};
 
 		this.recurrenceCalendarSelect = this.createRecurrenceSelectRow(
 			form,
@@ -722,7 +811,7 @@ export class CreateFileModal extends Modal {
 			form,
 			t("modal.repeatFrequency"),
 			(select) => {
-				for (const value of ["DAILY", "MONTHLY", "YEARLY"]) {
+				for (const value of ["DAILY", "WEEKLY", "MONTHLY", "YEARLY"]) {
 					select.createEl("option", {
 						value,
 						text: t(`modal.repeatFreq${value}`),
@@ -730,6 +819,14 @@ export class CreateFileModal extends Modal {
 				}
 				select.value = "YEARLY";
 			},
+		);
+		this.recurrenceIntervalInput = this.createRecurrenceNumberRow(
+			form,
+			t("modal.repeatInterval"),
+		);
+		this.recurrenceUntilDateInput = this.createRecurrenceDateRow(
+			form,
+			t("modal.repeatUntilDate"),
 		);
 
 		const hintRow = form.createDiv({
@@ -760,6 +857,46 @@ export class CreateFileModal extends Modal {
 		return select;
 	}
 
+	private createRecurrenceDateRow(
+		form: HTMLElement,
+		label: string,
+	): HTMLInputElement {
+		const row = form.createDiv({
+			cls: "yearly-planner-create-file-row yearly-planner-repeat-control-row",
+		});
+		row.createEl("label", { text: label });
+		const input = row.createEl("input", {
+			type: "date",
+			cls: "yearly-planner-date-input",
+		});
+		input.title = t("modal.repeatUntilDateDesc");
+		input.addEventListener("input", () => this.updateCreateState());
+		this.repeatRows.push(row);
+		return input;
+	}
+
+	private createRecurrenceNumberRow(
+		form: HTMLElement,
+		label: string,
+	): HTMLInputElement {
+		const row = form.createDiv({
+			cls: "yearly-planner-create-file-row yearly-planner-repeat-control-row",
+		});
+		row.createEl("label", { text: label });
+		const input = row.createEl("input", {
+			type: "number",
+			cls: "yearly-planner-year-input",
+		});
+		input.min = "1";
+		input.max = "999";
+		input.step = "1";
+		input.value = "1";
+		input.title = t("modal.repeatIntervalDesc");
+		input.addEventListener("input", () => this.updateCreateState());
+		this.repeatRows.push(row);
+		return input;
+	}
+
 	private updateRecurrenceVisibility(): void {
 		const enabled = this.repeatCheckbox?.checked ?? false;
 		for (const row of this.repeatRows) {
@@ -774,8 +911,10 @@ export class CreateFileModal extends Modal {
 			calendar: normalizeRecurrenceCalendar(
 				this.recurrenceCalendarSelect.value,
 			),
+			untilDate: this.recurrenceUntilDateInput.value || null,
 			rule: buildRecurrenceRuleFromForm({
 				frequency: this.recurrenceFrequencySelect.value,
+				interval: this.recurrenceIntervalInput.value,
 			}),
 		};
 	}
@@ -880,6 +1019,7 @@ export class CreateFileModal extends Modal {
 					color,
 					todo,
 					notifyMinutes,
+					this.getTimeRangeValue(),
 					this.getRecurrenceValue(),
 				);
 				this.options.onCreated();
@@ -906,6 +1046,7 @@ export class CreateFileModal extends Modal {
 					color,
 					todo,
 					notifyMinutes,
+					this.getTimeRangeValue(),
 					this.getRecurrenceValue(),
 				);
 				this.options.onCreated();
@@ -927,52 +1068,6 @@ export class CreateFileModal extends Modal {
 			return;
 		}
 		await this.app.workspace.getLeaf().openFile(file);
-	}
-}
-
-export class YearInputModal extends Modal {
-	constructor(
-		app: App,
-		currentYear: number,
-		private onSubmit: (year: number) => void,
-	) {
-		super(app);
-		this.contentEl.addClass("yearly-planner-modal-content");
-		this.contentEl.createEl("h2", { text: t("modal.enterYear") });
-		const form = this.contentEl.createDiv({
-			cls: "yearly-planner-year-modal",
-		});
-		const input = form.createEl("input", {
-			type: "number",
-			cls: "yearly-planner-year-input",
-		});
-		input.value = String(currentYear);
-		input.min = "1900";
-		input.max = "2100";
-		input.placeholder = "1900-2100";
-
-		const btn = form.createEl("button", {
-			text: t("modal.apply"),
-			cls: "mod-cta",
-			attr: { type: "button" },
-		});
-		const submit = () => {
-			const val = parseInt(input.value, 10);
-			if (!isNaN(val) && val >= 1900 && val <= 2100) {
-				this.onSubmit(val);
-				this.close();
-			} else {
-				new Notice(t("modal.invalidYear"));
-			}
-		};
-		btn.onclick = submit;
-		input.addEventListener("keydown", (e) => {
-			if (e.key !== "Enter") return;
-			e.preventDefault();
-			submit();
-		});
-		input.focus();
-		input.select();
 	}
 }
 
@@ -1019,12 +1114,16 @@ export class FileOptionsModal extends Modal {
 	private colorPresetBtns: HTMLButtonElement[] = [];
 	private colorPresets: { hex: string }[] = [];
 	private todoCheckbox!: HTMLInputElement;
+	private startTimeInput!: HTMLInputElement;
+	private endTimeInput!: HTMLInputElement;
 	private notifyTimeInput!: HTMLInputElement;
 	private completedCheckbox!: HTMLInputElement;
 	private completedRow!: HTMLElement;
 	private sourceRepeatCheckbox?: HTMLInputElement;
 	private sourceRecurrenceCalendarSelect?: HTMLSelectElement;
 	private sourceRecurrenceFrequencySelect?: HTMLSelectElement;
+	private sourceRecurrenceIntervalInput?: HTMLInputElement;
+	private sourceRecurrenceUntilDateInput?: HTMLInputElement;
 	private previewComponent: Component | null = null;
 	private startDateInput?: HTMLInputElement;
 	private endDateInput?: HTMLInputElement;
@@ -1206,6 +1305,37 @@ export class FileOptionsModal extends Modal {
 		completedLabel.appendText(` ${t("modal.completed")}`);
 		this.updateCompletedRowVisibility();
 
+		const existingTimeRange = getPlannerTimeRange(this.app, this.file);
+		const startTimeRow = form.createDiv({
+			cls: "yearly-planner-create-file-row",
+		});
+		startTimeRow.createEl("label", { text: t("modal.startTime") });
+		this.startTimeInput = startTimeRow.createEl("input", {
+			type: "time",
+			cls: "yearly-planner-date-input",
+		});
+		this.startTimeInput.value = existingTimeRange.startTime ?? "";
+		this.startTimeInput.addEventListener("input", () =>
+			this.updateFileOptionsState(),
+		);
+
+		const endTimeRow = form.createDiv({
+			cls: "yearly-planner-create-file-row",
+		});
+		endTimeRow.createEl("label", { text: t("modal.endTime") });
+		this.endTimeInput = endTimeRow.createEl("input", {
+			type: "time",
+			cls: "yearly-planner-date-input",
+		});
+		this.endTimeInput.value = existingTimeRange.endTime ?? "";
+		this.endTimeInput.addEventListener("input", () =>
+			this.updateFileOptionsState(),
+		);
+		endTimeRow.createDiv({
+			cls: "yearly-planner-create-file-hint",
+			text: t("modal.eventTimeDesc"),
+		});
+
 		const notifyRow = form.createDiv({
 			cls: "yearly-planner-create-file-row",
 		});
@@ -1384,7 +1514,7 @@ export class FileOptionsModal extends Modal {
 		this.sourceRecurrenceFrequencySelect = frequencyRow.createEl("select", {
 			cls: "yearly-planner-repeat-select",
 		});
-		for (const value of ["DAILY", "MONTHLY", "YEARLY"]) {
+		for (const value of ["DAILY", "WEEKLY", "MONTHLY", "YEARLY"]) {
 			this.sourceRecurrenceFrequencySelect.createEl("option", {
 				value,
 				text: t(`modal.repeatFreq${value}`),
@@ -1394,10 +1524,50 @@ export class FileOptionsModal extends Modal {
 			? getSimpleRecurrenceFrequency(source.rule)
 			: "YEARLY";
 
+		const intervalRow = form.createDiv({
+			cls: "yearly-planner-create-file-row yearly-planner-repeat-control-row",
+		});
+		intervalRow.createEl("label", { text: t("modal.repeatInterval") });
+		this.sourceRecurrenceIntervalInput = intervalRow.createEl("input", {
+			type: "number",
+			cls: "yearly-planner-year-input",
+		});
+		this.sourceRecurrenceIntervalInput.min = "1";
+		this.sourceRecurrenceIntervalInput.max = "999";
+		this.sourceRecurrenceIntervalInput.step = "1";
+		this.sourceRecurrenceIntervalInput.value = String(
+			source ? getRecurrenceInterval(source.rule) : 1,
+		);
+		this.sourceRecurrenceIntervalInput.title = t(
+			"modal.repeatIntervalDesc",
+		);
+		this.sourceRecurrenceIntervalInput.addEventListener("input", () =>
+			this.updateFileOptionsState(),
+		);
+
+		const untilRow = form.createDiv({
+			cls: "yearly-planner-create-file-row yearly-planner-repeat-control-row",
+		});
+		untilRow.createEl("label", { text: t("modal.repeatUntilDate") });
+		this.sourceRecurrenceUntilDateInput = untilRow.createEl("input", {
+			type: "date",
+			cls: "yearly-planner-date-input",
+		});
+		this.sourceRecurrenceUntilDateInput.value = source?.untilDate ?? "";
+		this.sourceRecurrenceUntilDateInput.title = t(
+			"modal.repeatUntilDateDesc",
+		);
+		this.sourceRecurrenceUntilDateInput.addEventListener("input", () =>
+			this.updateFileOptionsState(),
+		);
+
 		const toggleRows = () => {
 			const enabled = this.sourceRepeatCheckbox?.checked ?? false;
 			calendarRow.toggleClass("is-hidden", !enabled);
 			frequencyRow.toggleClass("is-hidden", !enabled);
+			intervalRow.toggleClass("is-hidden", !enabled);
+			untilRow.toggleClass("is-hidden", !enabled);
+			this.updateFileOptionsState();
 		};
 		this.sourceRepeatCheckbox.onchange = toggleRows;
 		toggleRows();
@@ -1440,8 +1610,10 @@ export class FileOptionsModal extends Modal {
 			calendar: normalizeRecurrenceCalendar(
 				this.sourceRecurrenceCalendarSelect?.value,
 			),
+			untilDate: this.sourceRecurrenceUntilDateInput?.value || null,
 			rule: buildRecurrenceRuleFromForm({
 				frequency: this.sourceRecurrenceFrequencySelect?.value ?? "YEARLY",
+				interval: this.sourceRecurrenceIntervalInput?.value ?? "1",
 			}),
 		};
 	}
@@ -1492,6 +1664,33 @@ export class FileOptionsModal extends Modal {
 	}
 
 	private getFileOptionsValidationError(): string | null {
+		const startTime = normalizeTimeValue(this.startTimeInput?.value ?? "");
+		const endTime = normalizeTimeValue(this.endTimeInput?.value ?? "");
+		if (endTime && !startTime) return t("modal.endTimeRequiresStart");
+		const isSameDay =
+			Boolean(this.singleDateInput) ||
+			this.startDateInput?.value === this.endDateInput?.value;
+		if (isSameDay && startTime && endTime && endTime < startTime) {
+			return t("modal.endTimeBeforeStart");
+		}
+		if (
+			this.sourceRepeatCheckbox?.checked &&
+			!isValidRecurrenceInterval(
+				this.sourceRecurrenceIntervalInput?.value ?? "",
+			)
+		) {
+			return t("modal.repeatIntervalInvalid");
+		}
+		const recurrenceAnchor =
+			this.singleDateInput?.value ?? this.startDateInput?.value ?? "";
+		if (
+			this.sourceRepeatCheckbox?.checked &&
+			this.sourceRecurrenceUntilDateInput?.value &&
+			recurrenceAnchor &&
+			this.sourceRecurrenceUntilDateInput.value < recurrenceAnchor
+		) {
+			return t("modal.repeatUntilBeforeStart");
+		}
 		if (this.singleDateInput) {
 			if (!isValidDateStr(this.singleDateInput.value)) {
 				return t("modal.invalidDate");
@@ -1592,6 +1791,10 @@ export class FileOptionsModal extends Modal {
 				fileToUpdate,
 				parseTimeValueToNotifyMinutes(this.notifyTimeInput.value),
 			);
+			await updateFileTimeRange(this.app, fileToUpdate, {
+				startTime: normalizeTimeValue(this.startTimeInput.value),
+				endTime: normalizeTimeValue(this.endTimeInput.value),
+			});
 			if (this.sourceRepeatCheckbox) {
 				const existingSource = getRecurrenceSourceDefinition(
 					this.app,

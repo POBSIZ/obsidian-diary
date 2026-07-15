@@ -18,10 +18,10 @@ import {
 } from "../../utils/calendar-overlays";
 import {
 	getExternalEventsForDate,
-	getExternalEventTimeLabel,
 	type ExternalCalendarEvent,
 } from "../../utils/external-calendars";
-import { YearInputModal } from "./modals";
+import { isRecurrenceVirtualEvent } from "../../utils/recurrence";
+import { PlannerPeriodModal } from "../planner-period-modal";
 import {
 	getFilesForDate,
 	getFileTitle,
@@ -38,6 +38,11 @@ import {
 	makeDateSelectionKey,
 	makeFileSelectionKey,
 } from "../planner-clipboard";
+import {
+	renderPlannerHeader,
+	type PlannerHeaderAction,
+	type PlannerViewMode,
+} from "../planner-layout";
 
 export interface HeaderCallbacks {
 	onPrev: () => void;
@@ -45,7 +50,8 @@ export interface HeaderCallbacks {
 	onToday: () => void;
 	onYearClick: (year: number) => void;
 	onAddFile?: () => void;
-	/** Yearly → monthly grid → list → yearly */
+	onSelectPlannerView: (mode: PlannerViewMode) => void;
+	/** Secondary compatibility action; direct selection is the primary path. */
 	onCyclePlannerView?: () => void;
 	hasExpandedMonthCells?: boolean;
 	onToggleAllCellWidths?: () => void;
@@ -55,51 +61,18 @@ export function renderYearlyPlannerHeader(
 	contentEl: HTMLElement,
 	ctx: {
 		year: number;
-		monthLabels: readonly string[];
 		app: App;
 	},
 	callbacks: HeaderCallbacks,
 ): void {
-	const header = contentEl.createDiv({ cls: "yearly-planner-header" });
-	header.createEl("h1", {
-		text: t("view.title"),
-		cls: "yearly-planner-title",
-	});
-
-	const yearWrapper = header.createDiv({
-		cls: "yearly-planner-year-wrapper",
-	});
-
-	createHeaderIconButton(yearWrapper, "yearly-planner-year-btn", {
-		icon: "chevron-left",
-		label: t("header.prevYear"),
-		onClick: callbacks.onPrev,
-	});
-
-	const yearDisplay = yearWrapper.createSpan({
-		cls: "yearly-planner-year-display",
-		text: String(ctx.year),
-	});
 	const openYearModal = () => {
-		new YearInputModal(ctx.app, ctx.year, callbacks.onYearClick).open();
+		new PlannerPeriodModal(ctx.app, {
+			granularity: "year",
+			year: ctx.year,
+			onSubmit: ({ year }) => callbacks.onYearClick(year),
+		}).open();
 	};
-	yearDisplay.onclick = openYearModal;
-	yearDisplay.tabIndex = 0;
-	yearDisplay.setAttribute("role", "button");
-	yearDisplay.onkeydown = (e) => {
-		if (e.key !== "Enter" && e.key !== " ") return;
-		e.preventDefault();
-		openYearModal();
-	};
-	yearDisplay.title = t("header.clickToEnterYear");
-
-	createHeaderIconButton(yearWrapper, "yearly-planner-year-btn", {
-		icon: "chevron-right",
-		label: t("header.nextYear"),
-		onClick: callbacks.onNext,
-	});
-
-	const secondaryActions: HeaderAction[] = [
+	const secondaryActions: PlannerHeaderAction[] = [
 		{
 			icon: "calendar",
 			label: t("header.goToCurrentYear"),
@@ -107,13 +80,11 @@ export function renderYearlyPlannerHeader(
 		},
 	];
 
-	if (callbacks.onCyclePlannerView) {
+	if (callbacks.onAddFile) {
 		secondaryActions.push({
-			icon: "repeat",
-			label: t("header.cyclePlannerView"),
-			title: t("header.cyclePlannerViewHint"),
-			onClick: callbacks.onCyclePlannerView,
-			extraClass: "yearly-planner-year-btn--cycle-view",
+			icon: "file-plus",
+			label: t("header.addFile"),
+			onClick: callbacks.onAddFile,
 		});
 	}
 
@@ -128,28 +99,46 @@ export function renderYearlyPlannerHeader(
 				? t("header.collapseYearlyCellsHint")
 				: t("header.expandYearlyCellsHint"),
 			onClick: callbacks.onToggleAllCellWidths,
-			extraClass: "yearly-planner-year-btn--cell-width",
 		});
 	}
 
-	if (callbacks.onAddFile) {
+	if (callbacks.onCyclePlannerView) {
 		secondaryActions.push({
-			icon: "file-plus",
-			label: t("header.addFile"),
-			onClick: callbacks.onAddFile,
+			icon: "repeat",
+			label: t("header.cyclePlannerView"),
+			title: t("header.cyclePlannerViewHint"),
+			onClick: callbacks.onCyclePlannerView,
+			moreOnly: true,
 		});
 	}
 
-	renderSecondaryHeaderActions(
-		yearWrapper,
-		"yearly-planner-year-btn",
-		secondaryActions,
-	);
+	renderPlannerHeader(contentEl, {
+		mode: "yearly",
+		onSelectView: callbacks.onSelectPlannerView,
+		previous: {
+			icon: "chevron-left",
+			label: t("header.prevYear"),
+			onClick: callbacks.onPrev,
+		},
+		next: {
+			icon: "chevron-right",
+			label: t("header.nextYear"),
+			onClick: callbacks.onNext,
+		},
+		period: {
+			text: String(ctx.year),
+			label: t("header.clickToEnterYear"),
+			title: t("header.clickToEnterYear"),
+			onClick: openYearModal,
+		},
+		actions: secondaryActions,
+	});
 }
 
 export interface MonthHeaderOptions {
 	widthRem?: number;
 	isExpanded?: boolean;
+	onOpenMonth?: (month: number) => void;
 	onToggleWidth?: (month: number) => void;
 }
 
@@ -176,10 +165,22 @@ export function createMonthHeaderCell(
 	const content = th.createDiv({
 		cls: "yearly-planner-month-header-content",
 	});
-	content.createSpan({
-		cls: "yearly-planner-month-header-label",
-		text: label,
-	});
+	const monthLabel = content.createEl(
+		options.onOpenMonth ? "button" : "span",
+		{
+			cls: "yearly-planner-month-header-label",
+			text: label,
+			...(options.onOpenMonth
+				? { attr: { type: "button", title: t("viewSwitcher.monthlyGrid") } }
+				: {}),
+		},
+	);
+	if (options.onOpenMonth) {
+		monthLabel.addEventListener("click", (event) => {
+			event.stopPropagation();
+			options.onOpenMonth?.(month);
+		});
+	}
 
 	if (!options.onToggleWidth) return th;
 
@@ -198,33 +199,9 @@ export function createMonthHeaderCell(
 	return th;
 }
 
-interface HeaderAction {
-	icon: string;
-	label: string;
-	onClick: () => void;
-	title?: string;
-	extraClass?: string;
-}
-
-function createHeaderIconButton(
-	parent: HTMLElement,
-	baseClass: string,
-	action: HeaderAction,
-): HTMLButtonElement {
-	const btn = parent.createEl("button", {
-		cls: [baseClass, action.extraClass].filter(Boolean).join(" "),
-		attr: { type: "button" },
-	});
-	setIcon(btn, action.icon);
-	btn.ariaLabel = action.label;
-	if (action.title) btn.title = action.title;
-	btn.onclick = action.onClick;
-	return btn;
-}
-
 function createMonthWidthButton(
 	parent: HTMLElement,
-	action: HeaderAction,
+	action: PlannerHeaderAction,
 ): HTMLButtonElement {
 	const btn = parent.createEl("button", {
 		cls: "yearly-planner-month-width-btn",
@@ -240,46 +217,6 @@ function createMonthWidthButton(
 	};
 	return btn;
 }
-
-function renderSecondaryHeaderActions(
-	parent: HTMLElement,
-	baseClass: string,
-	actions: HeaderAction[],
-): void {
-	if (actions.length === 0) return;
-	const inline = parent.createDiv({ cls: "planner-nav-secondary" });
-	for (const action of actions) {
-		createHeaderIconButton(inline, baseClass, action);
-	}
-
-	const moreMenu = parent.createEl("details", { cls: "planner-more-menu" });
-	const trigger = moreMenu.createEl("summary", {
-		cls: `${baseClass} planner-more-menu-trigger`,
-		attr: {
-			"aria-label": t("header.moreActions"),
-			role: "button",
-		},
-	});
-	setIcon(trigger, "ellipsis");
-
-	const popover = moreMenu.createDiv({ cls: "planner-more-menu-popover" });
-	for (const action of actions) {
-		const item = popover.createEl("button", {
-			cls: "planner-more-menu-item",
-			attr: { type: "button" },
-		});
-		const icon = item.createSpan({ cls: "planner-more-menu-item-icon" });
-		setIcon(icon, action.icon);
-		item.createSpan({ cls: "planner-more-menu-item-label", text: action.label });
-		item.ariaLabel = action.label;
-		if (action.title) item.title = action.title;
-		item.onclick = () => {
-			moreMenu.removeAttribute("open");
-			action.onClick();
-		};
-	}
-}
-
 export interface CreateCellContext {
 	year: number;
 	app: App;
@@ -422,9 +359,17 @@ export function createPlannerCell(
 		const maxLane = laneIndices.length > 0 ? Math.max(...laneIndices) : -1;
 		const externalStartLane = maxLane + 1;
 		externalDateEvents.rangeEvents.forEach(({ event }, index) => {
+			const isVirtualRecurrence = isRecurrenceVirtualEvent(event);
 			const lane = externalStartLane + index;
 			const bar = barsContainer.createDiv({
-				cls: "yearly-planner-cell-range-bar planner-external-event-range yearly-planner-external-event-range",
+				cls: [
+					"yearly-planner-cell-range-bar",
+					"planner-external-event-range",
+					"yearly-planner-external-event-range",
+					isVirtualRecurrence && "planner-recurrence-virtual",
+				]
+					.filter(Boolean)
+					.join(" "),
 			});
 			bar.tabIndex = 0;
 			bar.setAttribute("role", "button");
@@ -476,18 +421,18 @@ export function createPlannerCell(
 			});
 			linkEl.tabIndex = 0;
 			linkEl.setAttribute("role", "button");
-			const title = getFileTitle(ctx.app, file);
+			const chipTitle = getFileTitle(ctx.app, file);
 			if (isTodoCompleted(ctx.app, file)) {
 				linkEl.addClass("yearly-planner-chip-completed");
-				linkEl.textContent = `${TODO_CHIP_EMOJI_COMPLETED} ${title}`;
+				linkEl.textContent = `${TODO_CHIP_EMOJI_COMPLETED} ${chipTitle}`;
 			} else if (isTodoFile(ctx.app, file)) {
-				linkEl.textContent = `${TODO_CHIP_EMOJI_INCOMPLETE} ${title}`;
+				linkEl.textContent = `${TODO_CHIP_EMOJI_INCOMPLETE} ${chipTitle}`;
 			} else {
-				linkEl.textContent = title;
+				linkEl.textContent = chipTitle;
 			}
 			linkEl.title = file.path;
 			linkEl.ariaLabel = t("a11y.openPlannerNote", {
-				title,
+				title: chipTitle,
 				path: file.path,
 			});
 			linkEl.dataset.path = file.path;
@@ -511,19 +456,21 @@ export function createPlannerCell(
 			}
 		}
 		for (const event of externalDateEvents.singleEvents) {
+			const isVirtualRecurrence = isRecurrenceVirtualEvent(event);
 			const chipEl = listEl.createDiv({
-				cls: "yearly-planner-cell-file planner-external-event-chip yearly-planner-external-event-chip",
+				cls: [
+					"yearly-planner-cell-file",
+					"planner-external-event-chip",
+					"yearly-planner-external-event-chip",
+					isVirtualRecurrence && "planner-recurrence-virtual",
+				]
+					.filter(Boolean)
+					.join(" "),
 			});
 			chipEl.tabIndex = 0;
 			chipEl.setAttribute("role", "button");
 			chipEl.dataset.externalEventId = event.id;
-			const timeLabel = getExternalEventTimeLabel(
-				event,
-				ctx.calendarOverlay.locale,
-			);
-			chipEl.textContent = timeLabel
-				? `${timeLabel} ${event.title}`
-				: event.title;
+			chipEl.textContent = event.title;
 			chipEl.title = event.title;
 			chipEl.ariaLabel = t("a11y.openExternalEvent", {
 				title: event.title,

@@ -7,6 +7,8 @@ export const VIEW_TYPE_MONTHLY_SIDEBAR_PLANNER =
 export const VIEW_TYPE_MONTHLY_LIST_PLANNER = "monthly-list-planner-view";
 export const VIEW_TYPE_MONTHLY_LIST_SIDEBAR_PLANNER =
 	"monthly-list-sidebar-planner-view";
+export const VIEW_TYPE_DAILY_PLANNER = "daily-planner-view";
+export const VIEW_TYPE_THREE_DAY_PLANNER = "three-day-planner-view";
 
 /** Todo chip emoji: completed */
 export const TODO_CHIP_EMOJI_COMPLETED = "✅";

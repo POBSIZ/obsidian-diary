@@ -192,9 +192,16 @@ export function getFilesForDate(
 				!parseRangeBasename(file.basename))
 		);
 	});
-	singleFiles.sort((a, b) =>
-		a.basename.localeCompare(b.basename, undefined, { numeric: true }),
-	);
+	singleFiles.sort((a, b) => {
+		const aStart = getPlannerTimeRange(app, a).startTime;
+		const bStart = getPlannerTimeRange(app, b).startTime;
+		if (aStart && bStart && aStart !== bStart) {
+			return aStart.localeCompare(bStart);
+		}
+		if (aStart && !bStart) return -1;
+		if (!aStart && bStart) return 1;
+		return a.basename.localeCompare(b.basename, undefined, { numeric: true });
+	});
 
 	const rangeFiles: Array<{
 		file: TFile;
@@ -332,6 +339,55 @@ export function getNotifyMinutes(app: App, file: TFile): number | null {
 				: NaN;
 	if (!Number.isFinite(n) || n < 0 || n > 1439) return null;
 	return Math.round(n);
+}
+
+export interface PlannerTimeRange {
+	startTime: string | null;
+	endTime: string | null;
+}
+
+function normalizePlannerTime(value: unknown): string | null {
+	if (typeof value !== "string" && typeof value !== "number") return null;
+	const raw = String(value).trim();
+	const match = raw.match(/^(\d{1,2}):(\d{2})$/);
+	if (!match) return null;
+	const hour = Number(match[1]);
+	const minute = Number(match[2]);
+	if (
+		!Number.isInteger(hour) ||
+		!Number.isInteger(minute) ||
+		hour < 0 ||
+		hour > 23 ||
+		minute < 0 ||
+		minute > 59
+	) {
+		return null;
+	}
+	return `${pad(hour)}:${pad(minute)}`;
+}
+
+/**
+ * Optional schedule shown on planner chips. This is intentionally independent
+ * from reminder frontmatter (`notify_minutes`).
+ */
+export function getPlannerTimeRange(app: App, file: TFile): PlannerTimeRange {
+	const frontmatter = app.metadataCache.getFileCache(file)?.frontmatter;
+	return {
+		startTime: normalizePlannerTime(frontmatter?.start_time),
+		endTime: normalizePlannerTime(frontmatter?.end_time),
+	};
+}
+
+export function getPlannerTimeLabel(app: App, file: TFile): string | null {
+	const { startTime, endTime } = getPlannerTimeRange(app, file);
+	if (!startTime) return null;
+	return endTime ? `${startTime}–${endTime}` : startTime;
+}
+
+export function getPlannerChipTitle(app: App, file: TFile): string {
+	const title = getFileTitle(app, file);
+	const timeLabel = getPlannerTimeLabel(app, file);
+	return timeLabel ? `${timeLabel} ${title}` : title;
 }
 
 /** Returns chip color from frontmatter if valid; otherwise null (use default). */

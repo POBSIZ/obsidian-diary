@@ -14,6 +14,9 @@ export interface ExternalEventModalOptions {
 	locale: string;
 	onCreated: (file: TFile) => void | Promise<void>;
 	onRefresh?: () => boolean | void | Promise<boolean | void>;
+	createFile?: () => Promise<TFile>;
+	readOnlyHint?: string;
+	createSuccessMessage?: string;
 }
 
 export class ExternalEventModal extends Modal {
@@ -44,7 +47,7 @@ export class ExternalEventModal extends Modal {
 		titleBlock.createEl("h2", { text: event.title });
 		this.contentEl.createDiv({
 			cls: "yearly-planner-create-file-hint planner-external-event-readonly-hint",
-			text: t("externalEvent.readOnlyHint"),
+			text: this.options.readOnlyHint ?? t("externalEvent.readOnlyHint"),
 		});
 
 		const details = this.contentEl.createDiv({
@@ -192,15 +195,19 @@ export class ExternalEventModal extends Modal {
 	private async createMarkdownNote(button: HTMLButtonElement): Promise<void> {
 		this.setButtonBusy(button, true);
 		try {
-			const file = await createExternalEventFile(
-				this.app,
-				this.options.folder,
-				this.options.event,
-				this.options.calendarName,
-				this.options.locale,
-			);
+			const file = this.options.createFile
+				? await this.options.createFile()
+				: await createExternalEventFile(
+						this.app,
+						this.options.folder,
+						this.options.event,
+						this.options.calendarName,
+						this.options.locale,
+					);
 			await this.options.onCreated(file);
-			new Notice(t("externalEvent.createSuccess"));
+			new Notice(
+				this.options.createSuccessMessage ?? t("externalEvent.createSuccess"),
+			);
 			this.close();
 		} catch (error) {
 			const message =

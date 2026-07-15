@@ -33,8 +33,9 @@ import {
 	getYearNoteFilePath,
 } from "./file-utils";
 import {
-	materializeRecurrencesForRange,
-	type RecurrenceMaterializeRange,
+	createRecurrenceOccurrenceFile,
+	getRecurrenceVirtualEventsForRange,
+	isRecurrenceVirtualEvent,
 } from "../../utils/recurrence";
 import { getCalendarOverlayConfig } from "../../utils/calendar-overlays";
 import {
@@ -59,10 +60,10 @@ import {
 	shouldDeferPlannerClipboardToNative,
 	undoPlannerPasteBatch,
 } from "../planner-clipboard";
+import { PLANNER_COMPACT_LAYOUT_MAX_WIDTH } from "../planner-layout";
 
 export type { YearlyPlannerState } from "./types";
 
-const YEARLY_PLANNER_COMPACT_LAYOUT_MAX_WIDTH = 768;
 const YEARLY_PLANNER_EXPANDED_CELL_WIDTH_REM = 11;
 const YEARLY_PLANNER_DEFAULT_DESKTOP_CELL_WIDTH_REM = 5.25;
 const YEARLY_PLANNER_DAY_COLUMN_WIDTH_REM = 3;
@@ -80,7 +81,6 @@ export class YearlyPlannerView
 	private clipboardKeydownRegistered = false;
 	private compactLayout = Platform.isMobile;
 	private resizeObserver: ResizeObserver | null = null;
-	private materializeInFlightKey: string | null = null;
 	private visibleExternalEventsById = new Map<string, ExternalCalendarEvent>();
 	/** LIFO stack of paths created by each Cmd/Ctrl+V paste (for Cmd/Ctrl+Z undo). */
 	private pasteUndoBatches: string[][] = [];
@@ -402,39 +402,22 @@ export class YearlyPlannerView
 		});
 	}
 
-	private queueMaterializeVisibleRecurrences(
-		range: RecurrenceMaterializeRange,
-		plannerFiles: TFile[],
-	): void {
-		const key = `${range.start}|${range.end}`;
-		if (this.materializeInFlightKey === key) return;
-		this.materializeInFlightKey = key;
-		void (async () => {
-			try {
-				const result = await materializeRecurrencesForRange({
-					app: this.app,
-					plannerFiles,
-					range,
-				});
-				if (result.created > 0 || result.updated > 0) this.render();
-			} finally {
-				if (this.materializeInFlightKey === key) {
-					this.materializeInFlightKey = null;
-				}
-			}
-		})();
-	}
-
 	private renderHeader(contentEl: HTMLElement): void {
-		const locale = this.plugin.settings.locale ?? "en";
 		renderYearlyPlannerHeader(
 			contentEl,
 			{
 				year: this.year,
-				monthLabels: getMonthLabels(locale),
 				app: this.app,
 			},
 			{
+				onSelectPlannerView: (mode) => {
+					const now = new Date();
+					void this.plugin.selectPlannerView(this.leaf, mode, {
+						year: this.year,
+						month: now.getFullYear() === this.year ? now.getMonth() + 1 : 1,
+						day: now.getFullYear() === this.year ? now.getDate() : 1,
+					});
+				},
 				onPrev: () => {
 					if (this.year > 1900) {
 						this.year--;
@@ -531,6 +514,13 @@ export class YearlyPlannerView
 			createMonthHeaderCell(headerRow, month, monthLabel, {
 				widthRem: monthCellWidths?.[m],
 				isExpanded: this.monthCellWidths.has(month),
+				onOpenMonth: (targetMonth) => {
+					void this.plugin.selectPlannerView(this.leaf, "monthly", {
+						year: this.year,
+						month: targetMonth,
+						day: 1,
+					});
+				},
 				onToggleWidth: (targetMonth) =>
 					this.toggleMonthCellWidth(targetMonth),
 			});
@@ -549,13 +539,6 @@ export class YearlyPlannerView
 			folder,
 			plannerFileScope,
 		);
-		this.queueMaterializeVisibleRecurrences(
-			{
-				start: `${this.year}-01-01`,
-				end: `${this.year}-12-31`,
-			},
-			plannerFiles,
-		);
 		const visibleRange = {
 			start: `${this.year}-01-01`,
 			end: `${this.year}-12-31`,
@@ -567,7 +550,13 @@ export class YearlyPlannerView
 			"yearly",
 			plannerFiles,
 		);
-		this.visibleExternalEventsById = createExternalEventLookup(externalEvents);
+		const recurrenceEvents = getRecurrenceVirtualEventsForRange({
+			app: this.app,
+			plannerFiles,
+			range: visibleRange,
+		});
+		const overlayEvents = [...externalEvents, ...recurrenceEvents];
+		this.visibleExternalEventsById = createExternalEventLookup(overlayEvents);
 		const ranges = getRangesForYear(
 			this.app,
 			this.year,
@@ -587,7 +576,7 @@ export class YearlyPlannerView
 			clipboardSelection: this.clipboardSelection,
 			holidaysData,
 			calendarOverlay: getCalendarOverlayConfig(this.plugin.settings),
-			externalEvents,
+			externalEvents: overlayEvents,
 			rangeLaneMap,
 		};
 
@@ -653,6 +642,7 @@ export class YearlyPlannerView
 				color,
 				todo,
 				notifyMinutes,
+				timeRange,
 				recurrence,
 			) =>
 				createSingleDateFileOp(
@@ -662,6 +652,7 @@ export class YearlyPlannerView
 					color,
 					todo,
 					notifyMinutes,
+					timeRange,
 					recurrence,
 				),
 			createRangeFile: (
@@ -670,6 +661,7 @@ export class YearlyPlannerView
 				color,
 				todo,
 				notifyMinutes,
+				timeRange,
 				recurrence,
 			) =>
 				createRangeFileOp(
@@ -679,6 +671,7 @@ export class YearlyPlannerView
 					color,
 					todo,
 					notifyMinutes,
+					timeRange,
 					recurrence,
 				),
 			onCreated: () => this.render(),
@@ -703,23 +696,47 @@ export class YearlyPlannerView
 			this.visibleExternalEventsById.get(eventId) ??
 			this.getVisibleExternalEvents().find((item) => item.id === eventId);
 		if (!event) return;
+		const recurrenceEvent = isRecurrenceVirtualEvent(event) ? event : null;
+		const plannerFiles = recurrenceEvent
+			? getPlannerMarkdownFiles(
+					this.app,
+					this.plugin.settings.plannerFolder || "Planner",
+					this.plugin.settings.plannerFileScope ?? "vault",
+				)
+			: [];
 		new ExternalEventModal(this.app, {
 			event,
-			calendarName: getExternalCalendarName(
-				this.plugin.settings,
-				event.calendarId,
-			),
+			calendarName: recurrenceEvent
+				? t("recurrence.virtualSource")
+				: getExternalCalendarName(this.plugin.settings, event.calendarId),
 			folder: this.plugin.settings.plannerFolder || "Planner",
 			locale: this.plugin.settings.locale ?? "en",
 			onCreated: async (file) => {
 				await this.plugin.openPlannerFile(this.leaf, file);
 				this.render();
 			},
-			onRefresh: async () => {
-				const ok = await this.plugin.refreshExternalCalendar(event.calendarId);
-				this.render();
-				return ok;
-			},
+			createFile: recurrenceEvent
+				? () =>
+						createRecurrenceOccurrenceFile({
+							app: this.app,
+							sourcePath: recurrenceEvent.recurrenceSourcePath,
+							occurrenceDate: recurrenceEvent.recurrenceOccurrenceDate,
+							plannerFiles,
+						})
+				: undefined,
+			readOnlyHint: recurrenceEvent
+				? t("recurrence.virtualHint")
+				: undefined,
+			createSuccessMessage: recurrenceEvent
+				? t("recurrence.createSuccess")
+				: undefined,
+			onRefresh: recurrenceEvent
+				? undefined
+				: async () => {
+						const ok = await this.plugin.refreshExternalCalendar(event.calendarId);
+						this.render();
+						return ok;
+					},
 		}).open();
 	}
 
@@ -728,7 +745,7 @@ export class YearlyPlannerView
 		if (this.isInSidebar()) return true;
 		const width = this.getAvailableLayoutWidth();
 		if (width <= 0) return this.compactLayout;
-		return width <= YEARLY_PLANNER_COMPACT_LAYOUT_MAX_WIDTH;
+		return width <= PLANNER_COMPACT_LAYOUT_MAX_WIDTH;
 	}
 
 	private isInSidebar(): boolean {
@@ -774,16 +791,24 @@ export class YearlyPlannerView
 			folder,
 			plannerFileScope,
 		);
-		return getExternalEventsForRange(
-			this.app,
-			this.plugin.settings,
-			{
-				start: `${this.year}-01-01`,
-				end: `${this.year}-12-31`,
-			},
-			"yearly",
-			plannerFiles,
-		);
+		const range = {
+			start: `${this.year}-01-01`,
+			end: `${this.year}-12-31`,
+		};
+		return [
+			...getExternalEventsForRange(
+				this.app,
+				this.plugin.settings,
+				range,
+				"yearly",
+				plannerFiles,
+			),
+			...getRecurrenceVirtualEventsForRange({
+				app: this.app,
+				plannerFiles,
+				range,
+			}),
+		];
 	}
 
 	private handleClipboardKeydown(e: KeyboardEvent): void {

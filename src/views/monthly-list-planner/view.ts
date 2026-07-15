@@ -32,8 +32,9 @@ import {
 } from "./render-list";
 import { getDaysInMonth } from "../../utils/date";
 import {
-	materializeRecurrencesForRange,
-	type RecurrenceMaterializeRange,
+	createRecurrenceOccurrenceFile,
+	getRecurrenceVirtualEventsForRange,
+	isRecurrenceVirtualEvent,
 } from "../../utils/recurrence";
 import { getCalendarOverlayConfig } from "../../utils/calendar-overlays";
 import {
@@ -42,8 +43,7 @@ import {
 	type ExternalCalendarEvent,
 } from "../../utils/external-calendars";
 import { ExternalEventModal } from "../external-event-modal";
-
-const MONTHLY_LIST_PLANNER_COMPACT_LAYOUT_MAX_WIDTH = 560;
+import { PLANNER_COMPACT_LAYOUT_MAX_WIDTH } from "../planner-layout";
 
 export class MonthlyListPlannerView extends ItemView {
 	year: number;
@@ -58,7 +58,6 @@ export class MonthlyListPlannerView extends ItemView {
 	private listFilter: MonthlyListFilter = "all";
 	private compactLayout = Platform.isMobile;
 	private resizeObserver: ResizeObserver | null = null;
-	private materializeInFlightKey: string | null = null;
 	private visibleExternalEventsById = new Map<string, ExternalCalendarEvent>();
 
 	constructor(
@@ -181,6 +180,16 @@ export class MonthlyListPlannerView extends ItemView {
 		for (const el of elements) {
 			if (!this.contentEl.contains(el)) continue;
 			const h = el as HTMLElement;
+			const dailyDate = h.closest?.("[data-daily-date]");
+			if (dailyDate instanceof HTMLElement) {
+				const parts = dailyDate.dataset.dailyDate?.split("-").map(Number);
+				if (parts?.[0] && parts[1] && parts[2]) {
+					e.preventDefault();
+					e.stopPropagation();
+					this.openDailyPlanner(parts[0], parts[1], parts[2]);
+				}
+				return;
+			}
 
 			const externalEventEl = h.closest?.("[data-external-event-id]");
 			if (externalEventEl) {
@@ -297,6 +306,16 @@ export class MonthlyListPlannerView extends ItemView {
 		if (e.key !== "Enter" && e.key !== " ") return;
 		const target = e.target;
 		if (!(target instanceof HTMLElement)) return;
+		const dailyTarget = target.closest<HTMLElement>("[data-daily-date]");
+		if (dailyTarget?.dataset.dailyDate) {
+			const [year, month, day] = dailyTarget.dataset.dailyDate
+				.split("-")
+				.map(Number);
+			if (year == null || month == null || day == null) return;
+			e.preventDefault();
+			this.openDailyPlanner(year, month, day);
+			return;
+		}
 		const directTarget = target.closest(
 			".monthly-planner-cell-file, .monthly-planner-range-bar, .monthly-planner-cell-holiday-badge, .planner-external-event-chip, .planner-external-event-range",
 		);
@@ -436,29 +455,6 @@ export class MonthlyListPlannerView extends ItemView {
 		});
 	}
 
-	private queueMaterializeVisibleRecurrences(
-		range: RecurrenceMaterializeRange,
-		plannerFiles: TFile[],
-	): void {
-		const key = `${range.start}|${range.end}`;
-		if (this.materializeInFlightKey === key) return;
-		this.materializeInFlightKey = key;
-		void (async () => {
-			try {
-				const result = await materializeRecurrencesForRange({
-					app: this.app,
-					plannerFiles,
-					range,
-				});
-				if (result.created > 0 || result.updated > 0) this.render();
-			} finally {
-				if (this.materializeInFlightKey === key) {
-					this.materializeInFlightKey = null;
-				}
-			}
-		})();
-	}
-
 	private renderListFilters(contentEl: HTMLElement): void {
 		const filterBar = contentEl.createDiv({
 			cls: "monthly-list-planner-filter-bar",
@@ -499,9 +495,21 @@ export class MonthlyListPlannerView extends ItemView {
 				month: this.month,
 				monthLabel,
 				app: this.app,
-				viewTitle: t("view.monthlyListTitle"),
 			},
 			{
+				currentViewMode: "monthlyList",
+				onSelectPlannerView: (mode) => {
+					const now = new Date();
+					void this.plugin.selectPlannerView(this.leaf, mode, {
+						year: this.year,
+						month: this.month,
+						day:
+							this.year === now.getFullYear() &&
+							this.month === now.getMonth() + 1
+								? now.getDate()
+								: 1,
+					});
+				},
 				onPrev: () => {
 					if (this.month === 1) {
 						if (this.year > 1900) {
@@ -559,6 +567,7 @@ export class MonthlyListPlannerView extends ItemView {
 				color,
 				todo,
 				notifyMinutes,
+				timeRange,
 				recurrence,
 			) =>
 				createSingleDateFileOp(
@@ -568,6 +577,7 @@ export class MonthlyListPlannerView extends ItemView {
 					color,
 					todo,
 					notifyMinutes,
+					timeRange,
 					recurrence,
 				),
 			createRangeFile: (
@@ -576,6 +586,7 @@ export class MonthlyListPlannerView extends ItemView {
 				color,
 				todo,
 				notifyMinutes,
+				timeRange,
 				recurrence,
 			) =>
 				createRangeFileOp(
@@ -585,12 +596,21 @@ export class MonthlyListPlannerView extends ItemView {
 					color,
 					todo,
 					notifyMinutes,
+					timeRange,
 					recurrence,
 				),
 			onCreated: () => this.render(),
 			openCreatedFile: (file) =>
 				this.plugin.openPlannerFile(this.leaf, file),
 		}).open();
+	}
+
+	private openDailyPlanner(year: number, month: number, day: number): void {
+		void this.plugin.selectPlannerView(this.leaf, "daily", {
+			year,
+			month,
+			day,
+		});
 	}
 
 	private openFileOptionsModal(file: TFile): void {
@@ -609,23 +629,47 @@ export class MonthlyListPlannerView extends ItemView {
 			this.visibleExternalEventsById.get(eventId) ??
 			this.getVisibleExternalEvents().find((item) => item.id === eventId);
 		if (!event) return;
+		const recurrenceEvent = isRecurrenceVirtualEvent(event) ? event : null;
+		const plannerFiles = recurrenceEvent
+			? getPlannerMarkdownFiles(
+					this.app,
+					this.plugin.settings.plannerFolder || "Planner",
+					this.plugin.settings.plannerFileScope ?? "vault",
+				)
+			: [];
 		new ExternalEventModal(this.app, {
 			event,
-			calendarName: getExternalCalendarName(
-				this.plugin.settings,
-				event.calendarId,
-			),
+			calendarName: recurrenceEvent
+				? t("recurrence.virtualSource")
+				: getExternalCalendarName(this.plugin.settings, event.calendarId),
 			folder: this.plugin.settings.plannerFolder || "Planner",
 			locale: this.plugin.settings.locale ?? "en",
 			onCreated: async (file) => {
 				await this.plugin.openPlannerFile(this.leaf, file);
 				this.render();
 			},
-			onRefresh: async () => {
-				const ok = await this.plugin.refreshExternalCalendar(event.calendarId);
-				this.render();
-				return ok;
-			},
+			createFile: recurrenceEvent
+				? () =>
+						createRecurrenceOccurrenceFile({
+							app: this.app,
+							sourcePath: recurrenceEvent.recurrenceSourcePath,
+							occurrenceDate: recurrenceEvent.recurrenceOccurrenceDate,
+							plannerFiles,
+						})
+				: undefined,
+			readOnlyHint: recurrenceEvent
+				? t("recurrence.virtualHint")
+				: undefined,
+			createSuccessMessage: recurrenceEvent
+				? t("recurrence.createSuccess")
+				: undefined,
+			onRefresh: recurrenceEvent
+				? undefined
+				: async () => {
+						const ok = await this.plugin.refreshExternalCalendar(event.calendarId);
+						this.render();
+						return ok;
+					},
 		}).open();
 	}
 
@@ -700,15 +744,6 @@ export class MonthlyListPlannerView extends ItemView {
 			folder,
 			plannerFileScope,
 		);
-		this.queueMaterializeVisibleRecurrences(
-			{
-				start: `${this.year}-${String(this.month).padStart(2, "0")}-01`,
-				end: `${this.year}-${String(this.month).padStart(2, "0")}-${String(
-					getDaysInMonth(this.year, this.month),
-				).padStart(2, "0")}`,
-			},
-			plannerFiles,
-		);
 		const externalEvents = getExternalEventsForRange(
 			this.app,
 			this.plugin.settings,
@@ -716,7 +751,13 @@ export class MonthlyListPlannerView extends ItemView {
 			this.compactLayout ? "sidebar" : "monthlyList",
 			plannerFiles,
 		);
-		this.visibleExternalEventsById = createExternalEventLookup(externalEvents);
+		const recurrenceEvents = getRecurrenceVirtualEventsForRange({
+			app: this.app,
+			plannerFiles,
+			range: this.getVisibleRange(),
+		});
+		const overlayEvents = [...externalEvents, ...recurrenceEvents];
+		this.visibleExternalEventsById = createExternalEventLookup(overlayEvents);
 		renderMonthlyListBody(inner, {
 			year: this.year,
 			month: this.month,
@@ -727,7 +768,7 @@ export class MonthlyListPlannerView extends ItemView {
 			locale,
 			holidaysData,
 			calendarOverlay: getCalendarOverlayConfig(this.plugin.settings),
-			externalEvents,
+			externalEvents: overlayEvents,
 			filter: this.listFilter,
 		});
 	}
@@ -735,13 +776,26 @@ export class MonthlyListPlannerView extends ItemView {
 	private getVisibleExternalEvents(): ExternalCalendarEvent[] {
 		const folder = this.plugin.settings.plannerFolder || "Planner";
 		const plannerFileScope = this.plugin.settings.plannerFileScope ?? "vault";
-		return getExternalEventsForRange(
+		const plannerFiles = getPlannerMarkdownFiles(
 			this.app,
-			this.plugin.settings,
-			this.getVisibleRange(),
-			this.compactLayout ? "sidebar" : "monthlyList",
-			getPlannerMarkdownFiles(this.app, folder, plannerFileScope),
+			folder,
+			plannerFileScope,
 		);
+		const range = this.getVisibleRange();
+		return [
+			...getExternalEventsForRange(
+				this.app,
+				this.plugin.settings,
+				range,
+				this.compactLayout ? "sidebar" : "monthlyList",
+				plannerFiles,
+			),
+			...getRecurrenceVirtualEventsForRange({
+				app: this.app,
+				plannerFiles,
+				range,
+			}),
+		];
 	}
 
 	private getVisibleRange(): { start: string; end: string } {
@@ -758,7 +812,7 @@ export class MonthlyListPlannerView extends ItemView {
 		if (this.isInSidebar()) return true;
 		const width = this.getAvailableLayoutWidth();
 		if (width <= 0) return this.compactLayout;
-		return width <= MONTHLY_LIST_PLANNER_COMPACT_LAYOUT_MAX_WIDTH;
+		return width <= PLANNER_COMPACT_LAYOUT_MAX_WIDTH;
 	}
 
 	private isInSidebar(): boolean {

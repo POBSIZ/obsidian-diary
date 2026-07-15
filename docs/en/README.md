@@ -1,6 +1,6 @@
 # Diary (English)
 
-Diary is an Obsidian community plugin that turns Markdown files in your vault into date-based planner views. It helps you move between a yearly overview, a monthly grid, and a monthly list while managing single-date notes, range notes, monthly/yearly plan notes, holidays, one calendar overlay label, opt-in external calendar overlays, todo state, and local reminders.
+Diary is an Obsidian community plugin that turns Markdown files in your vault into date-based planner views. It helps you move between yearly, monthly grid, monthly list, daily, and 3-day views while managing single-date notes, range notes, monthly/yearly plan notes, holidays, calendar overlays, todo state, and local reminders.
 
 Full documentation: [English](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/en/README.md) | [Deutsch](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/de/README.md) | [Español](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/es/README.md) | [Français](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/fr/README.md) | [日本語](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/ja/README.md) | [简体中文](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/zh-CN/README.md) | [繁體中文](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/zh-TW/README.md) | [한국어](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/ko/README.md)
 
@@ -9,7 +9,7 @@ Full documentation: [English](https://github.com/POBSIZ/obsidian-diary/blob/main
 | Item | Value |
 | --- | --- |
 | Plugin ID | `diary` |
-| Current version | `1.6.0` |
+| Current version | `1.7.0` |
 | Minimum Obsidian version | `1.7.2` |
 | Supported platforms | Desktop / mobile (`isDesktopOnly: false`) |
 | Default language | `en` |
@@ -17,6 +17,7 @@ Full documentation: [English](https://github.com/POBSIZ/obsidian-diary/blob/main
 
 ## Latest Version
 
+- `1.7.0`: Adds daily and 3-day timeline planners, direct planner view selection, shared period navigation, independent start/end time metadata, and virtual every-N-days/weeks/months/years recurrence.
 - `1.6.0`: Adds full documentation for every supported UI language, Spain holiday support, and localized alternate calendar option text.
 - `1.5.0`: Adds German, Spanish, French, Japanese, Simplified Chinese, Traditional Chinese, and Korean UI language support alongside English.
 - `1.4.2`: Narrows Diary styles to planner, settings, and modal surfaces and adds localized labels for color preset buttons.
@@ -56,10 +57,13 @@ The images below were captured from a fresh demo vault with sample planner notes
 - **Localized UI**: Switch Diary between English, German, Spanish, French, Japanese, Simplified Chinese, Traditional Chinese, and Korean.
 - **Monthly grid planner**: Inspect one month in a large calendar grid with chips, range bars, holidays, calendar overlay labels, and external calendar overlays.
 - **Monthly list planner**: Review busy months in a day-by-day vertical list with `All`, `With notes`, and `Upcoming` filters.
+- **Daily planner**: Plan one day on a 24-hour timeline. Timed notes use `start_time` and `end_time`; all-day and untimed notes stay in a separate section.
+- **3-day planner**: Compare three consecutive days in parallel columns on one 24-hour timeline. Narrow screens use horizontal scrolling instead of compressing the day columns.
+- **Direct view selector**: Switch directly among yearly, monthly grid, monthly list, daily, and 3-day views. On narrow screens it stays visible while secondary actions move into **More**.
 - **Right sidebar planner**: Keep a compact monthly planner open in the right sidebar while notes remain open in the main workspace.
 - **Plan note panel**: Create and preview yearly notes (`YYYY.md`) and monthly notes (`YYYY-MM.md`) above the planner. Preview expanded/collapsed state is saved, with a separate mobile state that starts collapsed.
 - **Date and range notes**: Display notes as planner chips based on single-date and date-range filenames. Diary scans the whole vault by default, or only the planner folder when configured.
-- **Recurring events**: Repeat a note daily, monthly, or yearly, choose a Gregorian or alternate-calendar basis, and let Diary create only the occurrences that fall inside the planner range you are viewing.
+- **Recurring events**: Repeat every N days, weeks, months, or years using a Gregorian or alternate-calendar basis. Occurrences remain virtual until selected and converted to Markdown notes.
 - **Color, todo, and completion state**: Reflect `color`, `todo`, and `completed` frontmatter in chip styling and labels.
 - **Holiday overlays**: Show country-specific public holidays for the supported UI-language regions and select holiday badges to see their names.
 - **Alternate calendar label**: Optionally show one compact alternate calendar label at a time, including Korean lunar, Chinese lunar, Dangi, Hebrew, Islamic, Persian, Indian national, Buddhist, Japanese era, Minguo, Coptic, and Ethiopic calendars, with localized option text in every supported UI language.
@@ -103,11 +107,13 @@ Command palette:
 - `Open monthly planner`
 - `Open monthly planner in sidebar`
 - `Open monthly list planner`
+- `Open daily planner`
+- `Open 3-day planner`
 
 Select the repeat icon in any planner header to cycle the same leaf through this order.
 
 ```text
-Yearly -> Monthly Grid -> Monthly List -> Yearly
+Yearly -> Monthly Grid -> Monthly List -> Daily -> 3 Days -> Yearly
 ```
 
 Use previous/next buttons to move through years or months, and the calendar icon to return to the current year or month. Select the year or month label to type a specific value.
@@ -156,7 +162,7 @@ Select a date cell or the add-file button, then use **Single date**.
 - Set a color to display a chip border or mobile dot.
 - Enable **Todo file** to show todo state on the chip.
 - Set **Reminder time** to save `notify_minutes` frontmatter.
-- Enable **Repeat**, then choose **Daily**, **Monthly**, or **Yearly** and a calendar basis. Occurrences are created lazily for the currently visible year or month; Diary updates files from the same `recurrence_id` series and skips unrelated existing notes.
+- Enable **Repeat**, choose **Daily**, **Weekly**, **Monthly**, or **Yearly**, enter an interval from 1 to 999, then choose a calendar basis and optional inclusive end date. This supports every N days, weeks, months, or years. Future occurrences appear as virtual planner items without creating files.
 
 ### Range Notes
 
@@ -255,6 +261,8 @@ Diary also stores UI-only state in plugin data: plan note preview expansion, mob
 | `color` | Chip color. Any valid CSS color string can be used. Examples: `#22c55e`, `red`, `rgb(34, 197, 94)` |
 | `todo` | Shows the note as a todo chip when `true`. |
 | `completed` | Shows completed state when `todo: true`. |
+| `start_time` | Optional chip start time in `HH:mm` format. Timed chips are sorted by start time. |
+| `end_time` | Optional chip end time in `HH:mm` format. This does not schedule a reminder. |
 | `notify_minutes` | Minutes from local midnight on the event date. Accepts `0` through `1439`. Example: 9:00 AM is `540`. |
 | `date_start` | Start date automatically saved for range notes. |
 | `date_end` | End date automatically saved for range notes. |
@@ -262,8 +270,9 @@ Diary also stores UI-only state in plugin data: plan note preview expansion, mob
 | `recurrence_id` | Stable series ID shared by a repeat source and generated occurrences. |
 | `recurrence_role` | `source` for the repeat definition, `occurrence` for generated notes. |
 | `recurrence_calendar` | Calendar basis: `gregorian` or one of the supported alternate calendar IDs. |
-| `recurrence_rule` | Simple frequency rule: `FREQ=DAILY`, `FREQ=MONTHLY`, or `FREQ=YEARLY`. |
+| `recurrence_rule` | Frequency plus optional interval, such as `FREQ=WEEKLY;INTERVAL=2`. Existing rules without `INTERVAL` mean every 1 unit. |
 | `recurrence_anchor_date` | Gregorian source date used as the start of the series. |
+| `recurrence_until_date` | Optional inclusive Gregorian date after which no occurrences are created. |
 | `recurrence_anchor_year/month/day` | Calendar-basis anchor fields used for alternate-calendar matching. |
 | `recurrence_exdates` | Gregorian occurrence dates skipped from the series. |
 | `recurrence_source_path` | Source note path stored on generated occurrences. |
@@ -276,7 +285,7 @@ Diary also stores UI-only state in plugin data: plan note preview expansion, mob
 
 Reminders are not scheduled OS notifications. While Obsidian is open, Diary checks about every 15 seconds and shows an Obsidian Notice during the matching minute on the event date.
 
-Recurring occurrence generation is idempotent. If the target file already belongs to the same `recurrence_id`, Diary refreshes its series metadata; if the path is an ordinary note or another series, Diary leaves it untouched.
+Recurring occurrences are virtual by default. Creating one from its planner modal is idempotent: if the occurrence already belongs to the same `recurrence_id`, Diary opens that note; if the target path is an ordinary note or another series, Diary leaves it untouched.
 
 ## Filename Rules
 

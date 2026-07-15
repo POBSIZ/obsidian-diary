@@ -6,6 +6,7 @@ import type {
 	AlternateCalendarId,
 	AlternateCalendarSelection,
 } from "./alternate-calendars";
+import type { ExternalCalendarEvent } from "./external-calendars";
 import { parseRangeBasename } from "./range";
 
 export const RECURRENCE_GREGORIAN = "gregorian";
@@ -15,7 +16,11 @@ export type RecurrenceCalendarId =
 	| AlternateCalendarId;
 
 export type RecurrenceRole = "source" | "occurrence";
-export type SimpleRecurrenceFrequency = "DAILY" | "MONTHLY" | "YEARLY";
+export type SimpleRecurrenceFrequency =
+	| "DAILY"
+	| "WEEKLY"
+	| "MONTHLY"
+	| "YEARLY";
 
 export interface CalendarDateParts {
 	year: number;
@@ -29,6 +34,7 @@ export interface RecurrenceFormValue {
 	enabled: boolean;
 	calendar: RecurrenceCalendarId;
 	rule: string;
+	untilDate?: string | null;
 }
 
 export interface RecurrenceSourceDefinition {
@@ -38,6 +44,7 @@ export interface RecurrenceSourceDefinition {
 	rule: string;
 	anchorDate: string;
 	anchorParts: CalendarDateParts;
+	untilDate: string | null;
 	exdates: string[];
 	file: TFile;
 }
@@ -47,16 +54,16 @@ export interface RecurrenceMaterializeRange {
 	end: string;
 }
 
-export interface RecurrenceMaterializeResult {
-	created: number;
-	updated: number;
-	skipped: number;
+export interface RecurrenceVirtualEvent extends ExternalCalendarEvent {
+	recurrenceSourcePath: string;
+	recurrenceOccurrenceDate: string;
 }
 
 const pad = (n: number): string => String(n).padStart(2, "0");
 const DAY_MS = 86_400_000;
 const SIMPLE_RECURRENCE_FREQUENCIES: readonly SimpleRecurrenceFrequency[] = [
 	"DAILY",
+	"WEEKLY",
 	"MONTHLY",
 	"YEARLY",
 ];
@@ -103,6 +110,7 @@ const RECURRENCE_SOURCE_KEYS = [
 	"recurrence_anchor_day",
 	"recurrence_anchor_era",
 	"recurrence_anchor_is_leap_month",
+	"recurrence_until_date",
 	"recurrence_exdates",
 ] as const;
 
@@ -138,21 +146,30 @@ export function normalizeRecurrenceCalendar(
 }
 
 export function normalizeRecurrenceRule(rule: string): string {
-	return buildSimpleRecurrenceRule(getSimpleRecurrenceFrequency(rule));
+	return buildSimpleRecurrenceRule(
+		getSimpleRecurrenceFrequency(rule),
+		getRecurrenceInterval(rule),
+	);
 }
 
 export function buildRecurrenceRuleFromForm(options: {
 	frequency: string;
+	interval?: number | string;
 }): string {
 	return buildSimpleRecurrenceRule(
 		normalizeSimpleRecurrenceFrequency(options.frequency),
+		normalizeRecurrenceInterval(options.interval),
 	);
 }
 
 export function buildSimpleRecurrenceRule(
 	frequency: SimpleRecurrenceFrequency,
+	interval = 1,
 ): string {
-	return `FREQ=${frequency}`;
+	const normalizedInterval = normalizeRecurrenceInterval(interval);
+	return normalizedInterval > 1
+		? `FREQ=${frequency};INTERVAL=${normalizedInterval}`
+		: `FREQ=${frequency}`;
 }
 
 export function getSimpleRecurrenceFrequency(
@@ -160,6 +177,21 @@ export function getSimpleRecurrenceFrequency(
 ): SimpleRecurrenceFrequency {
 	const pairs = parseRulePairs(rule);
 	return normalizeSimpleRecurrenceFrequency(pairs.get("FREQ"));
+}
+
+export function getRecurrenceInterval(rule: string): number {
+	return normalizeRecurrenceInterval(parseRulePairs(rule).get("INTERVAL"));
+}
+
+export function normalizeRecurrenceInterval(value: unknown): number {
+	const parsed =
+		typeof value === "number"
+			? value
+			: typeof value === "string"
+				? Number(value.trim())
+				: 1;
+	if (!Number.isFinite(parsed)) return 1;
+	return Math.max(1, Math.min(999, Math.floor(parsed)));
 }
 
 export function normalizeSimpleRecurrenceFrequency(
@@ -207,6 +239,13 @@ export function getRecurrenceSourceDefinition(
 	const anchorParts =
 		storedAnchor ?? getCalendarDateParts(anchorDate, calendar);
 	if (!anchorParts) return null;
+	const storedUntilDate = toStringValue(fm.recurrence_until_date);
+	const untilDate =
+		storedUntilDate &&
+		isValidDateString(storedUntilDate) &&
+		storedUntilDate >= anchorDate
+			? storedUntilDate
+			: null;
 
 	return {
 		id,
@@ -215,6 +254,7 @@ export function getRecurrenceSourceDefinition(
 		rule: normalizeRecurrenceRule(rule),
 		anchorDate,
 		anchorParts,
+		untilDate,
 		exdates: normalizeDateList(fm.recurrence_exdates),
 		file,
 	};
@@ -260,6 +300,13 @@ export function buildRecurrenceSourceFrontmatter(
 	};
 	if (anchorParts.era) fields.recurrence_anchor_era = anchorParts.era;
 	if (anchorParts.isLeapMonth) fields.recurrence_anchor_is_leap_month = true;
+	if (
+		value.untilDate &&
+		isValidDateString(value.untilDate) &&
+		value.untilDate >= anchorDate
+	) {
+		fields.recurrence_until_date = value.untilDate;
+	}
 	return fields;
 }
 
@@ -269,11 +316,15 @@ export function applyRecurrenceSourceFrontmatter(
 	anchorDate: string,
 	existingId?: string | null,
 ): void {
+	const existingExdates = normalizeDateList(frontmatter.recurrence_exdates);
 	removeRecurrenceFrontmatter(frontmatter);
 	if (!value?.enabled) return;
 	const fields = buildRecurrenceSourceFrontmatter(value, anchorDate, existingId);
 	for (const [key, fieldValue] of Object.entries(fields)) {
 		frontmatter[key] = fieldValue;
+	}
+	if (existingExdates.length > 0) {
+		frontmatter.recurrence_exdates = existingExdates;
 	}
 }
 
@@ -312,36 +363,111 @@ export async function addRecurrenceExdate(
 	);
 }
 
-export async function materializeRecurrencesForRange(args: {
+export function getRecurrenceVirtualEventsForRange(args: {
 	app: App;
 	plannerFiles: TFile[];
 	range: RecurrenceMaterializeRange;
-}): Promise<RecurrenceMaterializeResult> {
-	const result: RecurrenceMaterializeResult = {
-		created: 0,
-		updated: 0,
-		skipped: 0,
-	};
-
+}): RecurrenceVirtualEvent[] {
+	const existingOccurrenceKeys = new Set<string>();
 	for (const file of args.plannerFiles) {
-		const source = getRecurrenceSourceDefinition(args.app, file);
-		if (!source) continue;
-		const dates = expandRecurrenceDates(source, args.range);
-		for (const dateStr of dates) {
-			if (dateStr === source.anchorDate) continue;
-			const changed = await materializeOccurrence(
-				args.app,
-				source,
-				dateStr,
-				args.plannerFiles,
-			);
-			if (changed === "created") result.created++;
-			else if (changed === "updated") result.updated++;
-			else result.skipped++;
+		const occurrence = getRecurrenceOccurrenceInfo(args.app, file);
+		if (occurrence?.occurrenceDate) {
+			existingOccurrenceKeys.add(`${occurrence.id}|${occurrence.occurrenceDate}`);
 		}
 	}
 
-	return result;
+	const events: RecurrenceVirtualEvent[] = [];
+	for (const file of args.plannerFiles) {
+		const source = getRecurrenceSourceDefinition(args.app, file);
+		if (!source) continue;
+		const sourceFm = args.app.metadataCache.getFileCache(file)?.frontmatter ?? {};
+		const targetTemplate = materializeTargetPath(source, source.anchorDate);
+		const color = toStringValue(sourceFm.color) ?? undefined;
+		const timeLabel = getPlannerTimeLabelFromFrontmatter(sourceFm);
+		for (const occurrenceDate of expandRecurrenceDates(source, args.range)) {
+			if (occurrenceDate === source.anchorDate) continue;
+			if (existingOccurrenceKeys.has(`${source.id}|${occurrenceDate}`)) continue;
+			const target = materializeTargetPath(source, occurrenceDate);
+			events.push({
+				id: `diary-recurrence:${source.id}:${occurrenceDate}`,
+				calendarId: "diary-recurrence",
+				uid: source.id,
+				instanceId: occurrenceDate,
+				title: timeLabel
+					? `${timeLabel} ${targetTemplate.title}`
+					: targetTemplate.title,
+				start: occurrenceDate,
+				end: target.rangeEnd,
+				allDay: true,
+				categories: [],
+				color,
+				recurrenceSourcePath: file.path,
+				recurrenceOccurrenceDate: occurrenceDate,
+			});
+		}
+	}
+
+	return events.sort((a, b) => {
+		const dateCompare = a.start.localeCompare(b.start);
+		return dateCompare !== 0 ? dateCompare : a.title.localeCompare(b.title);
+	});
+}
+
+export function isRecurrenceVirtualEvent(
+	event: ExternalCalendarEvent,
+): event is RecurrenceVirtualEvent {
+	return (
+		"recurrenceSourcePath" in event &&
+		typeof event.recurrenceSourcePath === "string" &&
+		"recurrenceOccurrenceDate" in event &&
+		typeof event.recurrenceOccurrenceDate === "string"
+	);
+}
+
+export async function createRecurrenceOccurrenceFile(args: {
+	app: App;
+	sourcePath: string;
+	occurrenceDate: string;
+	plannerFiles: TFile[];
+}): Promise<TFile> {
+	const sourceFile = args.app.vault.getAbstractFileByPath(args.sourcePath);
+	if (!(sourceFile instanceof TFile)) {
+		throw new Error("The repeat source note no longer exists.");
+	}
+	const source = getRecurrenceSourceDefinition(args.app, sourceFile);
+	if (!source) throw new Error("The repeat source is no longer valid.");
+	const matches = expandRecurrenceDates(source, {
+		start: args.occurrenceDate,
+		end: args.occurrenceDate,
+	});
+	if (!matches.includes(args.occurrenceDate)) {
+		throw new Error("This date is no longer part of the repeat series.");
+	}
+
+	const existingOccurrence = findExistingSeriesOccurrence(
+		args.app,
+		args.plannerFiles,
+		source.id,
+		args.occurrenceDate,
+	);
+	if (existingOccurrence) return existingOccurrence;
+
+	const target = materializeTargetPath(source, args.occurrenceDate);
+	const existingTarget = args.app.vault.getAbstractFileByPath(target.path);
+	if (existingTarget instanceof TFile) {
+		throw new Error(`A different note already exists at ${target.path}.`);
+	}
+	await materializeOccurrence(
+		args.app,
+		source,
+		args.occurrenceDate,
+		args.plannerFiles,
+	);
+	const created = args.app.vault.getAbstractFileByPath(target.path);
+	if (!(created instanceof TFile)) {
+		throw new Error("Failed to create the repeat occurrence note.");
+	}
+	return created;
 }
 
 export function getCalendarDateParts(
@@ -507,6 +633,8 @@ function buildOccurrenceFrontmatter(
 	};
 	copyFrontmatterValue(sourceFm, fields, "color");
 	copyFrontmatterValue(sourceFm, fields, "notify_minutes");
+	copyFrontmatterValue(sourceFm, fields, "start_time");
+	copyFrontmatterValue(sourceFm, fields, "end_time");
 	if (sourceFm.todo === true || sourceFm.todo === "true") {
 		fields.todo = true;
 		fields.completed = false;
@@ -531,14 +659,20 @@ function expandSimpleRecurrenceDates(
 ): string[] {
 	if (range.end < source.anchorDate) return [];
 	const frequency = getSimpleRecurrenceFrequency(source.rule);
+	const interval = getRecurrenceInterval(source.rule);
 	const start = range.start > source.anchorDate ? range.start : source.anchorDate;
+	const end =
+		source.untilDate && source.untilDate < range.end
+			? source.untilDate
+			: range.end;
+	if (end < start) return [];
 
 	const matches: string[] = [];
 	let cursor = start;
-	while (cursor <= range.end) {
+	while (cursor <= end) {
 		if (
 			!source.exdates.includes(cursor) &&
-			matchesSimpleRecurrenceDate(source, frequency, cursor)
+			matchesSimpleRecurrenceDate(source, frequency, interval, cursor)
 		) {
 			matches.push(cursor);
 		}
@@ -551,8 +685,17 @@ function expandSimpleRecurrenceDates(
 function matchesSimpleRecurrenceDate(
 	source: RecurrenceSourceDefinition,
 	frequency: SimpleRecurrenceFrequency,
+	interval: number,
 	dateStr: string,
 ): boolean {
+	const elapsedDays = daysBetween(source.anchorDate, dateStr);
+	if (elapsedDays < 0) return false;
+	if (frequency === "DAILY") {
+		return elapsedDays % interval === 0;
+	}
+	if (frequency === "WEEKLY") {
+		return elapsedDays % (7 * interval) === 0;
+	}
 	const parts = getCalendarDateParts(dateStr, source.calendar);
 	if (!parts) return false;
 	if (
@@ -561,17 +704,19 @@ function matchesSimpleRecurrenceDate(
 	) {
 		return false;
 	}
-	if (frequency === "DAILY") {
-		return daysBetween(source.anchorDate, dateStr) >= 0;
-	}
 	if (frequency === "MONTHLY") {
 		const months = monthsBetween(source.anchorParts, parts);
-		return months >= 0 && parts.day === source.anchorParts.day;
+		return (
+			months >= 0 &&
+			months % interval === 0 &&
+			parts.day === source.anchorParts.day
+		);
 	}
 	if (frequency === "YEARLY") {
 		const years = parts.year - source.anchorParts.year;
 		return (
 			years >= 0 &&
+			years % interval === 0 &&
 			parts.month === source.anchorParts.month &&
 			parts.day === source.anchorParts.day
 		);
@@ -761,6 +906,20 @@ function copyFrontmatterValue(
 	if (value !== undefined && value !== null && value !== "") {
 		target[key] = value;
 	}
+}
+
+function getPlannerTimeLabelFromFrontmatter(
+	frontmatter: Record<string, unknown>,
+): string | null {
+	const normalize = (value: unknown): string | null => {
+		if (typeof value !== "string") return null;
+		const match = value.trim().match(/^(?:[01]\d|2[0-3]):[0-5]\d$/);
+		return match ? match[0] : null;
+	};
+	const startTime = normalize(frontmatter.start_time);
+	if (!startTime) return null;
+	const endTime = normalize(frontmatter.end_time);
+	return endTime ? `${startTime}–${endTime}` : startTime;
 }
 
 function getFallbackTitleFromFile(file: TFile): string {

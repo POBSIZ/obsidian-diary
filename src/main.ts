@@ -25,6 +25,8 @@ import {
 	VIEW_TYPE_MONTHLY_SIDEBAR_PLANNER,
 	VIEW_TYPE_MONTHLY_LIST_PLANNER,
 	VIEW_TYPE_MONTHLY_LIST_SIDEBAR_PLANNER,
+	VIEW_TYPE_DAILY_PLANNER,
+	VIEW_TYPE_THREE_DAY_PLANNER,
 } from "./constants";
 import { YearlyPlannerView } from "./views/yearly-planner/view";
 import { YearlySidebarPlannerView } from "./views/yearly-planner/sidebar-view";
@@ -33,6 +35,9 @@ import { MonthlySidebarPlannerView } from "./views/monthly-planner/sidebar-view"
 import { MonthlyListPlannerView } from "./views/monthly-list-planner/view";
 import { MonthlyListSidebarPlannerView } from "./views/monthly-list-planner/sidebar-view";
 import { registerPlannerReminders } from "./planner-reminders";
+import { DailyPlannerView } from "./views/daily-planner/view";
+import { ThreeDayPlannerView } from "./views/three-day-planner/view";
+import type { PlannerViewMode } from "./views/planner-layout";
 
 const SIDEBAR_PLANNER_VIEW_TYPES = [
 	VIEW_TYPE_YEARLY_SIDEBAR_PLANNER,
@@ -65,6 +70,14 @@ export default class DiaryObsidian extends Plugin {
 		this.registerView(
 			VIEW_TYPE_YEARLY_PLANNER,
 			(leaf) => new YearlyPlannerView(leaf, this),
+		);
+		this.registerView(
+			VIEW_TYPE_DAILY_PLANNER,
+			(leaf) => new DailyPlannerView(leaf, this),
+		);
+		this.registerView(
+			VIEW_TYPE_THREE_DAY_PLANNER,
+			(leaf) => new ThreeDayPlannerView(leaf, this),
 		);
 		this.registerView(
 			VIEW_TYPE_YEARLY_SIDEBAR_PLANNER,
@@ -115,6 +128,16 @@ export default class DiaryObsidian extends Plugin {
 			callback: () => void this.activateYearlyPlanner(),
 		});
 		this.addCommand({
+			id: "open-daily-planner",
+			name: t("command.openDailyPlanner"),
+			callback: () => void this.activateDailyPlanner(),
+		});
+		this.addCommand({
+			id: "open-three-day-planner",
+			name: t("command.openThreeDayPlanner"),
+			callback: () => void this.activateThreeDayPlanner(),
+		});
+		this.addCommand({
 			id: "open-monthly-planner",
 			name: t("command.openMonthlyPlanner"),
 			callback: () => void this.activateMonthlyPlanner(),
@@ -147,6 +170,7 @@ export default class DiaryObsidian extends Plugin {
 			this.refreshYearlyPlannerViews();
 			this.refreshMonthlyPlannerViews();
 			this.refreshMonthlyListPlannerViews();
+			this.refreshDailyPlannerViews();
 		}, 150);
 
 		this.registerEvent(
@@ -171,6 +195,7 @@ export default class DiaryObsidian extends Plugin {
 					this.refreshYearlyPlannerViews();
 					this.refreshMonthlyPlannerViews();
 					this.refreshMonthlyListPlannerViews();
+					this.refreshDailyPlannerViews();
 				}
 			}, 60_000),
 		);
@@ -247,6 +272,71 @@ export default class DiaryObsidian extends Plugin {
 		await workspace.revealLeaf(leaf);
 	}
 
+	async activateDailyPlanner(
+		year = new Date().getFullYear(),
+		month = new Date().getMonth() + 1,
+		day = new Date().getDate(),
+	): Promise<void> {
+		const leaf = this.app.workspace.getLeaf();
+		await leaf.setViewState({
+			type: VIEW_TYPE_DAILY_PLANNER,
+			state: { year, month, day },
+		});
+		await this.app.workspace.revealLeaf(leaf);
+	}
+
+	async activateThreeDayPlanner(
+		year = new Date().getFullYear(),
+		month = new Date().getMonth() + 1,
+		day = new Date().getDate(),
+	): Promise<void> {
+		const leaf = this.app.workspace.getLeaf();
+		await leaf.setViewState({
+			type: VIEW_TYPE_THREE_DAY_PLANNER,
+			state: { year, month, day },
+		});
+		await this.app.workspace.revealLeaf(leaf);
+	}
+
+	async selectPlannerView(
+		leaf: WorkspaceLeaf,
+		mode: PlannerViewMode,
+		date: { year: number; month: number; day: number },
+	): Promise<void> {
+		const sidebar = this.isSidebarLeaf(leaf);
+		if (mode === "daily") {
+			await leaf.setViewState({
+				type: VIEW_TYPE_DAILY_PLANNER,
+				state: date,
+			});
+			await this.app.workspace.revealLeaf(leaf);
+			return;
+		}
+		if (mode === "threeDay") {
+			await leaf.setViewState({
+				type: VIEW_TYPE_THREE_DAY_PLANNER,
+				state: date,
+			});
+			await this.app.workspace.revealLeaf(leaf);
+			return;
+		}
+		if (mode === "yearly") {
+			if (sidebar) await this.switchToYearlySidebar(leaf, date.year);
+			else await this.switchToYearly(leaf, date.year);
+			return;
+		}
+		if (mode === "monthlyList") {
+			if (sidebar) {
+				await this.switchToMonthlyListSidebar(leaf, date.year, date.month);
+			} else {
+				await this.switchToMonthlyList(leaf, date.year, date.month);
+			}
+			return;
+		}
+		if (sidebar) await this.switchToMonthlySidebar(leaf, date.year, date.month);
+		else await this.switchToMonthly(leaf, date.year, date.month);
+	}
+
 	/** Switch leaf to monthly planner. Reuses the same leaf. */
 	async switchToMonthly(
 		leaf: WorkspaceLeaf,
@@ -318,7 +408,7 @@ export default class DiaryObsidian extends Plugin {
 	}
 
 	/**
-	 * Single control: yearly → monthly grid → monthly list → yearly.
+	 * Secondary control: yearly → monthly grid → monthly list → daily → 3 days → yearly.
 	 * Preserves year/month between the two monthly modes.
 	 */
 	async cyclePlannerView(leaf: WorkspaceLeaf): Promise<void> {
@@ -344,7 +434,15 @@ export default class DiaryObsidian extends Plugin {
 		} else if (view instanceof MonthlyListSidebarPlannerView) {
 			await this.switchToYearlySidebar(leaf, view.year);
 		} else if (view instanceof MonthlyListPlannerView) {
-			await this.switchToYearly(leaf, view.year);
+			await this.selectPlannerView(leaf, "daily", {
+				year: view.year,
+				month: view.month,
+				day: 1,
+			});
+		} else if (view instanceof ThreeDayPlannerView) {
+			await this.selectPlannerView(leaf, "yearly", view.getState());
+		} else if (view instanceof DailyPlannerView) {
+			await this.selectPlannerView(leaf, "threeDay", view.getState());
 		}
 	}
 
@@ -619,6 +717,16 @@ export default class DiaryObsidian extends Plugin {
 			if (view instanceof MonthlyListPlannerView) {
 				view.render();
 			}
+		}
+	}
+
+	refreshDailyPlannerViews(): void {
+		const leaves = [
+			...this.app.workspace.getLeavesOfType(VIEW_TYPE_DAILY_PLANNER),
+			...this.app.workspace.getLeavesOfType(VIEW_TYPE_THREE_DAY_PLANNER),
+		];
+		for (const leaf of leaves) {
+			if (leaf.view instanceof DailyPlannerView) leaf.view.render();
 		}
 	}
 

@@ -1,6 +1,6 @@
 # Diary (Deutsch)
 
-Diary ist ein Obsidian-Community-Plugin, das Markdown-Dateien im Vault als datumsbasierte Planeransichten darstellt. Du kannst zwischen Jahresübersicht, Monatsraster und Monatsliste wechseln und dabei Tagesnotizen, Zeitraum-Notizen, Monats- und Jahrespläne, Feiertage, ein Kalender-Overlay, optionale externe Kalender, Todo-Status und lokale Erinnerungen verwalten.
+Diary ist ein Obsidian-Community-Plugin, das Markdown-Dateien im Vault als datumsbasierte Planeransichten darstellt. Du kannst zwischen Jahres-, Monatsraster-, Monatslisten-, Tages- und 3-Tage-Ansicht wechseln und dabei Tagesnotizen, Zeitraum-Notizen, Kalender-Overlays, Todo-Status und lokale Erinnerungen verwalten.
 
 Vollständige Dokumentation: [English](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/en/README.md) | [Deutsch](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/de/README.md) | [Español](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/es/README.md) | [Français](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/fr/README.md) | [日本語](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/ja/README.md) | [简体中文](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/zh-CN/README.md) | [繁體中文](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/zh-TW/README.md) | [한국어](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/ko/README.md)
 
@@ -9,7 +9,7 @@ Vollständige Dokumentation: [English](https://github.com/POBSIZ/obsidian-diary/
 | Eintrag | Wert |
 | --- | --- |
 | Plugin-ID | `diary` |
-| Aktuelle Version | `1.6.0` |
+| Aktuelle Version | `1.7.0` |
 | Minimale Obsidian-Version | `1.7.2` |
 | Plattformen | Desktop / Mobil (`isDesktopOnly: false`) |
 | Standardsprache | `en` |
@@ -17,6 +17,7 @@ Vollständige Dokumentation: [English](https://github.com/POBSIZ/obsidian-diary/
 
 ## Neueste Version
 
+- `1.7.0`: Fügt Tages- und 3-Tage-Zeitplaner, eine direkte Ansichtsauswahl, gemeinsame Zeitraum-Navigation, getrennte Start-/Endzeiten und virtuelle Wiederholungen alle N Tage, Wochen, Monate oder Jahre hinzu.
 - `1.6.0`: Ergänzt vollständige Dokumentation für jede unterstützte UI-Sprache, Feiertage für Spanien und lokalisierte Texte für alternative Kalenderoptionen.
 - `1.5.0`: Fügt neben Englisch UI-Sprachen für Deutsch, Spanisch, Französisch, Japanisch, vereinfachtes Chinesisch, traditionelles Chinesisch und Koreanisch hinzu.
 - `1.4.2`: Begrenzt Diary-CSS auf Planer-, Einstellungs- und Modalflächen und ergänzt lokalisierte Beschriftungen für Farbvorgaben.
@@ -56,10 +57,13 @@ Die Screenshots stammen aus einem frischen Demo-Vault mit Beispiel-Planernotizen
 - **Lokalisierte Oberfläche**: Diary lässt sich zwischen Englisch, Deutsch, Spanisch, Französisch, Japanisch, vereinfachtem Chinesisch, traditionellem Chinesisch und Koreanisch umschalten.
 - **Monatsraster**: Ein großer Monatskalender mit Chips, Zeitraumleisten, Feiertagen, Kalender-Overlay-Beschriftungen und externen Kalender-Overlays.
 - **Monatsliste**: Eine vertikale Tagesliste für volle Monate, mit Filtern für `All`, `With notes` und `Upcoming`.
+- **Tagesplaner**: Plane einen Tag auf einer 24-Stunden-Zeitleiste. Notizen mit `start_time` und `end_time` erscheinen auf der Zeitachse; ganztägige und unzeitierte Notizen stehen separat.
+- **3-Tage-Planer**: Vergleiche drei aufeinanderfolgende Tage in parallelen Spalten. Auf schmalen Bildschirmen bleiben die Spalten per horizontalem Scrollen lesbar.
+- **Direkte Ansichtsauswahl**: Wechsle direkt zwischen Jahr, Monatsraster, Monatsliste, Tag und 3 Tagen.
 - **Rechter Seitenplaner**: Ein kompakter Monatsplaner bleibt in der rechten Seitenleiste geöffnet, während Notizen im Hauptbereich geöffnet werden.
 - **Plan-Notiz-Panel**: Erstellt und zeigt Jahresnotizen (`YYYY.md`) und Monatsnotizen (`YYYY-MM.md`) oberhalb des Planers. Eingeklappter Zustand wird gespeichert; mobil gibt es einen eigenen Zustand, der zunächst eingeklappt ist.
 - **Tages- und Zeitraum-Notizen**: Diary zeigt Notizen als Planer-Chips an, wenn Dateinamen Einzeltermine oder Zeiträume beschreiben. Standardmäßig wird der gesamte Vault gescannt; optional nur der Planerordner.
-- **Wiederkehrende Ereignisse**: Wiederhole Notizen täglich, monatlich oder jährlich, mit gregorianischer oder alternativer Kalenderbasis. Diary erzeugt nur Vorkommen im aktuell sichtbaren Planerbereich.
+- **Wiederkehrende Ereignisse**: Wiederhole alle N Tage, Wochen, Monate oder Jahre mit gregorianischer oder alternativer Kalenderbasis. Vorkommen bleiben bis zur Auswahl virtuell.
 - **Farbe, Todo und Erledigt-Status**: `color`, `todo` und `completed` aus dem Frontmatter beeinflussen Chip-Stil und Beschriftung.
 - **Feiertage**: Zeigt landesspezifische Feiertage für die unterstützten UI-Sprachregionen. Feiertags-Badges lassen sich auswählen, um Namen zu sehen.
 - **Alternative Kalenderbeschriftung**: Zeigt optional eine kompakte Zusatzbeschriftung, etwa koreanischen Mondkalender, chinesischen Mondkalender, Dangi, hebräischen, islamischen, persischen, indischen Nationalkalender, buddhistischen Kalender, japanische Ära, Minguo, koptischen oder äthiopischen Kalender. Die Optionsnamen sind in allen unterstützten UI-Sprachen lokalisiert.
@@ -103,11 +107,13 @@ Command Palette:
 - `Open monthly planner`
 - `Open monthly planner in sidebar`
 - `Open monthly list planner`
+- `Open daily planner`
+- `Open 3-day planner`
 
 Wähle das Wiederholen-Icon in einem Planerkopf, um dasselbe Blatt in dieser Reihenfolge zu wechseln.
 
 ```text
-Yearly -> Monthly Grid -> Monthly List -> Yearly
+Yearly -> Monthly Grid -> Monthly List -> Daily -> 3 Days -> Yearly
 ```
 
 Mit Zurück/Vorwärts wechselst du Jahre oder Monate. Das Kalender-Icon springt zum aktuellen Jahr oder Monat. Wähle die Jahres- oder Monatsbeschriftung, um einen konkreten Wert einzugeben.
@@ -156,7 +162,7 @@ Wähle eine Datumszelle oder die Datei-hinzufügen-Schaltfläche und nutze **Ein
 - Eine Farbe zeigt einen Chip-Rand oder mobilen Punkt.
 - **Todo file** zeigt den Todo-Status auf dem Chip.
 - **Reminder time** speichert `notify_minutes` im Frontmatter.
-- Mit **Repeat** wählst du tägliche, monatliche oder jährliche Wiederholung und eine Kalenderbasis. Vorkommen werden lazy für den sichtbaren Zeitraum erstellt; Diary aktualisiert Dateien derselben `recurrence_id`-Serie und überspringt andere vorhandene Notizen.
+- Mit **Repeat** wählst du täglich, wöchentlich, monatlich oder jährlich und ein Intervall von 1 bis 999. So sind alle N Tage, Wochen, Monate oder Jahre möglich; Kalenderbasis und Enddatum bleiben wählbar.
 
 ### Zeitraum-Notizen
 
@@ -255,6 +261,8 @@ Diary speichert außerdem reine UI-Zustände in Plugin-Daten: Plan-Notiz-Vorscha
 | `color` | Chip-Farbe. Jede gültige CSS-Farbe ist möglich, z. B. `#22c55e`, `red`, `rgb(34, 197, 94)`. |
 | `todo` | Zeigt die Notiz als Todo-Chip, wenn `true`. |
 | `completed` | Zeigt Erledigt-Status, wenn `todo: true`. |
+| `start_time` | Optionale Chip-Startzeit im Format `HH:mm`. Chips mit Zeit werden nach Startzeit sortiert. |
+| `end_time` | Optionale Chip-Endzeit im Format `HH:mm`. Dieser Wert löst keine Erinnerung aus. |
 | `notify_minutes` | Minuten ab lokaler Mitternacht am Ereignistag. Erlaubt `0` bis `1439`. 9:00 Uhr ist `540`. |
 | `date_start` | Startdatum für Zeitraum-Notizen. |
 | `date_end` | Enddatum für Zeitraum-Notizen. |
@@ -262,8 +270,9 @@ Diary speichert außerdem reine UI-Zustände in Plugin-Daten: Plan-Notiz-Vorscha
 | `recurrence_id` | Stabile Serien-ID für Wiederholungsquelle und erzeugte Vorkommen. |
 | `recurrence_role` | `source` für die Definition, `occurrence` für erzeugte Notizen. |
 | `recurrence_calendar` | Kalenderbasis: `gregorian` oder eine unterstützte alternative Kalender-ID. |
-| `recurrence_rule` | Einfache Frequenzregel: `FREQ=DAILY`, `FREQ=MONTHLY` oder `FREQ=YEARLY`. |
+| `recurrence_rule` | Frequenz mit optionalem Intervall, z. B. `FREQ=WEEKLY;INTERVAL=2`. Ohne `INTERVAL` gilt 1. |
 | `recurrence_anchor_date` | Gregorianisches Quelldatum als Serienstart. |
+| `recurrence_until_date` | Optionales inklusives gregorianisches Enddatum. |
 | `recurrence_anchor_year/month/day` | Ankerfelder der Kalenderbasis für alternative Kalender. |
 | `recurrence_exdates` | Gregorianische Vorkommensdaten, die aus der Serie übersprungen werden. |
 | `recurrence_source_path` | Pfad der Quellnotiz auf erzeugten Vorkommen. |
@@ -276,7 +285,7 @@ Diary speichert außerdem reine UI-Zustände in Plugin-Daten: Plan-Notiz-Vorscha
 
 Erinnerungen sind keine Betriebssystem-Benachrichtigungen. Solange Obsidian geöffnet ist, prüft Diary etwa alle 15 Sekunden und zeigt während der passenden Minute am Ereignistag eine Obsidian Notice.
 
-Wiederkehrende Vorkommen werden idempotent erzeugt. Gehört die Zieldatei bereits zur gleichen `recurrence_id`, aktualisiert Diary die Serienmetadaten. Ist der Pfad eine normale Notiz oder eine andere Serie, bleibt sie unverändert.
+Wiederkehrende Vorkommen sind standardmäßig virtuell. Beim Erstellen einer Notiz verwendet Diary ein vorhandenes Vorkommen derselben `recurrence_id`; normale Notizen oder andere Serien werden nicht überschrieben.
 
 ## Dateinamenregeln
 

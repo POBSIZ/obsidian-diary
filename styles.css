@@ -7,6 +7,8 @@ available in the app when your plugin is enabled.
 		.yearly-planner-container,
 		.monthly-planner-container,
 		.monthly-list-planner-container,
+		.daily-planner-container,
+		.three-day-planner-container,
 		.yearly-planner-modal-content,
 		.diary-calendar-overlay-settings-mount,
 		.diary-external-calendar-settings-mount,
@@ -16,6 +18,8 @@ available in the app when your plugin is enabled.
 		.yearly-planner-container,
 		.monthly-planner-container,
 		.monthly-list-planner-container,
+		.daily-planner-container,
+		.three-day-planner-container,
 		.yearly-planner-modal-content,
 		.diary-calendar-overlay-settings-mount,
 		.diary-external-calendar-settings-mount,
@@ -70,12 +74,13 @@ available in the app when your plugin is enabled.
 	overflow: hidden;
 }
 
-.yearly-planner-header {
+.planner-header {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
+	gap: 0.5rem;
 	margin-bottom: var(--planner-header-margin);
-	flex-shrink: 0;
+	flex: 0 0 auto;
 }
 
 .yearly-planner-title {
@@ -86,18 +91,17 @@ available in the app when your plugin is enabled.
 	margin: 0;
 }
 
-/* Planner header nav – shared by yearly and monthly */
-.yearly-planner-year-wrapper,
-.monthly-planner-nav-wrapper {
+/* Shared planner header navigation */
+.planner-header-nav {
 	display: flex;
 	align-items: center;
 	gap: var(--planner-header-gap);
-	flex-wrap: wrap;
-	row-gap: 0.3rem;
+	min-width: 0;
+	flex: 0 1 auto;
+	flex-wrap: nowrap;
 }
 
-.yearly-planner-year-btn,
-.monthly-planner-nav-btn {
+.planner-header-nav-btn {
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -112,42 +116,172 @@ available in the app when your plugin is enabled.
 	transition: background-color 0.15s ease;
 }
 
-.yearly-planner-year-btn:hover,
-.monthly-planner-nav-btn:hover {
+.planner-header-nav-btn:hover {
 	background: var(--background-modifier-hover);
 }
 
-.yearly-planner-year-display,
-.monthly-planner-month-year-display {
+.planner-header-period-display {
 	min-width: var(--planner-display-min-width);
+	max-width: min(28rem, 48vw);
 	padding: 0.25rem 0.5rem;
+	border: 0;
 	font-size: 1rem;
 	font-weight: 600;
 	text-align: center;
 	cursor: pointer;
 	border-radius: var(--planner-radius-sm);
+	background: transparent;
+	color: var(--text-normal);
+	box-shadow: none;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
 	user-select: none;
 }
 
-.yearly-planner-year-display:hover,
-.monthly-planner-month-year-display:hover {
+.planner-header-period-display:hover {
 	background: var(--background-modifier-hover);
-}
-
-.monthly-planner-month-year-display {
-	min-width: 8ch;
 }
 
 .planner-nav-secondary {
 	display: flex;
 	align-items: center;
 	gap: var(--planner-header-gap);
-	flex-wrap: wrap;
+	flex: 0 0 auto;
+	flex-wrap: nowrap;
 }
 
 .planner-more-menu {
 	display: none;
 	position: relative;
+	flex: 0 0 auto;
+}
+
+.planner-more-menu.has-more-only {
+	display: block;
+}
+
+.planner-more-menu-item-compact-only {
+	display: none;
+}
+
+.planner-view-switcher {
+	position: relative;
+	flex: 0 0 auto;
+}
+
+.planner-view-switcher > summary {
+	list-style: none;
+}
+
+.planner-view-switcher > summary::-webkit-details-marker {
+	display: none;
+}
+
+.planner-view-switcher-trigger {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.45rem;
+	min-height: var(--planner-btn-size);
+	padding: 0.25rem 0.55rem;
+	border-radius: var(--planner-radius-sm);
+	color: var(--text-normal);
+	font-size: var(--planner-title-size);
+	font-weight: 600;
+	cursor: pointer;
+	user-select: none;
+}
+
+.planner-view-switcher-trigger:hover,
+.planner-view-switcher[open] .planner-view-switcher-trigger {
+	background: var(--background-modifier-hover);
+}
+
+.planner-view-switcher-trigger-icon,
+.planner-view-switcher-trigger-chevron,
+.planner-view-switcher-item-icon,
+.planner-view-switcher-item-check {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	flex: 0 0 auto;
+}
+
+.planner-view-switcher-trigger-icon svg,
+.planner-view-switcher-trigger-chevron svg {
+	width: 1rem;
+	height: 1rem;
+}
+
+.planner-view-switcher-trigger-chevron {
+	color: var(--text-muted);
+}
+
+.planner-view-switcher-popover {
+	position: absolute;
+	top: calc(100% + 0.3rem);
+	left: 0;
+	z-index: 1100;
+	width: min(19rem, calc(100vw - 2rem));
+	padding: 0.4rem;
+	border: 1px solid var(--background-modifier-border);
+	border-radius: var(--planner-radius-sm);
+	background: var(--background-secondary);
+	box-shadow: var(--shadow-s);
+}
+
+.planner-view-switcher-heading {
+	padding: 0.35rem 0.5rem;
+	color: var(--text-muted);
+	font-size: var(--font-ui-smaller);
+	font-weight: 600;
+}
+
+.planner-view-switcher-item {
+	display: flex;
+	align-items: center;
+	gap: 0.65rem;
+	width: 100%;
+	min-height: 3rem;
+	padding: 0.45rem 0.55rem;
+	border: none;
+	border-radius: var(--planner-radius-sm);
+	background: transparent;
+	color: var(--text-normal);
+	text-align: left;
+	cursor: pointer;
+}
+
+.planner-view-switcher-item:hover,
+.planner-view-switcher-item:focus-visible,
+.planner-view-switcher-item.is-active {
+	background: var(--background-modifier-hover);
+}
+
+.planner-view-switcher-item-icon {
+	width: 1.25rem;
+	color: var(--text-muted);
+}
+
+.planner-view-switcher-item-copy {
+	display: flex;
+	flex: 1 1 auto;
+	min-width: 0;
+	flex-direction: column;
+	gap: 0.1rem;
+}
+
+.planner-view-switcher-item-label {
+	font-weight: 600;
+}
+
+.planner-view-switcher-item-description {
+	color: var(--text-muted);
+	font-size: var(--font-ui-smaller);
+}
+
+.planner-view-switcher-item-check {
+	color: var(--interactive-accent);
 }
 
 .planner-more-menu > summary {
@@ -203,22 +337,11 @@ available in the app when your plugin is enabled.
 	flex-shrink: 0;
 }
 
-.planner-container-compact .yearly-planner-header,
-.planner-container-compact .monthly-planner-header {
+.planner-container-compact .planner-header {
 	margin-bottom: var(--planner-header-margin-mobile);
 	flex-wrap: wrap;
 	gap: 0.5rem;
-}
-
-.planner-container-compact .yearly-planner-title,
-.planner-container-compact .monthly-planner-title {
-	font-size: var(--planner-title-size-mobile);
-}
-
-.planner-container-compact .yearly-planner-year-wrapper,
-.planner-container-compact .monthly-planner-nav-wrapper {
-	flex-wrap: wrap;
-	gap: 0.25rem;
+	align-items: stretch;
 }
 
 .planner-container-compact .planner-nav-secondary {
@@ -229,22 +352,46 @@ available in the app when your plugin is enabled.
 	display: block;
 }
 
-.planner-container-compact .yearly-planner-year-btn,
-.planner-container-compact .monthly-planner-nav-btn {
+.planner-container-compact .planner-more-menu-item-compact-only {
+	display: flex;
+}
+
+.planner-container-compact .planner-view-switcher {
+	order: 1;
+}
+
+.planner-container-compact .planner-header-nav {
+	order: 2;
+	width: 100%;
+	justify-content: space-between;
+	gap: 0.25rem;
+}
+
+.planner-container-compact .planner-view-switcher-popover {
+	position: fixed;
+	top: auto;
+	left: 0.75rem;
+	right: 0.75rem;
+	bottom: max(0.75rem, env(safe-area-inset-bottom));
+	width: auto;
+	max-height: min(80vh, 32rem);
+	overflow-y: auto;
+	border-radius: 0.75rem;
+}
+
+.planner-container-compact .planner-header-nav-btn {
 	width: var(--planner-btn-size-mobile);
 	height: var(--planner-btn-size-mobile);
 	min-width: var(--planner-btn-size-mobile);
 	min-height: var(--planner-btn-size-mobile);
 }
 
-.planner-container-compact .yearly-planner-year-display,
-.planner-container-compact .monthly-planner-month-year-display {
+.planner-container-compact .planner-header-period-display {
+	min-width: 0;
+	max-width: none;
+	flex: 1 1 auto;
 	font-size: 0.85rem;
 	padding: 0.2rem 0.4rem;
-}
-
-.planner-container-compact .monthly-planner-month-year-display {
-	min-width: 5.5ch;
 }
 
 .yearly-planner-cell:focus-visible,
@@ -261,17 +408,27 @@ available in the app when your plugin is enabled.
 	outline-offset: 2px;
 }
 
-.yearly-planner-year-modal {
-	display: flex;
-	flex-direction: column;
-	gap: 0.75rem;
-	margin-top: 1rem;
+.planner-period-form {
+	margin-bottom: 0;
 }
 
-.yearly-planner-year-modal input {
+.planner-period-input {
 	width: 100%;
-	padding: 0.5rem;
-	font-size: 1rem;
+	min-width: 0;
+	max-width: 100%;
+	min-height: 2.25rem;
+}
+
+.planner-period-error {
+	margin-top: 0;
+}
+
+.planner-period-actions {
+	flex-wrap: nowrap;
+}
+
+.yearly-planner-modal-content .planner-period-actions .mod-cta {
+	margin-top: 0;
 }
 
 .yearly-planner-create-file-modal {
@@ -691,9 +848,19 @@ available in the app when your plugin is enabled.
 	display: block;
 	min-width: 0;
 	max-width: 100%;
+	padding: 0;
+	border: 0;
+	background: transparent;
+	box-shadow: none;
+	color: inherit;
+	font: inherit;
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
+}
+
+button.yearly-planner-month-header-label {
+	cursor: pointer;
 }
 
 .yearly-planner-month-header-expanded
@@ -1997,6 +2164,11 @@ available in the app when your plugin is enabled.
 	opacity: 0.82;
 }
 
+.monthly-planner-mobile-recurrence-group {
+	pointer-events: none;
+	touch-action: none;
+}
+
 .planner-external-event-modal-header {
 	display: grid;
 	gap: 0.35rem;
@@ -2180,21 +2352,6 @@ available in the app when your plugin is enabled.
 
 	.yearly-planner-container {
 		padding: var(--planner-container-padding-mobile);
-	}
-
-	.yearly-planner-header {
-		flex-wrap: wrap;
-		gap: 0.5rem;
-	}
-
-	.yearly-planner-year-btn {
-		width: 2.5rem;
-		height: 2.5rem;
-	}
-
-	.yearly-planner-year-display {
-		min-width: 4.5ch;
-		padding: 0.35rem 0.5rem;
 	}
 
 	.yearly-planner-title {
@@ -2650,17 +2807,6 @@ body.-is-mobile .yearly-planner-file-preview {
 	overflow: hidden;
 }
 
-.monthly-planner-header {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	align-content: center;
-	margin-bottom: var(--planner-header-margin);
-	flex-shrink: 0;
-	flex-wrap: wrap;
-	gap: 0.5rem;
-}
-
 .monthly-planner-title {
 	font-family: var(--font-text, var(--font-ui));
 	font-size: var(--table-header-size, 1.25rem);
@@ -2669,12 +2815,6 @@ body.-is-mobile .yearly-planner-file-preview {
 	margin: 0;
 	flex: 1 1 auto;
 	min-width: 0;
-}
-
-.monthly-planner-header .monthly-planner-nav-wrapper {
-	flex: 1 1 12rem;
-	justify-content: flex-end;
-	max-width: 100%;
 }
 
 .monthly-planner-scroll {
@@ -3306,69 +3446,15 @@ body.-is-mobile .yearly-planner-file-preview {
 	z-index: 1000;
 }
 
-.monthly-planner-modal-row {
-	display: flex;
-	flex-direction: column;
-	gap: 0.25rem;
-	margin-bottom: 0.5rem;
-}
-
-.monthly-planner-modal-row label {
-	font-size: 0.85rem;
-	color: var(--text-muted);
-}
-
 /* Monthly planner mobile – compact layout for one-screen view */
 body.is-mobile .monthly-planner-container,
 body.-is-mobile .monthly-planner-container {
 	padding: var(--planner-container-padding-mobile);
 }
 
-body.is-mobile .yearly-planner-header,
-body.-is-mobile .yearly-planner-header,
-body.is-mobile .monthly-planner-header,
-body.-is-mobile .monthly-planner-header {
-	margin-bottom: var(--planner-header-margin-mobile);
-	flex-wrap: wrap;
-	gap: 0.5rem;
-}
-
 body.is-mobile .monthly-planner-title,
 body.-is-mobile .monthly-planner-title {
 	font-size: 1rem;
-}
-
-body.is-mobile .monthly-planner-nav-wrapper,
-body.-is-mobile .monthly-planner-nav-wrapper {
-	flex-wrap: wrap;
-	gap: 0.25rem;
-}
-
-body.is-mobile .planner-nav-secondary,
-body.-is-mobile .planner-nav-secondary {
-	display: none;
-}
-
-body.is-mobile .planner-more-menu,
-body.-is-mobile .planner-more-menu {
-	display: block;
-}
-
-body.is-mobile .yearly-planner-year-btn,
-body.-is-mobile .yearly-planner-year-btn,
-body.is-mobile .monthly-planner-nav-btn,
-body.-is-mobile .monthly-planner-nav-btn {
-	width: var(--planner-btn-size-mobile);
-	height: var(--planner-btn-size-mobile);
-	min-width: var(--planner-btn-size-mobile);
-	min-height: var(--planner-btn-size-mobile);
-}
-
-body.is-mobile .monthly-planner-month-year-display,
-body.-is-mobile .monthly-planner-month-year-display {
-	font-size: 0.85rem;
-	padding: 0.2rem 0.4rem;
-	min-width: 5.5ch;
 }
 
 body.is-mobile .monthly-planner-scroll,
@@ -3548,47 +3634,594 @@ body.-is-mobile .monthly-planner-weekend-label {
 	padding: var(--planner-container-padding-mobile);
 }
 
-.monthly-planner-container.monthly-planner-container-compact
-	.monthly-planner-header {
-	margin-bottom: var(--planner-header-margin-mobile);
-	flex-wrap: wrap;
+/* ========== Daily Planner ========== */
+
+.daily-planner-container {
+	--daily-planner-time-gutter: 4rem;
+	--daily-planner-scrollbar-width: 0px;
+	--daily-planner-multi-day-min-width: 52rem;
+	height: 100%;
+	padding: var(--planner-container-padding);
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
+}
+
+.daily-planner-section-heading {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
 	gap: 0.5rem;
+	color: var(--text-muted);
+	font-size: var(--font-ui-small);
+	font-weight: 600;
 }
 
-.monthly-planner-container.monthly-planner-container-compact
-	.monthly-planner-title {
-	font-size: 1rem;
+.daily-planner-alt-calendar {
+	font-weight: 400;
 }
 
-.monthly-planner-container.monthly-planner-container-compact
-	.monthly-planner-nav-wrapper {
+.daily-planner-untimed-list {
+	display: flex;
 	flex-wrap: wrap;
-	gap: 0.25rem;
+	gap: 0.3rem;
 }
 
-.monthly-planner-container.monthly-planner-container-compact
-	.planner-nav-secondary {
-	display: none;
+.daily-planner-days-viewport {
+	min-width: 0;
+	overflow-x: auto;
+	overscroll-behavior-x: contain;
 }
 
-.monthly-planner-container.monthly-planner-container-compact
-	.planner-more-menu {
+.daily-planner-day-heading {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 0.35rem;
+	min-width: 0;
+	padding: 0.3rem 0.45rem;
+	color: var(--text-muted);
+	font-size: var(--font-ui-smaller);
+	font-weight: 600;
+}
+
+.daily-planner-untimed-chip {
+	max-width: min(100%, 24rem);
+	min-height: 2rem;
+	padding: 0.3rem 0.55rem;
+	border: 1px solid var(--background-modifier-border);
+	border-left: var(--planner-border-width-accent) solid var(--interactive-accent);
+	border-radius: var(--planner-radius-sm);
+	background: var(--background-secondary);
+	color: var(--text-normal);
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	cursor: pointer;
+}
+
+.daily-planner-untimed-chip:hover {
+	background: var(--background-modifier-hover);
+}
+
+.daily-planner-holiday-chip {
+	color: var(--text-accent);
+	cursor: default;
+}
+
+.daily-planner-empty {
+	padding: 0.35rem 0;
+	color: var(--text-faint);
+	font-size: var(--font-ui-smaller);
+}
+
+.daily-planner-timeline {
+	min-height: 0;
+	display: flex;
+	flex: 1 1 auto;
+	flex-direction: column;
+	gap: 0.35rem;
+}
+
+.daily-planner-days-viewport {
+	display: flex;
+	min-height: 0;
+	flex: 1 1 auto;
+}
+
+.daily-planner-days-inner {
+	display: flex;
+	min-width: 100%;
+	min-height: 0;
+	flex: 1 0 100%;
+	flex-direction: column;
+}
+
+.daily-planner-days-inner.is-multi-day {
+	min-width: var(--daily-planner-multi-day-min-width);
+}
+
+.daily-planner-day-headings {
+	display: grid;
+	flex: 0 0 auto;
+	grid-template-columns: repeat(
+		var(--daily-planner-day-count),
+		minmax(0, 1fr)
+	);
+	padding-left: var(--daily-planner-time-gutter);
+	padding-right: var(--daily-planner-scrollbar-width);
+	border: 1px solid var(--background-modifier-border);
+	border-bottom: 0;
+	border-radius: var(--planner-radius-sm) var(--planner-radius-sm) 0 0;
+	background: var(--background-secondary);
+}
+
+.daily-planner-day-headings .daily-planner-day-heading {
+	border-right: 1px solid var(--background-modifier-border);
+}
+
+.daily-planner-day-headings .daily-planner-day-heading:last-child {
+	border-right: 0;
+}
+
+.daily-planner-all-day-row {
+	display: grid;
+	flex: 0 0 auto;
+	grid-template-columns: var(--daily-planner-time-gutter) minmax(0, 1fr);
+	min-height: 2.75rem;
+	max-height: 8rem;
+	padding-right: var(--daily-planner-scrollbar-width);
+	border: 1px solid var(--background-modifier-border);
+	border-bottom: 0;
+	border-radius: 0;
+	background: var(--background-primary);
+	overflow: hidden;
+}
+
+.daily-planner-all-day-label {
+	display: flex;
+	align-items: flex-start;
+	justify-content: flex-end;
+	padding: 0.5rem;
+	border-right: 1px solid var(--background-modifier-border);
+	background: var(--background-secondary);
+	color: var(--text-muted);
+	font-size: var(--font-ui-smaller);
+	font-weight: 600;
+	line-height: 1.25;
+	text-align: right;
+}
+
+.daily-planner-all-day-columns {
+	display: grid;
+	grid-template-columns: repeat(
+		var(--daily-planner-day-count),
+		minmax(0, 1fr)
+	);
+	min-width: 0;
+	min-height: 0;
+}
+
+.daily-planner-all-day-cell {
+	min-width: 0;
+	min-height: 0;
+	padding: 0.35rem;
+	border-right: 1px solid var(--background-modifier-border);
+	overflow-x: hidden;
+	overflow-y: auto;
+}
+
+.daily-planner-all-day-cell:last-child {
+	border-right: 0;
+}
+
+.daily-planner-all-day-cell .daily-planner-untimed-list {
+	align-content: flex-start;
+	max-height: 7.25rem;
+}
+
+.daily-planner-all-day-cell .daily-planner-untimed-chip {
+	width: 100%;
+	max-width: none;
+	justify-content: flex-start;
+	text-align: left;
+}
+
+.daily-planner-timeline-scroll {
+	min-height: 0;
+	flex: 1 1 auto;
+	overflow-y: auto;
+	overflow-x: hidden;
+	border: 1px solid var(--background-modifier-border);
+	border-radius: 0 0 var(--planner-radius-sm) var(--planner-radius-sm);
+	background: var(--background-primary);
+	-webkit-overflow-scrolling: touch;
+}
+
+.daily-planner-timeline-canvas {
+	position: relative;
+	height: 1440px;
+	min-height: 1440px;
+}
+
+.daily-planner-time-labels {
+	position: absolute;
+	inset: 0 auto 0 0;
+	width: var(--daily-planner-time-gutter);
+	background: var(--background-secondary);
+	border-right: 1px solid var(--background-modifier-border);
+}
+
+.daily-planner-time-label {
+	position: absolute;
+	top: calc(var(--daily-minute) * 1px);
+	right: 0.5rem;
+	transform: translateY(-0.5em);
+	color: var(--text-muted);
+	font-size: var(--font-ui-smaller);
+	font-variant-numeric: tabular-nums;
+}
+
+.daily-planner-day-columns {
+	position: absolute;
+	inset: 0 0 0 var(--daily-planner-time-gutter);
+	display: flex;
+}
+
+.daily-planner-events-layer {
+	position: relative;
+	min-width: 0;
+	flex: 1 1 0;
+	border-right: 1px solid var(--background-modifier-border);
+	background-image:
+		linear-gradient(
+			to bottom,
+			var(--background-modifier-border) 1px,
+			transparent 1px
+		),
+		linear-gradient(
+			to bottom,
+			color-mix(in srgb, var(--background-modifier-border) 55%, transparent) 1px,
+			transparent 1px
+		);
+	background-size: 100% 60px, 100% 30px;
+	cursor: crosshair;
+}
+
+.daily-planner-events-layer:last-child {
+	border-right: 0;
+}
+
+.daily-planner-event {
+	position: absolute;
+	display: flex;
+	flex-direction: column;
+	align-items: stretch;
+	justify-content: center;
+	top: calc(var(--daily-start) * 1px + 1px);
+	left: calc(
+		(100% / var(--daily-column-count)) * var(--daily-column) + 2px
+	);
+	width: calc(100% / var(--daily-column-count) - 4px);
+	height: calc(var(--daily-duration) * 1px - 2px);
+	min-height: 1.75rem;
+	padding: 0.25rem 0.4rem;
+	border: 1px solid
+		color-mix(in srgb, var(--daily-event-color, var(--interactive-accent)) 65%, var(--background-modifier-border));
+	border-left: 4px solid
+		var(--daily-event-color, var(--interactive-accent));
+	border-radius: var(--planner-radius-sm);
+	background: color-mix(
+		in srgb,
+		var(--daily-event-color, var(--interactive-accent)) 14%,
+		var(--background-primary)
+	);
+	color: var(--text-normal);
+	text-align: left;
+	overflow: hidden;
+	cursor: pointer;
+	z-index: 2;
+}
+
+.daily-planner-event:hover,
+.daily-planner-event:focus-visible {
+	z-index: 4;
+	background: color-mix(
+		in srgb,
+		var(--daily-event-color, var(--interactive-accent)) 22%,
+		var(--background-primary)
+	);
+}
+
+.daily-planner-event-resize-handle {
+	position: absolute;
+	left: 0.35rem;
+	right: 0.35rem;
+	height: 0.5rem;
+	z-index: 7;
+	cursor: ns-resize;
+	opacity: 0;
+}
+
+.daily-planner-event-resize-handle::after {
+	content: "";
+	position: absolute;
+	left: 50%;
+	width: min(2.5rem, 45%);
+	height: 2px;
+	border-radius: 999px;
+	background: color-mix(
+		in srgb,
+		var(--daily-event-color, var(--interactive-accent)) 82%,
+		var(--text-normal)
+	);
+	transform: translateX(-50%) scaleX(0.55);
+	transition:
+		transform 100ms cubic-bezier(0.2, 0, 0, 1),
+		opacity 100ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+.daily-planner-event-resize-handle.is-start {
+	top: 0;
+}
+
+.daily-planner-event-resize-handle.is-start::after {
+	top: 1px;
+}
+
+.daily-planner-event-resize-handle.is-end {
+	bottom: 0;
+}
+
+.daily-planner-event-resize-handle.is-end::after {
+	bottom: 1px;
+}
+
+.daily-planner-event.is-resizable:hover
+	.daily-planner-event-resize-handle,
+.daily-planner-event.is-resizable:focus-visible
+	.daily-planner-event-resize-handle,
+.daily-planner-event.is-resizing .daily-planner-event-resize-handle {
+	opacity: 0.82;
+}
+
+.daily-planner-event-resize-handle:hover::after,
+.daily-planner-event.is-resizing
+	.daily-planner-event-resize-handle::after {
+	transform: translateX(-50%) scaleX(1);
+}
+
+.daily-planner-event.is-resizing {
+	z-index: 8;
+	cursor: ns-resize;
+	box-shadow: 0 0 0 2px
+		color-mix(in srgb, var(--interactive-accent) 28%, transparent);
+}
+
+.daily-planner-resizing {
+	user-select: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+	.daily-planner-untimed-chip.is-draggable,
+	.daily-planner-event.is-draggable {
+		cursor: grab;
+		touch-action: none;
+	}
+
+	.daily-planner-untimed-chip.is-draggable:active,
+	.daily-planner-event.is-draggable:active {
+		cursor: grabbing;
+	}
+}
+
+.daily-planner-dragging {
+	user-select: none;
+}
+
+.daily-planner-dragging .is-dragging {
+	opacity: 0.38;
+	transform: scale(0.985);
+}
+
+.daily-planner-events-layer.is-drop-target {
+	background-color: color-mix(
+		in srgb,
+		var(--interactive-accent) 7%,
+		transparent
+	);
+	box-shadow: inset 0 0 0 2px
+		color-mix(in srgb, var(--interactive-accent) 58%, transparent);
+}
+
+.daily-planner-events-layer.is-time-selection-target {
+	background-color: color-mix(
+		in srgb,
+		var(--interactive-accent) 5%,
+		transparent
+	);
+	box-shadow: inset 0 0 0 1px
+		color-mix(in srgb, var(--interactive-accent) 42%, transparent);
+}
+
+.daily-planner-time-selecting {
+	user-select: none;
+}
+
+.daily-planner-time-selection-preview {
+	position: absolute;
+	top: calc(var(--daily-start) * 1px + 1px);
+	left: 2px;
+	right: 2px;
+	height: calc(var(--daily-duration) * 1px - 2px);
+	min-height: 0.8rem;
+	padding: 0.2rem 0.35rem;
+	border: 1px dashed var(--interactive-accent);
+	border-left: 4px solid var(--interactive-accent);
+	border-radius: var(--planner-radius-sm);
+	background: color-mix(
+		in srgb,
+		var(--interactive-accent) 15%,
+		var(--background-primary)
+	);
+	color: var(--text-normal);
+	pointer-events: none;
+	overflow: hidden;
+	z-index: 1;
+	transition:
+		top 80ms cubic-bezier(0.2, 0, 0, 1),
+		height 80ms cubic-bezier(0.2, 0, 0, 1),
+		background-color 80ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+.daily-planner-time-selection-preview-time {
 	display: block;
+	color: var(--text-muted);
+	font-size: var(--font-ui-smaller);
+	font-variant-numeric: tabular-nums;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
 }
 
-.monthly-planner-container.monthly-planner-container-compact
-	.monthly-planner-nav-btn {
-	width: var(--planner-btn-size-mobile);
-	height: var(--planner-btn-size-mobile);
-	min-width: var(--planner-btn-size-mobile);
-	min-height: var(--planner-btn-size-mobile);
+.daily-planner-drag-preview {
+	position: absolute;
+	display: flex;
+	flex-direction: column;
+	align-items: stretch;
+	justify-content: center;
+	top: calc(var(--daily-start) * 1px + 1px);
+	left: 2px;
+	right: 2px;
+	height: calc(var(--daily-duration) * 1px - 2px);
+	min-height: 1.75rem;
+	padding: 0.25rem 0.4rem;
+	border: 1px dashed var(--interactive-accent);
+	border-left: 4px solid var(--interactive-accent);
+	border-radius: var(--planner-radius-sm);
+	background: color-mix(
+		in srgb,
+		var(--interactive-accent) 18%,
+		var(--background-primary)
+	);
+	color: var(--text-normal);
+	pointer-events: none;
+	overflow: hidden;
+	z-index: 6;
+	transition:
+		top 100ms cubic-bezier(0.2, 0, 0, 1),
+		background-color 100ms cubic-bezier(0.2, 0, 0, 1),
+		border-color 100ms cubic-bezier(0.2, 0, 0, 1);
 }
 
-.monthly-planner-container.monthly-planner-container-compact
-	.monthly-planner-month-year-display {
-	font-size: 0.85rem;
-	padding: 0.2rem 0.4rem;
-	min-width: 5.5ch;
+.daily-planner-drag-preview-time,
+.daily-planner-drag-preview-title {
+	display: block;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.daily-planner-drag-preview-time {
+	color: var(--text-muted);
+	font-size: var(--font-ui-smaller);
+	font-variant-numeric: tabular-nums;
+}
+
+.daily-planner-drag-preview-title {
+	font-size: var(--font-ui-small);
+	font-weight: 600;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.daily-planner-drag-preview,
+	.daily-planner-time-selection-preview,
+	.daily-planner-dragging .is-dragging,
+	.daily-planner-event-resize-handle::after {
+		transition: none;
+	}
+}
+
+.daily-planner-event-time,
+.daily-planner-event-title {
+	display: block;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.daily-planner-event-time {
+	font-size: var(--font-ui-smaller);
+	font-variant-numeric: tabular-nums;
+	color: var(--text-muted);
+}
+
+.daily-planner-event-title {
+	font-size: var(--font-ui-small);
+	font-weight: 600;
+}
+
+.daily-planner-now-line {
+	position: absolute;
+	top: calc(var(--daily-now) * 1px);
+	left: 0;
+	right: 0;
+	height: 2px;
+	background: var(--text-error);
+	z-index: 5;
+	pointer-events: none;
+}
+
+.daily-planner-now-line::before {
+	content: "";
+	position: absolute;
+	left: -4px;
+	top: -3px;
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	background: var(--text-error);
+}
+
+.daily-planner-container.planner-container-compact {
+	--daily-planner-time-gutter: 3.25rem;
+	--daily-planner-multi-day-min-width: calc(
+		var(--daily-planner-time-gutter) + 42rem +
+			var(--daily-planner-scrollbar-width)
+	);
+	padding: var(--planner-container-padding-mobile);
+}
+
+.daily-planner-container.planner-container-compact
+	.daily-planner-days-viewport {
+	scroll-snap-type: x proximity;
+	scroll-padding-left: var(--daily-planner-time-gutter);
+	scrollbar-width: thin;
+}
+
+.daily-planner-container.planner-container-compact
+	.daily-planner-day-headings
+	.daily-planner-day-heading {
+	scroll-snap-align: start;
+}
+
+.daily-planner-container.planner-container-compact
+	.daily-planner-all-day-cell {
+	padding: 0.25rem;
+}
+
+.daily-planner-container.planner-container-compact
+	.daily-planner-all-day-label {
+	padding: 0.4rem 0.35rem;
+}
+
+.daily-planner-container.planner-container-compact .daily-planner-event {
+	padding: 0.2rem 0.3rem;
+}
+
+body.is-mobile .daily-planner-untimed-chip,
+body.-is-mobile .daily-planner-untimed-chip {
+	min-height: 2.5rem;
 }
 
 .monthly-planner-container.monthly-planner-container-compact
@@ -3989,8 +4622,11 @@ body.-is-mobile .monthly-planner-weekend-label {
 .yearly-planner-cell-file.planner-recurrence-occurrence,
 .yearly-planner-cell-range-bar.planner-recurrence-occurrence,
 .monthly-planner-cell-file.planner-recurrence-occurrence,
-.monthly-planner-range-bar.planner-recurrence-occurrence {
+	.monthly-planner-range-bar.planner-recurrence-occurrence {
 	border-style: dashed;
+	border-top-width: 1px;
+	border-right-width: 1px;
+	border-bottom-width: 1px;
 }
 
 .monthly-list-planner-files {

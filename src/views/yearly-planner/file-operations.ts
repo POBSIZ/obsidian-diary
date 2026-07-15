@@ -1,6 +1,6 @@
 import { App, TFile, WorkspaceLeaf } from "obsidian";
 import { parseRangeBasename } from "../../utils/range";
-import { getFilePath } from "./file-utils";
+import { getFilePath, type PlannerTimeRange } from "./file-utils";
 import {
 	buildRecurrenceSourceFrontmatter,
 	serializeYamlFrontmatter,
@@ -174,6 +174,7 @@ export async function createRangeFile(
 	color?: string,
 	todo?: boolean,
 	notifyMinutes?: number | null,
+	timeRange?: PlannerTimeRange | null,
 	recurrence?: RecurrenceFormValue | null,
 ): Promise<TFile> {
 	const cleanBasename = basename.trim().replace(/\.md$/i, "");
@@ -211,6 +212,7 @@ export async function createRangeFile(
 		frontmatter.completed = false;
 	}
 	if (hasNotify) frontmatter.notify_minutes = Math.round(notifyMinutes);
+	applyPlannerTimeRange(frontmatter, timeRange);
 	if (recurrence?.enabled) {
 		Object.assign(
 			frontmatter,
@@ -246,6 +248,7 @@ export async function createSingleDateFile(
 	color?: string,
 	todo?: boolean,
 	notifyMinutes?: number | null,
+	timeRange?: PlannerTimeRange | null,
 	recurrence?: RecurrenceFormValue | null,
 ): Promise<TFile> {
 	const trimmed = (folder || "Planner").trim();
@@ -277,6 +280,7 @@ export async function createSingleDateFile(
 		frontmatter.completed = false;
 	}
 	if (hasNotify) frontmatter.notify_minutes = Math.round(notifyMinutes);
+	applyPlannerTimeRange(frontmatter, timeRange);
 	if (recurrence?.enabled && parsed?.date) {
 		Object.assign(
 			frontmatter,
@@ -356,6 +360,40 @@ export async function updateFileNotifyMinutes(
 			} else {
 				frontmatter.notify_minutes = Math.round(minutes);
 			}
+		},
+	);
+}
+
+function isValidPlannerTime(value: string | null | undefined): value is string {
+	return Boolean(value && /^(?:[01]\d|2[0-3]):[0-5]\d$/.test(value));
+}
+
+function applyPlannerTimeRange(
+	frontmatter: Record<string, unknown>,
+	timeRange: PlannerTimeRange | null | undefined,
+): void {
+	if (isValidPlannerTime(timeRange?.startTime)) {
+		frontmatter.start_time = timeRange.startTime;
+	} else {
+		delete frontmatter.start_time;
+	}
+	if (isValidPlannerTime(timeRange?.endTime)) {
+		frontmatter.end_time = timeRange.endTime;
+	} else {
+		delete frontmatter.end_time;
+	}
+}
+
+/** Persist the chip schedule without changing reminder metadata. */
+export async function updateFileTimeRange(
+	app: App,
+	file: TFile,
+	timeRange: PlannerTimeRange | null,
+): Promise<void> {
+	await app.fileManager.processFrontMatter(
+		file,
+		(frontmatter: Record<string, unknown>) => {
+			applyPlannerTimeRange(frontmatter, timeRange);
 		},
 	);
 }

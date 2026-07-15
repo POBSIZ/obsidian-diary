@@ -12,10 +12,10 @@ import {
 	type CalendarOverlayConfig,
 } from "../../utils/calendar-overlays";
 import {
-	getExternalEventTimeLabel,
 	getExternalEventsForDate,
 	type ExternalCalendarEvent,
 } from "../../utils/external-calendars";
+import { isRecurrenceVirtualEvent } from "../../utils/recurrence";
 import {
 	getFileTitle,
 	getFilesForDate,
@@ -93,14 +93,17 @@ export function renderMonthlyListBody(
 			plannerFiles,
 		);
 		const externalDateEvents = getExternalEventsForDate(externalEvents, dateKey);
-		const hasNotes = singleFiles.length > 0 || rangeFiles.length > 0;
+		const hasEntries =
+			singleFiles.length > 0 ||
+			rangeFiles.length > 0 ||
+			externalDateEvents.summaryEvents.length > 0;
 		const dateIsUpcoming =
 			year > now.getFullYear() ||
 			(year === now.getFullYear() && month > now.getMonth() + 1) ||
 			(year === now.getFullYear() &&
 				month === now.getMonth() + 1 &&
 				day >= now.getDate());
-		if (filter === "withNotes" && !hasNotes) continue;
+		if (filter === "withNotes" && !hasEntries) continue;
 		if (filter === "upcoming" && !dateIsUpcoming) continue;
 		renderedDays++;
 
@@ -130,6 +133,10 @@ export function renderMonthlyListBody(
 
 		const head = dayBlock.createDiv({ cls: "monthly-list-planner-day-header" });
 		const dateLine = head.createDiv({ cls: "monthly-list-planner-day-date-line" });
+		dateLine.dataset.dailyDate = dateKey;
+		dateLine.tabIndex = 0;
+		dateLine.setAttribute("role", "button");
+		dateLine.ariaLabel = t("daily.openDate", { date: dateKey });
 		dateLine.createSpan({
 			cls: "monthly-list-planner-day-num",
 			text: String(day),
@@ -210,10 +217,12 @@ export function renderMonthlyListBody(
 				body.querySelector<HTMLElement>(".monthly-list-planner-ranges") ??
 				body.createDiv({ cls: "monthly-list-planner-ranges" });
 			for (const { event, runPos } of externalDateEvents.rangeEvents) {
+				const isVirtualRecurrence = isRecurrenceVirtualEvent(event);
 				const barClasses = [
 					"monthly-planner-range-bar",
 					"monthly-list-planner-range-bar",
 					"planner-external-event-range",
+					isVirtualRecurrence && "planner-recurrence-virtual",
 					runPos.runStart && "monthly-planner-range-run-start",
 					runPos.runEnd && "monthly-planner-range-run-end",
 					!runPos.runStart &&
@@ -247,18 +256,18 @@ export function renderMonthlyListBody(
 				});
 				linkEl.tabIndex = 0;
 				linkEl.setAttribute("role", "button");
-				const title = getFileTitle(app, file);
+				const chipTitle = getFileTitle(app, file);
 				if (isTodoCompleted(app, file)) {
 					linkEl.addClass("monthly-planner-chip-completed");
-					linkEl.textContent = `${TODO_CHIP_EMOJI_COMPLETED} ${title}`;
+					linkEl.textContent = `${TODO_CHIP_EMOJI_COMPLETED} ${chipTitle}`;
 				} else if (isTodoFile(app, file)) {
-					linkEl.textContent = `${TODO_CHIP_EMOJI_INCOMPLETE} ${title}`;
+					linkEl.textContent = `${TODO_CHIP_EMOJI_INCOMPLETE} ${chipTitle}`;
 				} else {
-					linkEl.textContent = title;
+					linkEl.textContent = chipTitle;
 				}
 				linkEl.title = file.path;
 				linkEl.ariaLabel = t("a11y.openPlannerNote", {
-					title,
+					title: chipTitle,
 					path: file.path,
 				});
 				linkEl.dataset.path = file.path;
@@ -279,19 +288,21 @@ export function renderMonthlyListBody(
 				body.querySelector<HTMLElement>(".monthly-list-planner-files") ??
 				body.createDiv({ cls: "monthly-list-planner-files" });
 			for (const event of externalDateEvents.singleEvents) {
+				const isVirtualRecurrence = isRecurrenceVirtualEvent(event);
 				const chipEl = listEl.createDiv({
-					cls: "monthly-planner-cell-file monthly-list-planner-cell-file planner-external-event-chip",
+					cls: [
+						"monthly-planner-cell-file",
+						"monthly-list-planner-cell-file",
+						"planner-external-event-chip",
+						isVirtualRecurrence && "planner-recurrence-virtual",
+					]
+						.filter(Boolean)
+						.join(" "),
 				});
 				chipEl.tabIndex = 0;
 				chipEl.setAttribute("role", "button");
 				chipEl.dataset.externalEventId = event.id;
-				const timeLabel = getExternalEventTimeLabel(
-					event,
-					calendarOverlay.locale,
-				);
-				chipEl.textContent = timeLabel
-					? `${timeLabel} ${event.title}`
-					: event.title;
+				chipEl.textContent = event.title;
 				chipEl.ariaLabel = t("a11y.openExternalEvent", {
 					title: event.title,
 				});
