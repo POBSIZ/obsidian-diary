@@ -11,7 +11,7 @@ Diary는 Obsidian vault 안의 Markdown 파일을 날짜 기반 플래너로 보
 | Item | Value |
 | --- | --- |
 | Plugin ID | `diary` |
-| Version | `1.7.0` |
+| Version | `1.7.1` |
 | Minimum Obsidian version | `1.7.2` |
 | Platforms | Desktop and mobile (`isDesktopOnly: false`) |
 | Default language | `en` |
@@ -19,6 +19,7 @@ Diary는 Obsidian vault 안의 Markdown 파일을 날짜 기반 플래너로 보
 
 ## Latest Version
 
+- `1.7.1`: removes unnecessary DOM type assertions and stabilizes typed lint resolution for the shared planner period modal.
 - `1.7.0`: adds daily and 3-day timeline planners, direct planner view selection, shared period navigation, independent start/end time metadata, and virtual every-N-days/weeks/months/years recurrence.
 - `1.6.0`: adds full documentation for every supported UI language, Spain holiday support, and localized alternate calendar option text.
 - `1.5.0`: adds German, Spanish, French, Japanese, Simplified Chinese, Traditional Chinese, and Korean UI language support alongside English.

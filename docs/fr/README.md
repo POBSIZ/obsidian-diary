@@ -9,7 +9,7 @@ Documentation complète : [English](https://github.com/POBSIZ/obsidian-diary/blo
 | Élément | Valeur |
 | --- | --- |
 | ID du plugin | `diary` |
-| Version actuelle | `1.7.0` |
+| Version actuelle | `1.7.1` |
 | Version minimale d’Obsidian | `1.7.2` |
 | Plateformes | Bureau / mobile (`isDesktopOnly: false`) |
 | Langue par défaut | `en` |
@@ -17,6 +17,7 @@ Documentation complète : [English](https://github.com/POBSIZ/obsidian-diary/blo
 
 ## Dernière version
 
+- `1.7.1` : supprime les assertions de type DOM inutiles et stabilise l’analyse typée de la boîte de dialogue de période commune.
 - `1.7.0` : ajoute les plannings chronologiques quotidien et sur 3 jours, la sélection directe de vue, une navigation de période commune, des heures de début/fin indépendantes et les récurrences virtuelles tous les N jours, semaines, mois ou années.
 - `1.6.0` : ajoute une documentation complète pour chaque langue d’interface prise en charge, les jours fériés espagnols et les textes localisés des options de calendrier alternatif.
 - `1.5.0` : ajoute la prise en charge de l’allemand, l’espagnol, le français, le japonais, le chinois simplifié, le chinois traditionnel et le coréen, en plus de l’anglais.

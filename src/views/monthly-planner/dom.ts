@@ -6,7 +6,7 @@ export function getTopmostMonthlyElementAt(
 ): Element | null {
 	const elements = contentEl.ownerDocument.elementsFromPoint(clientX, clientY);
 	for (const el of elements) {
-		if (!contentEl.contains(el as Node)) continue;
+		if (!contentEl.contains(el)) continue;
 		const he = el as HTMLElement;
 		if (
 			he.closest?.("[data-external-event-id]") ||
@@ -29,7 +29,7 @@ export function getChipOrBarAt(
 ): HTMLElement | null {
 	const elements = contentEl.ownerDocument.elementsFromPoint(clientX, clientY);
 	for (const el of elements) {
-		if (!contentEl.contains(el as Node)) continue;
+		if (!contentEl.contains(el)) continue;
 		const chip = (el as HTMLElement).closest?.(
 			".monthly-planner-cell-file[data-path], .monthly-planner-range-bar[data-path]",
 		);

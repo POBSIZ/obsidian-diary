@@ -6,7 +6,7 @@ export function getTopmostPlannerElementAt(
 ): Element | null {
 	const elements = contentEl.ownerDocument.elementsFromPoint(clientX, clientY);
 	for (const el of elements) {
-		if (!contentEl.contains(el as Node)) continue;
+		if (!contentEl.contains(el)) continue;
 		const he = el as HTMLElement;
 		if (he.closest?.(".yearly-planner-table th")) return null;
 		if (
@@ -30,7 +30,7 @@ export function getChipOrBarAt(
 ): HTMLElement | null {
 	const elements = contentEl.ownerDocument.elementsFromPoint(clientX, clientY);
 	for (const el of elements) {
-		if (!contentEl.contains(el as Node)) continue;
+		if (!contentEl.contains(el)) continue;
 		const chip = (el as HTMLElement).closest?.(
 			".yearly-planner-cell-file[data-path], .yearly-planner-cell-range-bar[data-path]",
 		);

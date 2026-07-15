@@ -26,10 +26,10 @@ export class PlannerPeriodModal extends Modal {
 	}
 
 	onOpen(): void {
-		this.contentEl.addClasses([
+		this.contentEl.addClass(
 			"yearly-planner-modal-content",
 			"planner-period-modal",
-		]);
+		);
 		this.contentEl.createEl("h2", { text: this.getTitle() });
 		const form = this.contentEl.createEl("form", {
 			cls: "yearly-planner-create-file-modal planner-period-form",

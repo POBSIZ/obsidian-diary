@@ -9,7 +9,7 @@ Documentación completa: [English](https://github.com/POBSIZ/obsidian-diary/blob
 | Elemento | Valor |
 | --- | --- |
 | ID del plugin | `diary` |
-| Versión actual | `1.7.0` |
+| Versión actual | `1.7.1` |
 | Versión mínima de Obsidian | `1.7.2` |
 | Plataformas | Escritorio / móvil (`isDesktopOnly: false`) |
 | Idioma predeterminado | `en` |
@@ -17,6 +17,7 @@ Documentación completa: [English](https://github.com/POBSIZ/obsidian-diary/blob
 
 ## Última versión
 
+- `1.7.1`: Elimina aserciones de tipo DOM innecesarias y estabiliza el lint tipado del diálogo de período compartido.
 - `1.7.0`: Añade planificadores de línea de tiempo diaria y de 3 días, selección directa de vista, navegación de período compartida, horas de inicio/fin independientes y repeticiones virtuales cada N días, semanas, meses o años.
 - `1.6.0`: Añade documentación completa para todos los idiomas de interfaz, festivos de España y textos localizados para las opciones de calendarios alternativos.
 - `1.5.0`: Añade soporte de interfaz para alemán, español, francés, japonés, chino simplificado, chino tradicional y coreano, además del inglés.

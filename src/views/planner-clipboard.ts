@@ -320,7 +320,7 @@ export function applyClipboardModifierClick(
 ): boolean {
 	if (Platform.isMobile || !isPrimaryMod(ctx.e)) return false;
 	const el = ctx.topmostAt(ctx.clientX, ctx.clientY);
-	if (!el || !ctx.contentEl.contains(el as Node)) return false;
+	if (!el || !ctx.contentEl.contains(el)) return false;
 
 	const chipOrBar = el.closest(ctx.chipBarSelector);
 	if (chipOrBar instanceof HTMLElement && chipOrBar.dataset.path) {

@@ -141,7 +141,7 @@ export class MonthlyInteractionHandler {
 			clientX,
 			clientY,
 		);
-		if (!el || !this.view.contentEl.contains(el as Node)) return;
+		if (!el || !this.view.contentEl.contains(el)) return;
 		const dailyDate = (el as HTMLElement).closest?.("[data-daily-date]");
 		if (dailyDate instanceof HTMLElement) {
 			const parts = dailyDate.dataset.dailyDate?.split("-").map(Number);
@@ -394,7 +394,7 @@ export class MonthlyInteractionHandler {
 			clientX,
 			clientY,
 		);
-		if (!el || !this.view.contentEl.contains(el as Node)) return;
+		if (!el || !this.view.contentEl.contains(el)) return;
 
 		const onHoliday = (el as HTMLElement).closest?.(
 			".monthly-planner-cell-holiday-badge",

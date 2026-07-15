@@ -118,7 +118,7 @@ export class PlannerInteractionHandler {
 		basename: string;
 		color: string | null;
 	} | null {
-		if (!el || !this.view.contentEl.contains(el as Node)) return null;
+		if (!el || !this.view.contentEl.contains(el)) return null;
 		const chip = (el as HTMLElement).closest?.(
 			".yearly-planner-cell-file[data-range-basename]",
 		);
@@ -133,7 +133,7 @@ export class PlannerInteractionHandler {
 		el: Element | null,
 		basename: string,
 	): boolean {
-		if (!el || !this.view.contentEl.contains(el as Node)) return false;
+		if (!el || !this.view.contentEl.contains(el)) return false;
 		const chip = (el as HTMLElement).closest?.(
 			".yearly-planner-cell-file[data-range-basename]",
 		);
@@ -271,7 +271,7 @@ export class PlannerInteractionHandler {
 			clientX,
 			clientY,
 		);
-		if (!el || !this.view.contentEl.contains(el as Node)) return;
+		if (!el || !this.view.contentEl.contains(el)) return;
 
 		const rangeBar = (el as HTMLElement).closest?.(
 			".yearly-planner-cell-range-bar[data-path]",
@@ -473,7 +473,7 @@ export class PlannerInteractionHandler {
 			clientY,
 		);
 		const chipOrBar = getChipOrBarAt(this.view.contentEl, clientX, clientY);
-		if (!el || !this.view.contentEl.contains(el as Node)) return;
+		if (!el || !this.view.contentEl.contains(el)) return;
 
 		const onHoliday = (el as HTMLElement).closest?.(
 			".yearly-planner-cell-holiday-badge",

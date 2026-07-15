@@ -9,7 +9,7 @@ Full documentation: [English](https://github.com/POBSIZ/obsidian-diary/blob/main
 | Item | Value |
 | --- | --- |
 | Plugin ID | `diary` |
-| Current version | `1.7.0` |
+| Current version | `1.7.1` |
 | Minimum Obsidian version | `1.7.2` |
 | Supported platforms | Desktop / mobile (`isDesktopOnly: false`) |
 | Default language | `en` |
@@ -17,6 +17,7 @@ Full documentation: [English](https://github.com/POBSIZ/obsidian-diary/blob/main
 
 ## Latest Version
 
+- `1.7.1`: Removes unnecessary DOM type assertions and stabilizes typed lint resolution for the shared planner period modal.
 - `1.7.0`: Adds daily and 3-day timeline planners, direct planner view selection, shared period navigation, independent start/end time metadata, and virtual every-N-days/weeks/months/years recurrence.
 - `1.6.0`: Adds full documentation for every supported UI language, Spain holiday support, and localized alternate calendar option text.
 - `1.5.0`: Adds German, Spanish, French, Japanese, Simplified Chinese, Traditional Chinese, and Korean UI language support alongside English.
