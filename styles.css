@@ -120,7 +120,7 @@ available in the app when your plugin is enabled.
 	background: var(--background-modifier-hover);
 }
 
-.planner-header-period-display {
+button.planner-header-period-display {
 	min-width: var(--planner-display-min-width);
 	max-width: min(28rem, 48vw);
 	padding: 0.25rem 0.5rem;
@@ -139,8 +139,11 @@ available in the app when your plugin is enabled.
 	user-select: none;
 }
 
-.planner-header-period-display:hover {
-	background: var(--background-modifier-hover);
+button.planner-header-period-display:hover,
+button.planner-header-period-display:focus-visible {
+	background: transparent;
+	box-shadow: none;
+	color: var(--text-accent);
 }
 
 .planner-nav-secondary {
@@ -237,7 +240,7 @@ available in the app when your plugin is enabled.
 	font-weight: 600;
 }
 
-.planner-view-switcher-item {
+button.planner-view-switcher-item {
 	display: flex;
 	align-items: center;
 	gap: 0.65rem;
@@ -247,15 +250,18 @@ available in the app when your plugin is enabled.
 	border: none;
 	border-radius: var(--planner-radius-sm);
 	background: transparent;
+	box-shadow: none;
 	color: var(--text-normal);
 	text-align: left;
 	cursor: pointer;
 }
 
-.planner-view-switcher-item:hover,
-.planner-view-switcher-item:focus-visible,
-.planner-view-switcher-item.is-active {
-	background: var(--background-modifier-hover);
+button.planner-view-switcher-item:hover,
+button.planner-view-switcher-item:focus-visible,
+button.planner-view-switcher-item.is-active {
+	background: transparent;
+	box-shadow: none;
+	color: var(--text-accent);
 }
 
 .planner-view-switcher-item-icon {
@@ -305,7 +311,7 @@ available in the app when your plugin is enabled.
 	box-shadow: var(--shadow-s);
 }
 
-.planner-more-menu-item {
+button.planner-more-menu-item {
 	display: flex;
 	align-items: center;
 	gap: 0.5rem;
@@ -315,6 +321,7 @@ available in the app when your plugin is enabled.
 	border: none;
 	border-radius: var(--planner-radius-sm);
 	background: transparent;
+	box-shadow: none;
 	color: var(--text-normal);
 	font: inherit;
 	font-size: 0.85rem;
@@ -323,8 +330,12 @@ available in the app when your plugin is enabled.
 }
 
 .planner-more-menu-item:hover,
-.planner-more-menu-item:focus-visible {
-	background: var(--background-modifier-hover);
+.planner-more-menu-item:focus-visible,
+button.planner-more-menu-item:hover,
+button.planner-more-menu-item:focus-visible {
+	background: transparent;
+	box-shadow: none;
+	color: var(--text-accent);
 }
 
 .planner-more-menu-item-icon {
@@ -861,6 +872,17 @@ available in the app when your plugin is enabled.
 
 button.yearly-planner-month-header-label {
 	cursor: pointer;
+	border: 0;
+	border-radius: 0;
+	background: transparent;
+	box-shadow: none;
+}
+
+button.yearly-planner-month-header-label:hover,
+button.yearly-planner-month-header-label:focus-visible {
+	background: transparent;
+	box-shadow: none;
+	color: var(--text-accent);
 }
 
 .yearly-planner-month-header-expanded
@@ -894,7 +916,8 @@ button.yearly-planner-month-header-label {
 	opacity: 1;
 }
 
-.yearly-planner-month-width-btn {
+.yearly-planner-month-width-btn,
+button.yearly-planner-month-width-btn {
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
@@ -903,17 +926,21 @@ button.yearly-planner-month-header-label {
 	min-width: 1.15rem;
 	min-height: 1.15rem;
 	padding: 0;
-	border: 1px solid var(--background-modifier-border);
-	border-radius: var(--planner-radius-xs);
-	background: var(--background-modifier-form-field);
+	border: 0;
+	border-radius: 0;
+	background: transparent;
+	box-shadow: none;
 	color: var(--text-muted);
 	cursor: pointer;
 }
 
 .yearly-planner-month-width-btn:hover,
-.yearly-planner-month-width-btn:focus-visible {
+.yearly-planner-month-width-btn:focus-visible,
+button.yearly-planner-month-width-btn:hover,
+button.yearly-planner-month-width-btn:focus-visible {
 	color: var(--text-accent);
-	background: var(--background-modifier-hover);
+	background: transparent;
+	box-shadow: none;
 }
 
 .yearly-planner-month-width-btn svg {
@@ -1293,25 +1320,7 @@ button.yearly-planner-month-header-label {
 .yearly-planner-cell-file {
 	position: relative;
 	z-index: 1;
-	box-sizing: border-box;
-	width: 100%;
-	background: var(--background-primary);
 	font-size: var(--planner-chip-font-size-sm);
-	color: var(--text-muted);
-	white-space: nowrap;
-	overflow: hidden;
-	text-overflow: ellipsis;
-	max-width: 100%;
-	min-width: 0;
-	padding: var(--planner-chip-padding);
-	border-radius: var(--planner-radius-xs);
-	border-left: var(--planner-border-width-accent) solid var(--interactive-accent);
-	cursor: pointer;
-}
-
-.yearly-planner-cell-file:hover {
-	color: var(--text-accent);
-	background: var(--background-modifier-hover);
 }
 
 .yearly-planner-external-event-chip {
@@ -1321,10 +1330,6 @@ button.yearly-planner-month-header-label {
 
 .yearly-planner-external-event-range {
 	width: calc(var(--planner-border-width-accent) + 1px);
-}
-
-.yearly-planner-cell-file.yearly-planner-chip-completed {
-	text-decoration: line-through;
 }
 
 /* During chip drag: make chips/containers ignore pointer so getCellAtClientPos hits the td */
@@ -3096,29 +3101,7 @@ body.-is-mobile .yearly-planner-file-preview {
 .monthly-planner-cell-file {
 	position: relative;
 	z-index: 1;
-	box-sizing: border-box;
-	width: 100%;
-	background: var(--background-primary);
 	font-size: 0.7em;
-	color: var(--text-muted);
-	white-space: nowrap;
-	overflow: hidden;
-	text-overflow: ellipsis;
-	max-width: 100%;
-	min-width: 0;
-	padding: var(--planner-chip-padding);
-	border-radius: var(--planner-radius-xs);
-	border-left: var(--planner-border-width-accent) solid var(--interactive-accent);
-	cursor: pointer;
-}
-
-.monthly-planner-cell-file:hover {
-	color: var(--text-accent);
-	background: var(--background-modifier-hover);
-}
-
-.monthly-planner-cell-file.monthly-planner-chip-completed {
-	text-decoration: line-through;
 }
 
 .monthly-planner-mobile-single-summary {
@@ -3687,21 +3670,7 @@ body.-is-mobile .monthly-planner-weekend-label {
 
 .daily-planner-untimed-chip {
 	max-width: min(100%, 24rem);
-	min-height: 2rem;
-	padding: 0.3rem 0.55rem;
-	border: 1px solid var(--background-modifier-border);
-	border-left: var(--planner-border-width-accent) solid var(--interactive-accent);
-	border-radius: var(--planner-radius-sm);
-	background: var(--background-secondary);
-	color: var(--text-normal);
-	white-space: nowrap;
-	overflow: hidden;
-	text-overflow: ellipsis;
-	cursor: pointer;
-}
-
-.daily-planner-untimed-chip:hover {
-	background: var(--background-modifier-hover);
+	min-height: 1.85rem;
 }
 
 .daily-planner-holiday-chip {
@@ -3905,32 +3874,13 @@ body.-is-mobile .monthly-planner-weekend-label {
 	width: calc(100% / var(--daily-column-count) - 4px);
 	height: calc(var(--daily-duration) * 1px - 2px);
 	min-height: 1.75rem;
-	padding: 0.25rem 0.4rem;
-	border: 1px solid
-		color-mix(in srgb, var(--daily-event-color, var(--interactive-accent)) 65%, var(--background-modifier-border));
-	border-left: 4px solid
-		var(--daily-event-color, var(--interactive-accent));
-	border-radius: var(--planner-radius-sm);
-	background: color-mix(
-		in srgb,
-		var(--daily-event-color, var(--interactive-accent)) 14%,
-		var(--background-primary)
-	);
-	color: var(--text-normal);
-	text-align: left;
 	overflow: hidden;
-	cursor: pointer;
 	z-index: 2;
 }
 
 .daily-planner-event:hover,
 .daily-planner-event:focus-visible {
 	z-index: 4;
-	background: color-mix(
-		in srgb,
-		var(--daily-event-color, var(--interactive-accent)) 22%,
-		var(--background-primary)
-	);
 }
 
 .daily-planner-event-resize-handle {
@@ -4157,8 +4107,8 @@ body.-is-mobile .monthly-planner-weekend-label {
 }
 
 .daily-planner-event-title {
-	font-size: var(--font-ui-small);
-	font-weight: 600;
+	font-size: inherit;
+	font-weight: 500;
 }
 
 .daily-planner-now-line {
@@ -4213,10 +4163,6 @@ body.-is-mobile .monthly-planner-weekend-label {
 .daily-planner-container.planner-container-compact
 	.daily-planner-all-day-label {
 	padding: 0.4rem 0.35rem;
-}
-
-.daily-planner-container.planner-container-compact .daily-planner-event {
-	padding: 0.2rem 0.3rem;
 }
 
 body.is-mobile .daily-planner-untimed-chip,
@@ -4619,9 +4565,7 @@ body.-is-mobile .daily-planner-untimed-chip {
 	margin-right: 0;
 }
 
-.yearly-planner-cell-file.planner-recurrence-occurrence,
 .yearly-planner-cell-range-bar.planner-recurrence-occurrence,
-.monthly-planner-cell-file.planner-recurrence-occurrence,
 	.monthly-planner-range-bar.planner-recurrence-occurrence {
 	border-style: dashed;
 	border-top-width: 1px;
@@ -4932,4 +4876,198 @@ body.-is-mobile .plan-note-panel-body {
 
 .plan-note-panel-create-btn:hover {
 	background: var(--interactive-hover);
+}
+/* Shared planner primitives: every calendar view uses the same functional UI base. */
+:where(.planner-interactive) {
+	cursor: pointer;
+}
+
+:where(.planner-interactive):focus-visible {
+	outline: 2px solid var(--interactive-accent);
+	outline-offset: 2px;
+}
+
+:where(.planner-entry-list),
+:where(.planner-range-list) {
+	min-width: 0;
+}
+
+.planner-chip,
+button.planner-chip {
+	box-sizing: border-box;
+	width: 100%;
+	max-width: 100%;
+	min-width: 0;
+	background: var(--background-primary);
+	font-size: var(--planner-chip-font-size, 0.7em);
+	color: var(--text-muted);
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	padding: var(--planner-chip-padding);
+	border-radius: var(--planner-radius-xs);
+	border-left: var(--planner-border-width-accent) solid var(--interactive-accent);
+	text-align: left;
+	cursor: pointer;
+	transition:
+		background-color 120ms ease,
+		color 120ms ease;
+}
+
+.planner-chip:hover,
+button.planner-chip:hover {
+	color: var(--text-accent);
+	background: var(--background-modifier-hover);
+}
+
+.planner-chip-timeline {
+	display: flex;
+	flex-direction: column;
+	align-items: stretch;
+	justify-content: center;
+}
+
+.planner-chip-meta,
+.planner-chip-label {
+	display: block;
+	min-width: 0;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.planner-chip-meta {
+	color: var(--text-faint);
+	font-size: 0.82em;
+	font-variant-numeric: tabular-nums;
+}
+
+.planner-chip-label {
+	color: inherit;
+}
+
+.planner-chip-completed {
+	text-decoration: line-through;
+}
+
+.planner-chip.planner-recurrence-occurrence {
+	background: color-mix(
+		in srgb,
+		var(--interactive-accent) 8%,
+		var(--background-primary)
+	);
+	outline: 1px dashed
+		color-mix(in srgb, var(--interactive-accent) 60%, transparent);
+	outline-offset: -1px;
+}
+
+button.planner-chip {
+	box-shadow: none;
+}
+
+button.planner-chip.planner-recurrence-source {
+	box-shadow: inset 0 0 0 1px
+		color-mix(in srgb, var(--interactive-accent) 45%, transparent);
+}
+
+.daily-planner-container .planner-chip {
+	--planner-chip-font-size: 0.7em;
+}
+
+.yearly-planner-container .planner-chip {
+	--planner-chip-font-size: var(--planner-chip-font-size-sm);
+}
+
+:where(.planner-holiday-badge) {
+	display: flex;
+	align-items: center;
+	justify-content: flex-start;
+	box-sizing: border-box;
+	width: 100%;
+	max-width: 100%;
+	min-width: 0;
+	padding: var(--planner-chip-padding);
+	border-radius: var(--planner-radius-xs);
+	border-left: var(--planner-border-width-accent) solid var(--text-accent);
+	background: color-mix(in srgb, var(--text-accent) 12%, var(--background-primary));
+	color: var(--text-accent);
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+:where(.planner-holiday-badge):hover {
+	background: color-mix(
+		in srgb,
+		var(--text-accent) 20%,
+		var(--background-modifier-hover)
+	);
+	color: var(--text-accent);
+}
+
+:where(.planner-alt-calendar-label) {
+	color: var(--text-faint);
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	max-width: 100%;
+}
+
+:where(.planner-segmented-control) {
+	display: flex;
+	align-items: center;
+	gap: 0.25rem;
+}
+
+:where(.planner-segmented-control-item) {
+	min-height: var(--planner-touch-target-min, 2rem);
+}
+
+/* Shared UI primitives used by planner views, modals, and settings. */
+:where(.diary-ui-button) {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.35rem;
+}
+
+:where(.diary-ui-button-icon),
+:where(.diary-ui-button-label) {
+	display: inline-flex;
+	align-items: center;
+}
+
+:where(.diary-ui-button-icon) svg {
+	width: 1em;
+	height: 1em;
+}
+
+:where(.diary-ui-button-row) {
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
+	gap: 0.5rem;
+	flex-wrap: wrap;
+}
+
+:where(.diary-ui-badge) {
+	display: inline-flex;
+	align-items: center;
+	max-width: 100%;
+}
+
+:where(.diary-ui-color-preset) {
+	background-color: var(--diary-ui-color);
+}
+
+:where(.diary-ui-field-row) {
+	min-width: 0;
+}
+
+:where(.diary-ui-error):empty {
+	display: none;
+}
+
+:where(.diary-ui-disclosure) {
+	min-width: 0;
 }

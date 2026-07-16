@@ -1,32 +1,23 @@
 import { ItemView, Notice, Platform, TFile, WorkspaceLeaf } from "obsidian";
 import { formatDateForLocale, t } from "../../i18n";
 import DiaryObsidian from "../../main";
-import {
-	TODO_CHIP_EMOJI_COMPLETED,
-	TODO_CHIP_EMOJI_INCOMPLETE,
-	VIEW_TYPE_MONTHLY_PLANNER,
-} from "../../constants";
+import { VIEW_TYPE_MONTHLY_PLANNER } from "../../constants";
 import type { ChipDragState } from "../yearly-planner/types";
 import type {
 	MonthlyPlannerSelectedDate,
 	MonthlyPlannerState,
 } from "./types";
 import {
-	getChipColor,
-	getFileTitle,
 	getFilesForDate,
-	isRecurrenceOccurrenceFile,
-	isRecurrenceSourceFile,
-	isTodoCompleted,
-	isTodoFile,
 	getRangeLaneMap,
 	getRangesForYear,
 	getPlannerMarkdownFiles,
 	getMonthNoteFilePath,
 } from "../yearly-planner/file-utils";
 import {
+	detachReusablePlanNotePanel,
+	mountPlanNotePanel,
 	renderPlanNotePanel,
-	syncPlanNotePanelExpandedState,
 } from "../plan-note-panel";
 import {
 	renderMonthlyPlannerHeader,
@@ -76,7 +67,18 @@ import {
 	shouldDeferPlannerClipboardToNative,
 	undoPlannerPasteBatch,
 } from "../planner-clipboard";
-import { PLANNER_COMPACT_LAYOUT_MAX_WIDTH } from "../planner-layout";
+import {
+	capturePlannerScroll,
+	PLANNER_COMPACT_LAYOUT_MAX_WIDTH,
+	restorePlannerScroll,
+	setupPlannerContainer,
+} from "../planner-layout";
+import {
+	createExternalEventChip,
+	createPlannerChip,
+	createPlannerFileChip,
+	createPlannerButton,
+} from "../planner-components";
 
 export type { MonthlyPlannerState } from "./types";
 
@@ -232,44 +234,31 @@ export class MonthlyPlannerView
 		if (!this.compactLayout) {
 			this.daySummaryOpen = false;
 		}
-		const scrollEl = contentEl.querySelector<HTMLElement>(
+		const scrollState = capturePlannerScroll(
+			contentEl,
 			".monthly-planner-scroll",
 		);
-		const scrollTop = scrollEl?.scrollTop ?? 0;
-		const scrollLeft = scrollEl?.scrollLeft ?? 0;
 
 		this.pinchZoomScale = this.pinchZoom?.getScale() ?? this.pinchZoomScale;
 		this.pinchZoom?.detach();
 		this.pinchZoom = null;
 
-		const planNoteWrapper = contentEl.querySelector<HTMLElement>(
-			".plan-note-panel-wrapper",
-		);
-		const preservePlanNote =
-			planNoteWrapper &&
-			planNoteWrapper.hasChildNodes() &&
-			planNoteWrapper.dataset.year === String(this.year) &&
-			planNoteWrapper.dataset.month === String(this.month);
-		if (preservePlanNote) planNoteWrapper.remove();
+		const planNoteWrapper = detachReusablePlanNotePanel(contentEl, {
+			year: this.year,
+			month: this.month,
+		});
 
 		contentEl.empty();
-			contentEl.addClass("monthly-planner-container");
-			contentEl.toggleClass("planner-container-compact", this.compactLayout);
-			contentEl.toggleClass(
-				"monthly-planner-container-compact",
-				this.compactLayout,
-		);
-		if (this.chipDragState) {
-			contentEl.addClass("monthly-planner-chip-dragging");
-		} else {
-			contentEl.removeClass("monthly-planner-chip-dragging");
-		}
-
 		const pad = this.plugin.settings.mobileBottomPadding ?? 3.5;
-		contentEl.style.setProperty(
-			"--monthly-planner-mobile-bottom-padding",
-			`${pad}rem`,
-		);
+		setupPlannerContainer(contentEl, {
+			className: "monthly-planner-container",
+			compactClassName: "monthly-planner-container-compact",
+			compact: this.compactLayout,
+			mobilePadding: pad,
+			mobilePaddingProperty: "--monthly-planner-mobile-bottom-padding",
+			draggingClassName: "monthly-planner-chip-dragging",
+			dragging: this.chipDragState != null,
+		});
 
 		if (
 			this.selectedDate &&
@@ -281,39 +270,22 @@ export class MonthlyPlannerView
 		}
 
 		this.renderHeader(contentEl);
-		if (preservePlanNote && planNoteWrapper) {
-			contentEl.appendChild(planNoteWrapper);
-			syncPlanNotePanelExpandedState(
-				planNoteWrapper,
-				this.plugin.isPlanNotePanelExpanded(),
-			);
-		} else {
-			const notePanelEl = contentEl.createDiv({
-				cls: "plan-note-panel-wrapper",
-			});
-			notePanelEl.dataset.year = String(this.year);
-			notePanelEl.dataset.month = String(this.month);
-			void this.renderMonthNotePanel(notePanelEl);
-		}
+		mountPlanNotePanel(contentEl, {
+			period: { year: this.year, month: this.month },
+			preserved: planNoteWrapper,
+			expanded: this.plugin.isPlanNotePanelExpanded(),
+			render: (container) => this.renderMonthNotePanel(container),
+		});
 		this.renderTable(contentEl);
 
-		const newScrollEl = contentEl.querySelector<HTMLElement>(
+		const newScrollEl = restorePlannerScroll(
+			contentEl,
 			".monthly-planner-scroll",
+			scrollState,
 		);
 		if (this.compactLayout && newScrollEl) {
 			this.renderMobileDaySummary(newScrollEl);
 		}
-		if (newScrollEl) {
-			newScrollEl.scrollTop = scrollTop;
-			newScrollEl.scrollLeft = scrollLeft;
-			window.requestAnimationFrame(() => {
-				window.requestAnimationFrame(() => {
-					newScrollEl.scrollTop = scrollTop;
-					newScrollEl.scrollLeft = scrollLeft;
-				});
-			});
-		}
-
 		if (Platform.isMobile) {
 			const zoomWrapper = contentEl.querySelector<HTMLElement>(
 				".monthly-planner-zoom-wrapper",
@@ -784,11 +756,11 @@ export class MonthlyPlannerView
 				text: alternateCalendarLabel.text,
 			});
 		}
-		const closeBtn = header.createEl("button", {
-			cls: "monthly-planner-day-summary-close",
+		const closeBtn = createPlannerButton(header, {
+			classes: "monthly-planner-day-summary-close",
 			text: "×",
+			ariaLabel: t("monthlyDaySheet.close"),
 		});
-		closeBtn.ariaLabel = t("monthlyDaySheet.close");
 		closeBtn.onclick = () => this.closeDaySummaryPanel();
 
 		const body = sheet.createDiv({
@@ -830,48 +802,47 @@ export class MonthlyPlannerView
 				: [];
 
 		for (const { file } of rangeFiles) {
-			this.createDaySummaryChip({
-				container: body,
-				text: this.getDisplayTitle(file),
-				color: getChipColor(this.app, file),
+			createPlannerFileChip(body, {
+				app: this.app,
+				file,
+				classes: {
+					root: "monthly-planner-day-summary-item monthly-planner-cell-file",
+					completed: "monthly-planner-chip-completed",
+				},
+				tag: "button",
 				onClick: () => this.openFileOptionsModal(file),
-				extraClass: this.getRecurrenceChipClass(file),
 			});
 		}
 
 		for (const file of singleFiles) {
-			this.createDaySummaryChip({
-				container: body,
-				text: this.getDisplayTitle(file),
-				color: getChipColor(this.app, file),
+			createPlannerFileChip(body, {
+				app: this.app,
+				file,
+				classes: {
+					root: "monthly-planner-day-summary-item monthly-planner-cell-file",
+					completed: "monthly-planner-chip-completed",
+				},
+				tag: "button",
 				onClick: () => this.openFileOptionsModal(file),
-				extraClass: this.getRecurrenceChipClass(file),
 			});
 		}
 
 		for (const event of externalDateEvents.summaryEvents) {
-			const recurrenceEvent = isRecurrenceVirtualEvent(event);
-			this.createDaySummaryChip({
-				container: body,
-				text: event.title,
-				color: event.color ?? null,
+			createExternalEventChip(body, {
+				event,
+				classes: "monthly-planner-day-summary-item monthly-planner-cell-file",
+				tag: "button",
 				onClick: () => this.openExternalEventModal(event.id),
-				extraClass: [
-					"planner-external-event-chip",
-					recurrenceEvent && "planner-recurrence-virtual",
-				]
-					.filter(Boolean)
-					.join(" "),
 			});
 		}
 
 		for (const holidayName of holidayNames) {
-			this.createDaySummaryChip({
-				container: body,
+			createPlannerChip(body, {
 				text: holidayName,
 				color: "var(--text-accent)",
-				onClick: undefined,
-				extraClass: "monthly-planner-day-summary-item-holiday",
+				classes:
+					"monthly-planner-day-summary-item monthly-planner-cell-file monthly-planner-day-summary-item-holiday",
+				tag: "button",
 			});
 		}
 
@@ -890,10 +861,9 @@ export class MonthlyPlannerView
 		const footer = sheet.createDiv({
 			cls: "monthly-planner-day-summary-footer",
 		});
-		const createBtn = footer.createEl("button", {
-			cls: "mod-cta monthly-planner-day-summary-create",
+		const createBtn = createPlannerButton(footer, {
+			classes: "mod-cta monthly-planner-day-summary-create",
 			text: t("monthlyDaySheet.create"),
-			type: "button",
 		});
 		createBtn.onclick = () =>
 			this.openCreateFileModal({
@@ -904,9 +874,9 @@ export class MonthlyPlannerView
 				endMonth: month,
 				endDay: day,
 			});
-		const dailyBtn = footer.createEl("button", {
+		const dailyBtn = createPlannerButton(footer, {
+			classes: "monthly-planner-day-summary-open-daily",
 			text: t("daily.openView"),
-			attr: { type: "button" },
 		});
 		dailyBtn.onclick = () => this.openDailyPlanner(year, month, day);
 	}
@@ -987,54 +957,9 @@ export class MonthlyPlannerView
 		];
 	}
 
-	private getDisplayTitle(file: TFile): string {
-		const title = getFileTitle(this.app, file);
-		if (isTodoCompleted(this.app, file)) {
-			return `${TODO_CHIP_EMOJI_COMPLETED} ${title}`;
-		}
-		if (isTodoFile(this.app, file)) {
-			return `${TODO_CHIP_EMOJI_INCOMPLETE} ${title}`;
-		}
-		return title;
-	}
-
-	private getRecurrenceChipClass(file: TFile): string | undefined {
-		if (isRecurrenceSourceFile(this.app, file)) return "planner-recurrence-source";
-		if (isRecurrenceOccurrenceFile(this.app, file)) {
-			return "planner-recurrence-occurrence";
-		}
-		return undefined;
-	}
-
 	private formatDaySummaryDate(year: number, month: number, day: number): string {
 		const locale = this.plugin.settings.locale ?? "en";
 		return formatDateForLocale(year, month, day, locale);
-	}
-
-	private createDaySummaryChip(opts: {
-		container: HTMLElement;
-		text: string;
-		color: string | null;
-		onClick?: (() => void) | undefined;
-		extraClass?: string;
-	}): void {
-		const item = opts.container.createEl("button", {
-			cls: [
-				"monthly-planner-day-summary-item",
-				"monthly-planner-cell-file",
-				opts.extraClass,
-			]
-				.filter(Boolean)
-				.join(" "),
-			type: "button",
-		});
-		item.textContent = opts.text;
-		if (opts.color) {
-			item.style.borderLeftColor = opts.color;
-		}
-		if (opts.onClick) {
-			item.onclick = opts.onClick;
-		}
 	}
 
 	private handleClipboardKeydown(e: KeyboardEvent): void {

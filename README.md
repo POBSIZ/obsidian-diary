@@ -11,7 +11,7 @@ Diary는 Obsidian vault 안의 Markdown 파일을 날짜 기반 플래너로 보
 | Item | Value |
 | --- | --- |
 | Plugin ID | `diary` |
-| Version | `1.7.1` |
+| Version | `1.8.0` |
 | Minimum Obsidian version | `1.7.2` |
 | Platforms | Desktop and mobile (`isDesktopOnly: false`) |
 | Default language | `en` |
@@ -19,6 +19,7 @@ Diary는 Obsidian vault 안의 Markdown 파일을 날짜 기반 플래너로 보
 
 ## Latest Version
 
+- `1.8.0`: unifies planner chips, controls, modal actions, compact layout state, and keyboard focus behavior across yearly, monthly, list, daily, and 3-day views; refreshes all planner screenshots.
 - `1.7.1`: removes unnecessary DOM type assertions and stabilizes typed lint resolution for the shared planner period modal.
 - `1.7.0`: adds daily and 3-day timeline planners, direct planner view selection, shared period navigation, independent start/end time metadata, and virtual every-N-days/weeks/months/years recurrence.
 - `1.6.0`: adds full documentation for every supported UI language, Spain holiday support, and localized alternate calendar option text.
@@ -38,19 +39,22 @@ Diary는 Obsidian vault 안의 Markdown 파일을 날짜 기반 플래너로 보
 
 ## Screenshots
 
-Captured from a fresh demo vault with sample planner notes. The main screenshots
-show full-size planner layouts; the right sidebar planner reuses the monthly
-grid in compact form.
+Captured with an isolated demo folder containing sample all-day, timed, range,
+todo, and plan notes. The temporary demo data was removed after capture.
 
 ![Monthly grid planner](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/assets/screenshots/monthly-grid.png)
 
-| Yearly planner | Monthly list |
+| Yearly planner | Monthly list planner |
 | --- | --- |
 | ![Yearly planner](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/assets/screenshots/yearly-planner.png) | ![Monthly list planner](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/assets/screenshots/monthly-list.png) |
 
-| Mobile monthly grid | Mobile monthly list |
+| Daily timeline | 3-day timeline |
 | --- | --- |
-| ![Mobile monthly grid](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/assets/screenshots/mobile-monthly-grid.png) | ![Mobile monthly list planner](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/assets/screenshots/mobile-monthly-list.png) |
+| ![Daily timeline planner](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/assets/screenshots/daily-planner.png) | ![3-day timeline planner](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/assets/screenshots/three-day-planner.png) |
+
+| Narrow monthly grid | Narrow monthly list |
+| --- | --- |
+| ![Narrow monthly grid](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/assets/screenshots/mobile-monthly-grid.png) | ![Narrow monthly list planner](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/assets/screenshots/mobile-monthly-list.png) |
 
 ## What It Does
 
@@ -129,6 +133,9 @@ npm test
 - `src/views/monthly-list-planner/*`: monthly list UI, filters, and interactions.
 - `src/views/*/sidebar-view.ts`: compact side-leaf variants for planner views.
 - `src/views/planner-clipboard.ts`: multi-select copy/paste/delete/undo flow.
+- `src/views/planner-components.ts`, `src/views/planner-dom.ts`: shared planner chips, badges, labels, and pointer/DOM lookup helpers.
+- `src/views/planner-layout.ts`, `src/views/plan-note-panel.ts`: shared headers, filters, container/scroll restoration, and reusable plan-note panels.
+- `src/ui/components.ts`: shared buttons, button rows, fields, disclosures, badges, errors, and press feedback for planner, modal, and settings surfaces.
 - `src/planner-reminders.ts`: runtime reminders based on `notify_minutes`.
 - `src/i18n.ts`, `locales/*`: English, German, Spanish, French, Japanese, Simplified Chinese, Traditional Chinese, and Korean localization.
 - `docs/*/README.md`: full documentation for each supported UI language.

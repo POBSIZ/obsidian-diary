@@ -1,5 +1,11 @@
-import { App, Modal, Notice, TFile, setIcon } from "obsidian";
+import { App, Modal, Notice, TFile } from "obsidian";
 import { t } from "../i18n";
+import {
+	attachUiPressFeedback,
+	createUiBadge,
+	createUiButton,
+	createUiButtonRow,
+} from "../ui/components";
 import {
 	getExternalEventDateRangeLabel,
 	getExternalEventTimeLabel,
@@ -37,13 +43,12 @@ export class ExternalEventModal extends Modal {
 		const titleBlock = header.createDiv({
 			cls: "planner-external-event-modal-title-block",
 		});
-		const sourceBadge = titleBlock.createDiv({
-			cls: "planner-external-event-source-badge",
+		createUiBadge(titleBlock, {
+			classes: "planner-external-event-source-badge",
 			text: calendarName,
+			color: event.color,
+			colorProperty: "--external-calendar-color",
 		});
-		if (event.color) {
-			sourceBadge.style.setProperty("--external-calendar-color", event.color);
-		}
 		titleBlock.createEl("h2", { text: event.title });
 		this.contentEl.createDiv({
 			cls: "yearly-planner-create-file-hint planner-external-event-readonly-hint",
@@ -74,9 +79,10 @@ export class ExternalEventModal extends Modal {
 			});
 		}
 
-		const actions = this.contentEl.createDiv({
-			cls: "yearly-planner-modal-actions",
-		});
+		const actions = createUiButtonRow(
+			this.contentEl,
+			"yearly-planner-modal-actions",
+		);
 		const createBtn = this.createActionButton(
 			actions,
 			"file-plus-2",
@@ -108,54 +114,18 @@ export class ExternalEventModal extends Modal {
 		text: string,
 		options: { cta?: boolean } = {},
 	): HTMLButtonElement {
-		const button = container.createEl("button", {
-			cls: options.cta
-				? "mod-cta diary-calendar-action-button"
-				: "diary-calendar-action-button",
-			attr: { type: "button" },
+		const button = createUiButton(container, {
+			classes: "diary-calendar-action-button",
+			variant: options.cta ? "cta" : "default",
+			icon,
+			text,
+			ariaLabel: text,
+			title: text,
+			iconClass: "diary-calendar-action-icon",
+			labelClass: "diary-calendar-action-label",
 		});
-		button.ariaLabel = text;
-		button.title = text;
-		const iconEl = button.createSpan({ cls: "diary-calendar-action-icon" });
-		setIcon(iconEl, icon);
-		button.createSpan({ cls: "diary-calendar-action-label", text });
-		this.attachPressFeedback(button);
+		attachUiPressFeedback(button);
 		return button;
-	}
-
-	private attachPressFeedback(button: HTMLButtonElement): void {
-		let releaseTimer: number | null = null;
-		const press = () => {
-			if (button.disabled) return;
-			if (releaseTimer != null) {
-				window.clearTimeout(releaseTimer);
-				releaseTimer = null;
-			}
-			button.addClass("is-pressed");
-		};
-		const release = () => {
-			if (releaseTimer != null) window.clearTimeout(releaseTimer);
-			releaseTimer = window.setTimeout(() => {
-				button.removeClass("is-pressed");
-				releaseTimer = null;
-			}, 120);
-		};
-
-		button.addEventListener("pointerdown", press);
-		button.addEventListener("pointerup", release);
-		button.addEventListener("pointercancel", release);
-		button.addEventListener("pointerleave", release);
-		button.addEventListener("keydown", (event) => {
-			if (event.key === "Enter" || event.key === " ") press();
-		});
-		button.addEventListener("keyup", release);
-		button.addEventListener("blur", () => {
-			if (releaseTimer != null) {
-				window.clearTimeout(releaseTimer);
-				releaseTimer = null;
-			}
-			button.removeClass("is-pressed");
-		});
 	}
 
 	private setButtonBusy(button: HTMLButtonElement, busy: boolean): void {

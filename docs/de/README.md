@@ -9,7 +9,7 @@ Vollständige Dokumentation: [English](https://github.com/POBSIZ/obsidian-diary/
 | Eintrag | Wert |
 | --- | --- |
 | Plugin-ID | `diary` |
-| Aktuelle Version | `1.7.1` |
+| Aktuelle Version | `1.8.0` |
 | Minimale Obsidian-Version | `1.7.2` |
 | Plattformen | Desktop / Mobil (`isDesktopOnly: false`) |
 | Standardsprache | `en` |
@@ -17,6 +17,7 @@ Vollständige Dokumentation: [English](https://github.com/POBSIZ/obsidian-diary/
 
 ## Neueste Version
 
+- `1.8.0`: Vereinheitlicht Planer-Chips, Bedienelemente, Modal-Aktionen, Compact-Layout-Zustand und Tastaturfokus in allen Planeransichten und aktualisiert die Screenshots.
 - `1.7.1`: Entfernt unnötige DOM-Typzusicherungen und stabilisiert die typisierte Lint-Auflösung für den gemeinsamen Planer-Zeitraumdialog.
 - `1.7.0`: Fügt Tages- und 3-Tage-Zeitplaner, eine direkte Ansichtsauswahl, gemeinsame Zeitraum-Navigation, getrennte Start-/Endzeiten und virtuelle Wiederholungen alle N Tage, Wochen, Monate oder Jahre hinzu.
 - `1.6.0`: Ergänzt vollständige Dokumentation für jede unterstützte UI-Sprache, Feiertage für Spanien und lokalisierte Texte für alternative Kalenderoptionen.
@@ -36,7 +37,7 @@ Vollständige Dokumentation: [English](https://github.com/POBSIZ/obsidian-diary/
 
 ## Screenshots
 
-Die Screenshots stammen aus einem frischen Demo-Vault mit Beispiel-Planernotizen. Die mobilen Bilder wurden mit aktivierter mobiler Darstellung aufgenommen. Der rechte Seitenplaner nutzt dasselbe Monatsraster im kompakten Modus; deshalb bleibt der Screenshot des großen Monatsrasters die visuelle Referenz.
+Die Screenshots stammen aus einem isolierten Demo-Ordner mit ganztägigen, zeitgebundenen, mehrtägigen, Todo- und Plan-Notizen. Die temporären Daten wurden anschließend entfernt. Die schmalen Ansichten zeigen die Anpassung von gemeinsamem Header und Monatsansichten bei wenig Platz.
 
 ### Desktop
 
@@ -46,11 +47,15 @@ Die Screenshots stammen aus einem frischen Demo-Vault mit Beispiel-Planernotizen
 
 ![Monthly list planner](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/assets/screenshots/monthly-list.png)
 
-### Mobil
-
-| Monatsraster und Tagesübersicht | Monatsliste |
+| Tages-Zeitleiste | 3-Tage-Zeitleiste |
 | --- | --- |
-| ![Mobile monthly grid](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/assets/screenshots/mobile-monthly-grid.png) | ![Mobile monthly list](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/assets/screenshots/mobile-monthly-list.png) |
+| ![Daily timeline planner](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/assets/screenshots/daily-planner.png) | ![3-day timeline planner](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/assets/screenshots/three-day-planner.png) |
+
+### Schmale Ansicht
+
+| Monatsraster | Monatsliste |
+| --- | --- |
+| ![Narrow monthly grid](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/assets/screenshots/mobile-monthly-grid.png) | ![Narrow monthly list](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/assets/screenshots/mobile-monthly-list.png) |
 
 ## Hauptfunktionen
 

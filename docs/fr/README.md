@@ -9,7 +9,7 @@ Documentation complète : [English](https://github.com/POBSIZ/obsidian-diary/blo
 | Élément | Valeur |
 | --- | --- |
 | ID du plugin | `diary` |
-| Version actuelle | `1.7.1` |
+| Version actuelle | `1.8.0` |
 | Version minimale d’Obsidian | `1.7.2` |
 | Plateformes | Bureau / mobile (`isDesktopOnly: false`) |
 | Langue par défaut | `en` |
@@ -17,6 +17,7 @@ Documentation complète : [English](https://github.com/POBSIZ/obsidian-diary/blo
 
 ## Dernière version
 
+- `1.8.0` : uniformise les puces, contrôles, actions de boîtes de dialogue, état de mise en page compacte et focus clavier dans toutes les vues du planificateur, avec des captures actualisées.
 - `1.7.1` : supprime les assertions de type DOM inutiles et stabilise l’analyse typée de la boîte de dialogue de période commune.
 - `1.7.0` : ajoute les plannings chronologiques quotidien et sur 3 jours, la sélection directe de vue, une navigation de période commune, des heures de début/fin indépendantes et les récurrences virtuelles tous les N jours, semaines, mois ou années.
 - `1.6.0` : ajoute une documentation complète pour chaque langue d’interface prise en charge, les jours fériés espagnols et les textes localisés des options de calendrier alternatif.
@@ -36,7 +37,7 @@ Documentation complète : [English](https://github.com/POBSIZ/obsidian-diary/blo
 
 ## Captures d’écran
 
-Les images proviennent d’un coffre de démonstration neuf avec des notes de planning. Les captures mobiles ont été prises avec le rendu mobile du plugin activé. Le planificateur latéral droit utilise la même grille mensuelle en mode compact ; la capture de la grande grille mensuelle reste donc la référence visuelle principale.
+Les images proviennent d’un dossier de démonstration isolé contenant des notes sur la journée, horaires, de période, de tâche et de plan. Les données temporaires ont ensuite été supprimées. Les vues étroites montrent l’adaptation de l’en-tête commun et des vues mensuelles lorsque l’espace horizontal est limité.
 
 ### Bureau
 
@@ -46,11 +47,15 @@ Les images proviennent d’un coffre de démonstration neuf avec des notes de pl
 
 ![Monthly list planner](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/assets/screenshots/monthly-list.png)
 
-### Mobile
-
-| Grille mensuelle et résumé du jour | Liste mensuelle |
+| Chronologie quotidienne | Chronologie sur 3 jours |
 | --- | --- |
-| ![Mobile monthly grid](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/assets/screenshots/mobile-monthly-grid.png) | ![Mobile monthly list](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/assets/screenshots/mobile-monthly-list.png) |
+| ![Daily timeline planner](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/assets/screenshots/daily-planner.png) | ![3-day timeline planner](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/assets/screenshots/three-day-planner.png) |
+
+### Mise en page étroite
+
+| Grille mensuelle | Liste mensuelle |
+| --- | --- |
+| ![Narrow monthly grid](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/assets/screenshots/mobile-monthly-grid.png) | ![Narrow monthly list](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/assets/screenshots/mobile-monthly-list.png) |
 
 ## Fonctionnalités principales
 

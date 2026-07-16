@@ -9,7 +9,7 @@ Diary は、Obsidian の vault 内にある Markdown ファイルを日付ベー
 | 項目 | 値 |
 | --- | --- |
 | プラグイン ID | `diary` |
-| 現在のバージョン | `1.7.1` |
+| 現在のバージョン | `1.8.0` |
 | 最小 Obsidian バージョン | `1.7.2` |
 | 対応プラットフォーム | デスクトップ / モバイル (`isDesktopOnly: false`) |
 | 既定の言語 | `en` |
@@ -17,6 +17,7 @@ Diary は、Obsidian の vault 内にある Markdown ファイルを日付ベー
 
 ## 最新バージョン
 
+- `1.8.0`: 全プランナービューのチップ、コントロール、モーダル操作、コンパクトレイアウト状態、キーボードフォーカスを統一し、スクリーンショットを更新しました。
 - `1.7.1`: 不要な DOM 型アサーションを削除し、共通期間ダイアログの typed lint 解決を安定化しました。
 - `1.7.0`: 日別・3日タイムラインプランナー、直接ビュー選択、共通期間ナビゲーション、独立した開始/終了時刻、N日・週・か月・年ごとの仮想繰り返しを追加しました。
 - `1.6.0`: 対応するすべての UI 言語の完全なドキュメント、スペインの祝日、代替カレンダー選択肢のローカライズ文言を追加しました。
@@ -36,7 +37,7 @@ Diary は、Obsidian の vault 内にある Markdown ファイルを日付ベー
 
 ## スクリーンショット
 
-画像は、サンプルプランナーノートを入れた新しいデモ vault で撮影しています。モバイル画像は、プラグインのモバイル描画経路を有効にして撮影しました。右サイドバーのプランナーは同じ月間グリッドをコンパクト表示するため、フルサイズの月間グリッド画像が代表的な見た目です。
+画像は、終日・時刻付き・期間・todo・計画ノートを入れた隔離デモフォルダで撮影しました。一時データは撮影後に削除しています。狭幅画像では、横幅が限られたときに共通ヘッダーと月間ビューが適応する様子を確認できます。
 
 ### デスクトップ
 
@@ -46,11 +47,15 @@ Diary は、Obsidian の vault 内にある Markdown ファイルを日付ベー
 
 ![Monthly list planner](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/assets/screenshots/monthly-list.png)
 
-### モバイル
-
-| 月間グリッドと日別サマリー | 月間リスト |
+| 日別タイムライン | 3日タイムライン |
 | --- | --- |
-| ![Mobile monthly grid](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/assets/screenshots/mobile-monthly-grid.png) | ![Mobile monthly list](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/assets/screenshots/mobile-monthly-list.png) |
+| ![Daily timeline planner](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/assets/screenshots/daily-planner.png) | ![3-day timeline planner](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/assets/screenshots/three-day-planner.png) |
+
+### 狭幅レイアウト
+
+| 月間グリッド | 月間リスト |
+| --- | --- |
+| ![Narrow monthly grid](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/assets/screenshots/mobile-monthly-grid.png) | ![Narrow monthly list](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/assets/screenshots/mobile-monthly-list.png) |
 
 ## 主な機能
 

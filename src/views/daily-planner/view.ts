@@ -34,6 +34,12 @@ import {
 	type PlannerViewMode,
 } from "../planner-layout";
 import {
+	applyExternalEventState,
+	applyPlannerFileState,
+	createAlternateCalendarLabel,
+	createPlannerChip,
+} from "../planner-components";
+import {
 	createRangeFile as createRangeFileOp,
 	createSingleDateFile as createSingleDateFileOp,
 	createExternalEventFile,
@@ -481,24 +487,7 @@ export class DailyPlannerView extends ItemView {
 			return;
 		}
 		for (const entry of entries) {
-			const isVirtualRecurrence = Boolean(
-				entry.externalEvent && isRecurrenceVirtualEvent(entry.externalEvent),
-			);
-			const chip = list.createEl("button", {
-				cls: [
-					"daily-planner-untimed-chip",
-					entry.kind === "external" && "planner-external-event-chip",
-					isVirtualRecurrence && "planner-recurrence-virtual",
-					entry.kind === "holiday" && "daily-planner-holiday-chip",
-				]
-					.filter(Boolean)
-					.join(" "),
-				text: entry.title,
-				attr: { type: "button" },
-			});
-			if (entry.color) chip.style.borderLeftColor = entry.color;
-			chip.onclick = () => this.openEntry(entry);
-			this.bindEntryDrag(chip, entry, day);
+			this.createDailyEntryChip(list, entry, day);
 		}
 	}
 
@@ -529,9 +518,10 @@ export class DailyPlannerView extends ItemView {
 				getCalendarOverlayConfig(this.plugin.settings),
 			);
 			if (overlay) {
-				heading.createSpan({
-					cls: "daily-planner-alt-calendar",
+				createAlternateCalendarLabel(heading, {
 					text: overlay.fullText,
+					containerClass: "daily-planner-alt-calendar-container",
+					labelClass: "daily-planner-alt-calendar",
 				});
 			}
 		}
@@ -610,39 +600,15 @@ export class DailyPlannerView extends ItemView {
 		for (const entry of layoutDailyPlannerEntries(
 			day.entries.filter((entry) => entry.startMinutes != null),
 		)) {
-			const isVirtualRecurrence = Boolean(
-				entry.externalEvent && isRecurrenceVirtualEvent(entry.externalEvent),
-			);
-			const block = layer.createEl("button", {
-				cls: [
-					"daily-planner-event",
-					entry.kind === "external" && "planner-external-event-chip",
-					isVirtualRecurrence && "planner-recurrence-virtual",
-				]
-					.filter(Boolean)
-					.join(" "),
-				attr: { type: "button" },
+			const block = this.createDailyEntryChip(layer, entry, day, {
+				column: entry.column,
+				columnCount: entry.columnCount,
 			});
 			block.style.setProperty("--daily-start", String(entry.startMinutes));
 			block.style.setProperty(
 				"--daily-duration",
 				String(Math.max(30, (entry.endMinutes ?? 0) - (entry.startMinutes ?? 0))),
 			);
-			block.style.setProperty("--daily-column", String(entry.column));
-			block.style.setProperty("--daily-column-count", String(entry.columnCount));
-			if (entry.color) block.style.setProperty("--daily-event-color", entry.color);
-			block.createSpan({
-				cls: "daily-planner-event-time",
-				text: `${minutesToTime(entry.startMinutes ?? 0)}–${minutesToTime(
-					Math.min(MINUTES_PER_DAY - 1, entry.endMinutes ?? 0),
-				)}`,
-			});
-			block.createSpan({ cls: "daily-planner-event-title", text: entry.title });
-			block.onclick = (event) => {
-				event.stopPropagation();
-				this.openEntry(entry);
-			};
-			this.bindEntryDrag(block, entry, day);
 		}
 		const now = new Date();
 		if (
@@ -656,6 +622,64 @@ export class DailyPlannerView extends ItemView {
 				String(now.getHours() * 60 + now.getMinutes()),
 			);
 		}
+	}
+
+	private createDailyEntryChip(
+		parent: HTMLElement,
+		entry: DailyPlannerEntry,
+		day: VisiblePlannerDay,
+		position?: { column: number; columnCount: number },
+	): HTMLElement {
+		const isTimeline = position != null;
+		const chip = createPlannerChip(parent, {
+			classes: [
+				isTimeline ? "daily-planner-event" : "daily-planner-untimed-chip",
+				entry.kind === "external" && "planner-external-event-chip",
+				entry.kind === "holiday" && "daily-planner-holiday-chip",
+			]
+				.filter(Boolean)
+				.join(" "),
+			text: isTimeline ? undefined : entry.title,
+			color: entry.color,
+			tag: "button",
+			variant: isTimeline ? "timeline" : "all-day",
+			ariaLabel: entry.title,
+			renderContent: isTimeline
+				? (element) => {
+						element.createSpan({
+							cls: "planner-chip-meta daily-planner-event-time",
+							text: `${minutesToTime(entry.startMinutes ?? 0)}–${minutesToTime(
+								Math.min(MINUTES_PER_DAY - 1, entry.endMinutes ?? 0),
+							)}`,
+						});
+						element.createSpan({
+							cls: "planner-chip-label daily-planner-event-title",
+							text: entry.title,
+						});
+					}
+				: undefined,
+		});
+		if (entry.file) {
+			applyPlannerFileState(chip, this.app, entry.file);
+			if (isTodoCompleted(this.app, entry.file)) {
+				chip.addClass("planner-chip-completed");
+			}
+		}
+		if (entry.externalEvent) applyExternalEventState(chip, entry.externalEvent);
+		if (position) {
+			chip.style.setProperty("--daily-column", String(position.column));
+			chip.style.setProperty(
+				"--daily-column-count",
+				String(position.columnCount),
+			);
+			if (entry.color) chip.style.setProperty("--daily-event-color", entry.color);
+		}
+		chip.onclick = (event) => {
+			event.stopPropagation();
+			this.openEntry(entry);
+		};
+		this.bindEntryDrag(chip, entry, day);
+		return chip;
 	}
 
 	private bindEntryDrag(

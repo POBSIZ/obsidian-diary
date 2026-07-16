@@ -2,6 +2,14 @@ import { Modal, Notice, Setting } from "obsidian";
 import { getLocale, t } from "../i18n";
 import type DiaryObsidian from "../main";
 import {
+	createUiBadge,
+	createUiButton,
+	createUiButtonRow,
+	createUiDisclosure,
+	createUiError,
+	createUiFieldRow,
+} from "../ui/components";
+import {
 	ALTERNATE_CALENDAR_OPTIONS,
 	getAlternateCalendarOptionText,
 	normalizeAlternateCalendarId,
@@ -63,8 +71,8 @@ function renderCalendarOverlaySettingsContent(
 				(option) => option.id === plugin.settings.alternateCalendarId,
 			)
 		: undefined;
-	const section = containerEl.createEl("details", {
-		cls: "diary-calendar-settings-panel diary-calendar-overlay-settings",
+	const section = createUiDisclosure(containerEl, {
+		classes: "diary-calendar-settings-panel diary-calendar-overlay-settings",
 	});
 	section.open =
 		state.sectionOpen ?? (profiles.length === 0 || Boolean(selectedCustomProfile));
@@ -89,13 +97,15 @@ function renderCalendarOverlaySettingsContent(
 	const meta = summary.createSpan({
 		cls: "diary-calendar-settings-meta",
 	});
-	meta.createSpan({
-		cls: "diary-calendar-settings-pill",
+	createUiBadge(meta, {
+		classes: "diary-calendar-settings-pill",
 		text: getOverlaySummaryText(selectedCustomProfile, selectedBuiltin, locale),
+		tag: "span",
 	});
-	meta.createSpan({
-		cls: "diary-calendar-settings-pill",
+	createUiBadge(meta, {
+		classes: "diary-calendar-settings-pill",
 		text: t("settings.customCalendarCount", { count: profiles.length }),
+		tag: "span",
 	});
 
 	const body = section.createDiv({
@@ -229,8 +239,8 @@ function renderCustomCalendarProfileCard(
 	state: CalendarOverlayRenderState,
 ): void {
 	const isSelected = plugin.settings.selectedCustomCalendarId === profile.id;
-	const card = containerEl.createEl("details", {
-		cls: "diary-calendar-profile-card",
+	const card = createUiDisclosure(containerEl, {
+		classes: "diary-calendar-profile-card",
 	});
 	card.open = state.openProfileIds.has(profile.id) || isSelected;
 	card.toggleClass("is-selected", isSelected);
@@ -261,16 +271,18 @@ function renderCustomCalendarProfileCard(
 		cls: "diary-calendar-settings-meta",
 	});
 	if (isSelected) {
-		meta.createSpan({
-			cls: "diary-calendar-settings-pill is-active",
+		createUiBadge(meta, {
+			classes: "diary-calendar-settings-pill is-active",
 			text: t("settings.calendarOverlayActive"),
+			tag: "span",
 		});
 	}
-	meta.createSpan({
-		cls: "diary-calendar-settings-pill",
+	createUiBadge(meta, {
+		classes: "diary-calendar-settings-pill",
 		text: t("settings.customCalendarYearLength", {
 			days: getBaseYearLength(profile),
 		}),
+		tag: "span",
 	});
 
 	const body = card.createDiv({
@@ -359,19 +371,12 @@ function createProfileActionButton(
 		onClick: () => void | Promise<void>;
 	},
 ): HTMLButtonElement {
-	const classes = options.cta
-		? "mod-cta"
-		: options.warning
-			? "mod-warning"
-			: "";
-	const button = containerEl.createEl("button", {
+	return createUiButton(containerEl, {
 		text,
-		cls: classes,
-		attr: { type: "button" },
+		variant: options.cta ? "cta" : options.warning ? "warning" : "default",
+		disabled: options.disabled,
+		onClick: options.onClick,
 	});
-	button.disabled = options.disabled ?? false;
-	button.onclick = () => void options.onClick();
-	return button;
 }
 
 function getProfileTodayPreview(profile: CustomCalendarProfile): string | null {
@@ -593,23 +598,22 @@ class CustomCalendarProfileModal extends Modal {
 		this.previewEl = form.createDiv({
 			cls: "diary-custom-calendar-preview",
 		});
-		this.errorEl = this.contentEl.createDiv({
-			cls: "yearly-planner-modal-error",
-			attr: { "aria-live": "polite" },
-		});
+		this.errorEl = createUiError(
+			this.contentEl,
+			"yearly-planner-modal-error",
+		);
 
-		const actions = this.contentEl.createDiv({
-			cls: "yearly-planner-modal-actions diary-custom-calendar-modal-actions",
-		});
-		this.saveBtn = actions.createEl("button", {
+		const actions = createUiButtonRow(
+			this.contentEl,
+			"yearly-planner-modal-actions diary-custom-calendar-modal-actions",
+		);
+		this.saveBtn = createUiButton(actions, {
 			text: t("modal.apply"),
-			cls: "mod-cta",
-			attr: { type: "button" },
+			variant: "cta",
 		});
 		this.saveBtn.onclick = () => void this.handleSave();
-		const cancelButton = actions.createEl("button", {
+		const cancelButton = createUiButton(actions, {
 			text: t("modal.cancel"),
-			attr: { type: "button" },
 		});
 		cancelButton.onclick = () => this.close();
 		this.contentEl.addEventListener("input", () => this.updateState());
@@ -630,7 +634,7 @@ class CustomCalendarProfileModal extends Modal {
 			max?: string;
 		} = {},
 	): HTMLInputElement {
-		const row = form.createDiv({ cls: "yearly-planner-create-file-row" });
+		const row = createUiFieldRow(form, "yearly-planner-create-file-row");
 		if (options.fullWidth) row.addClass("diary-custom-calendar-full-row");
 		row.createEl("label", { text: label });
 		const input = row.createEl("input", {
@@ -655,7 +659,7 @@ class CustomCalendarProfileModal extends Modal {
 		description: string,
 		placeholder: string,
 	): HTMLTextAreaElement {
-		const row = form.createDiv({ cls: "yearly-planner-create-file-row" });
+		const row = createUiFieldRow(form, "yearly-planner-create-file-row");
 		row.addClass("diary-custom-calendar-full-row");
 		row.createEl("label", { text: label });
 		const textarea = row.createEl("textarea", {
@@ -675,7 +679,7 @@ class CustomCalendarProfileModal extends Modal {
 		label: string,
 		options: Array<[string, string]>,
 	): HTMLSelectElement {
-		const row = form.createDiv({ cls: "yearly-planner-create-file-row" });
+		const row = createUiFieldRow(form, "yearly-planner-create-file-row");
 		row.createEl("label", { text: label });
 		const select = row.createEl("select", {
 			cls: "yearly-planner-repeat-select",

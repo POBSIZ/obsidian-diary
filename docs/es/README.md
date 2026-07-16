@@ -9,7 +9,7 @@ Documentación completa: [English](https://github.com/POBSIZ/obsidian-diary/blob
 | Elemento | Valor |
 | --- | --- |
 | ID del plugin | `diary` |
-| Versión actual | `1.7.1` |
+| Versión actual | `1.8.0` |
 | Versión mínima de Obsidian | `1.7.2` |
 | Plataformas | Escritorio / móvil (`isDesktopOnly: false`) |
 | Idioma predeterminado | `en` |
@@ -17,6 +17,7 @@ Documentación completa: [English](https://github.com/POBSIZ/obsidian-diary/blob
 
 ## Última versión
 
+- `1.8.0`: Unifica chips, controles, acciones de diálogos, estado del diseño compacto y foco de teclado en todas las vistas del planificador, y renueva las capturas.
 - `1.7.1`: Elimina aserciones de tipo DOM innecesarias y estabiliza el lint tipado del diálogo de período compartido.
 - `1.7.0`: Añade planificadores de línea de tiempo diaria y de 3 días, selección directa de vista, navegación de período compartida, horas de inicio/fin independientes y repeticiones virtuales cada N días, semanas, meses o años.
 - `1.6.0`: Añade documentación completa para todos los idiomas de interfaz, festivos de España y textos localizados para las opciones de calendarios alternativos.
@@ -36,7 +37,7 @@ Documentación completa: [English](https://github.com/POBSIZ/obsidian-diary/blob
 
 ## Capturas
 
-Las imágenes se tomaron en un vault de demostración limpio con notas de ejemplo. Las capturas móviles se tomaron con la ruta de renderizado móvil del plugin activada. El planificador lateral derecho usa la misma cuadrícula mensual en modo compacto, por eso la captura de la cuadrícula completa sigue siendo la referencia visual principal.
+Las imágenes se tomaron desde una carpeta de demostración aislada con notas de todo el día, con hora, de rango, de tarea y de planificación. Los datos temporales se eliminaron después. Las vistas estrechas muestran cómo se adaptan el encabezado común y las vistas mensuales cuando falta espacio horizontal.
 
 ### Escritorio
 
@@ -46,11 +47,15 @@ Las imágenes se tomaron en un vault de demostración limpio con notas de ejempl
 
 ![Monthly list planner](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/assets/screenshots/monthly-list.png)
 
-### Móvil
-
-| Cuadrícula mensual y resumen del día | Lista mensual |
+| Línea de tiempo diaria | Línea de tiempo de 3 días |
 | --- | --- |
-| ![Mobile monthly grid](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/assets/screenshots/mobile-monthly-grid.png) | ![Mobile monthly list](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/assets/screenshots/mobile-monthly-list.png) |
+| ![Daily timeline planner](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/assets/screenshots/daily-planner.png) | ![3-day timeline planner](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/assets/screenshots/three-day-planner.png) |
+
+### Diseño estrecho
+
+| Cuadrícula mensual | Lista mensual |
+| --- | --- |
+| ![Narrow monthly grid](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/assets/screenshots/mobile-monthly-grid.png) | ![Narrow monthly list](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/assets/screenshots/mobile-monthly-list.png) |
 
 ## Funciones principales
 

@@ -1,5 +1,11 @@
 import { App, Modal } from "obsidian";
 import { t } from "../i18n";
+import {
+	createUiButton,
+	createUiButtonRow,
+	createUiError,
+	createUiFieldRow,
+} from "../ui/components";
 
 export type PlannerPeriodGranularity = "year" | "month" | "day";
 
@@ -34,9 +40,10 @@ export class PlannerPeriodModal extends Modal {
 		const form = this.contentEl.createEl("form", {
 			cls: "yearly-planner-create-file-modal planner-period-form",
 		});
-		const field = form.createDiv({
-			cls: "yearly-planner-create-file-row planner-period-field",
-		});
+		const field = createUiFieldRow(
+			form,
+			"yearly-planner-create-file-row planner-period-field",
+		);
 		const label = field.createEl("label", {
 			text: this.getFieldLabel(),
 		});
@@ -47,22 +54,22 @@ export class PlannerPeriodModal extends Modal {
 		label.htmlFor = input.id = `diary-period-${this.options.granularity}`;
 		this.configureInput(input);
 
-		const error = form.createDiv({
-			cls: "yearly-planner-modal-error planner-period-error is-hidden",
-			attr: { role: "alert", "aria-live": "polite" },
-		});
-		const actions = form.createDiv({
-			cls: "yearly-planner-modal-buttons planner-period-actions",
-		});
-		const cancel = actions.createEl("button", {
+		const error = createUiError(
+			form,
+			"yearly-planner-modal-error planner-period-error is-hidden",
+		);
+		const actions = createUiButtonRow(
+			form,
+			"yearly-planner-modal-buttons planner-period-actions",
+		);
+		const cancel = createUiButton(actions, {
 			text: t("modal.cancel"),
-			attr: { type: "button" },
 		});
 		cancel.onclick = () => this.close();
-		actions.createEl("button", {
+		createUiButton(actions, {
 			text: t("modal.apply"),
-			cls: "mod-cta",
-			attr: { type: "submit" },
+			variant: "cta",
+			type: "submit",
 		});
 
 		form.onsubmit = (event) => {

@@ -1,4 +1,4 @@
-import { App, Modal, Notice, PluginSettingTab, Setting, setIcon } from "obsidian";
+import { App, Modal, Notice, PluginSettingTab, Setting } from "obsidian";
 import {
 	LOCALE_OPTIONS,
 	normalizeLocale,
@@ -22,6 +22,13 @@ import {
 	type ExternalCalendarSettings,
 } from "./utils/external-calendars";
 import type { PlannerFileScope } from "./views/yearly-planner/file-utils";
+import {
+	createUiBadge,
+	createUiButton,
+	createUiButtonRow,
+	createUiDisclosure,
+	createUiError,
+} from "./ui/components";
 
 export interface DiaryObsidianSettings {
 	locale: Locale;
@@ -272,8 +279,8 @@ export class DiaryObsidianSettingTab extends PluginSettingTab {
 				getExternalCalendarCache(this.plugin.settings, calendar.id)
 					?.lastError,
 		).length;
-		const section = containerEl.createEl("details", {
-			cls: "diary-calendar-settings-panel diary-external-calendar-settings",
+		const section = createUiDisclosure(containerEl, {
+			classes: "diary-calendar-settings-panel diary-external-calendar-settings",
 		});
 		section.open = state.sectionOpen ?? (calendars.length === 0 || errorCount > 0);
 		section.addEventListener("toggle", (event) => {
@@ -298,32 +305,36 @@ export class DiaryObsidianSettingTab extends PluginSettingTab {
 		const meta = summary.createSpan({
 			cls: "diary-calendar-settings-meta diary-external-calendar-settings-meta",
 		});
-		meta.createSpan({
-			cls: "diary-calendar-settings-pill diary-external-calendar-settings-pill",
+		createUiBadge(meta, {
+			classes: "diary-calendar-settings-pill diary-external-calendar-settings-pill",
 			text: t("settings.externalCalendarCount", {
 				count: calendars.length,
 			}),
+			tag: "span",
 		});
 		if (enabledCount > 0) {
-			meta.createSpan({
-				cls: "diary-calendar-settings-pill diary-external-calendar-settings-pill",
+			createUiBadge(meta, {
+				classes: "diary-calendar-settings-pill diary-external-calendar-settings-pill",
 				text: t("settings.externalCalendarEnabledCount", {
 					count: enabledCount,
 				}),
+				tag: "span",
 			});
 		}
 		if (autoRefreshCount > 0) {
-			meta.createSpan({
-				cls: "diary-calendar-settings-pill diary-external-calendar-settings-pill",
+			createUiBadge(meta, {
+				classes: "diary-calendar-settings-pill diary-external-calendar-settings-pill",
 				text: t("settings.externalCalendarAutoRefreshCount", {
 					count: autoRefreshCount,
 				}),
+				tag: "span",
 			});
 		}
 		if (errorCount > 0) {
-			meta.createSpan({
-				cls: "diary-calendar-settings-pill diary-calendar-settings-pill-error diary-external-calendar-settings-pill diary-external-calendar-settings-pill-error",
+			createUiBadge(meta, {
+				classes: "diary-calendar-settings-pill diary-calendar-settings-pill-error diary-external-calendar-settings-pill diary-external-calendar-settings-pill-error",
 				text: t("settings.externalCalendarHasError"),
+				tag: "span",
 			});
 		}
 
@@ -419,8 +430,8 @@ export class DiaryObsidianSettingTab extends PluginSettingTab {
 		const status = refreshTiming
 			? `${cacheStatus} ${refreshTiming}`
 			: cacheStatus;
-		const item = containerEl.createEl("details", {
-			cls: "diary-calendar-profile-card diary-external-calendar-feed",
+		const item = createUiDisclosure(containerEl, {
+			classes: "diary-calendar-profile-card diary-external-calendar-feed",
 		});
 		item.open = state.openCalendarIds.has(calendar.id) || Boolean(cache?.lastError);
 		item.toggleClass("is-disabled", !calendar.enabled);
@@ -456,8 +467,8 @@ export class DiaryObsidianSettingTab extends PluginSettingTab {
 		const meta = summary.createSpan({
 			cls: "diary-calendar-settings-meta",
 		});
-		meta.createSpan({
-			cls: cache?.lastError
+		createUiBadge(meta, {
+			classes: cache?.lastError
 				? "diary-calendar-settings-pill diary-calendar-settings-pill-error"
 				: calendar.enabled
 					? "diary-calendar-settings-pill is-active"
@@ -467,17 +478,20 @@ export class DiaryObsidianSettingTab extends PluginSettingTab {
 				: calendar.enabled
 					? t("settings.externalCalendarEnabled")
 					: t("settings.externalCalendarDisabled"),
+			tag: "span",
 		});
-		meta.createSpan({
-			cls: "diary-calendar-settings-pill",
+		createUiBadge(meta, {
+			classes: "diary-calendar-settings-pill",
 			text: refreshLabel,
+			tag: "span",
 		});
-		meta.createSpan({
-			cls:
+		createUiBadge(meta, {
+			classes:
 				getExternalCalendarVisibilityCount(calendar) > 0
 					? "diary-calendar-settings-pill"
 					: "diary-calendar-settings-pill is-muted",
 			text: formatExternalCalendarVisibilitySummary(calendar),
+			tag: "span",
 		});
 
 		const body = item.createDiv({
@@ -598,24 +612,16 @@ function createExternalCalendarActionButton(
 		onClick: () => void | Promise<void>;
 	},
 ): HTMLButtonElement {
-	const classes = options.cta
-		? "mod-cta"
-		: options.warning
-			? "mod-warning"
-			: "";
-	const button = containerEl.createEl("button", {
-		cls: classes,
-		attr: { type: "button" },
+	return createUiButton(containerEl, {
+		variant: options.cta ? "cta" : options.warning ? "warning" : "default",
+		icon: options.icon,
+		text,
+		ariaLabel: text,
+		title: text,
+		iconClass: "diary-calendar-action-icon",
+		labelClass: "diary-calendar-action-label",
+		onClick: options.onClick,
 	});
-	button.ariaLabel = text;
-	button.title = text;
-	if (options.icon) {
-		const iconEl = button.createSpan({ cls: "diary-calendar-action-icon" });
-		setIcon(iconEl, options.icon);
-	}
-	button.createSpan({ cls: "diary-calendar-action-label", text });
-	button.onclick = () => void options.onClick();
-	return button;
 }
 
 function getExternalCalendarVisibilityItems(calendar: ExternalCalendarSettings): Array<{
@@ -672,11 +678,12 @@ function createExternalCalendarVisibilityPills(
 		cls: "diary-external-calendar-visibility-pills",
 	});
 	for (const item of getExternalCalendarVisibilityItems(calendar)) {
-		pills.createSpan({
-			cls: item.enabled
+		createUiBadge(pills, {
+			classes: item.enabled
 				? "diary-calendar-settings-pill is-active"
 				: "diary-calendar-settings-pill is-muted",
 			text: item.label,
+			tag: "span",
 		});
 	}
 }
@@ -876,22 +883,21 @@ class ExternalCalendarFeedModal extends Modal {
 			},
 		);
 
-		this.errorEl = this.contentEl.createDiv({
-			cls: "yearly-planner-modal-error",
-			attr: { "aria-live": "polite" },
-		});
-		const actions = this.contentEl.createDiv({
-			cls: "yearly-planner-modal-actions",
-		});
-		this.saveButton = actions.createEl("button", {
-			cls: "mod-cta",
+		this.errorEl = createUiError(
+			this.contentEl,
+			"yearly-planner-modal-error",
+		);
+		const actions = createUiButtonRow(
+			this.contentEl,
+			"yearly-planner-modal-actions",
+		);
+		this.saveButton = createUiButton(actions, {
+			variant: "cta",
 			text: t("modal.apply"),
-			attr: { type: "button" },
 		});
 		this.saveButton.onclick = () => void this.handleSave();
-		const cancelButton = actions.createEl("button", {
+		const cancelButton = createUiButton(actions, {
 			text: t("modal.cancel"),
-			attr: { type: "button" },
 		});
 		cancelButton.onclick = () => this.close();
 		this.updateState();

@@ -12,8 +12,9 @@ import {
 	getPlannerMarkdownFiles,
 } from "../yearly-planner/file-utils";
 import {
+	detachReusablePlanNotePanel,
+	mountPlanNotePanel,
 	renderPlanNotePanel,
-	syncPlanNotePanelExpandedState,
 } from "../plan-note-panel";
 import { getHolidaysForYear } from "../../utils/holidays";
 import {
@@ -43,7 +44,11 @@ import {
 	type ExternalCalendarEvent,
 } from "../../utils/external-calendars";
 import { ExternalEventModal } from "../external-event-modal";
-import { PLANNER_COMPACT_LAYOUT_MAX_WIDTH } from "../planner-layout";
+import {
+	PLANNER_COMPACT_LAYOUT_MAX_WIDTH,
+	renderPlannerSegmentedControl,
+	setupPlannerContainer,
+} from "../planner-layout";
 
 export class MonthlyListPlannerView extends ItemView {
 	year: number;
@@ -356,44 +361,28 @@ export class MonthlyListPlannerView extends ItemView {
 			? 0
 			: (scrollEl?.scrollTop ?? 0);
 
-		const planNoteWrapper = contentEl.querySelector<HTMLElement>(
-			".plan-note-panel-wrapper",
-		);
-		const preservePlanNote =
-			planNoteWrapper &&
-			planNoteWrapper.hasChildNodes() &&
-			planNoteWrapper.dataset.year === String(this.year) &&
-			planNoteWrapper.dataset.month === String(this.month);
-		if (preservePlanNote) planNoteWrapper.remove();
+		const planNoteWrapper = detachReusablePlanNotePanel(contentEl, {
+			year: this.year,
+			month: this.month,
+		});
 
 		contentEl.empty();
-		contentEl.addClass("monthly-list-planner-container");
-		contentEl.toggleClass("planner-container-compact", this.compactLayout);
-		contentEl.toggleClass(
-			"monthly-list-planner-container-compact",
-			this.compactLayout,
-		);
 		const pad = this.plugin.settings.mobileBottomPadding ?? 3.5;
-		contentEl.style.setProperty(
-			"--monthly-list-planner-mobile-bottom-padding",
-			`${pad}rem`,
-		);
+		setupPlannerContainer(contentEl, {
+			className: "monthly-list-planner-container",
+			compactClassName: "monthly-list-planner-container-compact",
+			compact: this.compactLayout,
+			mobilePadding: pad,
+			mobilePaddingProperty: "--monthly-list-planner-mobile-bottom-padding",
+		});
 
 		this.renderHeader(contentEl);
-		if (preservePlanNote && planNoteWrapper) {
-			contentEl.appendChild(planNoteWrapper);
-			syncPlanNotePanelExpandedState(
-				planNoteWrapper,
-				this.plugin.isPlanNotePanelExpanded(),
-			);
-		} else {
-			const notePanelEl = contentEl.createDiv({
-				cls: "plan-note-panel-wrapper",
-			});
-			notePanelEl.dataset.year = String(this.year);
-			notePanelEl.dataset.month = String(this.month);
-			void this.renderMonthNotePanel(notePanelEl);
-		}
+		mountPlanNotePanel(contentEl, {
+			period: { year: this.year, month: this.month },
+			preserved: planNoteWrapper,
+			expanded: this.plugin.isPlanNotePanelExpanded(),
+			render: (container) => this.renderMonthNotePanel(container),
+		});
 		this.renderListFilters(contentEl);
 		this.renderList(contentEl);
 
@@ -456,33 +445,22 @@ export class MonthlyListPlannerView extends ItemView {
 	}
 
 	private renderListFilters(contentEl: HTMLElement): void {
-		const filterBar = contentEl.createDiv({
-			cls: "monthly-list-planner-filter-bar",
-			attr: {
-				role: "tablist",
-				"aria-label": t("monthlyListFilter.label"),
-			},
-		});
 		const options: { value: MonthlyListFilter; label: string }[] = [
 			{ value: "all", label: t("monthlyListFilter.all") },
 			{ value: "withNotes", label: t("monthlyListFilter.withNotes") },
 			{ value: "upcoming", label: t("monthlyListFilter.upcoming") },
 		];
-		for (const option of options) {
-			const btn = filterBar.createEl("button", {
-				cls: "monthly-list-planner-filter-btn",
-				text: option.label,
-				attr: { type: "button", role: "tab" },
-			});
-			const selected = this.listFilter === option.value;
-			btn.toggleClass("is-active", selected);
-			btn.setAttribute("aria-selected", selected ? "true" : "false");
-			btn.onclick = () => {
-				if (this.listFilter === option.value) return;
-				this.listFilter = option.value;
+		renderPlannerSegmentedControl(contentEl, {
+			className: "monthly-list-planner-filter-bar",
+			buttonClassName: "monthly-list-planner-filter-btn",
+			label: t("monthlyListFilter.label"),
+			items: options,
+			selected: this.listFilter,
+			onSelect: (value) => {
+				this.listFilter = value;
 				this.render();
-			};
-		}
+			},
+		});
 	}
 
 	private renderHeader(contentEl: HTMLElement): void {

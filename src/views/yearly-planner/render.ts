@@ -1,13 +1,9 @@
-import { App, TFile, setIcon } from "obsidian";
+import { App, TFile } from "obsidian";
 import {
 	getMonthLabels as getLocalizedMonthLabels,
 	getWeekendLabels,
 	t,
 } from "../../i18n";
-import {
-	TODO_CHIP_EMOJI_COMPLETED,
-	TODO_CHIP_EMOJI_INCOMPLETE,
-} from "../../constants";
 import { getDaysInMonth, getDayOfWeek } from "../../utils/date";
 import type { ChipDragState, DragState } from "./types";
 import type { HolidayData } from "../../utils/holidays";
@@ -20,16 +16,11 @@ import {
 	getExternalEventsForDate,
 	type ExternalCalendarEvent,
 } from "../../utils/external-calendars";
-import { isRecurrenceVirtualEvent } from "../../utils/recurrence";
 import { PlannerPeriodModal } from "../planner-period-modal";
 import {
 	getFilesForDate,
 	getFileTitle,
 	getChipColor,
-	isRecurrenceOccurrenceFile,
-	isRecurrenceSourceFile,
-	isTodoCompleted,
-	isTodoFile,
 	type PlannerFileScope,
 } from "./file-utils";
 import { parseRangeBasename } from "../../utils/range";
@@ -43,6 +34,17 @@ import {
 	type PlannerHeaderAction,
 	type PlannerViewMode,
 } from "../planner-layout";
+import {
+	applyPlannerFileState,
+	applyExternalEventState,
+	createAlternateCalendarLabel,
+	createExternalEventChip,
+	createHolidayBadge,
+	createPlannerFileChip,
+	makePlannerInteractive,
+	PLANNER_UI_CLASSES,
+} from "../planner-components";
+import { createUiButton } from "../../ui/components";
 
 export interface HeaderCallbacks {
 	onPrev: () => void;
@@ -203,13 +205,12 @@ function createMonthWidthButton(
 	parent: HTMLElement,
 	action: PlannerHeaderAction,
 ): HTMLButtonElement {
-	const btn = parent.createEl("button", {
-		cls: "yearly-planner-month-width-btn",
-		attr: { type: "button" },
+	const btn = createUiButton(parent, {
+		classes: "yearly-planner-month-width-btn",
+		ariaLabel: action.label,
+		title: action.label,
+		icon: action.icon,
 	});
-	setIcon(btn, action.icon);
-	btn.ariaLabel = action.label;
-	btn.title = action.label;
 	btn.onclick = (e) => {
 		e.preventDefault();
 		e.stopPropagation();
@@ -323,15 +324,14 @@ export function createPlannerCell(
 		}
 
 		const barsContainer = cell.createDiv({
-			cls: "yearly-planner-cell-range-bars",
+			cls: `${PLANNER_UI_CLASSES.rangeList} yearly-planner-cell-range-bars`,
 		});
 		for (const { file } of rangeFiles) {
 			const lane = ctx.rangeLaneMap.get(file.basename) ?? 0;
 			const bar = barsContainer.createDiv({
-				cls: "yearly-planner-cell-range-bar",
+				cls: `${PLANNER_UI_CLASSES.range} yearly-planner-cell-range-bar`,
 			});
-			bar.tabIndex = 0;
-			bar.setAttribute("role", "button");
+			makePlannerInteractive(bar);
 			bar.dataset.lane = String(lane);
 			bar.dataset.path = file.path;
 			bar.ariaLabel = t("a11y.openPlannerNote", {
@@ -344,11 +344,7 @@ export function createPlannerCell(
 			if (chipColor) {
 				bar.style.borderRightColor = chipColor;
 			}
-			if (isRecurrenceSourceFile(ctx.app, file)) {
-				bar.addClass("planner-recurrence-source");
-			} else if (isRecurrenceOccurrenceFile(ctx.app, file)) {
-				bar.addClass("planner-recurrence-occurrence");
-			}
+			applyPlannerFileState(bar, ctx.app, file);
 			if (ctx.clipboardSelection.has(makeFileSelectionKey(file.path))) {
 				bar.addClass("yearly-planner-cell-clipboard-selected");
 			}
@@ -359,20 +355,19 @@ export function createPlannerCell(
 		const maxLane = laneIndices.length > 0 ? Math.max(...laneIndices) : -1;
 		const externalStartLane = maxLane + 1;
 		externalDateEvents.rangeEvents.forEach(({ event }, index) => {
-			const isVirtualRecurrence = isRecurrenceVirtualEvent(event);
 			const lane = externalStartLane + index;
 			const bar = barsContainer.createDiv({
 				cls: [
+					PLANNER_UI_CLASSES.range,
 					"yearly-planner-cell-range-bar",
 					"planner-external-event-range",
 					"yearly-planner-external-event-range",
-					isVirtualRecurrence && "planner-recurrence-virtual",
 				]
 					.filter(Boolean)
 					.join(" "),
 			});
-			bar.tabIndex = 0;
-			bar.setAttribute("role", "button");
+			makePlannerInteractive(bar);
+			applyExternalEventState(bar, event);
 			bar.dataset.lane = String(lane);
 			bar.dataset.externalEventId = event.id;
 			bar.ariaLabel = t("a11y.openExternalEvent", {
@@ -403,103 +398,52 @@ export function createPlannerCell(
 
 	if (alternateCalendarLabel) {
 		cell.addClass("yearly-planner-cell-has-alt-calendar");
-		const labelsEl = cell.createDiv({
-			cls: "yearly-planner-alt-calendar-labels",
-		});
-		labelsEl.setAttribute("aria-hidden", "true");
-		labelsEl.createSpan({
-			cls: "yearly-planner-alt-calendar-label",
+		createAlternateCalendarLabel(cell, {
 			text: alternateCalendarLabel.text,
+			containerClass: "yearly-planner-alt-calendar-labels",
+			labelClass: "yearly-planner-alt-calendar-label",
 		});
 	}
 
 	if (allFiles.length > 0 || externalDateEvents.singleEvents.length > 0) {
-		const listEl = cell.createDiv({ cls: "yearly-planner-cell-files" });
+		const listEl = cell.createDiv({
+			cls: `${PLANNER_UI_CLASSES.entryList} yearly-planner-cell-files`,
+		});
 		for (const file of allFiles) {
-			const linkEl = listEl.createDiv({
-				cls: "yearly-planner-cell-file",
+			createPlannerFileChip(listEl, {
+				app: ctx.app,
+				file,
+				classes: {
+					root: "yearly-planner-cell-file",
+					completed: "yearly-planner-chip-completed",
+					selected: "yearly-planner-cell-clipboard-selected",
+				},
+				selected: ctx.clipboardSelection.has(makeFileSelectionKey(file.path)),
+				onCreated: (element, color) => {
+					if (!parseRangeBasename(file.basename)) return;
+					element.dataset.rangeBasename = file.basename;
+					if (color) element.dataset.rangeColor = color;
+				},
 			});
-			linkEl.tabIndex = 0;
-			linkEl.setAttribute("role", "button");
-			const chipTitle = getFileTitle(ctx.app, file);
-			if (isTodoCompleted(ctx.app, file)) {
-				linkEl.addClass("yearly-planner-chip-completed");
-				linkEl.textContent = `${TODO_CHIP_EMOJI_COMPLETED} ${chipTitle}`;
-			} else if (isTodoFile(ctx.app, file)) {
-				linkEl.textContent = `${TODO_CHIP_EMOJI_INCOMPLETE} ${chipTitle}`;
-			} else {
-				linkEl.textContent = chipTitle;
-			}
-			linkEl.title = file.path;
-			linkEl.ariaLabel = t("a11y.openPlannerNote", {
-				title: chipTitle,
-				path: file.path,
-			});
-			linkEl.dataset.path = file.path;
-			const chipColor = getChipColor(ctx.app, file);
-			if (chipColor) {
-				linkEl.style.borderLeftColor = chipColor;
-			}
-			if (parseRangeBasename(file.basename)) {
-				linkEl.dataset.rangeBasename = file.basename;
-				if (chipColor) {
-					linkEl.dataset.rangeColor = chipColor;
-				}
-			}
-			if (isRecurrenceSourceFile(ctx.app, file)) {
-				linkEl.addClass("planner-recurrence-source");
-			} else if (isRecurrenceOccurrenceFile(ctx.app, file)) {
-				linkEl.addClass("planner-recurrence-occurrence");
-			}
-			if (ctx.clipboardSelection.has(makeFileSelectionKey(file.path))) {
-				linkEl.addClass("yearly-planner-cell-clipboard-selected");
-			}
 		}
 		for (const event of externalDateEvents.singleEvents) {
-			const isVirtualRecurrence = isRecurrenceVirtualEvent(event);
-			const chipEl = listEl.createDiv({
-				cls: [
-					"yearly-planner-cell-file",
-					"planner-external-event-chip",
-					"yearly-planner-external-event-chip",
-					isVirtualRecurrence && "planner-recurrence-virtual",
-				]
-					.filter(Boolean)
-					.join(" "),
+			createExternalEventChip(listEl, {
+				event,
+				classes:
+					"yearly-planner-cell-file yearly-planner-external-event-chip",
+				showTitle: true,
 			});
-			chipEl.tabIndex = 0;
-			chipEl.setAttribute("role", "button");
-			chipEl.dataset.externalEventId = event.id;
-			chipEl.textContent = event.title;
-			chipEl.title = event.title;
-			chipEl.ariaLabel = t("a11y.openExternalEvent", {
-				title: event.title,
-			});
-			if (event.color) {
-				chipEl.style.borderLeftColor = event.color;
-			}
 		}
 	}
 
 	if (isHoliday && ctx.holidaysData?.names.has(dateKey)) {
-		const holidaysContainer = cell.createDiv({
-			cls: "yearly-planner-cell-holidays",
+		createHolidayBadge(cell, {
+			dateKey,
+			names: holidayNames,
+			containerClass: "yearly-planner-cell-holidays",
+			badgeClass: "yearly-planner-cell-holiday-badge",
+			labelClass: "yearly-planner-holiday-label",
 		});
-		const badge = holidaysContainer.createDiv({
-			cls: "yearly-planner-cell-holiday-badge",
-		});
-		badge.tabIndex = 0;
-		badge.setAttribute("role", "button");
-		badge.createSpan({
-			cls: "yearly-planner-holiday-label",
-			text: holidayNames.join(", "),
-		});
-		badge.ariaLabel = t("a11y.openHoliday", {
-			date: dateKey,
-			names: holidayNames.join(", "),
-		});
-		badge.dataset.holidayDate = dateKey;
-		badge.dataset.holidayNames = JSON.stringify(holidayNames);
 	}
 
 	if (isValid && (isSaturday || isSunday)) {

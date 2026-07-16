@@ -53,6 +53,13 @@ import {
 } from "./file-operations";
 import { parseRangeBasename } from "../../utils/range";
 import type { SelectionBounds } from "./types";
+import {
+	createUiButton,
+	createUiButtonRow,
+	createUiColorPresetButton,
+	createUiError,
+	createUiFieldRow,
+} from "../../ui/components";
 
 /** Additional chip color presets (first preset is theme accent, computed at runtime). No duplicates. */
 const CHIP_COLOR_PRESETS_EXTRA: readonly { hex: string }[] = [
@@ -419,31 +426,25 @@ export class CreateFileModal extends Modal {
 			cls: "yearly-planner-create-file-modal",
 		});
 
-		const modeRow = form.createDiv({
-			cls: "yearly-planner-create-file-row",
-		});
+		const modeRow = createUiFieldRow(form, "yearly-planner-create-file-row");
 		modeRow.createEl("label", { text: t("modal.mode") });
 		const modeBtnsWrap = modeRow.createDiv({
 			cls: "yearly-planner-mode-btns",
 		});
-		this.singleModeBtn = modeBtnsWrap.createEl("button", {
-			cls: "yearly-planner-mode-btn",
+		this.singleModeBtn = createUiButton(modeBtnsWrap, {
+			classes: "yearly-planner-mode-btn",
 			text: t("modal.singleDate"),
-			attr: { type: "button" },
 		});
-		this.rangeModeBtn = modeBtnsWrap.createEl("button", {
-			cls: "yearly-planner-mode-btn",
+		this.rangeModeBtn = createUiButton(modeBtnsWrap, {
+			classes: "yearly-planner-mode-btn",
 			text: t("modal.range"),
-			attr: { type: "button" },
 		});
 		this.singleModeBtn.onclick = () => this.setMode("single");
 		this.rangeModeBtn.onclick = () => this.setMode("range");
 		if (this.mode === "single") this.singleModeBtn.addClass("is-active");
 		else this.rangeModeBtn.addClass("is-active");
 
-		const folderRow = form.createDiv({
-			cls: "yearly-planner-create-file-row",
-		});
+		const folderRow = createUiFieldRow(form, "yearly-planner-create-file-row");
 		folderRow.createEl("label", { text: t("modal.folder") });
 		const folderPaths = getAllFolderPaths(
 			this.app,
@@ -483,9 +484,10 @@ export class CreateFileModal extends Modal {
 			this.updateCreateState();
 		};
 
-		this.folderOtherRow = form.createDiv({
-			cls: "yearly-planner-create-file-row yearly-planner-folder-other-row",
-		});
+		this.folderOtherRow = createUiFieldRow(
+			form,
+			"yearly-planner-create-file-row yearly-planner-folder-other-row",
+		);
 		this.folderOtherRow.createEl("label", {
 			text: t("modal.customFolderPath"),
 		});
@@ -501,9 +503,7 @@ export class CreateFileModal extends Modal {
 		);
 		this.updateFolderOtherVisibility();
 
-		const startRow = form.createDiv({
-			cls: "yearly-planner-create-file-row",
-		});
+		const startRow = createUiFieldRow(form, "yearly-planner-create-file-row");
 		startRow.createEl("label", { text: t("modal.startDate") });
 		this.startDateInput = startRow.createEl("input", {
 			type: "date",
@@ -516,9 +516,7 @@ export class CreateFileModal extends Modal {
 			this.updateCreateState();
 		};
 
-		this.rangeRow = form.createDiv({
-			cls: "yearly-planner-create-file-row",
-		});
+		this.rangeRow = createUiFieldRow(form, "yearly-planner-create-file-row");
 		this.rangeRow.createEl("label", { text: t("modal.endDate") });
 		this.endDateInput = this.rangeRow.createEl("input", {
 			type: "date",
@@ -531,13 +529,15 @@ export class CreateFileModal extends Modal {
 			this.updateCreateState();
 		};
 
-		this.calendarPreviewEl = form.createDiv({
-			cls: "yearly-planner-create-file-row yearly-planner-calendar-preview-row",
-		});
+		this.calendarPreviewEl = createUiFieldRow(
+			form,
+			"yearly-planner-create-file-row yearly-planner-calendar-preview-row",
+		);
 
-		const filenameRow = form.createDiv({
-			cls: "yearly-planner-create-file-row",
-		});
+		const filenameRow = createUiFieldRow(
+			form,
+			"yearly-planner-create-file-row",
+		);
 		filenameRow.createEl("label", { text: t("modal.fileName") });
 		this.filenameInput = filenameRow.createEl("input", {
 			type: "text",
@@ -557,9 +557,7 @@ export class CreateFileModal extends Modal {
 
 		this.colorPresets = getChipColorPresets(this.contentEl.ownerDocument);
 		const defaultColor = this.colorPresets[0]!.hex;
-		const colorRow = form.createDiv({
-			cls: "yearly-planner-create-file-row",
-		});
+		const colorRow = createUiFieldRow(form, "yearly-planner-create-file-row");
 		colorRow.createEl("label", { text: t("modal.color") });
 		const colorPresetsWrap = colorRow.createDiv({
 			cls: "yearly-planner-color-row",
@@ -568,15 +566,13 @@ export class CreateFileModal extends Modal {
 			cls: "yearly-planner-color-presets",
 		});
 		this.colorPresets.forEach((preset) => {
-			const btn = presetsEl.createEl("button", {
-				cls: "yearly-planner-color-preset-btn",
-				attr: { type: "button" },
-			});
-			btn.style.backgroundColor = preset.hex;
 			const label = t("modal.colorPresetLabel", { color: preset.hex });
-			btn.ariaLabel = label;
-			btn.title = label;
-			btn.onclick = () => this.setColorFromPreset(preset.hex);
+			const btn = createUiColorPresetButton(presetsEl, {
+				classes: "yearly-planner-color-preset-btn",
+				color: preset.hex,
+				label,
+				onClick: () => this.setColorFromPreset(preset.hex),
+			});
 			this.colorPresetBtns.push(btn);
 		});
 		this.colorPickerInput = colorPresetsWrap.createEl("input", {
@@ -599,9 +595,7 @@ export class CreateFileModal extends Modal {
 		this.colorInput.oninput = () => this.syncColorFromText();
 		this.updateColorPresetActive();
 
-		const todoRow = form.createDiv({
-			cls: "yearly-planner-create-file-row",
-		});
+		const todoRow = createUiFieldRow(form, "yearly-planner-create-file-row");
 		this.todoCheckbox = todoRow.createEl("input", {
 			type: "checkbox",
 			cls: "yearly-planner-todo-checkbox",
@@ -610,9 +604,10 @@ export class CreateFileModal extends Modal {
 		todoLabel.appendChild(this.todoCheckbox);
 		todoLabel.appendText(` ${t("modal.todoFile")}`);
 
-		const startTimeRow = form.createDiv({
-			cls: "yearly-planner-create-file-row",
-		});
+		const startTimeRow = createUiFieldRow(
+			form,
+			"yearly-planner-create-file-row",
+		);
 		startTimeRow.createEl("label", { text: t("modal.startTime") });
 		this.startTimeInput = startTimeRow.createEl("input", {
 			type: "time",
@@ -623,9 +618,10 @@ export class CreateFileModal extends Modal {
 			this.updateCreateState(),
 		);
 
-		const endTimeRow = form.createDiv({
-			cls: "yearly-planner-create-file-row",
-		});
+		const endTimeRow = createUiFieldRow(
+			form,
+			"yearly-planner-create-file-row",
+		);
 		endTimeRow.createEl("label", { text: t("modal.endTime") });
 		this.endTimeInput = endTimeRow.createEl("input", {
 			type: "time",
@@ -640,9 +636,7 @@ export class CreateFileModal extends Modal {
 			text: t("modal.eventTimeDesc"),
 		});
 
-		const notifyRow = form.createDiv({
-			cls: "yearly-planner-create-file-row",
-		});
+		const notifyRow = createUiFieldRow(form, "yearly-planner-create-file-row");
 		notifyRow.createEl("label", { text: t("modal.notifyTime") });
 		this.notifyTimeInput = notifyRow.createEl("input", {
 			type: "time",
@@ -659,15 +653,14 @@ export class CreateFileModal extends Modal {
 		this.syncFilename();
 		this.updateCalendarPreview();
 		this.updateModeUI();
-		this.createErrorEl = this.contentEl.createDiv({
-			cls: "yearly-planner-modal-error",
-			attr: { "aria-live": "polite" },
-		});
+		this.createErrorEl = createUiError(
+			this.contentEl,
+			"yearly-planner-modal-error",
+		);
 
-		this.createBtn = this.contentEl.createEl("button", {
+		this.createBtn = createUiButton(this.contentEl, {
 			text: t("modal.create"),
-			cls: "mod-cta",
-			attr: { type: "button" },
+			variant: "cta",
 		});
 		this.createBtn.onclick = () => void this.handleCreate();
 		this.contentEl.addEventListener("keydown", (e) => {
@@ -774,9 +767,10 @@ export class CreateFileModal extends Modal {
 	}
 
 	private createRecurrenceControls(form: HTMLElement): void {
-		const repeatRow = form.createDiv({
-			cls: "yearly-planner-create-file-row yearly-planner-repeat-row",
-		});
+		const repeatRow = createUiFieldRow(
+			form,
+			"yearly-planner-create-file-row yearly-planner-repeat-row",
+		);
 		this.repeatCheckbox = repeatRow.createEl("input", {
 			type: "checkbox",
 			cls: "yearly-planner-repeat-checkbox",
@@ -829,9 +823,10 @@ export class CreateFileModal extends Modal {
 			t("modal.repeatUntilDate"),
 		);
 
-		const hintRow = form.createDiv({
-			cls: "yearly-planner-create-file-row yearly-planner-repeat-control-row",
-		});
+		const hintRow = createUiFieldRow(
+			form,
+			"yearly-planner-create-file-row yearly-planner-repeat-control-row",
+		);
 		hintRow.createDiv({
 			cls: "yearly-planner-create-file-hint",
 			text: t("modal.repeatDesc"),
@@ -845,9 +840,10 @@ export class CreateFileModal extends Modal {
 		label: string,
 		configure: (select: HTMLSelectElement) => void,
 	): HTMLSelectElement {
-		const row = form.createDiv({
-			cls: "yearly-planner-create-file-row yearly-planner-repeat-control-row",
-		});
+		const row = createUiFieldRow(
+			form,
+			"yearly-planner-create-file-row yearly-planner-repeat-control-row",
+		);
 		row.createEl("label", { text: label });
 		const select = row.createEl("select", {
 			cls: "yearly-planner-repeat-select",
@@ -861,9 +857,10 @@ export class CreateFileModal extends Modal {
 		form: HTMLElement,
 		label: string,
 	): HTMLInputElement {
-		const row = form.createDiv({
-			cls: "yearly-planner-create-file-row yearly-planner-repeat-control-row",
-		});
+		const row = createUiFieldRow(
+			form,
+			"yearly-planner-create-file-row yearly-planner-repeat-control-row",
+		);
 		row.createEl("label", { text: label });
 		const input = row.createEl("input", {
 			type: "date",
@@ -879,9 +876,10 @@ export class CreateFileModal extends Modal {
 		form: HTMLElement,
 		label: string,
 	): HTMLInputElement {
-		const row = form.createDiv({
-			cls: "yearly-planner-create-file-row yearly-planner-repeat-control-row",
-		});
+		const row = createUiFieldRow(
+			form,
+			"yearly-planner-create-file-row yearly-planner-repeat-control-row",
+		);
 		row.createEl("label", { text: label });
 		const input = row.createEl("input", {
 			type: "number",
@@ -1088,16 +1086,17 @@ export class DeleteConfirmModal extends Modal {
 			cls: "yearly-planner-delete-desc",
 			text: this.desc,
 		});
-		const btnRow = this.contentEl.createDiv({
-			cls: "yearly-planner-modal-buttons",
-		});
-		const cancelBtn = btnRow.createEl("button", {
+		const btnRow = createUiButtonRow(
+			this.contentEl,
+			"yearly-planner-modal-buttons",
+		);
+		const cancelBtn = createUiButton(btnRow, {
 			text: t("modal.cancel"),
 		});
 		cancelBtn.onclick = () => this.close();
-		const deleteBtn = btnRow.createEl("button", {
+		const deleteBtn = createUiButton(btnRow, {
 			text: t("modal.delete"),
-			cls: "mod-danger",
+			variant: "danger",
 		});
 		deleteBtn.onclick = () => {
 			this.onConfirm();
@@ -1151,9 +1150,7 @@ export class FileOptionsModal extends Modal {
 			cls: "yearly-planner-create-file-modal yearly-planner-file-options-form",
 		});
 
-		const pathRow = form.createDiv({
-			cls: "yearly-planner-create-file-row",
-		});
+		const pathRow = createUiFieldRow(form, "yearly-planner-create-file-row");
 		pathRow.createEl("label", { text: t("modal.filePath") });
 		const pathInput = pathRow.createEl("input", {
 			type: "text",
@@ -1163,9 +1160,7 @@ export class FileOptionsModal extends Modal {
 		pathInput.value = this.file.path;
 		pathInput.title = this.file.path;
 
-		const titleRow = form.createDiv({
-			cls: "yearly-planner-create-file-row",
-		});
+		const titleRow = createUiFieldRow(form, "yearly-planner-create-file-row");
 		titleRow.createEl("label", { text: t("modal.displayTitle") });
 		this.titleInput = titleRow.createEl("input", {
 			type: "text",
@@ -1187,9 +1182,10 @@ export class FileOptionsModal extends Modal {
 			!rangeParsed &&
 			parseSingleDateBasename(this.file.basename.replace(/\.md$/i, ""));
 		if (rangeParsed) {
-			const startRow = form.createDiv({
-				cls: "yearly-planner-create-file-row",
-			});
+			const startRow = createUiFieldRow(
+				form,
+				"yearly-planner-create-file-row",
+			);
 			startRow.createEl("label", { text: t("modal.startDate") });
 			this.startDateInput = startRow.createEl("input", {
 				type: "date",
@@ -1199,9 +1195,10 @@ export class FileOptionsModal extends Modal {
 			this.startDateInput.addEventListener("input", () =>
 				this.updateDateRelatedFileOptionsState(),
 			);
-			const endRow = form.createDiv({
-				cls: "yearly-planner-create-file-row",
-			});
+			const endRow = createUiFieldRow(
+				form,
+				"yearly-planner-create-file-row",
+			);
 			endRow.createEl("label", { text: t("modal.endDate") });
 			this.endDateInput = endRow.createEl("input", {
 				type: "date",
@@ -1212,9 +1209,10 @@ export class FileOptionsModal extends Modal {
 				this.updateDateRelatedFileOptionsState(),
 			);
 		} else if (singleParsed) {
-			const dateRow = form.createDiv({
-				cls: "yearly-planner-create-file-row",
-			});
+			const dateRow = createUiFieldRow(
+				form,
+				"yearly-planner-create-file-row",
+			);
 			dateRow.createEl("label", { text: t("modal.changeDate") });
 			this.singleDateInput = dateRow.createEl("input", {
 				type: "date",
@@ -1227,17 +1225,16 @@ export class FileOptionsModal extends Modal {
 		}
 
 		if (this.singleDateInput || this.startDateInput) {
-			this.calendarPreviewEl = form.createDiv({
-				cls: "yearly-planner-create-file-row yearly-planner-calendar-preview-row",
-			});
+			this.calendarPreviewEl = createUiFieldRow(
+				form,
+				"yearly-planner-create-file-row yearly-planner-calendar-preview-row",
+			);
 			this.updateCalendarPreview();
 		}
 
 		this.colorPresets = getChipColorPresets(this.contentEl.ownerDocument);
 		const defaultColor = this.colorPresets[0]!.hex;
-		const colorRow = form.createDiv({
-			cls: "yearly-planner-create-file-row",
-		});
+		const colorRow = createUiFieldRow(form, "yearly-planner-create-file-row");
 		colorRow.createEl("label", { text: t("modal.color") });
 		const colorPresetsWrap = colorRow.createDiv({
 			cls: "yearly-planner-color-row",
@@ -1247,15 +1244,13 @@ export class FileOptionsModal extends Modal {
 		});
 		const currentColor = getChipColor(this.app, this.file) ?? defaultColor;
 		this.colorPresets.forEach((preset) => {
-			const btn = presetsEl.createEl("button", {
-				cls: "yearly-planner-color-preset-btn",
-				attr: { type: "button" },
-			});
-			btn.style.backgroundColor = preset.hex;
 			const label = t("modal.colorPresetLabel", { color: preset.hex });
-			btn.ariaLabel = label;
-			btn.title = label;
-			btn.onclick = () => this.setColorFromPreset(preset.hex);
+			const btn = createUiColorPresetButton(presetsEl, {
+				classes: "yearly-planner-color-preset-btn",
+				color: preset.hex,
+				label,
+				onClick: () => this.setColorFromPreset(preset.hex),
+			});
 			this.colorPresetBtns.push(btn);
 		});
 		this.colorPickerInput = colorPresetsWrap.createEl("input", {
@@ -1279,9 +1274,7 @@ export class FileOptionsModal extends Modal {
 		this.colorInput.oninput = () => this.syncColorFromText();
 		this.updateColorPresetActive();
 
-		const todoRow = form.createDiv({
-			cls: "yearly-planner-create-file-row",
-		});
+		const todoRow = createUiFieldRow(form, "yearly-planner-create-file-row");
 		this.todoCheckbox = todoRow.createEl("input", {
 			type: "checkbox",
 			cls: "yearly-planner-todo-checkbox",
@@ -1292,9 +1285,10 @@ export class FileOptionsModal extends Modal {
 		todoLabel.appendText(` ${t("modal.todoFile")}`);
 		this.todoCheckbox.onchange = () => this.updateCompletedRowVisibility();
 
-		this.completedRow = form.createDiv({
-			cls: "yearly-planner-create-file-row yearly-planner-completed-row",
-		});
+		this.completedRow = createUiFieldRow(
+			form,
+			"yearly-planner-create-file-row yearly-planner-completed-row",
+		);
 		this.completedCheckbox = this.completedRow.createEl("input", {
 			type: "checkbox",
 			cls: "yearly-planner-completed-checkbox",
@@ -1306,9 +1300,10 @@ export class FileOptionsModal extends Modal {
 		this.updateCompletedRowVisibility();
 
 		const existingTimeRange = getPlannerTimeRange(this.app, this.file);
-		const startTimeRow = form.createDiv({
-			cls: "yearly-planner-create-file-row",
-		});
+		const startTimeRow = createUiFieldRow(
+			form,
+			"yearly-planner-create-file-row",
+		);
 		startTimeRow.createEl("label", { text: t("modal.startTime") });
 		this.startTimeInput = startTimeRow.createEl("input", {
 			type: "time",
@@ -1319,9 +1314,10 @@ export class FileOptionsModal extends Modal {
 			this.updateFileOptionsState(),
 		);
 
-		const endTimeRow = form.createDiv({
-			cls: "yearly-planner-create-file-row",
-		});
+		const endTimeRow = createUiFieldRow(
+			form,
+			"yearly-planner-create-file-row",
+		);
 		endTimeRow.createEl("label", { text: t("modal.endTime") });
 		this.endTimeInput = endTimeRow.createEl("input", {
 			type: "time",
@@ -1336,9 +1332,7 @@ export class FileOptionsModal extends Modal {
 			text: t("modal.eventTimeDesc"),
 		});
 
-		const notifyRow = form.createDiv({
-			cls: "yearly-planner-create-file-row",
-		});
+		const notifyRow = createUiFieldRow(form, "yearly-planner-create-file-row");
 		notifyRow.createEl("label", { text: t("modal.notifyTime") });
 		this.notifyTimeInput = notifyRow.createEl("input", {
 			type: "time",
@@ -1366,32 +1360,30 @@ export class FileOptionsModal extends Modal {
 			cls: "yearly-planner-file-preview-loading",
 		});
 		void this.loadPreview(previewEl);
-		this.fileOptionsErrorEl = this.contentEl.createDiv({
-			cls: "yearly-planner-modal-error",
-			attr: { "aria-live": "polite" },
-		});
+		this.fileOptionsErrorEl = createUiError(
+			this.contentEl,
+			"yearly-planner-modal-error",
+		);
 
-		const btnRow = this.contentEl.createDiv({
-			cls: "yearly-planner-file-options-buttons",
-		});
-		const openBtn = btnRow.createEl("button", {
+		const btnRow = createUiButtonRow(
+			this.contentEl,
+			"yearly-planner-file-options-buttons",
+		);
+		const openBtn = createUiButton(btnRow, {
 			text: t("modal.openFile"),
-			attr: { type: "button" },
 		});
 		openBtn.onclick = () => {
 			void this.openPlannerFile();
 			this.close();
 		};
-		this.applyBtn = btnRow.createEl("button", {
+		this.applyBtn = createUiButton(btnRow, {
 			text: t("modal.applyChange"),
-			cls: "mod-cta",
-			attr: { type: "button" },
+			variant: "cta",
 		});
 		this.applyBtn.onclick = () => void this.handleApplyChange();
-		const deleteBtn = btnRow.createEl("button", {
+		const deleteBtn = createUiButton(btnRow, {
 			text: t("modal.delete"),
-			cls: "mod-danger",
-			attr: { type: "button" },
+			variant: "danger",
 		});
 		deleteBtn.onclick = () => this.handleDelete();
 		this.contentEl.addEventListener("keydown", (e) => {
@@ -1474,9 +1466,10 @@ export class FileOptionsModal extends Modal {
 			return;
 		}
 		const source = getRecurrenceSourceDefinition(this.app, this.file);
-		const section = form.createDiv({
-			cls: "yearly-planner-create-file-row yearly-planner-repeat-row yearly-planner-file-options-repeat-row",
-		});
+		const section = createUiFieldRow(
+			form,
+			"yearly-planner-create-file-row yearly-planner-repeat-row yearly-planner-file-options-repeat-row",
+		);
 		this.sourceRepeatCheckbox = section.createEl("input", {
 			type: "checkbox",
 			cls: "yearly-planner-repeat-checkbox",
@@ -1486,9 +1479,10 @@ export class FileOptionsModal extends Modal {
 		label.appendChild(this.sourceRepeatCheckbox);
 		label.appendText(` ${t("modal.repeatEvent")}`);
 
-		const calendarRow = form.createDiv({
-			cls: "yearly-planner-create-file-row yearly-planner-repeat-control-row",
-		});
+		const calendarRow = createUiFieldRow(
+			form,
+			"yearly-planner-create-file-row yearly-planner-repeat-control-row",
+		);
 		calendarRow.createEl("label", { text: t("modal.repeatCalendar") });
 		this.sourceRecurrenceCalendarSelect = calendarRow.createEl("select", {
 			cls: "yearly-planner-repeat-select",
@@ -1507,9 +1501,10 @@ export class FileOptionsModal extends Modal {
 		this.sourceRecurrenceCalendarSelect.value =
 			source?.calendar ?? RECURRENCE_GREGORIAN;
 
-		const frequencyRow = form.createDiv({
-			cls: "yearly-planner-create-file-row yearly-planner-repeat-control-row",
-		});
+		const frequencyRow = createUiFieldRow(
+			form,
+			"yearly-planner-create-file-row yearly-planner-repeat-control-row",
+		);
 		frequencyRow.createEl("label", { text: t("modal.repeatFrequency") });
 		this.sourceRecurrenceFrequencySelect = frequencyRow.createEl("select", {
 			cls: "yearly-planner-repeat-select",
@@ -1524,9 +1519,10 @@ export class FileOptionsModal extends Modal {
 			? getSimpleRecurrenceFrequency(source.rule)
 			: "YEARLY";
 
-		const intervalRow = form.createDiv({
-			cls: "yearly-planner-create-file-row yearly-planner-repeat-control-row",
-		});
+		const intervalRow = createUiFieldRow(
+			form,
+			"yearly-planner-create-file-row yearly-planner-repeat-control-row",
+		);
 		intervalRow.createEl("label", { text: t("modal.repeatInterval") });
 		this.sourceRecurrenceIntervalInput = intervalRow.createEl("input", {
 			type: "number",
@@ -1545,9 +1541,10 @@ export class FileOptionsModal extends Modal {
 			this.updateFileOptionsState(),
 		);
 
-		const untilRow = form.createDiv({
-			cls: "yearly-planner-create-file-row yearly-planner-repeat-control-row",
-		});
+		const untilRow = createUiFieldRow(
+			form,
+			"yearly-planner-create-file-row yearly-planner-repeat-control-row",
+		);
 		untilRow.createEl("label", { text: t("modal.repeatUntilDate") });
 		this.sourceRecurrenceUntilDateInput = untilRow.createEl("input", {
 			type: "date",
@@ -1575,30 +1572,29 @@ export class FileOptionsModal extends Modal {
 
 	private createOccurrenceActionSection(form: HTMLElement): void {
 		const info = getRecurrenceOccurrenceInfo(this.app, this.file);
-		const section = form.createDiv({
-			cls: "yearly-planner-create-file-row yearly-planner-file-options-repeat-actions",
-		});
+		const section = createUiFieldRow(
+			form,
+			"yearly-planner-create-file-row yearly-planner-file-options-repeat-actions",
+		);
 		section.createEl("label", { text: t("modal.repeatSeries") });
-		const actions = section.createDiv({
-			cls: "yearly-planner-file-options-repeat-action-buttons",
-		});
-		const openSourceBtn = actions.createEl("button", {
+		const actions = createUiButtonRow(
+			section,
+			"yearly-planner-file-options-repeat-action-buttons",
+		);
+		const openSourceBtn = createUiButton(actions, {
 			text: t("modal.openRepeatSource"),
-			attr: { type: "button" },
+			disabled: !info?.sourcePath,
 		});
-		openSourceBtn.disabled = !info?.sourcePath;
 		openSourceBtn.onclick = () => void this.openRecurrenceSource();
 
-		const skipBtn = actions.createEl("button", {
+		const skipBtn = createUiButton(actions, {
 			text: t("modal.skipRepeatOccurrence"),
-			attr: { type: "button" },
+			disabled: !info?.sourcePath || !info?.occurrenceDate,
 		});
-		skipBtn.disabled = !info?.sourcePath || !info?.occurrenceDate;
 		skipBtn.onclick = () => void this.skipRecurrenceOccurrence();
 
-		const detachBtn = actions.createEl("button", {
+		const detachBtn = createUiButton(actions, {
 			text: t("modal.detachRepeatOccurrence"),
-			attr: { type: "button" },
 		});
 		detachBtn.onclick = () => void this.detachRecurrenceOccurrence();
 	}

@@ -1,8 +1,4 @@
 import { App, TFile } from "obsidian";
-import {
-	TODO_CHIP_EMOJI_COMPLETED,
-	TODO_CHIP_EMOJI_INCOMPLETE,
-} from "../../constants";
 import { getWeekendLabels, t } from "../../i18n";
 import { getDayOfWeek, getDaysInMonth } from "../../utils/date";
 import type { HolidayData } from "../../utils/holidays";
@@ -15,18 +11,23 @@ import {
 	getExternalEventsForDate,
 	type ExternalCalendarEvent,
 } from "../../utils/external-calendars";
-import { isRecurrenceVirtualEvent } from "../../utils/recurrence";
 import {
-	getFileTitle,
 	getFilesForDate,
 	getChipColor,
-	isRecurrenceOccurrenceFile,
-	isRecurrenceSourceFile,
-	isTodoCompleted,
-	isTodoFile,
 	type PlannerFileScope,
 } from "../yearly-planner/file-utils";
 import { getWeekdayLabels } from "../monthly-planner/render";
+import {
+	applyExternalEventState,
+	applyPlannerFileState,
+	createAlternateCalendarLabel,
+	createExternalEventChip,
+	createHolidayBadge,
+	createPlannerFileChip,
+	getPlannerFileDisplay,
+	makePlannerInteractive,
+	PLANNER_UI_CLASSES,
+} from "../planner-components";
 
 export type MonthlyListFilter = "all" | "withNotes" | "upcoming";
 
@@ -146,13 +147,10 @@ export function renderMonthlyListBody(
 			text: wk,
 		});
 		if (alternateCalendarLabel) {
-			const labelsEl = dateLine.createSpan({
-				cls: "monthly-list-planner-alt-calendar-labels",
-			});
-			labelsEl.setAttribute("aria-hidden", "true");
-			labelsEl.createSpan({
-				cls: "monthly-list-planner-alt-calendar-label",
+			createAlternateCalendarLabel(dateLine, {
 				text: alternateCalendarLabel.text,
+				containerClass: "monthly-list-planner-alt-calendar-labels",
+				labelClass: "monthly-list-planner-alt-calendar-label",
 			});
 		}
 		if (isSaturday || isSunday) {
@@ -164,9 +162,12 @@ export function renderMonthlyListBody(
 
 		const body = dayBlock.createDiv({ cls: "monthly-list-planner-day-body" });
 		if (rangeFiles.length > 0) {
-			const rangeWrap = body.createDiv({ cls: "monthly-list-planner-ranges" });
+			const rangeWrap = body.createDiv({
+				cls: `${PLANNER_UI_CLASSES.rangeList} monthly-list-planner-ranges`,
+			});
 			for (const { file, runPos } of rangeFiles) {
 				const barClasses = [
+					PLANNER_UI_CLASSES.range,
 					"monthly-planner-range-bar",
 					"monthly-list-planner-range-bar",
 					runPos.runStart && "monthly-planner-range-run-start",
@@ -180,24 +181,15 @@ export function renderMonthlyListBody(
 				const barEl = rangeWrap.createDiv({
 					cls: barClasses,
 				});
-				barEl.tabIndex = 0;
-				barEl.setAttribute("role", "button");
+				makePlannerInteractive(barEl);
 				barEl.dataset.path = file.path;
 				const chipColor = getChipColor(app, file);
 				if (chipColor) {
 					barEl.style.setProperty("--range-color", chipColor);
 				}
-				if (isRecurrenceSourceFile(app, file)) {
-					barEl.addClass("planner-recurrence-source");
-				} else if (isRecurrenceOccurrenceFile(app, file)) {
-					barEl.addClass("planner-recurrence-occurrence");
-				}
-				const title = getFileTitle(app, file);
-				const displayTitle = isTodoCompleted(app, file)
-					? `${TODO_CHIP_EMOJI_COMPLETED} ${title}`
-					: isTodoFile(app, file)
-						? `${TODO_CHIP_EMOJI_INCOMPLETE} ${title}`
-						: title;
+				applyPlannerFileState(barEl, app, file);
+				const display = getPlannerFileDisplay(app, file);
+				const displayTitle = display.text;
 				const labelEl = barEl.createSpan({
 					cls: "monthly-planner-range-label",
 					text: displayTitle,
@@ -206,7 +198,7 @@ export function renderMonthlyListBody(
 					title: displayTitle,
 					path: file.path,
 				});
-				if (isTodoCompleted(app, file)) {
+				if (display.completed) {
 					labelEl.addClass("monthly-planner-chip-completed");
 				}
 			}
@@ -215,14 +207,15 @@ export function renderMonthlyListBody(
 		if (externalDateEvents.rangeEvents.length > 0) {
 			const rangeWrap =
 				body.querySelector<HTMLElement>(".monthly-list-planner-ranges") ??
-				body.createDiv({ cls: "monthly-list-planner-ranges" });
+				body.createDiv({
+					cls: `${PLANNER_UI_CLASSES.rangeList} monthly-list-planner-ranges`,
+				});
 			for (const { event, runPos } of externalDateEvents.rangeEvents) {
-				const isVirtualRecurrence = isRecurrenceVirtualEvent(event);
 				const barClasses = [
+					PLANNER_UI_CLASSES.range,
 					"monthly-planner-range-bar",
 					"monthly-list-planner-range-bar",
 					"planner-external-event-range",
-					isVirtualRecurrence && "planner-recurrence-virtual",
 					runPos.runStart && "monthly-planner-range-run-start",
 					runPos.runEnd && "monthly-planner-range-run-end",
 					!runPos.runStart &&
@@ -232,8 +225,8 @@ export function renderMonthlyListBody(
 					.filter(Boolean)
 					.join(" ");
 				const barEl = rangeWrap.createDiv({ cls: barClasses });
-				barEl.tabIndex = 0;
-				barEl.setAttribute("role", "button");
+				makePlannerInteractive(barEl);
+				applyExternalEventState(barEl, event);
 				barEl.dataset.externalEventId = event.id;
 				if (event.color) {
 					barEl.style.setProperty("--range-color", event.color);
@@ -249,88 +242,44 @@ export function renderMonthlyListBody(
 		}
 
 		if (singleFiles.length > 0) {
-			const listEl = body.createDiv({ cls: "monthly-list-planner-files" });
+			const listEl = body.createDiv({
+				cls: `${PLANNER_UI_CLASSES.entryList} monthly-list-planner-files`,
+			});
 			for (const file of singleFiles) {
-				const linkEl = listEl.createEl("div", {
-					cls: "monthly-planner-cell-file monthly-list-planner-cell-file",
+				createPlannerFileChip(listEl, {
+					app,
+					file,
+					classes: {
+						root: "monthly-planner-cell-file monthly-list-planner-cell-file",
+						completed: "monthly-planner-chip-completed",
+					},
 				});
-				linkEl.tabIndex = 0;
-				linkEl.setAttribute("role", "button");
-				const chipTitle = getFileTitle(app, file);
-				if (isTodoCompleted(app, file)) {
-					linkEl.addClass("monthly-planner-chip-completed");
-					linkEl.textContent = `${TODO_CHIP_EMOJI_COMPLETED} ${chipTitle}`;
-				} else if (isTodoFile(app, file)) {
-					linkEl.textContent = `${TODO_CHIP_EMOJI_INCOMPLETE} ${chipTitle}`;
-				} else {
-					linkEl.textContent = chipTitle;
-				}
-				linkEl.title = file.path;
-				linkEl.ariaLabel = t("a11y.openPlannerNote", {
-					title: chipTitle,
-					path: file.path,
-				});
-				linkEl.dataset.path = file.path;
-				const chipColor = getChipColor(app, file);
-				if (chipColor) {
-					linkEl.style.borderLeftColor = chipColor;
-				}
-				if (isRecurrenceSourceFile(app, file)) {
-					linkEl.addClass("planner-recurrence-source");
-				} else if (isRecurrenceOccurrenceFile(app, file)) {
-					linkEl.addClass("planner-recurrence-occurrence");
-				}
 			}
 		}
 
 		if (externalDateEvents.singleEvents.length > 0) {
 			const listEl =
 				body.querySelector<HTMLElement>(".monthly-list-planner-files") ??
-				body.createDiv({ cls: "monthly-list-planner-files" });
+				body.createDiv({
+					cls: `${PLANNER_UI_CLASSES.entryList} monthly-list-planner-files`,
+				});
 			for (const event of externalDateEvents.singleEvents) {
-				const isVirtualRecurrence = isRecurrenceVirtualEvent(event);
-				const chipEl = listEl.createDiv({
-					cls: [
-						"monthly-planner-cell-file",
-						"monthly-list-planner-cell-file",
-						"planner-external-event-chip",
-						isVirtualRecurrence && "planner-recurrence-virtual",
-					]
-						.filter(Boolean)
-						.join(" "),
+				createExternalEventChip(listEl, {
+					event,
+					classes:
+						"monthly-planner-cell-file monthly-list-planner-cell-file",
 				});
-				chipEl.tabIndex = 0;
-				chipEl.setAttribute("role", "button");
-				chipEl.dataset.externalEventId = event.id;
-				chipEl.textContent = event.title;
-				chipEl.ariaLabel = t("a11y.openExternalEvent", {
-					title: event.title,
-				});
-				if (event.color) {
-					chipEl.style.borderLeftColor = event.color;
-				}
 			}
 		}
 
 		if (isHoliday && holidayNames.length > 0) {
-			const holidaysContainer = body.createDiv({
-				cls: "monthly-planner-cell-holidays",
+			createHolidayBadge(body, {
+				dateKey,
+				names: holidayNames,
+				containerClass: "monthly-planner-cell-holidays",
+				badgeClass: "monthly-planner-cell-holiday-badge",
+				labelClass: "monthly-planner-holiday-label",
 			});
-			const badge = holidaysContainer.createDiv({
-				cls: "monthly-planner-cell-holiday-badge",
-			});
-			badge.tabIndex = 0;
-			badge.setAttribute("role", "button");
-			badge.createSpan({
-				cls: "monthly-planner-holiday-label",
-				text: holidayNames.join(", "),
-			});
-			badge.ariaLabel = t("a11y.openHoliday", {
-				date: dateKey,
-				names: holidayNames.join(", "),
-			});
-			badge.dataset.holidayDate = dateKey;
-			badge.dataset.holidayNames = JSON.stringify(holidayNames);
 		}
 
 		if (

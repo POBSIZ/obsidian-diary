@@ -1,25 +1,28 @@
+import {
+	getPlannerCellAtClientPosition,
+	getPlannerPathElementAt,
+	getTopmostPlannerElement,
+} from "../planner-dom";
+
 /** Get topmost planner-relevant element at coords; skips scroll/table wrappers. */
 export function getTopmostPlannerElementAt(
 	contentEl: HTMLElement,
 	clientX: number,
 	clientY: number,
 ): Element | null {
-	const elements = contentEl.ownerDocument.elementsFromPoint(clientX, clientY);
-	for (const el of elements) {
-		if (!contentEl.contains(el)) continue;
-		const he = el as HTMLElement;
-		if (he.closest?.(".yearly-planner-table th")) return null;
-		if (
-			he.closest?.("[data-external-event-id]") ||
-			he.closest?.(".yearly-planner-cell-file[data-path]") ||
-			he.closest?.(".yearly-planner-cell-range-bar[data-path]") ||
-			he.closest?.(".yearly-planner-cell-holiday-badge") ||
-			he.closest?.("td[data-year][data-month][data-day]")
-		) {
-			return el;
-		}
-	}
-	return null;
+	return getTopmostPlannerElement(
+		contentEl,
+		clientX,
+		clientY,
+		[
+			"[data-external-event-id]",
+			".planner-entry[data-path]",
+			".planner-range[data-path]",
+			".planner-holiday-badge",
+			"td[data-year][data-month][data-day]",
+		],
+		".yearly-planner-table th",
+	);
 }
 
 /** Get chip or range bar element at coords that has data-path (for chip drag). */
@@ -28,15 +31,12 @@ export function getChipOrBarAt(
 	clientX: number,
 	clientY: number,
 ): HTMLElement | null {
-	const elements = contentEl.ownerDocument.elementsFromPoint(clientX, clientY);
-	for (const el of elements) {
-		if (!contentEl.contains(el)) continue;
-		const chip = (el as HTMLElement).closest?.(
-			".yearly-planner-cell-file[data-path], .yearly-planner-cell-range-bar[data-path]",
-		);
-		if (chip && (chip as HTMLElement).dataset.path) return chip as HTMLElement;
-	}
-	return null;
+	return getPlannerPathElementAt(
+		contentEl,
+		clientX,
+		clientY,
+		".planner-entry[data-path], .planner-range[data-path]",
+	);
 }
 
 export function getCellAtClientPos(
@@ -48,13 +48,10 @@ export function getCellAtClientPos(
 	month: number;
 	day: number;
 } | null {
-	const el = contentEl.ownerDocument.elementFromPoint(clientX, clientY);
-	const cell = el?.closest("td[data-year][data-month][data-day]");
-	if (!cell) return null;
-	const year = parseInt(cell.getAttribute("data-year") ?? "", 10);
-	const month = parseInt(cell.getAttribute("data-month") ?? "", 10);
-	const day = parseInt(cell.getAttribute("data-day") ?? "", 10);
-	if (isNaN(year) || isNaN(month) || isNaN(day)) return null;
-	if (cell.closest(".yearly-planner-cell-invalid")) return null;
-	return { year, month, day };
+	return getPlannerCellAtClientPosition(
+		contentEl,
+		clientX,
+		clientY,
+		".yearly-planner-cell-invalid",
+	);
 }

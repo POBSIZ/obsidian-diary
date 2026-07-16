@@ -45,8 +45,9 @@ import {
 } from "../../utils/external-calendars";
 import { ExternalEventModal } from "../external-event-modal";
 import {
+	detachReusablePlanNotePanel,
+	mountPlanNotePanel,
 	renderPlanNotePanel,
-	syncPlanNotePanelExpandedState,
 } from "../plan-note-panel";
 import {
 	copyPlannerSelectionToClipboard,
@@ -60,7 +61,12 @@ import {
 	shouldDeferPlannerClipboardToNative,
 	undoPlannerPasteBatch,
 } from "../planner-clipboard";
-import { PLANNER_COMPACT_LAYOUT_MAX_WIDTH } from "../planner-layout";
+import {
+	capturePlannerScroll,
+	PLANNER_COMPACT_LAYOUT_MAX_WIDTH,
+	restorePlannerScroll,
+	setupPlannerContainer,
+} from "../planner-layout";
 
 export type { YearlyPlannerState } from "./types";
 
@@ -296,44 +302,30 @@ export class YearlyPlannerView
 		const { contentEl } = this;
 		this.compactLayout = this.shouldUseCompactLayout();
 		this.syncMonthCellWidthsFromSettings();
-		const scrollEl = contentEl.querySelector<HTMLElement>(
+		const scrollState = capturePlannerScroll(
+			contentEl,
 			".yearly-planner-scroll",
 		);
-		const scrollTop = scrollEl?.scrollTop ?? 0;
-		const scrollLeft = scrollEl?.scrollLeft ?? 0;
 
-		const planNoteWrapper = contentEl.querySelector<HTMLElement>(
-			".plan-note-panel-wrapper",
-		);
-		const preservePlanNote =
-			planNoteWrapper &&
-			planNoteWrapper.hasChildNodes() &&
-			planNoteWrapper.dataset.year === String(this.year);
-		if (preservePlanNote) planNoteWrapper.remove();
+		const planNoteWrapper = detachReusablePlanNotePanel(contentEl, {
+			year: this.year,
+		});
 
 		contentEl.empty();
-		contentEl.addClass("yearly-planner-container");
-		contentEl.toggleClass("planner-container-compact", this.compactLayout);
-		contentEl.toggleClass(
-			"yearly-planner-container-compact",
-			this.compactLayout,
-		);
+		const pad = this.plugin.settings.mobileBottomPadding ?? 3.5;
+		setupPlannerContainer(contentEl, {
+			className: "yearly-planner-container",
+			compactClassName: "yearly-planner-container-compact",
+			compact: this.compactLayout,
+			mobilePadding: pad,
+			mobilePaddingProperty: "--yearly-planner-mobile-bottom-padding",
+			draggingClassName: "yearly-planner-chip-dragging",
+			dragging: this.chipDragState != null,
+		});
 		contentEl.toggleClass(
 			"yearly-planner-has-expanded-months",
 			this.hasExpandedMonthCells(),
 		);
-		if (this.chipDragState) {
-			contentEl.addClass("yearly-planner-chip-dragging");
-		} else {
-			contentEl.removeClass("yearly-planner-chip-dragging");
-		}
-
-		const pad = this.plugin.settings.mobileBottomPadding ?? 3.5;
-		contentEl.style.setProperty(
-			"--yearly-planner-mobile-bottom-padding",
-			`${pad}rem`,
-		);
-
 		const cellWidth = this.plugin.settings.mobileCellWidth ?? 0;
 		if (cellWidth > 0) {
 			contentEl.style.setProperty(
@@ -347,34 +339,15 @@ export class YearlyPlannerView
 		}
 
 		this.renderHeader(contentEl);
-		if (preservePlanNote && planNoteWrapper) {
-			contentEl.appendChild(planNoteWrapper);
-			syncPlanNotePanelExpandedState(
-				planNoteWrapper,
-				this.plugin.isPlanNotePanelExpanded(),
-			);
-		} else {
-			const notePanelEl = contentEl.createDiv({
-				cls: "plan-note-panel-wrapper",
-			});
-			notePanelEl.dataset.year = String(this.year);
-			void this.renderYearNotePanel(notePanelEl);
-		}
+		mountPlanNotePanel(contentEl, {
+			period: { year: this.year },
+			preserved: planNoteWrapper,
+			expanded: this.plugin.isPlanNotePanelExpanded(),
+			render: (container) => this.renderYearNotePanel(container),
+		});
 		this.renderTable(contentEl);
 
-		const newScrollEl = contentEl.querySelector<HTMLElement>(
-			".yearly-planner-scroll",
-		);
-		if (newScrollEl) {
-			newScrollEl.scrollTop = scrollTop;
-			newScrollEl.scrollLeft = scrollLeft;
-			window.requestAnimationFrame(() => {
-				window.requestAnimationFrame(() => {
-					newScrollEl.scrollTop = scrollTop;
-					newScrollEl.scrollLeft = scrollLeft;
-				});
-			});
-		}
+		restorePlannerScroll(contentEl, ".yearly-planner-scroll", scrollState);
 	}
 
 	private async renderYearNotePanel(container: HTMLElement): Promise<void> {

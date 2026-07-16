@@ -9,7 +9,7 @@ Diary는 Obsidian vault 안의 Markdown 파일을 날짜 기반 플래너로 보
 | 항목 | 값 |
 | --- | --- |
 | 플러그인 ID | `diary` |
-| 현재 버전 | `1.7.1` |
+| 현재 버전 | `1.8.0` |
 | 최소 Obsidian 버전 | `1.7.2` |
 | 지원 플랫폼 | 데스크톱 / 모바일 (`isDesktopOnly: false`) |
 | 기본 언어 | `en` |
@@ -17,6 +17,7 @@ Diary는 Obsidian vault 안의 Markdown 파일을 날짜 기반 플래너로 보
 
 ## 최신 버전
 
+- `1.8.0`: 모든 플래너 뷰의 칩, 컨트롤, 모달 액션, compact 레이아웃 상태, 키보드 포커스 동작을 통일하고 스크린샷을 새로 갱신했습니다.
 - `1.7.1`: 불필요한 DOM 타입 assertion을 제거하고 공통 플래너 기간 모달의 typed lint 해석을 안정화했습니다.
 - `1.7.0`: 일별·3일 타임라인 플래너, 직접 뷰 선택기, 공통 기간 이동 모달, 독립적인 시작/종료 시간 메타데이터, N일·주·월·년 단위의 가상 반복 일정을 추가했습니다.
 - `1.6.0`: 모든 지원 UI 언어의 full documentation, 스페인 공휴일, 보조 역법 선택지 문구 현지화를 추가했습니다.
@@ -36,7 +37,7 @@ Diary는 Obsidian vault 안의 Markdown 파일을 날짜 기반 플래너로 보
 
 ## 스크린샷
 
-아래 이미지는 README 설명을 위해 새 데모 vault에 샘플 플래너 노트를 만든 뒤 캡처했습니다. 모바일 이미지는 데모 vault에서 모바일 렌더링 분기를 사용해 모바일 폭으로 촬영했습니다. 오른쪽 사이드바 플래너는 같은 월간 그리드를 compact 모드로 사용하므로, 전체 크기 월간 그리드 스크린샷을 대표 이미지로 유지합니다.
+아래 이미지는 격리된 데모 폴더에 종일·시간 지정·기간·todo·플랜 노트를 만든 뒤 캡처했습니다. 촬영이 끝난 뒤 임시 데모 데이터는 모두 제거했습니다. 좁은 레이아웃 이미지는 가로 공간이 제한될 때 공통 헤더와 월간 뷰가 적응하는 모습을 보여줍니다.
 
 ### 데스크톱
 
@@ -46,11 +47,15 @@ Diary는 Obsidian vault 안의 Markdown 파일을 날짜 기반 플래너로 보
 
 ![월간 목록 플래너](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/assets/screenshots/monthly-list.png)
 
-### 모바일
-
-| 월간 그리드와 일자 요약 | 월간 목록 |
+| 일별 타임라인 | 3일 타임라인 |
 | --- | --- |
-| ![모바일 월간 그리드](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/assets/screenshots/mobile-monthly-grid.png) | ![모바일 월간 목록](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/assets/screenshots/mobile-monthly-list.png) |
+| ![일별 타임라인 플래너](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/assets/screenshots/daily-planner.png) | ![3일 타임라인 플래너](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/assets/screenshots/three-day-planner.png) |
+
+### 좁은 레이아웃
+
+| 월간 그리드 | 월간 목록 |
+| --- | --- |
+| ![좁은 월간 그리드](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/assets/screenshots/mobile-monthly-grid.png) | ![좁은 월간 목록](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/assets/screenshots/mobile-monthly-list.png) |
 
 ## 주요 기능
 
