@@ -1,4 +1,10 @@
-import { App, Modal, Notice, PluginSettingTab, Setting } from "obsidian";
+import {
+	App,
+	Modal,
+	Notice,
+	PluginSettingTab,
+	Setting,
+} from "obsidian";
 import {
 	LOCALE_OPTIONS,
 	normalizeLocale,
@@ -113,6 +119,169 @@ export class DiaryObsidianSettingTab extends PluginSettingTab {
 	constructor(app: App, plugin: DiaryObsidian) {
 		super(app, plugin);
 		this.plugin = plugin;
+	}
+
+	/** Obsidian 1.13+ uses these definitions for rendering and settings search. */
+	getSettingDefinitions() {
+		return [
+			{
+				name: t("settings.language"),
+				desc: t("settings.languageDesc"),
+				control: {
+					type: "dropdown",
+					key: "locale",
+					options: Object.fromEntries(
+						LOCALE_OPTIONS.map((option) => [option.value, option.label]),
+					),
+				},
+			},
+			{
+				name: t("settings.plannerFolder"),
+				desc: t("settings.plannerFolderDesc"),
+				control: {
+					type: "text",
+					key: "plannerFolder",
+					defaultValue: "Planner",
+					placeholder: "Planner",
+				},
+			},
+			{
+				name: t("settings.plannerFileScope"),
+				desc: t("settings.plannerFileScopeDesc"),
+				control: {
+					type: "dropdown",
+					key: "plannerFileScope",
+					defaultValue: "vault",
+					options: {
+						vault: t("settings.plannerFileScopeVault"),
+						plannerFolder: t("settings.plannerFileScopeFolder"),
+					},
+				},
+			},
+			{
+				name: t("settings.dateFormat"),
+				desc: t("settings.dateFormatDesc"),
+				control: {
+					type: "text",
+					key: "dateFormat",
+					defaultValue: "YYYY-MM-DD",
+					placeholder: "2000-01-15",
+				},
+			},
+			{
+				name: t("settings.showHolidays"),
+				desc: t("settings.showHolidaysDesc"),
+				control: { type: "toggle", key: "showHolidays" },
+			},
+			{
+				name: t("settings.holidayCountry"),
+				desc: t("settings.holidayCountryDesc"),
+				control: {
+					type: "dropdown",
+					key: "holidayCountry",
+					options: {
+						"": t("country.none"),
+						KR: t("country.KR"),
+						US: t("country.US"),
+						JP: t("country.JP"),
+						CN: t("country.CN"),
+						GB: t("country.GB"),
+						DE: t("country.DE"),
+						ES: t("country.ES"),
+						FR: t("country.FR"),
+						AU: t("country.AU"),
+						CA: t("country.CA"),
+						TW: t("country.TW"),
+					},
+				},
+			},
+			{
+				name: t("settings.calendarOverlay"),
+				desc: t("settings.calendarOverlayDesc"),
+				aliases: [
+					t("settings.calendarOverlayMode"),
+					t("settings.customCalendars"),
+				],
+				render: (setting: Setting) => {
+					setting.settingEl.empty();
+					renderCalendarOverlaySettings(setting.settingEl, this.plugin);
+				},
+			},
+			{
+				name: t("settings.externalCalendars"),
+				desc: t("settings.externalCalendarsDesc"),
+				aliases: [
+					t("settings.externalCalendarRefreshAll"),
+					t("settings.externalCalendarAdd"),
+				],
+				render: (setting: Setting) => {
+					setting.settingEl.empty();
+					this.renderExternalCalendars(setting.settingEl);
+				},
+			},
+			{
+				name: t("settings.mobileBottomPadding"),
+				desc: t("settings.mobileBottomPaddingDesc"),
+				control: {
+					type: "slider",
+					key: "mobileBottomPadding",
+					min: 0,
+					max: 8,
+					step: 0.5,
+				},
+			},
+			{
+				name: t("settings.mobileCellWidth"),
+				desc: t("settings.mobileCellWidthDesc"),
+				control: {
+					type: "slider",
+					key: "mobileCellWidth",
+					min: 0,
+					max: 8,
+					step: 0.25,
+				},
+			},
+		];
+	}
+
+	getControlValue(key: string): unknown {
+		return this.plugin.settings[key as keyof DiaryObsidianSettings];
+	}
+
+	async setControlValue(key: string, value: unknown): Promise<void> {
+		switch (key) {
+			case "locale":
+				this.plugin.settings.locale = normalizeLocale(String(value));
+				setLocale(this.plugin.settings.locale);
+				await this.plugin.saveSettings();
+				this.update();
+				return;
+			case "plannerFolder":
+				this.plugin.settings.plannerFolder = String(value).trim() || "Planner";
+				break;
+			case "plannerFileScope":
+				this.plugin.settings.plannerFileScope =
+					value === "plannerFolder" ? "plannerFolder" : "vault";
+				break;
+			case "dateFormat":
+				this.plugin.settings.dateFormat = String(value).trim() || "YYYY-MM-DD";
+				break;
+			case "showHolidays":
+				this.plugin.settings.showHolidays = Boolean(value);
+				break;
+			case "holidayCountry":
+				this.plugin.settings.holidayCountry = String(value);
+				break;
+			case "mobileBottomPadding":
+				this.plugin.settings.mobileBottomPadding = Number(value);
+				break;
+			case "mobileCellWidth":
+				this.plugin.settings.mobileCellWidth = Number(value);
+				break;
+			default:
+				return;
+		}
+		await this.plugin.saveSettings();
 	}
 
 	display(): void {

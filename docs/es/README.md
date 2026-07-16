@@ -9,7 +9,7 @@ Documentación completa: [English](https://github.com/POBSIZ/obsidian-diary/blob
 | Elemento | Valor |
 | --- | --- |
 | ID del plugin | `diary` |
-| Versión actual | `1.8.0` |
+| Versión actual | `1.8.1` |
 | Versión mínima de Obsidian | `1.7.2` |
 | Plataformas | Escritorio / móvil (`isDesktopOnly: false`) |
 | Idioma predeterminado | `en` |
@@ -17,6 +17,7 @@ Documentación completa: [English](https://github.com/POBSIZ/obsidian-diary/blob
 
 ## Última versión
 
+- `1.8.1`: Añade ajustes declarativos con búsqueda para Obsidian 1.13+, conserva la compatibilidad anterior y usa de forma coherente los helpers DOM de Obsidian.
 - `1.8.0`: Unifica chips, controles, acciones de diálogos, estado del diseño compacto y foco de teclado en todas las vistas del planificador, y renueva las capturas.
 - `1.7.1`: Elimina aserciones de tipo DOM innecesarias y estabiliza el lint tipado del diálogo de período compartido.
 - `1.7.0`: Añade planificadores de línea de tiempo diaria y de 3 días, selección directa de vista, navegación de período compartida, horas de inicio/fin independientes y repeticiones virtuales cada N días, semanas, meses o años.

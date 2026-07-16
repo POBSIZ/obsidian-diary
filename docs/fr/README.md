@@ -9,7 +9,7 @@ Documentation complète : [English](https://github.com/POBSIZ/obsidian-diary/blo
 | Élément | Valeur |
 | --- | --- |
 | ID du plugin | `diary` |
-| Version actuelle | `1.8.0` |
+| Version actuelle | `1.8.1` |
 | Version minimale d’Obsidian | `1.7.2` |
 | Plateformes | Bureau / mobile (`isDesktopOnly: false`) |
 | Langue par défaut | `en` |
@@ -17,6 +17,7 @@ Documentation complète : [English](https://github.com/POBSIZ/obsidian-diary/blo
 
 ## Dernière version
 
+- `1.8.1` : ajoute des réglages déclaratifs recherchables pour Obsidian 1.13+, conserve la compatibilité avec l’ancien écran de réglages et utilise systématiquement les helpers DOM d’Obsidian.
 - `1.8.0` : uniformise les puces, contrôles, actions de boîtes de dialogue, état de mise en page compacte et focus clavier dans toutes les vues du planificateur, avec des captures actualisées.
 - `1.7.1` : supprime les assertions de type DOM inutiles et stabilise l’analyse typée de la boîte de dialogue de période commune.
 - `1.7.0` : ajoute les plannings chronologiques quotidien et sur 3 jours, la sélection directe de vue, une navigation de période commune, des heures de début/fin indépendantes et les récurrences virtuelles tous les N jours, semaines, mois ou années.

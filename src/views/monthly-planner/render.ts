@@ -158,7 +158,7 @@ export function createMonthlyCell(
 	cellData: CalendarCell | null,
 	ctx: CreateMonthlyCellContext,
 ): HTMLTableCellElement {
-	const cell = ctx.app.workspace.containerEl.ownerDocument.createElement("td");
+	const cell = createEl("td");
 
 	if (!cellData) {
 		cell.addClass("monthly-planner-cell-invalid");

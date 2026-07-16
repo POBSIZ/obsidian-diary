@@ -101,33 +101,7 @@ export async function renderPlanNotePanel(
 			classes: "plan-note-panel-open-btn clickable-icon",
 			ariaLabel: t("planNote.openButton"),
 		});
-		const doc = openBtn.ownerDocument;
-		const svg = doc.createElementNS("http://www.w3.org/2000/svg", "svg");
-		svg.setAttribute("viewBox", "0 0 24 24");
-		svg.setAttribute("width", "14");
-		svg.setAttribute("height", "14");
-		svg.setAttribute("fill", "none");
-		svg.setAttribute("stroke", "currentColor");
-		svg.setAttribute("stroke-width", "2");
-		svg.setAttribute("stroke-linecap", "round");
-		svg.setAttribute("stroke-linejoin", "round");
-		const path = doc.createElementNS("http://www.w3.org/2000/svg", "path");
-		path.setAttribute(
-			"d",
-			"M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6",
-		);
-		const polyline = doc.createElementNS(
-			"http://www.w3.org/2000/svg",
-			"polyline",
-		);
-		polyline.setAttribute("points", "15 3 21 3 21 9");
-		const line = doc.createElementNS("http://www.w3.org/2000/svg", "line");
-		line.setAttribute("x1", "10");
-		line.setAttribute("y1", "14");
-		line.setAttribute("x2", "21");
-		line.setAttribute("y2", "3");
-		svg.append(path, polyline, line);
-		openBtn.appendChild(svg);
+		setIcon(openBtn, "external-link");
 		openBtn.addEventListener("click", (e) => {
 			e.stopPropagation();
 			opts.onOpen(file);

@@ -72,11 +72,10 @@ const CHIP_COLOR_PRESETS_EXTRA: readonly { hex: string }[] = [
 /** Resolves var(--interactive-accent) to 6-digit hex. Falls back to #7c3aed if unavailable. */
 function getThemeAccentHex(doc: Document = window.document): string {
 	const activeWindow = doc.defaultView ?? window;
-	const el = doc.createElement("div");
+	const el = doc.body.createDiv();
 	el.setCssProps({ color: "var(--interactive-accent)" });
-	doc.body.appendChild(el);
 	const computed = activeWindow.getComputedStyle(el).color;
-	doc.body.removeChild(el);
+	el.remove();
 	const m = computed.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
 	if (m) {
 		const r = parseInt(m[1] ?? "0", 10);
@@ -149,11 +148,10 @@ function normalizeColorToHex(
 	const hex = toHex6(trimmed);
 	if (hex) return hex.toLowerCase();
 	const activeWindow = doc.defaultView ?? window;
-	const div = doc.createElement("div");
+	const div = doc.body.createDiv();
 	div.style.color = trimmed;
-	doc.body.appendChild(div);
 	const computed = activeWindow.getComputedStyle(div).color;
-	doc.body.removeChild(div);
+	div.remove();
 	if (!computed) return null;
 	const m = computed.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
 	if (m) {

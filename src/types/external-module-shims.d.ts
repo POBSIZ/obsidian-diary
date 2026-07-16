@@ -251,10 +251,14 @@ declare module "obsidian" {
 		plugin: Plugin;
 		containerEl: HTMLElement;
 		constructor(app: App, plugin: Plugin);
+		update(): void;
+		getControlValue(key: string): unknown;
+		setControlValue(key: string, value: unknown): void | Promise<void>;
 		display(): void;
 	}
 
 	export class Setting {
+		settingEl: HTMLElement;
 		constructor(containerEl: HTMLElement);
 		setName(name: string | DocumentFragment): this;
 		setDesc(desc: string | DocumentFragment): this;
