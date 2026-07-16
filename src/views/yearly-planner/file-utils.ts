@@ -402,7 +402,9 @@ export function getChipColor(app: App, file: TFile): string | null {
 }
 
 function isValidCssColor(value: string): boolean {
-	const div = window.document.createDocumentFragment().createEl("div");
+	const div = window.document.body.createDiv();
 	div.style.color = value;
-	return div.style.color !== "";
+	const isValid = div.style.color !== "";
+	div.remove();
+	return isValid;
 }

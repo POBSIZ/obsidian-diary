@@ -1,6 +1,6 @@
 ---
 version: "alpha"
-lastReviewedPluginVersion: "1.8.2"
+lastReviewedPluginVersion: "1.8.3"
 name: "Diary Planner UI"
 description: "Obsidian-native planner visuals for yearly, monthly, monthly list, daily, 3-day, recurrence, calendar overlays, external calendar overlays, and compact sidebar views."
 colors:
@@ -70,7 +70,7 @@ components:
 Diary 플러그인의 UI는 Obsidian 테마와 자연스럽게 통합되는 것을 최우선으로 한다.
 따라서 실제 렌더링은 Obsidian CSS 변수(`--background-*`, `--text-*`, `--interactive-*`)를
 기준으로 하되, 플러그인 내부에서는 공통 토큰으로 형태와 간격을 통일한다.
-이 문서는 `1.8.2` 기준의 연간/월간/목록/일별/3일 플래너 UI, 오른쪽 사이드바 플래너, 공통 헤더와 기간 이동, 반복 이벤트 표시, built-in/custom 캘린더 오버레이, 외부 캘린더 오버레이, 다국어 UI, 키보드 접근성 상태를 함께 설명한다.
+이 문서는 `1.8.3` 기준의 연간/월간/목록/일별/3일 플래너 UI, 오른쪽 사이드바 플래너, 공통 헤더와 기간 이동, 반복 이벤트 표시, built-in/custom 캘린더 오버레이, 외부 캘린더 오버레이, 다국어 UI, 키보드 접근성 상태를 함께 설명한다.
 
 핵심 원칙:
 

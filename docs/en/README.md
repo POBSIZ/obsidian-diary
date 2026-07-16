@@ -9,7 +9,7 @@ Full documentation: [English](https://github.com/POBSIZ/obsidian-diary/blob/main
 | Item | Value |
 | --- | --- |
 | Plugin ID | `diary` |
-| Current version | `1.8.2` |
+| Current version | `1.8.3` |
 | Minimum Obsidian version | `1.7.2` |
 | Supported platforms | Desktop / mobile (`isDesktopOnly: false`) |
 | Default language | `en` |
@@ -17,6 +17,7 @@ Full documentation: [English](https://github.com/POBSIZ/obsidian-diary/blob/main
 
 ## Latest Version
 
+- `1.8.3`: Removes direct `Document` creation calls entirely by using typed Obsidian element instance helpers and immediate detachment.
 - `1.8.2`: Creates detached planner DOM through typed `DocumentFragment` Obsidian helpers, eliminating unsafe type propagation in community-plugin audits.
 - `1.8.1`: Adds searchable declarative settings for Obsidian 1.13+ while retaining legacy settings support, and uses Obsidian DOM helpers consistently.
 - `1.8.0`: Unifies planner chips, controls, modal actions, compact layout state, and keyboard focus behavior across every planner view, with refreshed screenshots.

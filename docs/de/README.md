@@ -9,7 +9,7 @@ Vollständige Dokumentation: [English](https://github.com/POBSIZ/obsidian-diary/
 | Eintrag | Wert |
 | --- | --- |
 | Plugin-ID | `diary` |
-| Aktuelle Version | `1.8.2` |
+| Aktuelle Version | `1.8.3` |
 | Minimale Obsidian-Version | `1.7.2` |
 | Plattformen | Desktop / Mobil (`isDesktopOnly: false`) |
 | Standardsprache | `en` |
@@ -17,6 +17,7 @@ Vollständige Dokumentation: [English](https://github.com/POBSIZ/obsidian-diary/
 
 ## Neueste Version
 
+- `1.8.3`: Entfernt direkte `Document`-Erzeugungsaufrufe vollständig, indem typisierte Obsidian-Elementhelfer mit sofortigem Ablösen verwendet werden.
 - `1.8.2`: Erstellt getrenntes Planer-DOM über typisierte Obsidian-Helfer auf `DocumentFragment` und beseitigt dadurch unsichere Typweitergabe in Community-Plugin-Prüfungen.
 - `1.8.1`: Ergänzt durchsuchbare deklarative Einstellungen für Obsidian 1.13+, behält die bisherige Einstellungsunterstützung bei und verwendet durchgehend Obsidian-DOM-Helfer.
 - `1.8.0`: Vereinheitlicht Planer-Chips, Bedienelemente, Modal-Aktionen, Compact-Layout-Zustand und Tastaturfokus in allen Planeransichten und aktualisiert die Screenshots.

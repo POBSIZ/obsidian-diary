@@ -9,7 +9,7 @@ Documentación completa: [English](https://github.com/POBSIZ/obsidian-diary/blob
 | Elemento | Valor |
 | --- | --- |
 | ID del plugin | `diary` |
-| Versión actual | `1.8.2` |
+| Versión actual | `1.8.3` |
 | Versión mínima de Obsidian | `1.7.2` |
 | Plataformas | Escritorio / móvil (`isDesktopOnly: false`) |
 | Idioma predeterminado | `en` |
@@ -17,6 +17,7 @@ Documentación completa: [English](https://github.com/POBSIZ/obsidian-diary/blob
 
 ## Última versión
 
+- `1.8.3`: Elimina por completo las llamadas directas de creación de `Document` mediante helpers de instancia tipados de Obsidian y separación inmediata.
 - `1.8.2`: Crea DOM desconectado del planificador mediante helpers tipados de Obsidian sobre `DocumentFragment`, eliminando la propagación de tipos inseguros en las auditorías.
 - `1.8.1`: Añade ajustes declarativos con búsqueda para Obsidian 1.13+, conserva la compatibilidad anterior y usa de forma coherente los helpers DOM de Obsidian.
 - `1.8.0`: Unifica chips, controles, acciones de diálogos, estado del diseño compacto y foco de teclado en todas las vistas del planificador, y renueva las capturas.

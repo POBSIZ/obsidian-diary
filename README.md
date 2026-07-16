@@ -11,7 +11,7 @@ Diary는 Obsidian vault 안의 Markdown 파일을 날짜 기반 플래너로 보
 | Item | Value |
 | --- | --- |
 | Plugin ID | `diary` |
-| Version | `1.8.2` |
+| Version | `1.8.3` |
 | Minimum Obsidian version | `1.7.2` |
 | Platforms | Desktop and mobile (`isDesktopOnly: false`) |
 | Default language | `en` |
@@ -19,6 +19,7 @@ Diary는 Obsidian vault 안의 Markdown 파일을 날짜 기반 플래너로 보
 
 ## Latest Version
 
+- `1.8.3`: removes direct `Document` creation calls entirely by using typed Obsidian element instance helpers and immediate detachment.
 - `1.8.2`: creates detached planner DOM through typed `DocumentFragment` Obsidian helpers, eliminating unsafe type propagation in community-plugin audits.
 - `1.8.1`: adds searchable declarative settings for Obsidian 1.13+ while preserving legacy settings support, and replaces direct DOM element construction with Obsidian helpers.
 - `1.8.0`: unifies planner chips, controls, modal actions, compact layout state, and keyboard focus behavior across yearly, monthly, list, daily, and 3-day views; refreshes all planner screenshots.
