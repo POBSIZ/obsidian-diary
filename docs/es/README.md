@@ -9,7 +9,7 @@ Documentación completa: [English](https://github.com/POBSIZ/obsidian-diary/blob
 | Elemento | Valor |
 | --- | --- |
 | ID del plugin | `diary` |
-| Versión actual | `1.8.3` |
+| Versión actual | `1.9.0` |
 | Versión mínima de Obsidian | `1.7.2` |
 | Plataformas | Escritorio / móvil (`isDesktopOnly: false`) |
 | Idioma predeterminado | `en` |
@@ -17,6 +17,7 @@ Documentación completa: [English](https://github.com/POBSIZ/obsidian-diary/blob
 
 ## Última versión
 
+- `1.9.0`: Mantiene el contenido móvil, los finales de línea de tiempo y los menús compactos por encima de la navegación inferior normal o flotante de Obsidian, conservando un espacio mínimo configurable.
 - `1.8.3`: Elimina por completo las llamadas directas de creación de `Document` mediante helpers de instancia tipados de Obsidian y separación inmediata.
 - `1.8.2`: Crea DOM desconectado del planificador mediante helpers tipados de Obsidian sobre `DocumentFragment`, eliminando la propagación de tipos inseguros en las auditorías.
 - `1.8.1`: Añade ajustes declarativos con búsqueda para Obsidian 1.13+, conserva la compatibilidad anterior y usa de forma coherente los helpers DOM de Obsidian.
@@ -243,7 +244,7 @@ Reglas de pegado:
 - Selecciona **Create note** para crear una nota nueva en esa fecha.
 - Usa gesto de pellizco para hacer zoom.
 - Usa el botón de restablecer zoom para volver al tamaño de la cuadrícula.
-- Ajusta **Espacio inferior en móvil** y **Ancho de celda en móvil** para adaptar el espacio y el ancho.
+- Diary mantiene automáticamente el contenido y los menús sobre la navegación inferior normal o flotante de Obsidian. Usa **Espacio inferior en móvil** como separación mínima adicional y **Ancho de celda en móvil** para las celdas anuales.
 
 ## Ajustes
 
@@ -258,7 +259,7 @@ Reglas de pegado:
 | Calendario mostrado | Selecciona un calendario alternativo integrado o un perfil personalizado para anual, cuadrícula mensual, lista mensual, resumen del día y planificador lateral. Predeterminado: `None`. |
 | Calendarios personalizados | Perfiles locales de fantasía o campaña con longitudes de mes, días de la semana, época, formato de etiqueta y regla simple de año bisiesto. |
 | Calendarios externos | Feeds `.ics` opcionales por `webcal://` o `https://` como superposiciones de solo lectura. Cada feed tiene estado, color, intervalo, descripciones y visibilidad por vista. |
-| Espacio inferior en móvil | Espacio inferior para planificadores móviles para que el contenido no quede cubierto por controles de Obsidian. |
+| Espacio inferior en móvil | Espacio inferior mínimo para todos los planificadores móviles. La separación automática de navbar y safe area sigue activa con valores menores. |
 | Ancho de celda en móvil | Ancho de celdas de mes en el planificador anual móvil. `0` usa el valor predeterminado. |
 
 Diary también guarda estado solo de interfaz: expansión del panel de plan, expansión móvil del panel y anchos de meses expandidos en el planificador anual.
@@ -381,7 +382,7 @@ npm test
 - Si faltan comandos, confirma que **Diary** esté activo en **Settings -> Community plugins**.
 - Si falta el planificador lateral, ejecuta **Open monthly planner in sidebar** o recarga Obsidian tras activar el plugin.
 - Si no aparecen chips, comprueba que los nombres sigan `YYYY-MM-DD` o `YYYY-MM-DD--YYYY-MM-DD`.
-- Si el contenido móvil queda tapado abajo, aumenta **Espacio inferior en móvil**.
+- Si deseas más espacio sobre la navegación móvil reservada automáticamente, aumenta **Espacio inferior en móvil**.
 - Si no aparece un recordatorio, confirma que Obsidian esté abierto, que la fecha sea hoy y que `notify_minutes` esté entre `0` y `1439`.
 
 ## Licencia

@@ -242,6 +242,10 @@ export class DailyPlannerView extends ItemView {
 		this.contentEl.addClass("daily-planner-container");
 		this.contentEl.addClass(this.getContainerClass());
 		this.contentEl.toggleClass("planner-container-compact", this.compactLayout);
+		this.contentEl.style.setProperty(
+			"--planner-mobile-bottom-padding",
+			`${this.plugin.settings.mobileBottomPadding ?? 3.5}rem`,
+		);
 		this.renderHeader();
 		const days = this.getVisibleDays();
 		this.renderTimeline(days);

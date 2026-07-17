@@ -125,6 +125,10 @@ export function setupPlannerContainer(
 		options.mobilePaddingProperty,
 		`${options.mobilePadding}rem`,
 	);
+	contentEl.style.setProperty(
+		"--planner-mobile-bottom-padding",
+		`${options.mobilePadding}rem`,
+	);
 }
 
 export interface PlannerSegment<T extends string> {

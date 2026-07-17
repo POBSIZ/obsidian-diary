@@ -295,7 +295,7 @@
 	"settings.externalCalendarShowYearly": "年プランナーに表示",
 	"settings.externalCalendarPrivacy": "秘密の iCal URL は、リンクを知っている人にカレンダーへのアクセスを許可する場合があります。Diary は URL をローカルのプラグインデータに保存し、Vault の同期によって他の端末へ同期されることがあります。",
 	"settings.mobileBottomPadding": "モバイル下部余白",
-	"settings.mobileBottomPaddingDesc": "モバイルの年プランナー下部余白（rem）。ツールタブに表が隠れないようにします。0 で無効。",
+	"settings.mobileBottomPaddingDesc": "すべてのモバイルプランナーの最小下部余白（rem）です。Obsidian の通常またはフローティング下部ナビゲーション領域は自動で確保します。",
 	"settings.mobileCellWidth": "モバイルセル幅",
 	"settings.mobileCellWidthDesc": "モバイルでの月セル幅（rem）。0 は既定値（ブレークポイントにより 4.5rem / 4rem）を使います。",
 	"settings.language": "言語",

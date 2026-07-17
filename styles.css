@@ -54,6 +54,7 @@ available in the app when your plugin is enabled.
 	--planner-chip-font-size-sm: 0.65em;
 	--planner-weekend-saturday: #3b82f6;
 	--planner-weekend-sunday: #ef4444;
+	--planner-mobile-bottom-gap: 0.75rem;
 }
 
 /* Planner copy/paste in progress (class on view contentEl) */
@@ -383,11 +384,58 @@ button.planner-more-menu-item:focus-visible {
 	top: auto;
 	left: 0.75rem;
 	right: 0.75rem;
-	bottom: max(0.75rem, env(safe-area-inset-bottom));
+	bottom: max(
+		var(--planner-mobile-bottom-gap),
+		env(safe-area-inset-bottom)
+	);
 	width: auto;
 	max-height: min(80vh, 32rem);
 	overflow-y: auto;
 	border-radius: 0.75rem;
+}
+
+/*
+ * Obsidian's mobile navbar overlays plugin views. Keep fixed surfaces and
+ * scroll endings above it; floating navigation also needs its bottom offset.
+ */
+body.is-mobile,
+body.-is-mobile {
+	--planner-mobile-bottom-clearance: calc(
+		var(--navbar-height, var(--mobile-toolbar-height, 3rem)) +
+			var(--planner-mobile-bottom-gap)
+	);
+}
+
+body.is-mobile.is-floating-nav,
+body.-is-mobile.is-floating-nav {
+	--planner-mobile-bottom-clearance: calc(
+		var(--navbar-height, var(--mobile-toolbar-height, 3rem)) +
+			var(
+				--navbar-bottom-offset,
+				max(
+					var(--safe-area-inset-bottom, 0px),
+					env(safe-area-inset-bottom, 0px)
+				)
+			) +
+			var(--planner-mobile-bottom-gap)
+	);
+}
+
+body.is-mobile .planner-container-compact,
+body.-is-mobile .planner-container-compact {
+	--planner-mobile-bottom-inset: max(
+		var(--planner-mobile-bottom-clearance),
+		var(--planner-mobile-bottom-padding, 0px)
+	);
+}
+
+body.is-mobile .planner-container-compact .planner-view-switcher-popover,
+body.-is-mobile .planner-container-compact .planner-view-switcher-popover {
+	bottom: var(--planner-mobile-bottom-inset);
+	max-height: min(
+		calc(100dvh - var(--planner-mobile-bottom-inset) - 1rem),
+		32rem
+	);
 }
 
 .planner-container-compact .planner-header-nav-btn {
@@ -2678,9 +2726,9 @@ body.-is-mobile .yearly-planner-month-width-btn,
 /* Mobile: bottom padding so table is not covered by tools tab (configurable in settings) */
 body.is-mobile .yearly-planner-scroll,
 body.-is-mobile .yearly-planner-scroll {
-	padding-bottom: var(
-		--yearly-planner-mobile-bottom-padding,
-		max(3.5rem, env(safe-area-inset-bottom, 0px))
+	padding-bottom: max(
+		var(--yearly-planner-mobile-bottom-padding, 3.5rem),
+		var(--planner-mobile-bottom-clearance)
 	);
 }
 
@@ -3442,9 +3490,9 @@ body.-is-mobile .monthly-planner-title {
 
 body.is-mobile .monthly-planner-scroll,
 body.-is-mobile .monthly-planner-scroll {
-	padding-bottom: var(
-		--monthly-planner-mobile-bottom-padding,
-		max(3.5rem, env(safe-area-inset-bottom, 0px))
+	padding-bottom: max(
+		var(--monthly-planner-mobile-bottom-padding, 3.5rem),
+		var(--planner-mobile-bottom-clearance)
 	);
 }
 
@@ -4170,6 +4218,14 @@ body.-is-mobile .daily-planner-untimed-chip {
 	min-height: 2.5rem;
 }
 
+body.is-mobile .daily-planner-timeline-scroll,
+body.-is-mobile .daily-planner-timeline-scroll {
+	padding-bottom: max(
+		var(--planner-mobile-bottom-padding, 3.5rem),
+		var(--planner-mobile-bottom-clearance)
+	);
+}
+
 .monthly-planner-container.monthly-planner-container-compact
 	.monthly-planner-table {
 	border-width: 0.5px;
@@ -4609,7 +4665,10 @@ body.-is-mobile .monthly-list-planner-container {
 
 body.is-mobile .monthly-list-planner-scroll,
 body.-is-mobile .monthly-list-planner-scroll {
-	padding-bottom: var(--monthly-list-planner-mobile-bottom-padding, 3.5rem);
+	padding-bottom: max(
+		var(--monthly-list-planner-mobile-bottom-padding, 3.5rem),
+		var(--planner-mobile-bottom-clearance)
+	);
 }
 
 body.is-mobile .monthly-list-planner-inner,

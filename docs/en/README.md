@@ -9,7 +9,7 @@ Full documentation: [English](https://github.com/POBSIZ/obsidian-diary/blob/main
 | Item | Value |
 | --- | --- |
 | Plugin ID | `diary` |
-| Current version | `1.8.3` |
+| Current version | `1.9.0` |
 | Minimum Obsidian version | `1.7.2` |
 | Supported platforms | Desktop / mobile (`isDesktopOnly: false`) |
 | Default language | `en` |
@@ -17,6 +17,7 @@ Full documentation: [English](https://github.com/POBSIZ/obsidian-diary/blob/main
 
 ## Latest Version
 
+- `1.9.0`: Keeps mobile planner content, timeline endings, and compact view menus above Obsidian's standard or floating bottom navigation while preserving configurable minimum padding.
 - `1.8.3`: Removes direct `Document` creation calls entirely by using typed Obsidian element instance helpers and immediate detachment.
 - `1.8.2`: Creates detached planner DOM through typed `DocumentFragment` Obsidian helpers, eliminating unsafe type propagation in community-plugin audits.
 - `1.8.1`: Adds searchable declarative settings for Obsidian 1.13+ while retaining legacy settings support, and uses Obsidian DOM helpers consistently.
@@ -243,7 +244,7 @@ Paste rules:
 - Select **Create note** to create a new note for that date.
 - Use pinch zoom in the monthly grid.
 - Use the reset zoom button to restore the monthly grid zoom level.
-- Use **Mobile bottom padding** and **Mobile cell width** settings to adjust spacing and cell width.
+- Diary automatically keeps planner content and menus above standard or floating Obsidian bottom navigation. Use **Mobile bottom padding** as an additional minimum gap and **Mobile cell width** to adjust yearly cells.
 
 ## Settings
 
@@ -258,7 +259,7 @@ Paste rules:
 | Calendar overlay | Selects one built-in alternate calendar or one custom calendar profile for yearly, monthly grid, monthly list, day summary, and sidebar planner views. Default: `None`. |
 | Custom calendars | Local fantasy/campaign calendar profiles. Each profile can define month lengths, weekday names, an epoch mapping, a label format, and a simple leap rule. |
 | External calendars | Opt-in `webcal://` or `https://` `.ics` feeds shown as read-only overlays. Each feed has an enabled state, color, refresh interval, description toggle, and per-view visibility settings. |
-| Mobile bottom padding | Bottom padding for mobile planners so content is not covered by Obsidian mobile controls. |
+| Mobile bottom padding | Minimum bottom padding for every mobile planner. Automatic navbar and safe-area clearance still applies when this value is smaller. |
 | Mobile cell width | Month cell width for the mobile yearly planner. `0` uses the default. |
 
 Diary also stores UI-only state in plugin data: plan note preview expansion, mobile plan note preview expansion, and expanded yearly month-cell widths.
@@ -381,7 +382,7 @@ npm test
 - If commands are missing, confirm that **Diary** is enabled in **Settings → Community plugins**.
 - If the sidebar planner is missing, run **Open monthly planner in sidebar** or reload Obsidian after enabling the plugin.
 - If chips do not appear, confirm that filenames follow `YYYY-MM-DD` or `YYYY-MM-DD--YYYY-MM-DD` rules.
-- If mobile content is covered at the bottom, increase **Mobile bottom padding**.
+- If you want more space above the automatically cleared mobile navigation, increase **Mobile bottom padding**.
 - If a reminder does not appear, confirm that Obsidian is open, the event date is today, and `notify_minutes` is within `0-1439`.
 
 ## License

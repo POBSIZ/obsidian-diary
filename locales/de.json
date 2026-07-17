@@ -295,7 +295,7 @@
 	"settings.externalCalendarShowYearly": "Im Jahresplaner anzeigen",
 	"settings.externalCalendarPrivacy": "Geheime iCal-URLs können jedem mit dem Link Kalenderzugriff geben. Diary speichert die URL in lokalen Plugin-Daten, die mit deinem Vault synchronisiert werden können.",
 	"settings.mobileBottomPadding": "Unterer Abstand mobil",
-	"settings.mobileBottomPaddingDesc": "Unterer Abstand (rem) im mobilen Jahresplaner, damit die Tabelle nicht vom Werkzeug-Tab verdeckt wird. 0 zum Deaktivieren.",
+	"settings.mobileBottomPaddingDesc": "Minimaler unterer Abstand (rem) für alle mobilen Planer. Diary hält automatisch Abstand zur normalen oder schwebenden unteren Obsidian-Navigation.",
 	"settings.mobileCellWidth": "Mobile Zellbreite",
 	"settings.mobileCellWidthDesc": "Breite (rem) der Monatszellen auf Mobilgeräten. 0 verwendet den Standardwert (4,5rem / 4rem je nach Breakpoint).",
 	"settings.language": "Sprache",

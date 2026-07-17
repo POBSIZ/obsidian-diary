@@ -295,7 +295,7 @@
 	"settings.externalCalendarShowYearly": "在年度規劃器中顯示",
 	"settings.externalCalendarPrivacy": "私密 iCal URL 可能讓任何擁有連結的人存取日曆。Diary 會將 URL 儲存在本地外掛資料中，這些資料可能隨 vault 同步。",
 	"settings.mobileBottomPadding": "行動裝置底部間距",
-	"settings.mobileBottomPaddingDesc": "行動裝置年度規劃器底部間距（rem），避免表格被工具分頁遮住。設為 0 可停用。",
+	"settings.mobileBottomPaddingDesc": "所有行動裝置規劃器的最小底部間距（rem）。Diary 會自動避開 Obsidian 的標準或浮動底部導覽。",
 	"settings.mobileCellWidth": "行動裝置儲存格寬度",
 	"settings.mobileCellWidthDesc": "行動裝置月份儲存格寬度（rem）。0 使用預設值（依斷點為 4.5rem / 4rem）。",
 	"settings.language": "語言",

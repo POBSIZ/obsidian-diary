@@ -296,7 +296,7 @@
 	"settings.externalCalendarShowYearly": "Show in yearly planner",
 	"settings.externalCalendarPrivacy": "Secret iCal URLs can grant calendar access to anyone with the link. Diary stores the URL in local plugin data, which may sync with your vault.",
 	"settings.mobileBottomPadding": "Mobile bottom padding",
-	"settings.mobileBottomPaddingDesc": "Padding (rem) at bottom of yearly planner on mobile so the table is not covered by the tools tab. 0 to disable.",
+	"settings.mobileBottomPaddingDesc": "Minimum bottom padding (rem) for all mobile planners. Diary also clears Obsidian's standard or floating bottom navigation automatically.",
 	"settings.mobileCellWidth": "Mobile cell width",
 	"settings.mobileCellWidthDesc": "Width (rem) of month cells on mobile. 0 to use default (4.5rem / 4rem by breakpoint).",
 	"settings.language": "Language",

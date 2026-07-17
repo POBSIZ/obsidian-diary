@@ -296,7 +296,7 @@
 	"settings.externalCalendarShowYearly": "연간 플래너에 표시",
 	"settings.externalCalendarPrivacy": "Secret iCal URL은 링크를 아는 사람이 캘린더를 읽을 수 있습니다. Diary는 URL을 로컬 plugin data에 저장하며 vault sync로 동기화될 수 있습니다.",
 	"settings.mobileBottomPadding": "모바일 하단 여백",
-	"settings.mobileBottomPaddingDesc": "모바일에서 연간 플래너 하단 여백(rem). 도구 탭에 가리지 않도록 합니다. 0으로 비활성화.",
+	"settings.mobileBottomPaddingDesc": "모든 모바일 플래너의 최소 하단 여백(rem)입니다. Obsidian의 일반 또는 부동 하단 내비게이션 영역은 자동으로 확보합니다.",
 	"settings.mobileCellWidth": "모바일 셀 너비",
 	"settings.mobileCellWidthDesc": "모바일에서 월 셀 너비(rem). 0은 기본값 사용(4.5rem / 4rem, 브레이크포인트별).",
 	"settings.language": "언어",

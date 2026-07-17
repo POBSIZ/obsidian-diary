@@ -295,7 +295,7 @@
 	"settings.externalCalendarShowYearly": "Afficher dans le planning annuel",
 	"settings.externalCalendarPrivacy": "Les URL iCal secrètes peuvent donner accès au calendrier à toute personne qui possède le lien. Diary stocke l’URL dans les données locales du plugin, qui peuvent être synchronisées avec votre vault.",
 	"settings.mobileBottomPadding": "Marge inférieure mobile",
-	"settings.mobileBottomPaddingDesc": "Marge inférieure (rem) du planning annuel sur mobile pour que le tableau ne soit pas masqué par l’onglet d’outils. 0 pour désactiver.",
+	"settings.mobileBottomPaddingDesc": "Marge inférieure minimale (rem) pour tous les plannings mobiles. Diary réserve automatiquement la navigation inférieure normale ou flottante d’Obsidian.",
 	"settings.mobileCellWidth": "Largeur des cellules mobile",
 	"settings.mobileCellWidthDesc": "Largeur (rem) des cellules de mois sur mobile. 0 utilise la valeur par défaut (4.5rem / 4rem selon le point de rupture).",
 	"settings.language": "Langue",

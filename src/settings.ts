@@ -54,7 +54,7 @@ export interface DiaryObsidianSettings {
 	enabledAlternateCalendars?: AlternateCalendarId[];
 	/** Legacy migration field from the earlier single Korean-lunar toggle. */
 	showLunarDates?: boolean;
-	/** Mobile only: bottom padding (rem) so table isn't covered by Obsidian tools tab. 0 = use default. */
+	/** Mobile only: minimum bottom padding (rem), combined with Obsidian navbar clearance. */
 	mobileBottomPadding: number;
 	/** Mobile only: month cell width (rem). 0 = use default. */
 	mobileCellWidth: number;

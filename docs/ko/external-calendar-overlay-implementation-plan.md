@@ -2,7 +2,7 @@
 
 이 문서는 Diary에 Google Calendar, Outlook, Apple Calendar, `webcal://`, `.ics` 같은 외부 캘린더를 불러와 플래너에 표시하는 기능의 실제 구현 계획과 현재 적용 상태를 정리한다. 핵심 방향은 **외부 일정은 먼저 읽기 전용 overlay로만 보여주고, 사용자가 선택한 일정만 Markdown 노트로 승격한다**는 것이다.
 
-현재 상태: `1.8.3` 기준으로 사용자가 추가한 `webcal://` 또는 `https://` `.ics` feed를 연간/월간/목록/일별/3일 플래너의 읽기 전용 overlay로 표시하고, 외부 일정 상세 모달에서 선택한 일정만 Markdown 노트로 만들 수 있다. 새 feed는 기본 60분 자동 새로고침과 전체 planner surface 표시가 켜진 상태로 추가되며, 사용자가 수동 새로고침이나 화면별 숨김으로 바꿀 수 있다. OAuth, CalDAV 쓰기, 외부 원본 이벤트 수정은 아직 비목표다.
+현재 상태: `1.9.0` 기준으로 사용자가 추가한 `webcal://` 또는 `https://` `.ics` feed를 연간/월간/목록/일별/3일 플래너의 읽기 전용 overlay로 표시하고, 외부 일정 상세 모달에서 선택한 일정만 Markdown 노트로 만들 수 있다. 새 feed는 기본 60분 자동 새로고침과 전체 planner surface 표시가 켜진 상태로 추가되며, 사용자가 수동 새로고침이나 화면별 숨김으로 바꿀 수 있다. OAuth, CalDAV 쓰기, 외부 원본 이벤트 수정은 아직 비목표다.
 
 ## 목표
 
@@ -404,7 +404,7 @@ calendarId | uid | instanceId
 - 외부 item은 클릭 시 상세 모달을 연다.
 - Markdown 파일은 자동으로 만들지 않는다. 파일 생성은 2단계의 명시적 액션으로 분리한다.
 
-상태: `1.8.3` 기준 적용됨. 여러 feed, feed별 색상, 표시 위치, description 포함 여부, 수동/주기 새로고침, startup refresh, URL 검증을 지원한다.
+상태: `1.9.0` 기준 적용됨. 여러 feed, feed별 색상, 표시 위치, description 포함 여부, 수동/주기 새로고침, startup refresh, URL 검증을 지원한다.
 
 검증:
 
@@ -428,7 +428,7 @@ calendarId | uid | instanceId
 - 같은 외부 이벤트에서 노트를 만든 뒤 overlay가 중복 표시되지 않음
 - 생성된 노트는 플러그인을 꺼도 일반 Markdown 파일로 남음
 
-상태: `1.8.3` 기준 적용됨. 생성된 노트에는 `diary_external_calendar`, `diary_external_event_uid`, `diary_external_event_instance`, `diary_external_event_source`, `diary_external_event_linked_at` frontmatter를 저장한다. 모달 액션 버튼은 공통 UI primitive로 아이콘+텍스트, 눌림, loading, 완료 상태 피드백을 제공한다.
+상태: `1.9.0` 기준 적용됨. 생성된 노트에는 `diary_external_calendar`, `diary_external_event_uid`, `diary_external_event_instance`, `diary_external_event_source`, `diary_external_event_linked_at` frontmatter를 저장한다. 모달 액션 버튼은 공통 UI primitive로 아이콘+텍스트, 눌림, loading, 완료 상태 피드백을 제공한다.
 
 ### 3단계: 반복, timezone, cache 안정화
 
@@ -437,7 +437,7 @@ calendarId | uid | instanceId
 - 여러 feed를 지원한다.
 - feed별 오류 상태와 마지막 성공 시각을 표시한다.
 
-상태: `1.8.3` 기준 부분 적용됨. `RRULE`/`EXDATE`/`RDATE`, cancelled event 숨김, `ETag`/`Last-Modified`, 오류 cache 유지, feed별 오류/새로고침 상태 표시는 구현되어 있다. `TZID`별 timezone 변환은 아직 남아 있다.
+상태: `1.9.0` 기준 부분 적용됨. `RRULE`/`EXDATE`/`RDATE`, cancelled event 숨김, `ETag`/`Last-Modified`, 오류 cache 유지, feed별 오류/새로고침 상태 표시는 구현되어 있다. `TZID`별 timezone 변환은 아직 남아 있다.
 
 검증:
 
@@ -452,7 +452,7 @@ calendarId | uid | instanceId
 - 사용자가 원하면 연간 셀에서도 외부 item 목록을 일자 요약으로 확인할 수 있게 한다.
 - 사용자가 추가하고 활성화한 feed에 한해 주기 새로고침을 제공한다.
 
-상태: `1.8.3` 기준 적용됨. feed 표시 범위에 연간/일별/3일 플래너가 포함되고, 주기 새로고침은 feed별 `refreshMinutes`로 제어된다.
+상태: `1.9.0` 기준 적용됨. feed 표시 범위에 연간/일별/3일 플래너가 포함되고, 주기 새로고침은 feed별 `refreshMinutes`로 제어된다.
 
 검증:
 

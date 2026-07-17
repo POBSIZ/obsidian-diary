@@ -1,7 +1,7 @@
 {
 	"id": "diary",
 	"name": "Diary",
-	"version": "1.8.3",
+	"version": "1.9.0",
 	"minAppVersion": "1.7.2",
 	"description": "Yearly and monthly planner with date notes, range notes, and holiday support.",
 	"author": "Won",

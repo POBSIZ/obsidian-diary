@@ -11,7 +11,7 @@ Diary는 Obsidian vault 안의 Markdown 파일을 날짜 기반 플래너로 보
 | Item | Value |
 | --- | --- |
 | Plugin ID | `diary` |
-| Version | `1.8.3` |
+| Version | `1.9.0` |
 | Minimum Obsidian version | `1.7.2` |
 | Platforms | Desktop and mobile (`isDesktopOnly: false`) |
 | Default language | `en` |
@@ -19,6 +19,7 @@ Diary는 Obsidian vault 안의 Markdown 파일을 날짜 기반 플래너로 보
 
 ## Latest Version
 
+- `1.9.0`: keeps mobile planner content, timeline endings, and compact view menus above Obsidian's standard or floating bottom navigation while preserving configurable minimum padding.
 - `1.8.3`: removes direct `Document` creation calls entirely by using typed Obsidian element instance helpers and immediate detachment.
 - `1.8.2`: creates detached planner DOM through typed `DocumentFragment` Obsidian helpers, eliminating unsafe type propagation in community-plugin audits.
 - `1.8.1`: adds searchable declarative settings for Obsidian 1.13+ while preserving legacy settings support, and replaces direct DOM element construction with Obsidian helpers.
@@ -78,7 +79,7 @@ todo, and plan notes. The temporary demo data was removed after capture.
 - External calendar overlays: add opt-in `webcal://` or `https://` `.ics` feeds, refresh them manually or on an interval, and show events as read-only chips/ranges. Select an external event only when you want to create a normal Markdown note for it.
 - Scoped styling: Diary's CSS is limited to planner views, settings panels, and plugin modals so it does not restyle ordinary vault content.
 - Desktop workflows: right-sidebar companion planner, drag range selection, chip drag-to-move, keyboard activation, internal planner copy/paste/delete/undo.
-- Mobile workflows: tap a day to open the day summary sheet, create notes from the sheet, pinch zoom the monthly grid, and adjust mobile spacing in settings.
+- Mobile workflows: tap a day to open the day summary sheet, create notes from the sheet, pinch zoom the monthly grid, and keep planner content and menus above standard or floating Obsidian navigation with an adjustable minimum bottom gap.
 
 ## Quick Usage
 

@@ -9,7 +9,7 @@ Vollständige Dokumentation: [English](https://github.com/POBSIZ/obsidian-diary/
 | Eintrag | Wert |
 | --- | --- |
 | Plugin-ID | `diary` |
-| Aktuelle Version | `1.8.3` |
+| Aktuelle Version | `1.9.0` |
 | Minimale Obsidian-Version | `1.7.2` |
 | Plattformen | Desktop / Mobil (`isDesktopOnly: false`) |
 | Standardsprache | `en` |
@@ -17,6 +17,7 @@ Vollständige Dokumentation: [English](https://github.com/POBSIZ/obsidian-diary/
 
 ## Neueste Version
 
+- `1.9.0`: Hält mobile Planerinhalte, Zeitleistenenden und kompakte Ansichtsmenüs über der normalen oder schwebenden unteren Obsidian-Navigation und bewahrt den konfigurierbaren Mindestabstand.
 - `1.8.3`: Entfernt direkte `Document`-Erzeugungsaufrufe vollständig, indem typisierte Obsidian-Elementhelfer mit sofortigem Ablösen verwendet werden.
 - `1.8.2`: Erstellt getrenntes Planer-DOM über typisierte Obsidian-Helfer auf `DocumentFragment` und beseitigt dadurch unsichere Typweitergabe in Community-Plugin-Prüfungen.
 - `1.8.1`: Ergänzt durchsuchbare deklarative Einstellungen für Obsidian 1.13+, behält die bisherige Einstellungsunterstützung bei und verwendet durchgehend Obsidian-DOM-Helfer.
@@ -243,7 +244,7 @@ Einfügeregeln:
 - Wähle **Create note**, um eine neue Notiz für diesen Tag zu erstellen.
 - Nutze Pinch-Zoom im Monatsraster.
 - Nutze den Zoom-Reset, um die Rastergröße zurückzusetzen.
-- Passe mit **Unterer Abstand mobil** und **Mobile Zellbreite** Abstand und Zellbreite an.
+- Diary hält Inhalte und Menüs automatisch über der normalen oder schwebenden unteren Obsidian-Navigation. **Unterer Abstand mobil** legt zusätzlichen Mindestabstand fest; **Mobile Zellbreite** passt die Jahreszellen an.
 
 ## Einstellungen
 
@@ -258,7 +259,7 @@ Einfügeregeln:
 | Angezeigter Kalender | Wählt einen eingebauten alternativen Kalender oder ein eigenes Kalenderprofil für Jahresplaner, Monatsraster, Monatsliste, Tagesübersicht und Seitenplaner. Standard: `None`. |
 | Eigene Kalender | Lokale Fantasy- oder Kampagnenkalenderprofile mit Monatslängen, Wochentagen, Epoche, Beschriftungsformat und einfacher Schaltregel. |
 | Externe Kalender | Optionale `webcal://`- oder `https://`-`.ics`-Feeds als schreibgeschützte Overlays. Jeder Feed hat Aktivierung, Farbe, Aktualisierungsintervall, Beschreibung und Sichtbarkeit pro Ansicht. |
-| Unterer Abstand mobil | Unterer Abstand für mobile Planer, damit Inhalte nicht von mobilen Obsidian-Bedienelementen verdeckt werden. |
+| Unterer Abstand mobil | Mindestabstand für alle mobilen Planer. Automatischer Navbar- und Safe-Area-Abstand bleibt auch bei einem kleineren Wert aktiv. |
 | Mobile Zellbreite | Breite der Monatszellen im mobilen Jahresplaner. `0` nutzt den Standardwert. |
 
 Diary speichert außerdem reine UI-Zustände in Plugin-Daten: Plan-Notiz-Vorschau, mobile Plan-Notiz-Vorschau und erweiterte Monatszellenbreiten im Jahresplaner.
@@ -381,7 +382,7 @@ npm test
 - Wenn Befehle fehlen, stelle sicher, dass **Diary** unter **Settings -> Community plugins** aktiviert ist.
 - Wenn der Seitenplaner fehlt, führe **Open monthly planner in sidebar** aus oder lade Obsidian nach Aktivierung neu.
 - Wenn Chips nicht erscheinen, prüfe, ob Dateinamen `YYYY-MM-DD` oder `YYYY-MM-DD--YYYY-MM-DD` folgen.
-- Wenn mobile Inhalte unten verdeckt werden, erhöhe **Unterer Abstand mobil**.
+- Wenn mehr Platz über der automatisch freigehaltenen mobilen Navigation gewünscht ist, erhöhe **Unterer Abstand mobil**.
 - Wenn eine Erinnerung nicht erscheint, prüfe, ob Obsidian geöffnet ist, das Ereignis heute liegt und `notify_minutes` zwischen `0` und `1439` liegt.
 
 ## Lizenz

@@ -9,7 +9,7 @@ Documentation complète : [English](https://github.com/POBSIZ/obsidian-diary/blo
 | Élément | Valeur |
 | --- | --- |
 | ID du plugin | `diary` |
-| Version actuelle | `1.8.3` |
+| Version actuelle | `1.9.0` |
 | Version minimale d’Obsidian | `1.7.2` |
 | Plateformes | Bureau / mobile (`isDesktopOnly: false`) |
 | Langue par défaut | `en` |
@@ -17,6 +17,7 @@ Documentation complète : [English](https://github.com/POBSIZ/obsidian-diary/blo
 
 ## Dernière version
 
+- `1.9.0` : maintient le contenu mobile, les fins de chronologie et les menus compacts au-dessus de la navigation inférieure normale ou flottante d’Obsidian, tout en conservant une marge minimale configurable.
 - `1.8.3` : supprime entièrement les appels directs de création via `Document` en utilisant les helpers d’instance Obsidian typés puis un détachement immédiat.
 - `1.8.2` : crée le DOM détaché du planificateur avec les helpers Obsidian typés de `DocumentFragment`, supprimant la propagation de types non sûrs dans les audits.
 - `1.8.1` : ajoute des réglages déclaratifs recherchables pour Obsidian 1.13+, conserve la compatibilité avec l’ancien écran de réglages et utilise systématiquement les helpers DOM d’Obsidian.
@@ -243,7 +244,7 @@ Règles de collage :
 - Sélectionnez **Create note** pour créer une note à cette date.
 - Utilisez le pincement pour zoomer dans la grille.
 - Utilisez le bouton de réinitialisation du zoom pour revenir à la taille initiale.
-- Ajustez **Marge inférieure mobile** et **Largeur des cellules mobile** pour adapter l’espace et la largeur.
+- Diary maintient automatiquement le contenu et les menus au-dessus de la navigation inférieure normale ou flottante d’Obsidian. Utilisez **Marge inférieure mobile** comme marge minimale supplémentaire et **Largeur des cellules mobile** pour les cellules annuelles.
 
 ## Réglages
 
@@ -258,7 +259,7 @@ Règles de collage :
 | Calendrier affiché | Sélectionne un calendrier alternatif intégré ou un profil personnalisé pour les vues annuelle, grille mensuelle, liste mensuelle, résumé du jour et barre latérale. Par défaut : `None`. |
 | Calendriers personnalisés | Profils locaux de fiction ou campagne avec longueurs de mois, jours de semaine, époque, format d’étiquette et règle de bissextile simple. |
 | Calendriers externes | Flux `.ics` optionnels en `webcal://` ou `https://` affichés en lecture seule. Chaque flux a état, couleur, intervalle, descriptions et visibilité par vue. |
-| Marge inférieure mobile | Marge basse des planificateurs mobiles pour éviter que le contenu soit masqué par les contrôles Obsidian. |
+| Marge inférieure mobile | Marge minimale pour tous les planificateurs mobiles. Le dégagement automatique de la navbar et de la safe area reste actif avec une valeur plus petite. |
 | Largeur des cellules mobile | Largeur des cellules de mois dans le planificateur annuel mobile. `0` utilise la valeur par défaut. |
 
 Diary enregistre aussi des états uniquement UI : expansion du panneau de plan, expansion mobile et largeurs des mois étendus dans le planificateur annuel.
@@ -381,7 +382,7 @@ npm test
 - Si les commandes manquent, confirmez que **Diary** est activé dans **Settings -> Community plugins**.
 - Si le planificateur latéral manque, exécutez **Open monthly planner in sidebar** ou rechargez Obsidian après activation.
 - Si les chips n’apparaissent pas, vérifiez que les noms suivent `YYYY-MM-DD` ou `YYYY-MM-DD--YYYY-MM-DD`.
-- Si le contenu mobile est masqué en bas, augmentez **Marge inférieure mobile**.
+- Pour obtenir plus d’espace au-dessus de la navigation mobile automatiquement dégagée, augmentez **Marge inférieure mobile**.
 - Si un rappel ne s’affiche pas, vérifiez qu’Obsidian est ouvert, que l’événement est aujourd’hui et que `notify_minutes` est entre `0` et `1439`.
 
 ## Licence
