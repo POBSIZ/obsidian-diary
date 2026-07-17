@@ -9,7 +9,7 @@ Vollständige Dokumentation: [English](https://github.com/POBSIZ/obsidian-diary/
 | Eintrag | Wert |
 | --- | --- |
 | Plugin-ID | `diary` |
-| Aktuelle Version | `1.9.0` |
+| Aktuelle Version | `1.9.1` |
 | Minimale Obsidian-Version | `1.7.2` |
 | Plattformen | Desktop / Mobil (`isDesktopOnly: false`) |
 | Standardsprache | `en` |
@@ -17,6 +17,7 @@ Vollständige Dokumentation: [English](https://github.com/POBSIZ/obsidian-diary/
 
 ## Neueste Version
 
+- `1.9.1`: Erstellt mit der aktuellen Attestierungsaktion für jedes Release-Asset eine separate, von GitHub verifizierbare Herkunftsattestierung.
 - `1.9.0`: Hält mobile Planerinhalte, Zeitleistenenden und kompakte Ansichtsmenüs über der normalen oder schwebenden unteren Obsidian-Navigation und bewahrt den konfigurierbaren Mindestabstand.
 - `1.8.3`: Entfernt direkte `Document`-Erzeugungsaufrufe vollständig, indem typisierte Obsidian-Elementhelfer mit sofortigem Ablösen verwendet werden.
 - `1.8.2`: Erstellt getrenntes Planer-DOM über typisierte Obsidian-Helfer auf `DocumentFragment` und beseitigt dadurch unsichere Typweitergabe in Community-Plugin-Prüfungen.

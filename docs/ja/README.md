@@ -9,7 +9,7 @@ Diary は、Obsidian の vault 内にある Markdown ファイルを日付ベー
 | 項目 | 値 |
 | --- | --- |
 | プラグイン ID | `diary` |
-| 現在のバージョン | `1.9.0` |
+| 現在のバージョン | `1.9.1` |
 | 最小 Obsidian バージョン | `1.7.2` |
 | 対応プラットフォーム | デスクトップ / モバイル (`isDesktopOnly: false`) |
 | 既定の言語 | `en` |
@@ -17,6 +17,7 @@ Diary は、Obsidian の vault 内にある Markdown ファイルを日付ベー
 
 ## 最新バージョン
 
+- `1.9.1`: 現行の attestation アクションを使用し、各リリースアセットに個別の GitHub 検証可能な provenance attestation を生成します。
 - `1.9.0`: モバイルプランナーの内容、タイムライン末尾、コンパクト表示メニューを Obsidian の通常またはフローティング下部ナビゲーションの上に保ち、設定可能な最小余白も維持します。
 - `1.8.3`: 型付けされた Obsidian element instance helper で要素を作成して直ちに detach し、直接の `Document` 生成呼び出しをすべて削除しました。
 - `1.8.2`: 型付けされた `DocumentFragment` の Obsidian helper で detached プランナー DOM を生成し、community plugin audit の unsafe 型伝播警告を解消しました。

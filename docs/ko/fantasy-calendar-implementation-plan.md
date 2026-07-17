@@ -332,7 +332,7 @@ recurrence_anchor_day: 12
 - 노트 생성/수정 모달에 커스텀 날짜 미리보기가 보인다.
 - 반복 이벤트의 기준 역법으로는 아직 선택할 수 없다.
 
-상태: `1.9.0` 기준 적용됨. 설정의 **Calendar overlay**에서 built-in 보조 역법 또는 커스텀 캘린더 프로필 하나를 선택하고, 연간/월간/목록/일별/3일/사이드바 라벨과 노트 생성/수정 모달 미리보기에 반영한다. 설정 UI는 공통 disclosure, badge, button, field primitive를 사용하며 프로필 생성, 편집, 복제, 삭제, 선택을 지원한다. import/export와 custom recurrence basis는 아직 후속 단계다.
+상태: `1.9.1` 기준 적용됨. 설정의 **Calendar overlay**에서 built-in 보조 역법 또는 커스텀 캘린더 프로필 하나를 선택하고, 연간/월간/목록/일별/3일/사이드바 라벨과 노트 생성/수정 모달 미리보기에 반영한다. 설정 UI는 공통 disclosure, badge, button, field primitive를 사용하며 프로필 생성, 편집, 복제, 삭제, 선택을 지원한다. import/export와 custom recurrence basis는 아직 후속 단계다.
 
 검증:
 

@@ -9,7 +9,7 @@ Documentación completa: [English](https://github.com/POBSIZ/obsidian-diary/blob
 | Elemento | Valor |
 | --- | --- |
 | ID del plugin | `diary` |
-| Versión actual | `1.9.0` |
+| Versión actual | `1.9.1` |
 | Versión mínima de Obsidian | `1.7.2` |
 | Plataformas | Escritorio / móvil (`isDesktopOnly: false`) |
 | Idioma predeterminado | `en` |
@@ -17,6 +17,7 @@ Documentación completa: [English](https://github.com/POBSIZ/obsidian-diary/blob
 
 ## Última versión
 
+- `1.9.1`: Genera una certificación de procedencia independiente y verificable por GitHub para cada recurso de la versión mediante la acción de certificación actual.
 - `1.9.0`: Mantiene el contenido móvil, los finales de línea de tiempo y los menús compactos por encima de la navegación inferior normal o flotante de Obsidian, conservando un espacio mínimo configurable.
 - `1.8.3`: Elimina por completo las llamadas directas de creación de `Document` mediante helpers de instancia tipados de Obsidian y separación inmediata.
 - `1.8.2`: Crea DOM desconectado del planificador mediante helpers tipados de Obsidian sobre `DocumentFragment`, eliminando la propagación de tipos inseguros en las auditorías.
