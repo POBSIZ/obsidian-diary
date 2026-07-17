@@ -9,7 +9,7 @@ Full documentation: [English](https://github.com/POBSIZ/obsidian-diary/blob/main
 | Item | Value |
 | --- | --- |
 | Plugin ID | `diary` |
-| Current version | `1.9.3` |
+| Current version | `1.9.4` |
 | Minimum Obsidian version | `1.7.2` |
 | Supported platforms | Desktop / mobile (`isDesktopOnly: false`) |
 | Default language | `en` |
@@ -17,6 +17,7 @@ Full documentation: [English](https://github.com/POBSIZ/obsidian-diary/blob/main
 
 ## Latest Version
 
+- `1.9.4`: Removes optional artifact attestations that the Obsidian Community Scorecard rejected despite successful GitHub cryptographic verification.
 - `1.9.3`: Aligns release provenance with Obsidian Community Scorecard verification by using the current build-provenance action and lightweight Git tags.
 - `1.9.2`: Stamps JavaScript and CSS release assets with the plugin version so each release has unique digests and unambiguous provenance attestations.
 - `1.9.1`: Generates a separate GitHub-verified provenance attestation for each release asset using the current attestation action.
@@ -369,7 +370,7 @@ npm test
 - Release assets: `main.js`, `manifest.json`, `styles.css`
 - Use `npm version patch|minor|major --no-git-tag-version` so `package.json`, `package-lock.json`, `manifest.json`, and `versions.json` stay in sync.
 - The GitHub release tag must exactly match the `manifest.json` version and should not have a leading `v`.
-- This repository publishes release assets as individual files, and the release workflow generates build provenance attestation for `main.js`, `manifest.json`, and `styles.css`.
+- This repository builds `main.js`, `manifest.json`, and `styles.css` from the tagged source in GitHub Actions and publishes them as individual release assets.
 
 ## Privacy And Network
 

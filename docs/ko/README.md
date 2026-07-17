@@ -9,7 +9,7 @@ Diary는 Obsidian vault 안의 Markdown 파일을 날짜 기반 플래너로 보
 | 항목 | 값 |
 | --- | --- |
 | 플러그인 ID | `diary` |
-| 현재 버전 | `1.9.3` |
+| 현재 버전 | `1.9.4` |
 | 최소 Obsidian 버전 | `1.7.2` |
 | 지원 플랫폼 | 데스크톱 / 모바일 (`isDesktopOnly: false`) |
 | 기본 언어 | `en` |
@@ -17,6 +17,7 @@ Diary는 Obsidian vault 안의 Markdown 파일을 날짜 기반 플래너로 보
 
 ## 최신 버전
 
+- `1.9.4`: GitHub 암호화 검증은 통과했지만 Obsidian Community Scorecard가 거부한 선택적 artifact attestation 생성을 제거합니다.
 - `1.9.3`: 최신 build-provenance 액션과 lightweight Git 태그를 사용해 릴리스 provenance를 Obsidian Community Scorecard 검증 방식에 맞춥니다.
 - `1.9.2`: JavaScript와 CSS 릴리스 자산에 플러그인 버전을 기록해 릴리스마다 고유 digest와 모호하지 않은 provenance attestation을 생성합니다.
 - `1.9.1`: 최신 attestation 액션으로 각 릴리스 자산에 독립적인 GitHub 검증 가능 provenance attestation을 생성합니다.
@@ -376,7 +377,7 @@ npm test
 - 릴리스 에셋: `main.js`, `manifest.json`, `styles.css`
 - `npm version patch|minor|major --no-git-tag-version`을 사용해 `package.json`, `package-lock.json`, `manifest.json`, `versions.json`을 함께 맞춥니다.
 - GitHub 릴리스 태그는 `manifest.json`의 버전과 정확히 같아야 하며, 앞에 `v`를 붙이지 않습니다.
-- 이 저장소는 릴리스 에셋을 개별 파일로 게시하며, 릴리스 워크플로는 `main.js`, `manifest.json`, `styles.css`에 대한 build provenance attestation을 생성합니다.
+- 이 저장소는 태그된 소스에서 `main.js`, `manifest.json`, `styles.css`를 GitHub Actions로 빌드한 뒤 개별 릴리스 에셋으로 게시합니다.
 
 ## 개인정보와 네트워크
 

@@ -9,7 +9,7 @@ Diary は、Obsidian の vault 内にある Markdown ファイルを日付ベー
 | 項目 | 値 |
 | --- | --- |
 | プラグイン ID | `diary` |
-| 現在のバージョン | `1.9.3` |
+| 現在のバージョン | `1.9.4` |
 | 最小 Obsidian バージョン | `1.7.2` |
 | 対応プラットフォーム | デスクトップ / モバイル (`isDesktopOnly: false`) |
 | 既定の言語 | `en` |
@@ -17,6 +17,7 @@ Diary は、Obsidian の vault 内にある Markdown ファイルを日付ベー
 
 ## 最新バージョン
 
+- `1.9.4`: GitHub の暗号検証には成功したものの Obsidian Community Scorecard が拒否した、任意の artifact attestation 生成を削除します。
 - `1.9.3`: 現行の build-provenance アクションと lightweight Git tag を使用し、リリース provenance を Obsidian Community Scorecard の検証方式に合わせます。
 - `1.9.2`: JavaScript と CSS のリリースアセットにプラグインバージョンを記録し、各リリースに固有の digest と曖昧さのない provenance attestation を持たせます。
 - `1.9.1`: 現行の attestation アクションを使用し、各リリースアセットに個別の GitHub 検証可能な provenance attestation を生成します。
@@ -369,7 +370,7 @@ npm test
 - リリースファイル: `main.js`, `manifest.json`, `styles.css`
 - `npm version patch|minor|major --no-git-tag-version` を使うと、`package.json`, `package-lock.json`, `manifest.json`, `versions.json` を同期できます。
 - GitHub Release のタグは `manifest.json` の version と完全一致し、先頭に `v` を付けません。
-- このリポジトリはリリースファイルを個別 asset として公開し、ワークフローは `main.js`, `manifest.json`, `styles.css` の provenance attestation を生成します。
+- このリポジトリはタグ付きソースから `main.js`, `manifest.json`, `styles.css` を GitHub Actions でビルドし、個別の release asset として公開します。
 
 ## プライバシーとネットワーク
 

@@ -9,7 +9,7 @@ Documentación completa: [English](https://github.com/POBSIZ/obsidian-diary/blob
 | Elemento | Valor |
 | --- | --- |
 | ID del plugin | `diary` |
-| Versión actual | `1.9.3` |
+| Versión actual | `1.9.4` |
 | Versión mínima de Obsidian | `1.7.2` |
 | Plataformas | Escritorio / móvil (`isDesktopOnly: false`) |
 | Idioma predeterminado | `en` |
@@ -17,6 +17,7 @@ Documentación completa: [English](https://github.com/POBSIZ/obsidian-diary/blob
 
 ## Última versión
 
+- `1.9.4`: Elimina las attestations opcionales de artefactos que Obsidian Community Scorecard rechazó pese a superar la verificación criptográfica de GitHub.
 - `1.9.3`: Alinea la procedencia de la versión con la verificación de Obsidian Community Scorecard mediante la acción de procedencia de compilación actual y etiquetas Git ligeras.
 - `1.9.2`: Marca los recursos JavaScript y CSS con la versión del plugin para que cada versión tenga resúmenes únicos y certificaciones de procedencia inequívocas.
 - `1.9.1`: Genera una certificación de procedencia independiente y verificable por GitHub para cada recurso de la versión mediante la acción de certificación actual.

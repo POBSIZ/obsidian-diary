@@ -9,7 +9,7 @@ Documentation complète : [English](https://github.com/POBSIZ/obsidian-diary/blo
 | Élément | Valeur |
 | --- | --- |
 | ID du plugin | `diary` |
-| Version actuelle | `1.9.3` |
+| Version actuelle | `1.9.4` |
 | Version minimale d’Obsidian | `1.7.2` |
 | Plateformes | Bureau / mobile (`isDesktopOnly: false`) |
 | Langue par défaut | `en` |
@@ -17,6 +17,7 @@ Documentation complète : [English](https://github.com/POBSIZ/obsidian-diary/blo
 
 ## Dernière version
 
+- `1.9.4` : supprime les attestations d’artefacts facultatives rejetées par l’Obsidian Community Scorecard malgré une vérification cryptographique GitHub réussie.
 - `1.9.3` : aligne la provenance de la version sur la vérification de l’Obsidian Community Scorecard grâce à l’action de provenance de build actuelle et à des tags Git légers.
 - `1.9.2` : marque les ressources JavaScript et CSS avec la version du plugin afin que chaque version possède des condensats uniques et des attestations de provenance sans ambiguïté.
 - `1.9.1` : génère une attestation de provenance distincte et vérifiable par GitHub pour chaque ressource de version avec l’action d’attestation actuelle.
@@ -369,7 +370,7 @@ npm test
 - Fichiers publiés : `main.js`, `manifest.json`, `styles.css`
 - Utilisez `npm version patch|minor|major --no-git-tag-version` pour garder `package.json`, `package-lock.json`, `manifest.json` et `versions.json` synchronisés.
 - Le tag GitHub Release doit correspondre exactement à la version de `manifest.json` et ne doit pas commencer par `v`.
-- Le dépôt publie les assets comme fichiers individuels, et le workflow génère une attestation de provenance pour `main.js`, `manifest.json` et `styles.css`.
+- Le dépôt compile `main.js`, `manifest.json` et `styles.css` depuis la source taguée dans GitHub Actions, puis les publie comme assets individuels.
 
 ## Confidentialité et réseau
 

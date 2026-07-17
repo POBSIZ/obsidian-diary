@@ -17,7 +17,7 @@ if (!(targetVersion in versions)) {
 }
 
 // Keep the shipped stylesheet digest unique per release so artifact
-// attestations cannot collide with an older release that had identical CSS.
+// release validators cannot confuse an asset with an older release that had identical CSS.
 const stylesPath = "styles.css";
 const styles = readFileSync(stylesPath, "utf8");
 const versionMarker = /(?<=Diary release version: )\d+\.\d+\.\d+/;

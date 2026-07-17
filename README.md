@@ -11,7 +11,7 @@ Diary는 Obsidian vault 안의 Markdown 파일을 날짜 기반 플래너로 보
 | Item | Value |
 | --- | --- |
 | Plugin ID | `diary` |
-| Version | `1.9.3` |
+| Version | `1.9.4` |
 | Minimum Obsidian version | `1.7.2` |
 | Platforms | Desktop and mobile (`isDesktopOnly: false`) |
 | Default language | `en` |
@@ -19,6 +19,7 @@ Diary는 Obsidian vault 안의 Markdown 파일을 날짜 기반 플래너로 보
 
 ## Latest Version
 
+- `1.9.4`: removes optional artifact attestations that the Obsidian Community Scorecard rejected despite successful GitHub cryptographic verification.
 - `1.9.3`: aligns release provenance with Obsidian Community Scorecard verification by using the current build-provenance action and lightweight Git tags.
 - `1.9.2`: stamps JavaScript and CSS release assets with the plugin version so each release has unique digests and unambiguous provenance attestations.
 - `1.9.1`: generates a separate GitHub-verified provenance attestation for each release asset using the current attestation action.
@@ -153,7 +154,7 @@ npm test
 - Release workflow: `.github/workflows/release.yml`
 - Release assets: `main.js`, `manifest.json`, `styles.css`
 - Version bump helper: `npm version patch|minor|major --no-git-tag-version`
-- Build provenance attestation is generated during release workflow.
+- Release assets are built from the tagged source in GitHub Actions and uploaded directly to the matching GitHub release.
 
 ## License
 

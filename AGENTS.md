@@ -6,7 +6,7 @@
 - Source entry point: `src/main.ts`; esbuild bundles it to top-level `main.js`, which Obsidian loads.
 - Release artifacts for this repo: `main.js`, `manifest.json`, and `styles.css`.
 - Current plugin ID: `diary`.
-- Current plugin version: `1.9.3`.
+- Current plugin version: `1.9.4`.
 - Current minimum Obsidian version: `1.7.2`.
 
 ## Environment & tooling
@@ -120,9 +120,9 @@ git diff --check
 - If a release contains mixed changes, use the highest applicable bump.
 - When asked to push or release, inspect the diff first and state the selected version bump before committing.
 - Create a GitHub release whose tag exactly matches `manifest.json`'s `version`. Do not use a leading `v`.
-- Use a lightweight Git tag (`git tag <version>`), not an annotated tag. Obsidian's release provenance verification compares the tag ref directly with the attested source commit.
+- Use a lightweight Git tag (`git tag <version>`), not an annotated tag, so the release tag resolves directly to the source commit.
 - Attach `manifest.json`, `main.js`, and `styles.css` (if present) to the release as individual assets.
-- This repository's release workflow runs on every tag, builds with npm, creates a published GitHub release, attaches `main.js`, `manifest.json`, and `styles.css`, and generates build provenance attestation.
+- This repository's release workflow runs on every tag, builds with npm, creates a published GitHub release, and attaches `main.js`, `manifest.json`, and `styles.css`. Do not generate GitHub artifact attestations: they are optional for Obsidian submissions and the Community Scorecard verifier currently rejects otherwise valid attestations for this repository.
 - After the initial release, follow the process to add/update your plugin in the community catalog as required.
 
 ## Security, privacy, and compliance
