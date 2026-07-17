@@ -9,7 +9,7 @@ Diary는 Obsidian vault 안의 Markdown 파일을 날짜 기반 플래너로 보
 | 항목 | 값 |
 | --- | --- |
 | 플러그인 ID | `diary` |
-| 현재 버전 | `1.9.1` |
+| 현재 버전 | `1.9.2` |
 | 최소 Obsidian 버전 | `1.7.2` |
 | 지원 플랫폼 | 데스크톱 / 모바일 (`isDesktopOnly: false`) |
 | 기본 언어 | `en` |
@@ -17,6 +17,7 @@ Diary는 Obsidian vault 안의 Markdown 파일을 날짜 기반 플래너로 보
 
 ## 최신 버전
 
+- `1.9.2`: JavaScript와 CSS 릴리스 자산에 플러그인 버전을 기록해 릴리스마다 고유 digest와 모호하지 않은 provenance attestation을 생성합니다.
 - `1.9.1`: 최신 attestation 액션으로 각 릴리스 자산에 독립적인 GitHub 검증 가능 provenance attestation을 생성합니다.
 - `1.9.0`: 모바일 플래너 콘텐츠, 타임라인 끝, compact 뷰 메뉴가 Obsidian의 일반/부동 하단 내비게이션 위에 유지되며 설정 가능한 최소 하단 여백도 함께 적용됩니다.
 - `1.8.3`: 타입이 지정된 Obsidian element instance helper로 요소를 생성한 뒤 즉시 detach해 직접 `Document` 생성 호출을 모두 제거했습니다.

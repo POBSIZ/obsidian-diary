@@ -15,3 +15,13 @@ if (!(targetVersion in versions)) {
     versions[targetVersion] = minAppVersion;
     writeFileSync('versions.json', JSON.stringify(versions, null, '\t'));
 }
+
+// Keep the shipped stylesheet digest unique per release so artifact
+// attestations cannot collide with an older release that had identical CSS.
+const stylesPath = "styles.css";
+const styles = readFileSync(stylesPath, "utf8");
+const versionMarker = /(?<=Diary release version: )\d+\.\d+\.\d+/;
+if (!versionMarker.test(styles)) {
+    throw new Error("styles.css is missing its Diary release version marker");
+}
+writeFileSync(stylesPath, styles.replace(versionMarker, targetVersion));

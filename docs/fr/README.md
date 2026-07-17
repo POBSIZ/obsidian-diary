@@ -9,7 +9,7 @@ Documentation complète : [English](https://github.com/POBSIZ/obsidian-diary/blo
 | Élément | Valeur |
 | --- | --- |
 | ID du plugin | `diary` |
-| Version actuelle | `1.9.1` |
+| Version actuelle | `1.9.2` |
 | Version minimale d’Obsidian | `1.7.2` |
 | Plateformes | Bureau / mobile (`isDesktopOnly: false`) |
 | Langue par défaut | `en` |
@@ -17,6 +17,7 @@ Documentation complète : [English](https://github.com/POBSIZ/obsidian-diary/blo
 
 ## Dernière version
 
+- `1.9.2` : marque les ressources JavaScript et CSS avec la version du plugin afin que chaque version possède des condensats uniques et des attestations de provenance sans ambiguïté.
 - `1.9.1` : génère une attestation de provenance distincte et vérifiable par GitHub pour chaque ressource de version avec l’action d’attestation actuelle.
 - `1.9.0` : maintient le contenu mobile, les fins de chronologie et les menus compacts au-dessus de la navigation inférieure normale ou flottante d’Obsidian, tout en conservant une marge minimale configurable.
 - `1.8.3` : supprime entièrement les appels directs de création via `Document` en utilisant les helpers d’instance Obsidian typés puis un détachement immédiat.

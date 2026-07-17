@@ -1,13 +1,13 @@
 {
 	"name": "diary-obsidian",
-	"version": "1.9.1",
+	"version": "1.9.2",
 	"description": "This is a diary obsidian plugin for Obsidian (https://obsidian.md)",
 	"main": "main.js",
 	"type": "module",
 	"scripts": {
 		"dev": "node esbuild.config.mjs",
 		"build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production",
-		"version": "node version-bump.mjs && git add manifest.json versions.json",
+		"version": "node version-bump.mjs && git add manifest.json versions.json styles.css",
 		"lint": "eslint .",
 		"test": "echo \"No tests configured\""
 	},
