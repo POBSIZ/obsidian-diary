@@ -9,7 +9,7 @@ Vollständige Dokumentation: [English](https://github.com/POBSIZ/obsidian-diary/
 | Eintrag | Wert |
 | --- | --- |
 | Plugin-ID | `diary` |
-| Aktuelle Version | `1.9.2` |
+| Aktuelle Version | `1.9.3` |
 | Minimale Obsidian-Version | `1.7.2` |
 | Plattformen | Desktop / Mobil (`isDesktopOnly: false`) |
 | Standardsprache | `en` |
@@ -17,6 +17,7 @@ Vollständige Dokumentation: [English](https://github.com/POBSIZ/obsidian-diary/
 
 ## Neueste Version
 
+- `1.9.3`: Stimmt die Release-Provenienz durch die aktuelle Build-Provenienz-Aktion und Lightweight-Git-Tags auf die Prüfung der Obsidian Community Scorecard ab.
 - `1.9.2`: Kennzeichnet JavaScript- und CSS-Release-Assets mit der Plugin-Version, damit jede Version eindeutige Digests und zweifelsfreie Herkunftsattestierungen erhält.
 - `1.9.1`: Erstellt mit der aktuellen Attestierungsaktion für jedes Release-Asset eine separate, von GitHub verifizierbare Herkunftsattestierung.
 - `1.9.0`: Hält mobile Planerinhalte, Zeitleistenenden und kompakte Ansichtsmenüs über der normalen oder schwebenden unteren Obsidian-Navigation und bewahrt den konfigurierbaren Mindestabstand.

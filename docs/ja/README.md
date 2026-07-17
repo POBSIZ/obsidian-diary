@@ -9,7 +9,7 @@ Diary は、Obsidian の vault 内にある Markdown ファイルを日付ベー
 | 項目 | 値 |
 | --- | --- |
 | プラグイン ID | `diary` |
-| 現在のバージョン | `1.9.2` |
+| 現在のバージョン | `1.9.3` |
 | 最小 Obsidian バージョン | `1.7.2` |
 | 対応プラットフォーム | デスクトップ / モバイル (`isDesktopOnly: false`) |
 | 既定の言語 | `en` |
@@ -17,6 +17,7 @@ Diary は、Obsidian の vault 内にある Markdown ファイルを日付ベー
 
 ## 最新バージョン
 
+- `1.9.3`: 現行の build-provenance アクションと lightweight Git tag を使用し、リリース provenance を Obsidian Community Scorecard の検証方式に合わせます。
 - `1.9.2`: JavaScript と CSS のリリースアセットにプラグインバージョンを記録し、各リリースに固有の digest と曖昧さのない provenance attestation を持たせます。
 - `1.9.1`: 現行の attestation アクションを使用し、各リリースアセットに個別の GitHub 検証可能な provenance attestation を生成します。
 - `1.9.0`: モバイルプランナーの内容、タイムライン末尾、コンパクト表示メニューを Obsidian の通常またはフローティング下部ナビゲーションの上に保ち、設定可能な最小余白も維持します。

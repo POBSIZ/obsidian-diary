@@ -9,7 +9,7 @@ Full documentation: [English](https://github.com/POBSIZ/obsidian-diary/blob/main
 | Item | Value |
 | --- | --- |
 | Plugin ID | `diary` |
-| Current version | `1.9.2` |
+| Current version | `1.9.3` |
 | Minimum Obsidian version | `1.7.2` |
 | Supported platforms | Desktop / mobile (`isDesktopOnly: false`) |
 | Default language | `en` |
@@ -17,6 +17,7 @@ Full documentation: [English](https://github.com/POBSIZ/obsidian-diary/blob/main
 
 ## Latest Version
 
+- `1.9.3`: Aligns release provenance with Obsidian Community Scorecard verification by using the current build-provenance action and lightweight Git tags.
 - `1.9.2`: Stamps JavaScript and CSS release assets with the plugin version so each release has unique digests and unambiguous provenance attestations.
 - `1.9.1`: Generates a separate GitHub-verified provenance attestation for each release asset using the current attestation action.
 - `1.9.0`: Keeps mobile planner content, timeline endings, and compact view menus above Obsidian's standard or floating bottom navigation while preserving configurable minimum padding.

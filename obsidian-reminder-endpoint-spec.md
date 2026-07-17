@@ -1,7 +1,7 @@
 # Obsidian Reminder Plugin → External Endpoint 연동 문서
 
 > [!info] 현재 상태
-> `Diary 1.9.2` 기준으로 이 문서는 향후 reminder 외부 endpoint 연동을 위한 설계 메모입니다. 현재 배포된 플러그인은 `notify_minutes` frontmatter를 읽어 Obsidian이 열려 있는 동안 로컬 Notice만 표시하며, `start_time`/`end_time`은 플래너 배치에만 사용합니다. reminder 데이터를 네트워크로 전송하거나 reminder endpoint 설정을 노출하지 않습니다.
+> `Diary 1.9.3` 기준으로 이 문서는 향후 reminder 외부 endpoint 연동을 위한 설계 메모입니다. 현재 배포된 플러그인은 `notify_minutes` frontmatter를 읽어 Obsidian이 열려 있는 동안 로컬 Notice만 표시하며, `start_time`/`end_time`은 플래너 배치에만 사용합니다. reminder 데이터를 네트워크로 전송하거나 reminder endpoint 설정을 노출하지 않습니다.
 
 ## 목표
 향후 Obsidian 플러그인에서 리마인더가 생성/수정/삭제될 때 외부 endpoint로 이벤트를 보내고, 실제 예약/발송은 OpenClaw 쪽에서 처리한다.

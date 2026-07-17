@@ -6,12 +6,12 @@
 - Source entry point: `src/main.ts`; esbuild bundles it to top-level `main.js`, which Obsidian loads.
 - Release artifacts for this repo: `main.js`, `manifest.json`, and `styles.css`.
 - Current plugin ID: `diary`.
-- Current plugin version: `1.9.2`.
+- Current plugin version: `1.9.3`.
 - Current minimum Obsidian version: `1.7.2`.
 
 ## Environment & tooling
 
-- Node.js: use a supported LTS for local development. As of June 2026, Node.js 24 is the current LTS; this repo's CI validates Node.js `20.x` and `22.x`, and the release workflow currently builds with `18.x`.
+- Node.js: use a supported LTS for local development. As of June 2026, Node.js 24 is the current LTS; this repo's CI validates Node.js `20.x` and `22.x`, and the release workflow builds with the current LTS.
 - **Package manager: npm**. Use `npm ci` for clean CI-style installs and `npm install` when intentionally changing dependencies.
 - **Bundler: esbuild** via `esbuild.config.mjs`; bundle all runtime dependencies into `main.js`.
 - Types: `obsidian` type definitions.
@@ -120,8 +120,9 @@ git diff --check
 - If a release contains mixed changes, use the highest applicable bump.
 - When asked to push or release, inspect the diff first and state the selected version bump before committing.
 - Create a GitHub release whose tag exactly matches `manifest.json`'s `version`. Do not use a leading `v`.
+- Use a lightweight Git tag (`git tag <version>`), not an annotated tag. Obsidian's release provenance verification compares the tag ref directly with the attested source commit.
 - Attach `manifest.json`, `main.js`, and `styles.css` (if present) to the release as individual assets.
-- This repository's release workflow runs on every tag, builds with npm, creates a draft GitHub release, attaches `main.js`, `manifest.json`, and `styles.css`, and generates build provenance attestation.
+- This repository's release workflow runs on every tag, builds with npm, creates a published GitHub release, attaches `main.js`, `manifest.json`, and `styles.css`, and generates build provenance attestation.
 - After the initial release, follow the process to add/update your plugin in the community catalog as required.
 
 ## Security, privacy, and compliance
