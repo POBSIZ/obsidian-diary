@@ -546,7 +546,7 @@ export class DailyPlannerDragController {
 	}
 
 	private getLayerAtPoint(clientX: number, clientY: number): HTMLElement | null {
-		return (
+		const direct =
 			this.contentEl.ownerDocument
 				.elementsFromPoint(clientX, clientY)
 				.map((element) =>
@@ -555,7 +555,21 @@ export class DailyPlannerDragController {
 				.find(
 					(candidate): candidate is HTMLElement =>
 						candidate != null && this.contentEl.contains(candidate),
-				) ?? null
+				) ?? null;
+		if (direct) return direct;
+
+		// Range sources become pointer-transparent while resizing, and the pointer
+		// can briefly sit on a column seam. Keep resolving the target by horizontal
+		// column bounds so moving a boundary across dates remains continuous.
+		return (
+			Array.from(
+				this.contentEl.querySelectorAll<HTMLElement>(
+					".daily-planner-events-layer",
+				),
+			).find((layer) => {
+				const rect = layer.getBoundingClientRect();
+				return clientX >= rect.left && clientX <= rect.right;
+			}) ?? null
 		);
 	}
 
