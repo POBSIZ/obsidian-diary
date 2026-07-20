@@ -678,6 +678,9 @@ export class DailyPlannerView extends ItemView {
 		layer.tabIndex = 0;
 		layer.ariaLabel = t("threeDay.timelineForDate", { date: day.label });
 		layer.onclick = (event) => {
+			// A drag or resize may end over the layer, causing the browser to emit
+			// a follow-up click whose target is the layer rather than the event chip.
+			if (this.dragController.shouldSuppressClick()) return;
 			if (event.target !== layer) return;
 			const rect = layer.getBoundingClientRect();
 			const minute = Math.max(

@@ -92,6 +92,10 @@ export class DailyPlannerDragController {
 		private readonly onDrop: (drop: DailyPlannerDrop) => Promise<void> | void,
 	) {}
 
+	shouldSuppressClick(): boolean {
+		return Date.now() < this.suppressClickUntil;
+	}
+
 	bind(element: HTMLElement, item: DailyPlannerDragItem): boolean {
 		if (isMobileSurface(this.contentEl.ownerDocument)) return false;
 		element.setAttribute("draggable", "false");
@@ -121,7 +125,7 @@ export class DailyPlannerDragController {
 		element.addEventListener(
 			"click",
 			(event) => {
-				if (Date.now() >= this.suppressClickUntil) return;
+				if (!this.shouldSuppressClick()) return;
 				event.preventDefault();
 				event.stopImmediatePropagation();
 			},
