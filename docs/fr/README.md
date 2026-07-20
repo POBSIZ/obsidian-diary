@@ -71,7 +71,7 @@ Les images proviennent d’un dossier de démonstration isolé contenant des not
 - **Interface localisée** : basculez Diary entre anglais, allemand, espagnol, français, japonais, chinois simplifié, chinois traditionnel et coréen.
 - **Grille mensuelle** : consultez un mois dans une grande grille avec chips, barres de période, jours fériés, étiquettes de calendrier et calendriers externes.
 - **Liste mensuelle** : parcourez un mois chargé jour par jour, avec les filtres `All`, `With notes` et `Upcoming`.
-- **Planning quotidien** : planifiez une journée sur une chronologie de 24 heures. Les notes avec `start_time` et `end_time` sont placées sur l’axe; les notes sans heure restent séparées.
+- **Planning quotidien** : planifiez une journée sur une chronologie de 24 heures. Les plages de plusieurs jours s’affichent comme des barres continues sur la journée entière ou des intervalles date-heure, dont les limites peuvent être ajustées entre les dates.
 - **Planning sur 3 jours** : comparez trois jours consécutifs en colonnes parallèles. Les petits écrans conservent des colonnes lisibles grâce au défilement horizontal.
 - **Sélecteur direct de vue** : passez directement entre année, grille mensuelle, liste mensuelle, jour et 3 jours.
 - **Planificateur latéral droit** : gardez un planning mensuel compact dans la barre latérale droite pendant que les notes s’ouvrent dans l’espace principal.
@@ -186,6 +186,8 @@ Sur ordinateur, faites glisser sur les cellules de date pour préremplir une mod
 - Ajoutez un suffixe pour le titre. Exemple : `2026-05-21--2026-05-24-family-trip.md` -> `family-trip`
 - `date_start` et `date_end` sont enregistrés automatiquement à la création.
 - Le planificateur annuel affiche les périodes avec des barres verticales et un chip au début. La grille et la liste mensuelles affichent des barres de période.
+- Sélectionnez **Toute la journée** pour laisser les deux heures vides, ou renseignez-les toutes les deux pour définir un intervalle continu de `date_start` + `start_time` à `date_end` + `end_time`.
+- Les plannings quotidien et sur 3 jours affichent les plages sur toute la journée comme des barres continues. Faites-en glisser une sur la chronologie pour lui attribuer des heures, puis ajustez sa première ou sa dernière limite avec la date et l’heure correspondantes.
 
 ### Notes de plan
 
@@ -275,8 +277,8 @@ Diary enregistre aussi des états uniquement UI : expansion du panneau de plan, 
 | `color` | Couleur du chip. Toute couleur CSS valide est acceptée, par exemple `#22c55e`, `red`, `rgb(34, 197, 94)`. |
 | `todo` | Affiche la note comme tâche lorsque `true`. |
 | `completed` | Affiche l’état terminé si `todo: true`. |
-| `start_time` | Heure de début facultative du chip au format `HH:mm`. Les chips avec heure sont triés par heure de début. |
-| `end_time` | Heure de fin facultative du chip au format `HH:mm`. Cette valeur ne déclenche pas de rappel. |
+| `start_time` | Heure de début facultative au format `HH:mm`. Pour une note de plage, c’est la limite à `date_start` ; les deux heures doivent être renseignées ou vides. |
+| `end_time` | Heure de fin facultative au format `HH:mm`. Pour une note de plage, c’est la limite à `date_end` ; elle ne déclenche pas de rappel. |
 | `notify_minutes` | Minutes depuis minuit local le jour de l’événement. Accepte `0` à `1439`; 9 h vaut `540`. |
 | `date_start` | Date de début enregistrée pour les notes de période. |
 | `date_end` | Date de fin enregistrée pour les notes de période. |

@@ -70,14 +70,14 @@ todo, and plan notes. The temporary demo data was removed after capture.
 - Localized UI: switch Diary between English, German, Spanish, French, Japanese, Simplified Chinese, Traditional Chinese, and Korean.
 - Monthly grid planner: one-month calendar view with date chips, range bars, holidays, calendar overlay labels, external calendar overlays, and mobile pinch zoom.
 - Monthly list planner: day-by-day list for dense monthly review, with `All`, `With notes`, and `Upcoming` filters.
-- Daily planner: a 24-hour timeline that separates timed plans from all-day and untimed notes. Select an empty time slot to create a note with start and end times prefilled.
+- Daily planner: a 24-hour timeline that separates timed plans from all-day and untimed notes. Multi-day ranges render as continuous all-day bars or datetime slices, with cross-date time selection and boundary resizing. Select an empty time slot to create a note with start and end times prefilled.
 - 3-day planner: compare three consecutive days in parallel columns on the same 24-hour timeline. Narrow screens keep readable column widths with horizontal scrolling.
 - Direct view selector: switch directly among yearly, monthly grid, monthly list, daily, and 3-day views. In narrow layouts it remains visible while secondary actions move into **More**.
 - Sidebar planner: a compact monthly planner opens in the right sidebar by default, can be revealed from the ribbon or command palette, and can cycle through yearly, monthly grid, and monthly list layouts in the same side leaf.
 - Date notes and range notes: recognized by `YYYY-MM-DD` and `YYYY-MM-DD--YYYY-MM-DD` filenames. By default Diary scans the entire vault, with an optional planner-folder-only scope. Title suffixes can keep visible spaces.
 - Plan notes: yearly `{plannerFolder}/{year}.md` and monthly `{plannerFolder}/{year}-{month}.md` notes, with persisted preview state on desktop and separate mobile state.
 - Remembered yearly cell width: expanded month-cell widths are saved across reloads.
-- Chip metadata: `color`, `todo`, `completed`, `start_time`, `end_time`, `notify_minutes`, `title`, `date_start`, `date_end`, and recurrence frontmatter. Chip times are displayed independently from reminders.
+- Chip metadata: `color`, `todo`, `completed`, `start_time`, `end_time`, `notify_minutes`, `title`, `date_start`, `date_end`, and recurrence frontmatter. For range files, `date_start` + `start_time` and `date_end` + `end_time` define one continuous datetime interval; times remain independent from reminders.
 - Recurring events: repeat every N days, weeks, months, or years with a Gregorian or alternate-calendar basis. Occurrences stay virtual until you explicitly create Markdown notes from them.
 - Custom calendar overlays: create local fantasy/campaign calendar profiles and show one custom label in planner cells while keeping normal `YYYY-MM-DD` files.
 - External calendar overlays: add opt-in `webcal://` or `https://` `.ics` feeds, refresh them manually or on an interval, and show events as read-only chips/ranges. Select an external event only when you want to create a normal Markdown note for it.

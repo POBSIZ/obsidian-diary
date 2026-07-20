@@ -71,7 +71,7 @@ Die Screenshots stammen aus einem isolierten Demo-Ordner mit ganztägigen, zeitg
 - **Lokalisierte Oberfläche**: Diary lässt sich zwischen Englisch, Deutsch, Spanisch, Französisch, Japanisch, vereinfachtem Chinesisch, traditionellem Chinesisch und Koreanisch umschalten.
 - **Monatsraster**: Ein großer Monatskalender mit Chips, Zeitraumleisten, Feiertagen, Kalender-Overlay-Beschriftungen und externen Kalender-Overlays.
 - **Monatsliste**: Eine vertikale Tagesliste für volle Monate, mit Filtern für `All`, `With notes` und `Upcoming`.
-- **Tagesplaner**: Plane einen Tag auf einer 24-Stunden-Zeitleiste. Notizen mit `start_time` und `end_time` erscheinen auf der Zeitachse; ganztägige und unzeitierte Notizen stehen separat.
+- **Tagesplaner**: Plane einen Tag auf einer 24-Stunden-Zeitleiste. Mehrtägige Bereiche erscheinen als durchgehende ganztägige Balken oder Datums-Zeit-Intervalle; ihre zeitlichen Grenzen lassen sich über Datumsgrenzen hinweg anpassen.
 - **3-Tage-Planer**: Vergleiche drei aufeinanderfolgende Tage in parallelen Spalten. Auf schmalen Bildschirmen bleiben die Spalten per horizontalem Scrollen lesbar.
 - **Direkte Ansichtsauswahl**: Wechsle direkt zwischen Jahr, Monatsraster, Monatsliste, Tag und 3 Tagen.
 - **Rechter Seitenplaner**: Ein kompakter Monatsplaner bleibt in der rechten Seitenleiste geöffnet, während Notizen im Hauptbereich geöffnet werden.
@@ -186,6 +186,8 @@ Auf dem Desktop kannst du über Datumszellen ziehen, um ein **Zeitraum**-Modal v
 - Ein Suffix wird als Zeitraumtitel genutzt. Beispiel: `2026-05-21--2026-05-24-family-trip.md` -> `family-trip`
 - `date_start` und `date_end` werden beim Erstellen automatisch gespeichert.
 - Der Jahresplaner zeigt Zeitraum-Notizen mit vertikalen Leisten und einem Chip am Startdatum. Monatsraster und Monatsliste zeigen Zeitraumleisten.
+- Wähle **Ganztägig**, um beide Zeiten leer zu lassen, oder gib beide Zeiten ein, um ein durchgehendes Intervall von `date_start` + `start_time` bis `date_end` + `end_time` festzulegen.
+- Tages- und 3-Tage-Planer zeigen ganztägige Bereiche als durchgehende Balken. Ziehe einen solchen Bereich auf die Zeitleiste, um Zeiten zuzuweisen, und passe danach die erste oder letzte Grenze samt Datum und Uhrzeit an.
 
 ### Plan-Notizen
 
@@ -275,8 +277,8 @@ Diary speichert außerdem reine UI-Zustände in Plugin-Daten: Plan-Notiz-Vorscha
 | `color` | Chip-Farbe. Jede gültige CSS-Farbe ist möglich, z. B. `#22c55e`, `red`, `rgb(34, 197, 94)`. |
 | `todo` | Zeigt die Notiz als Todo-Chip, wenn `true`. |
 | `completed` | Zeigt Erledigt-Status, wenn `todo: true`. |
-| `start_time` | Optionale Chip-Startzeit im Format `HH:mm`. Chips mit Zeit werden nach Startzeit sortiert. |
-| `end_time` | Optionale Chip-Endzeit im Format `HH:mm`. Dieser Wert löst keine Erinnerung aus. |
+| `start_time` | Optionale Startzeit im Format `HH:mm`. Bei Zeitraum-Notizen ist dies die Grenze am `date_start`; beide Zeiten müssen gesetzt oder leer sein. |
+| `end_time` | Optionale Endzeit im Format `HH:mm`. Bei Zeitraum-Notizen ist dies die Grenze am `date_end`; sie löst keine Erinnerung aus. |
 | `notify_minutes` | Minuten ab lokaler Mitternacht am Ereignistag. Erlaubt `0` bis `1439`. 9:00 Uhr ist `540`. |
 | `date_start` | Startdatum für Zeitraum-Notizen. |
 | `date_end` | Enddatum für Zeitraum-Notizen. |

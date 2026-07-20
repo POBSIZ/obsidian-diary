@@ -71,7 +71,7 @@ Las imágenes se tomaron desde una carpeta de demostración aislada con notas de
 - **Interfaz localizada**: Cambia Diary entre inglés, alemán, español, francés, japonés, chino simplificado, chino tradicional y coreano.
 - **Cuadrícula mensual**: Revisa un mes en una cuadrícula grande con chips, barras de rango, festivos, etiquetas de calendario y calendarios externos.
 - **Lista mensual**: Repasa meses cargados en una lista vertical, con filtros `All`, `With notes` y `Upcoming`.
-- **Planificador diario**: Organiza un día en una línea de tiempo de 24 horas. Las notas con `start_time` y `end_time` aparecen en el eje; las notas de todo el día o sin hora quedan aparte.
+- **Planificador diario**: Organiza un día en una línea de tiempo de 24 horas. Los rangos de varios días se muestran como barras continuas de todo el día o intervalos de fecha y hora; sus límites temporales se pueden ajustar entre fechas.
 - **Planificador de 3 días**: Compara tres días consecutivos en columnas paralelas. En pantallas estrechas conserva columnas legibles mediante desplazamiento horizontal.
 - **Selector directo de vista**: Cambia directamente entre año, cuadrícula mensual, lista mensual, día y 3 días.
 - **Planificador lateral derecho**: Mantén un planificador mensual compacto en la barra lateral derecha mientras las notas se abren en el área principal.
@@ -186,6 +186,8 @@ En escritorio, arrastra sobre celdas de fecha para rellenar un modal de **Rango*
 - Añade un sufijo para usarlo como título del rango. Ejemplo: `2026-05-21--2026-05-24-family-trip.md` -> `family-trip`
 - `date_start` y `date_end` se guardan automáticamente al crear la nota.
 - El planificador anual muestra barras verticales y un chip en la fecha inicial. La cuadrícula y la lista mensual muestran barras de rango.
+- Selecciona **Todo el día** para dejar ambas horas vacías, o introduce las dos para definir un intervalo continuo desde `date_start` + `start_time` hasta `date_end` + `end_time`.
+- Los planificadores diario y de 3 días muestran los rangos de todo el día como barras continuas. Arrastra uno a la línea de tiempo para asignar horas y ajusta después el primer o último límite junto con su fecha y hora.
 
 ### Notas de plan
 
@@ -275,8 +277,8 @@ Diary también guarda estado solo de interfaz: expansión del panel de plan, exp
 | `color` | Color del chip. Puede ser cualquier color CSS válido, como `#22c55e`, `red` o `rgb(34, 197, 94)`. |
 | `todo` | Muestra la nota como chip de tarea cuando es `true`. |
 | `completed` | Muestra estado completado cuando `todo: true`. |
-| `start_time` | Hora de inicio opcional del chip en formato `HH:mm`. Los chips con hora se ordenan por la hora de inicio. |
-| `end_time` | Hora de finalización opcional del chip en formato `HH:mm`. Este valor no activa un recordatorio. |
+| `start_time` | Hora de inicio opcional en formato `HH:mm`. En una nota de rango, es el límite de `date_start`; deben indicarse ambas horas o ninguna. |
+| `end_time` | Hora de fin opcional en formato `HH:mm`. En una nota de rango, es el límite de `date_end`; no activa un recordatorio. |
 | `notify_minutes` | Minutos desde la medianoche local del día del evento. Acepta `0` a `1439`; 9:00 AM es `540`. |
 | `date_start` | Fecha inicial guardada automáticamente para notas de rango. |
 | `date_end` | Fecha final guardada automáticamente para notas de rango. |

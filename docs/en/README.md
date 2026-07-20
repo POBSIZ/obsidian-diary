@@ -71,7 +71,7 @@ The images below were captured from an isolated demo folder with sample all-day,
 - **Localized UI**: Switch Diary between English, German, Spanish, French, Japanese, Simplified Chinese, Traditional Chinese, and Korean.
 - **Monthly grid planner**: Inspect one month in a large calendar grid with chips, range bars, holidays, calendar overlay labels, and external calendar overlays.
 - **Monthly list planner**: Review busy months in a day-by-day vertical list with `All`, `With notes`, and `Upcoming` filters.
-- **Daily planner**: Plan one day on a 24-hour timeline. Timed notes use `start_time` and `end_time`; all-day and untimed notes stay in a separate section.
+- **Daily planner**: Plan one day on a 24-hour timeline. Multi-day ranges render as continuous all-day bars or datetime intervals; timed range boundaries can be resized across dates. All-day and untimed notes stay in a separate section.
 - **3-day planner**: Compare three consecutive days in parallel columns on one 24-hour timeline. Narrow screens use horizontal scrolling instead of compressing the day columns.
 - **Direct view selector**: Switch directly among yearly, monthly grid, monthly list, daily, and 3-day views. On narrow screens it stays visible while secondary actions move into **More**.
 - **Right sidebar planner**: Keep a compact monthly planner open in the right sidebar while notes remain open in the main workspace.
@@ -186,6 +186,8 @@ On desktop, drag across date cells to prefill a **Range** modal. On mobile, sele
 - Add a suffix to use it as the range title. Example: `2026-05-21--2026-05-24-family-trip.md` -> `family-trip`
 - `date_start` and `date_end` frontmatter are saved automatically when the range note is created.
 - The yearly planner shows range notes with vertical bars and a start-date chip. The monthly grid and list show them as range bars.
+- Choose **All day** to keep both times empty, or enter both times to define one continuous interval from `date_start` + `start_time` through `date_end` + `end_time`.
+- The daily and 3-day planners show all-day ranges as spanning bars. Drag an all-day range onto the timeline to assign times, then drag its first or last edge to change the corresponding date and time boundary.
 
 ### Plan Notes
 
@@ -275,8 +277,8 @@ Diary also stores UI-only state in plugin data: plan note preview expansion, mob
 | `color` | Chip color. Any valid CSS color string can be used. Examples: `#22c55e`, `red`, `rgb(34, 197, 94)` |
 | `todo` | Shows the note as a todo chip when `true`. |
 | `completed` | Shows completed state when `todo: true`. |
-| `start_time` | Optional chip start time in `HH:mm` format. Timed chips are sorted by start time. |
-| `end_time` | Optional chip end time in `HH:mm` format. This does not schedule a reminder. |
+| `start_time` | Optional chip start time in `HH:mm` format. For a range note, this is the time boundary on `date_start`; range notes require both times or neither. |
+| `end_time` | Optional chip end time in `HH:mm` format. For a range note, this is the time boundary on `date_end`; it does not schedule a reminder. |
 | `notify_minutes` | Minutes from local midnight on the event date. Accepts `0` through `1439`. Example: 9:00 AM is `540`. |
 | `date_start` | Start date automatically saved for range notes. |
 | `date_end` | End date automatically saved for range notes. |
