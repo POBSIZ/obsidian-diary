@@ -9,7 +9,7 @@ Diary は、Obsidian の vault 内にある Markdown ファイルを日付ベー
 | 項目 | 値 |
 | --- | --- |
 | プラグイン ID | `diary` |
-| 現在のバージョン | `1.9.4` |
+| 現在のバージョン | `1.10.1` |
 | 最小 Obsidian バージョン | `1.7.2` |
 | 対応プラットフォーム | デスクトップ / モバイル (`isDesktopOnly: false`) |
 | 既定の言語 | `en` |
@@ -17,6 +17,8 @@ Diary は、Obsidian の vault 内にある Markdown ファイルを日付ベー
 
 ## 最新バージョン
 
+- `1.10.1`: 日別期間レイアウトの新しい配列 helper を ES2020 互換の型安全なロジックへ置き換え、`no-unsafe-assignment` と `no-unsafe-call` の監査警告を解消し、ローカルのエージェント指示をリリースソースから除外します。
+- `1.10.0`: 複数日の範囲を日別・3日プランナーで連続する終日バーまたは日時区間として表示し、日付をまたぐ選択と境界調整を追加します。
 - `1.9.4`: GitHub の暗号検証には成功したものの Obsidian Community Scorecard が拒否した、任意の artifact attestation 生成を削除します。
 - `1.9.3`: 現行の build-provenance アクションと lightweight Git tag を使用し、リリース provenance を Obsidian Community Scorecard の検証方式に合わせます。
 - `1.9.2`: JavaScript と CSS のリリースアセットにプラグインバージョンを記録し、各リリースに固有の digest と曖昧さのない provenance attestation を持たせます。

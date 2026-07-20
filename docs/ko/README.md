@@ -9,7 +9,7 @@ Diary는 Obsidian vault 안의 Markdown 파일을 날짜 기반 플래너로 보
 | 항목 | 값 |
 | --- | --- |
 | 플러그인 ID | `diary` |
-| 현재 버전 | `1.9.4` |
+| 현재 버전 | `1.10.1` |
 | 최소 Obsidian 버전 | `1.7.2` |
 | 지원 플랫폼 | 데스크톱 / 모바일 (`isDesktopOnly: false`) |
 | 기본 언어 | `en` |
@@ -17,6 +17,8 @@ Diary는 Obsidian vault 안의 Markdown 파일을 날짜 기반 플래너로 보
 
 ## 최신 버전
 
+- `1.10.1`: 일별 기간 레이아웃의 최신 배열 helper를 ES2020 호환 타입 안전 로직으로 바꿔 `no-unsafe-assignment`와 `no-unsafe-call` audit 경고를 제거하고, 로컬 에이전트 지침을 릴리스 소스에서 제외합니다.
+- `1.10.0`: 여러 날의 기간을 일별·3일 플래너에서 연속된 종일 막대 또는 날짜·시간 구간으로 표시하고, 날짜를 넘는 선택과 경계 조절을 지원합니다.
 - `1.9.4`: GitHub 암호화 검증은 통과했지만 Obsidian Community Scorecard가 거부한 선택적 artifact attestation 생성을 제거합니다.
 - `1.9.3`: 최신 build-provenance 액션과 lightweight Git 태그를 사용해 릴리스 provenance를 Obsidian Community Scorecard 검증 방식에 맞춥니다.
 - `1.9.2`: JavaScript와 CSS 릴리스 자산에 플러그인 버전을 기록해 릴리스마다 고유 digest와 모호하지 않은 provenance attestation을 생성합니다.

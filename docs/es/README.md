@@ -9,7 +9,7 @@ Documentación completa: [English](https://github.com/POBSIZ/obsidian-diary/blob
 | Elemento | Valor |
 | --- | --- |
 | ID del plugin | `diary` |
-| Versión actual | `1.9.4` |
+| Versión actual | `1.10.1` |
 | Versión mínima de Obsidian | `1.7.2` |
 | Plataformas | Escritorio / móvil (`isDesktopOnly: false`) |
 | Idioma predeterminado | `en` |
@@ -17,6 +17,8 @@ Documentación completa: [English](https://github.com/POBSIZ/obsidian-diary/blob
 
 ## Última versión
 
+- `1.10.1`: Sustituye helpers de arrays recientes en el diseño diario de rangos por lógica tipada compatible con ES2020, elimina los avisos `no-unsafe-assignment` y `no-unsafe-call`, y excluye las instrucciones locales del agente de las fuentes de la versión.
+- `1.10.0`: Muestra rangos de varios días como barras continuas de todo el día o intervalos de fecha y hora en los planificadores diario y de 3 días, con selección y ajuste de límites entre fechas.
 - `1.9.4`: Elimina las attestations opcionales de artefactos que Obsidian Community Scorecard rechazó pese a superar la verificación criptográfica de GitHub.
 - `1.9.3`: Alinea la procedencia de la versión con la verificación de Obsidian Community Scorecard mediante la acción de procedencia de compilación actual y etiquetas Git ligeras.
 - `1.9.2`: Marca los recursos JavaScript y CSS con la versión del plugin para que cada versión tenga resúmenes únicos y certificaciones de procedencia inequívocas.

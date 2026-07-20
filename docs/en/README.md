@@ -9,7 +9,7 @@ Full documentation: [English](https://github.com/POBSIZ/obsidian-diary/blob/main
 | Item | Value |
 | --- | --- |
 | Plugin ID | `diary` |
-| Current version | `1.9.4` |
+| Current version | `1.10.1` |
 | Minimum Obsidian version | `1.7.2` |
 | Supported platforms | Desktop / mobile (`isDesktopOnly: false`) |
 | Default language | `en` |
@@ -17,6 +17,8 @@ Full documentation: [English](https://github.com/POBSIZ/obsidian-diary/blob/main
 
 ## Latest Version
 
+- `1.10.1`: Replaces newer array helpers in daily range layout with ES2020-compatible typed logic, eliminating `no-unsafe-assignment` and `no-unsafe-call` audit warnings; local agent guidance no longer ships with release sources.
+- `1.10.0`: Renders multi-day ranges as continuous all-day bars or datetime intervals in daily and 3-day planners, with cross-date selection and boundary resizing.
 - `1.9.4`: Removes optional artifact attestations that the Obsidian Community Scorecard rejected despite successful GitHub cryptographic verification.
 - `1.9.3`: Aligns release provenance with Obsidian Community Scorecard verification by using the current build-provenance action and lightweight Git tags.
 - `1.9.2`: Stamps JavaScript and CSS release assets with the plugin version so each release has unique digests and unambiguous provenance attestations.

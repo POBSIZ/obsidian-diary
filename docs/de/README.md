@@ -9,7 +9,7 @@ Vollständige Dokumentation: [English](https://github.com/POBSIZ/obsidian-diary/
 | Eintrag | Wert |
 | --- | --- |
 | Plugin-ID | `diary` |
-| Aktuelle Version | `1.9.4` |
+| Aktuelle Version | `1.10.1` |
 | Minimale Obsidian-Version | `1.7.2` |
 | Plattformen | Desktop / Mobil (`isDesktopOnly: false`) |
 | Standardsprache | `en` |
@@ -17,6 +17,8 @@ Vollständige Dokumentation: [English](https://github.com/POBSIZ/obsidian-diary/
 
 ## Neueste Version
 
+- `1.10.1`: Ersetzt neuere Array-Helfer im Tagesbereichslayout durch ES2020-kompatible typisierte Logik, beseitigt `no-unsafe-assignment`- und `no-unsafe-call`-Warnungen und hält lokale Agentenanweisungen aus den Release-Quellen heraus.
+- `1.10.0`: Zeigt mehrtägige Bereiche im Tages- und 3-Tage-Planer als durchgehende Ganztagsbalken oder Datums-Zeit-Intervalle mit datumsübergreifender Auswahl und Grenzanpassung.
 - `1.9.4`: Entfernt optionale Artefakt-Attestierungen, die der Obsidian Community Scorecard trotz erfolgreicher kryptografischer GitHub-Prüfung abgelehnt hat.
 - `1.9.3`: Stimmt die Release-Provenienz durch die aktuelle Build-Provenienz-Aktion und Lightweight-Git-Tags auf die Prüfung der Obsidian Community Scorecard ab.
 - `1.9.2`: Kennzeichnet JavaScript- und CSS-Release-Assets mit der Plugin-Version, damit jede Version eindeutige Digests und zweifelsfreie Herkunftsattestierungen erhält.
