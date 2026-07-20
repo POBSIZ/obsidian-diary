@@ -38,7 +38,7 @@ export function layoutDailyPlannerRanges(
 	entries: DailyPlannerEntry[],
 ): DailyPlannerRangeBar[] {
 	const firstVisible = dates[0];
-	const lastVisible = dates.at(-1);
+	const lastVisible = dates[dates.length - 1];
 	if (!firstVisible || !lastVisible) return [];
 
 	const unique = new Map<string, DailyPlannerEntry>();
@@ -60,7 +60,8 @@ export function layoutDailyPlannerRanges(
 		const rangeStart = entry.rangeStart ?? firstVisible;
 		const rangeEnd = entry.rangeEnd ?? lastVisible;
 		const startColumn = Math.max(0, dates.findIndex((date) => date >= rangeStart));
-		let endColumn = dates.findLastIndex((date) => date <= rangeEnd);
+		let endColumn = dates.length - 1;
+		while (endColumn >= 0 && dates[endColumn]! > rangeEnd) endColumn -= 1;
 		if (endColumn < 0) endColumn = dates.length - 1;
 		let lane = laneEnds.findIndex((occupiedThrough) => occupiedThrough < startColumn);
 		if (lane < 0) lane = laneEnds.length;
