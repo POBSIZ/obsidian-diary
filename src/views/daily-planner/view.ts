@@ -306,7 +306,6 @@ export class DailyPlannerView extends ItemView {
 	}
 
 	private renderHeader(): void {
-		const dayCount = this.getVisibleDayCount();
 		const openDateModal = () => {
 			new PlannerPeriodModal(this.app, {
 				granularity: "day",
@@ -347,13 +346,13 @@ export class DailyPlannerView extends ItemView {
 			},
 			previous: {
 				icon: "chevron-left",
-				label: t(dayCount > 1 ? "threeDay.prevRange" : "daily.prevDay"),
-				onClick: () => this.moveDate(-dayCount),
+				label: t("daily.prevDay"),
+				onClick: () => this.moveDate(-1),
 			},
 			next: {
 				icon: "chevron-right",
-				label: t(dayCount > 1 ? "threeDay.nextRange" : "daily.nextDay"),
-				onClick: () => this.moveDate(dayCount),
+				label: t("daily.nextDay"),
+				onClick: () => this.moveDate(1),
 			},
 			period: {
 				text: this.formatHeaderDate(),
