@@ -15,11 +15,15 @@ import DiaryObsidian from "../../main";
 import { getCalendarOverlayConfig, getCalendarOverlayLabel } from "../../utils/calendar-overlays";
 import {
 	getExternalCalendarName,
+	getExternalEventEndDate,
+	getExternalEventStartDate,
 	getExternalEventsForDate,
 	getExternalEventsForRange,
+	isExternalRangeEvent,
 	type ExternalCalendarEvent,
 } from "../../utils/external-calendars";
 import { getHolidaysForYear } from "../../utils/holidays";
+import { parseRangeBasename } from "../../utils/range";
 import {
 	createRecurrenceOccurrenceFile,
 	getRecurrenceVirtualEventsForRange,
@@ -44,6 +48,7 @@ import {
 	createSingleDateFile as createSingleDateFileOp,
 	createExternalEventFile,
 	moveFileToDate,
+	moveRangeFileToNewDates,
 	updateFileTimeRange,
 } from "../yearly-planner/file-operations";
 import {
@@ -66,6 +71,10 @@ import {
 	type DailyPlannerDrop,
 } from "./drag";
 import { layoutDailyPlannerEntries } from "./layout";
+import {
+	getDailyRangeTimeSlice,
+	layoutDailyPlannerRanges,
+} from "./range-layout";
 import {
 	DailyPlannerTimeSelectionController,
 	type DailyPlannerTimeSelection,
@@ -117,6 +126,10 @@ function timeToMinutes(value: string | null): number | null {
 function minutesToTime(minutes: number): string {
 	const normalized = Math.max(0, Math.min(MINUTES_PER_DAY - 1, minutes));
 	return `${pad(Math.floor(normalized / 60))}:${pad(normalized % 60)}`;
+}
+
+function minutesToDisplayTime(minutes: number): string {
+	return minutes >= MINUTES_PER_DAY ? "24:00" : minutesToTime(minutes);
 }
 
 function getExternalEventMinutes(
@@ -381,9 +394,21 @@ export class DailyPlannerView extends ItemView {
 			});
 		}
 		for (const { file } of rangeFiles) {
+			const dateRange = parseRangeBasename(file.basename);
+			if (!dateRange) continue;
 			const range = getPlannerTimeRange(this.app, file);
-			const start = timeToMinutes(range.startTime);
-			const end = timeToMinutes(range.endTime);
+			const dateTimeSlice = getDailyRangeTimeSlice(
+				dateString,
+				dateRange.start,
+				dateRange.end,
+				timeToMinutes(range.startTime),
+				timeToMinutes(range.endTime),
+			);
+			const rangeStartMinutes = timeToMinutes(range.startTime);
+			const rangeEndMinutes = timeToMinutes(range.endTime);
+			if (range.startTime && range.endTime && !dateTimeSlice) continue;
+			const start = dateTimeSlice?.start ?? timeToMinutes(range.startTime);
+			const end = dateTimeSlice?.end ?? timeToMinutes(range.endTime);
 			entries.push({
 				id: `range:${file.path}`,
 				title: this.getTodoTitle(file, start == null),
@@ -400,6 +425,10 @@ export class DailyPlannerView extends ItemView {
 							),
 				file,
 				kind: "range",
+				rangeStart: dateRange.start,
+				rangeEnd: dateRange.end,
+				rangeStartMinutes: rangeStartMinutes ?? undefined,
+				rangeEndMinutes: rangeEndMinutes ?? undefined,
 			});
 		}
 
@@ -440,6 +469,7 @@ export class DailyPlannerView extends ItemView {
 					}
 				}
 			}
+			const isRange = isExternalRangeEvent(event);
 			entries.push({
 				id: `external:${event.id}`,
 				title: minutes
@@ -450,6 +480,8 @@ export class DailyPlannerView extends ItemView {
 				endMinutes: minutes?.end ?? null,
 				externalEvent: event,
 				kind: "external",
+				rangeStart: isRange ? getExternalEventStartDate(event) : undefined,
+				rangeEnd: isRange ? getExternalEventEndDate(event) : undefined,
 			});
 		}
 
@@ -477,9 +509,11 @@ export class DailyPlannerView extends ItemView {
 		parent: HTMLElement,
 		entries: DailyPlannerEntry[],
 		day: VisiblePlannerDay,
+		showEmpty = true,
 	): void {
 		const list = parent.createDiv({ cls: "daily-planner-untimed-list" });
 		if (entries.length === 0) {
+			if (!showEmpty) return;
 			list.createDiv({
 				cls: "daily-planner-empty",
 				text: "—",
@@ -551,14 +585,69 @@ export class DailyPlannerView extends ItemView {
 			cls: "daily-planner-all-day-label",
 			text: t("daily.allDayLane"),
 		});
-		const columns = row.createDiv({ cls: "daily-planner-all-day-columns" });
+		const content = row.createDiv({ cls: "daily-planner-all-day-content" });
+		this.renderRangeBars(content, days);
+		const columns = content.createDiv({ cls: "daily-planner-all-day-columns" });
 		for (const day of days) {
 			const cell = columns.createDiv({ cls: "daily-planner-all-day-cell" });
+			const entries = day.entries.filter(
+				(entry) => entry.startMinutes == null && !entry.rangeStart,
+			);
 			this.renderUntimedList(
 				cell,
-				day.entries.filter((entry) => entry.startMinutes == null),
+				entries,
 				day,
+				!day.entries.some(
+					(entry) => entry.startMinutes == null && entry.rangeStart,
+				),
 			);
+		}
+	}
+
+	private renderRangeBars(parent: HTMLElement, days: VisiblePlannerDay[]): void {
+		const bars = layoutDailyPlannerRanges(
+			days.map((day) => day.dateString),
+			days.flatMap((day) =>
+				day.entries.filter((entry) => entry.startMinutes == null),
+			),
+		);
+		if (bars.length === 0) return;
+
+		const lanes = parent.createDiv({ cls: "daily-planner-range-lanes" });
+		lanes.style.setProperty(
+			"--daily-planner-range-lane-count",
+			String(Math.max(...bars.map((bar) => bar.lane)) + 1),
+		);
+		for (const bar of bars) {
+			const day = days[bar.startColumn];
+			if (!day) continue;
+			const chip = this.createDailyEntryChip(lanes, bar.entry, day);
+			chip.addClass("daily-planner-range-bar");
+			chip.empty();
+			for (let index = bar.startColumn; index <= bar.endColumn; index++) {
+				const visibleDay = days[index];
+				if (!visibleDay) continue;
+				chip.createSpan({
+					cls: "daily-planner-range-day-label",
+					text: bar.entry.title,
+					attr: {
+						title: `${visibleDay.dateString} · ${bar.entry.title}`,
+					},
+				});
+			}
+			chip.style.setProperty(
+				"--daily-range-visible-days",
+				String(bar.endColumn - bar.startColumn + 1),
+			);
+			chip.toggleClass("is-range-start", !bar.continuesBefore);
+			chip.toggleClass("is-range-end", !bar.continuesAfter);
+			chip.toggleClass("continues-before", bar.continuesBefore);
+			chip.toggleClass("continues-after", bar.continuesAfter);
+			chip.style.setProperty("--daily-range-start-column", String(bar.startColumn + 1));
+			chip.style.setProperty("--daily-range-end-column", String(bar.endColumn + 2));
+			chip.style.setProperty("--daily-range-lane", String(bar.lane + 1));
+			chip.title = `${bar.entry.title} · ${bar.entry.rangeStart} – ${bar.entry.rangeEnd}`;
+			chip.ariaLabel = chip.title;
 		}
 	}
 
@@ -638,6 +727,15 @@ export class DailyPlannerView extends ItemView {
 		const chip = createPlannerChip(parent, {
 			classes: [
 				isTimeline ? "daily-planner-event" : "daily-planner-untimed-chip",
+				isTimeline && entry.rangeStart && "daily-planner-range-event",
+				isTimeline &&
+					entry.rangeStart &&
+					day.dateString !== entry.rangeStart &&
+					"continues-before",
+				isTimeline &&
+					entry.rangeEnd &&
+					day.dateString !== entry.rangeEnd &&
+					"continues-after",
 				entry.kind === "external" && "planner-external-event-chip",
 				entry.kind === "holiday" && "daily-planner-holiday-chip",
 			]
@@ -650,13 +748,18 @@ export class DailyPlannerView extends ItemView {
 			ariaLabel: entry.title,
 			renderContent: isTimeline
 				? (element) => {
-						element.createSpan({
+						const content = entry.rangeStart
+							? element.createSpan({
+									cls: "daily-planner-range-event-content",
+								})
+							: element;
+						content.createSpan({
 							cls: "planner-chip-meta daily-planner-event-time",
-							text: `${minutesToTime(entry.startMinutes ?? 0)}–${minutesToTime(
-								Math.min(MINUTES_PER_DAY - 1, entry.endMinutes ?? 0),
-							)}`,
+							text: `${minutesToDisplayTime(
+								entry.startMinutes ?? 0,
+							)}–${minutesToDisplayTime(entry.endMinutes ?? 0)}`,
 						});
-						element.createSpan({
+						content.createSpan({
 							cls: "planner-chip-label daily-planner-event-title",
 							text: entry.title,
 						});
@@ -670,6 +773,21 @@ export class DailyPlannerView extends ItemView {
 			}
 		}
 		if (entry.externalEvent) applyExternalEventState(chip, entry.externalEvent);
+		if (entry.rangeStart) {
+			chip.dataset.rangeId = entry.id;
+			chip.addEventListener("mouseenter", () =>
+				this.setRangeHighlight(entry.id, true),
+			);
+			chip.addEventListener("mouseleave", () =>
+				this.setRangeHighlight(entry.id, false),
+			);
+			chip.addEventListener("focus", () =>
+				this.setRangeHighlight(entry.id, true),
+			);
+			chip.addEventListener("blur", () =>
+				this.setRangeHighlight(entry.id, false),
+			);
+		}
 		if (position) {
 			chip.style.setProperty("--daily-column", String(position.column));
 			chip.style.setProperty(
@@ -684,6 +802,19 @@ export class DailyPlannerView extends ItemView {
 		};
 		this.bindEntryDrag(chip, entry, day);
 		return chip;
+	}
+
+	private setRangeHighlight(rangeId: string, highlighted: boolean): void {
+		this.contentEl
+			.querySelectorAll<HTMLElement>("[data-range-id]")
+			.forEach((element) => {
+				if (element.dataset.rangeId === rangeId) {
+					element.toggleClass(
+						"daily-planner-range-highlighted",
+						highlighted,
+					);
+				}
+			});
 	}
 
 	private bindEntryDrag(
@@ -702,7 +833,36 @@ export class DailyPlannerView extends ItemView {
 			day: day.day,
 			dateString: day.dateString,
 		};
-		const item: DailyPlannerDragItem = { entry, sourceDate };
+		const item: DailyPlannerDragItem = {
+			entry,
+			sourceDate,
+			preserveDateRange: Boolean(entry.rangeStart),
+		};
+		// A range is one continuous datetime interval. A per-day slice cannot be
+		// moved or resized independently. Its all-day bar can still be dropped on
+		// the timeline to assign the interval's start and end times.
+		if (entry.rangeStart) {
+			if (
+				entry.startMinutes == null &&
+				this.dragController.bind(element, item)
+			) {
+				element.addClass("is-draggable");
+			}
+			if (
+				entry.startMinutes != null &&
+				entry.endMinutes != null &&
+				entry.rangeStartMinutes != null &&
+				entry.rangeEndMinutes != null
+			) {
+				const edges: Array<"start" | "end"> = [];
+				if (day.dateString === entry.rangeStart) edges.push("start");
+				if (day.dateString === entry.rangeEnd) edges.push("end");
+				if (edges.length > 0 && this.dragController.bindResize(element, item, edges)) {
+					element.addClass("is-resizable");
+				}
+			}
+			return;
+		}
 		if (this.dragController.bind(element, item)) {
 			element.addClass("is-draggable");
 		}
@@ -725,7 +885,7 @@ export class DailyPlannerView extends ItemView {
 
 		try {
 			let file = await this.materializeDragItem(drop.item);
-			if (!sameDate) {
+			if (!sameDate && !drop.item.preserveDateRange) {
 				const moved = await moveFileToDate(
 					this.app,
 					file,
@@ -739,9 +899,44 @@ export class DailyPlannerView extends ItemView {
 				}
 				file = moved;
 			}
+			const entry = drop.item.entry;
+			const rangeResize = Boolean(entry.rangeStart && drop.resizeEdge);
+			if (
+				rangeResize &&
+				drop.rangeStartDate &&
+				drop.rangeEndDate &&
+				(drop.rangeStartDate !== entry.rangeStart ||
+					drop.rangeEndDate !== entry.rangeEnd)
+			) {
+				const start = drop.rangeStartDate.split("-").map(Number);
+				const end = drop.rangeEndDate.split("-").map(Number);
+				const moved = await moveRangeFileToNewDates(
+					this.app,
+					file,
+					start[0] ?? 0,
+					start[1] ?? 0,
+					start[2] ?? 0,
+					end[0] ?? 0,
+					end[1] ?? 0,
+					end[2] ?? 0,
+				);
+				if (!moved) {
+					new Notice(t("chipDrag.targetExists"));
+					return;
+				}
+				file = moved;
+			}
 			await updateFileTimeRange(this.app, file, {
-				startTime: minutesToTime(drop.startMinutes),
-				endTime: minutesToTime(drop.endMinutes),
+				startTime: minutesToTime(
+					rangeResize && drop.resizeEdge === "end"
+						? (entry.rangeStartMinutes ?? drop.startMinutes)
+						: drop.startMinutes,
+				),
+				endTime: minutesToTime(
+					rangeResize && drop.resizeEdge === "start"
+						? (entry.rangeEndMinutes ?? drop.endMinutes)
+						: drop.endMinutes,
+				),
 			});
 			this.render();
 		} catch (error) {

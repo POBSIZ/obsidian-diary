@@ -16,6 +16,12 @@ export interface DailyPlannerEntry {
 	file?: TFile;
 	externalEvent?: ExternalCalendarEvent;
 	kind: "note" | "range" | "external" | "holiday";
+	/** Inclusive calendar bounds when this entry should render as a range bar. */
+	rangeStart?: string;
+	rangeEnd?: string;
+	/** Original datetime boundary times, before this entry is sliced per day. */
+	rangeStartMinutes?: number;
+	rangeEndMinutes?: number;
 }
 
 export interface PositionedDailyPlannerEntry extends DailyPlannerEntry {

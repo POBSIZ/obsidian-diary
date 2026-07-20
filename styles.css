@@ -3810,7 +3810,121 @@ body.-is-mobile .monthly-planner-weekend-label {
 	text-align: right;
 }
 
+.daily-planner-all-day-content {
+	display: flex;
+	min-width: 0;
+	min-height: 0;
+	flex-direction: column;
+	overflow-y: auto;
+}
+
+.daily-planner-range-lanes {
+	position: relative;
+	display: grid;
+	grid-template-columns: repeat(
+		var(--daily-planner-day-count),
+		minmax(0, 1fr)
+	);
+	grid-template-rows: repeat(
+		var(--daily-planner-range-lane-count),
+		1.75rem
+	);
+	gap: 0.18rem 0;
+	padding: 0.35rem 0 0.18rem;
+	border-bottom: 1px solid var(--background-modifier-border);
+}
+
+.daily-planner-range-lanes::after {
+	content: "";
+	position: absolute;
+	inset: 0;
+	z-index: 2;
+	pointer-events: none;
+	background-image: linear-gradient(
+		to right,
+		transparent calc(100% - 1px),
+		var(--background-modifier-border) calc(100% - 1px)
+	);
+	background-size: calc(100% / var(--daily-planner-day-count)) 100%;
+	background-repeat: repeat-x;
+}
+
+.daily-planner-range-lanes .daily-planner-range-bar {
+	position: relative;
+	z-index: 1;
+	display: grid;
+	grid-column: var(--daily-range-start-column) / var(--daily-range-end-column);
+	grid-row: var(--daily-range-lane);
+	grid-template-columns: repeat(
+		var(--daily-range-visible-days),
+		minmax(0, 1fr)
+	);
+	width: auto;
+	max-width: none;
+	min-width: 0;
+	min-height: 1.75rem;
+	margin: 0 0.35rem;
+	justify-content: flex-start;
+	border-radius: 0;
+	overflow: hidden;
+	text-align: left;
+	white-space: nowrap;
+}
+
+.daily-planner-range-day-label {
+	min-width: 0;
+	padding: 0 0.35rem;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.daily-planner-range-day-label + .daily-planner-range-day-label {
+	border-left: 1px solid
+		color-mix(in srgb, var(--background-modifier-border) 72%, transparent);
+}
+
+.daily-planner-range-bar.is-range-start {
+	border-top-left-radius: var(--planner-radius-sm);
+	border-bottom-left-radius: var(--planner-radius-sm);
+}
+
+.daily-planner-range-bar.is-range-end {
+	border-top-right-radius: var(--planner-radius-sm);
+	border-bottom-right-radius: var(--planner-radius-sm);
+}
+
+.daily-planner-range-bar.continues-before {
+	margin-left: 0.12rem;
+	border-left: 0;
+}
+
+.daily-planner-range-bar.continues-after {
+	margin-right: 0.12rem;
+	border-right: 0;
+}
+
+.daily-planner-range-bar:focus-visible {
+	z-index: 3;
+}
+
+.daily-planner-container .daily-planner-range-highlighted {
+	color: var(--text-normal);
+	background: color-mix(
+		in srgb,
+		var(--interactive-accent) 18%,
+		var(--background-primary)
+	);
+	box-shadow: inset 0 0 0 2px
+		color-mix(in srgb, var(--interactive-accent) 68%, transparent);
+}
+
+.daily-planner-range-lanes .daily-planner-range-highlighted {
+	z-index: 3;
+}
+
 .daily-planner-all-day-columns {
+	flex: 1 0 auto;
 	display: grid;
 	grid-template-columns: repeat(
 		var(--daily-planner-day-count),
@@ -3910,7 +4024,7 @@ body.-is-mobile .monthly-planner-weekend-label {
 	border-right: 0;
 }
 
-.daily-planner-event {
+.daily-planner-container .daily-planner-event {
 	position: absolute;
 	display: flex;
 	flex-direction: column;
@@ -3930,6 +4044,33 @@ body.-is-mobile .monthly-planner-weekend-label {
 .daily-planner-event:hover,
 .daily-planner-event:focus-visible {
 	z-index: 4;
+}
+
+.daily-planner-range-event.continues-before {
+	border-top: 0;
+	border-top-left-radius: 0;
+	border-top-right-radius: 0;
+}
+
+.daily-planner-range-event.continues-after {
+	border-bottom: 0;
+	border-bottom-left-radius: 0;
+	border-bottom-right-radius: 0;
+}
+
+.daily-planner-container .daily-planner-range-event {
+	justify-content: flex-start;
+	padding-top: 0.35rem;
+	overflow: clip;
+}
+
+.daily-planner-range-event-content {
+	position: sticky;
+	top: 0.35rem;
+	display: flex;
+	min-width: 0;
+	flex-direction: column;
+	flex: 0 0 auto;
 }
 
 .daily-planner-event-resize-handle {
@@ -3997,6 +4138,11 @@ body.-is-mobile .monthly-planner-weekend-label {
 		color-mix(in srgb, var(--interactive-accent) 28%, transparent);
 }
 
+.daily-planner-container .is-range-resizing-source {
+	opacity: 0;
+	pointer-events: none;
+}
+
 .daily-planner-resizing {
 	user-select: none;
 }
@@ -4034,13 +4180,9 @@ body.-is-mobile .monthly-planner-weekend-label {
 }
 
 .daily-planner-events-layer.is-time-selection-target {
-	background-color: color-mix(
-		in srgb,
-		var(--interactive-accent) 5%,
-		transparent
-	);
+	background-color: transparent;
 	box-shadow: inset 0 0 0 1px
-		color-mix(in srgb, var(--interactive-accent) 42%, transparent);
+		color-mix(in srgb, var(--interactive-accent) 22%, transparent);
 }
 
 .daily-planner-time-selecting {
@@ -4049,6 +4191,9 @@ body.-is-mobile .monthly-planner-weekend-label {
 
 .daily-planner-time-selection-preview {
 	position: absolute;
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
 	top: calc(var(--daily-start) * 1px + 1px);
 	left: 2px;
 	right: 2px;
@@ -4060,23 +4205,47 @@ body.-is-mobile .monthly-planner-weekend-label {
 	border-radius: var(--planner-radius-sm);
 	background: color-mix(
 		in srgb,
-		var(--interactive-accent) 15%,
+		var(--interactive-accent) 22%,
 		var(--background-primary)
 	);
 	color: var(--text-normal);
 	pointer-events: none;
 	overflow: hidden;
-	z-index: 1;
+	z-index: 6;
 	transition:
 		top 80ms cubic-bezier(0.2, 0, 0, 1),
 		height 80ms cubic-bezier(0.2, 0, 0, 1),
 		background-color 80ms cubic-bezier(0.2, 0, 0, 1);
 }
 
+.daily-planner-time-selection-preview.continues-before,
+.daily-planner-drag-preview.continues-before {
+	border-top: 0;
+	border-top-left-radius: 0;
+	border-top-right-radius: 0;
+}
+
+.daily-planner-time-selection-preview.continues-after,
+.daily-planner-drag-preview.continues-after {
+	border-bottom: 0;
+	border-bottom-left-radius: 0;
+	border-bottom-right-radius: 0;
+}
+
 .daily-planner-time-selection-preview-time {
 	display: block;
-	color: var(--text-muted);
+	color: var(--text-normal);
 	font-size: var(--font-ui-smaller);
+	font-variant-numeric: tabular-nums;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.daily-planner-time-selection-preview-range {
+	display: block;
+	color: var(--text-muted);
+	font-size: calc(var(--font-ui-smaller) * 0.88);
 	font-variant-numeric: tabular-nums;
 	white-space: nowrap;
 	overflow: hidden;
@@ -4132,6 +4301,10 @@ body.-is-mobile .monthly-planner-weekend-label {
 	font-weight: 600;
 }
 
+.daily-planner-range-drag-preview {
+	justify-content: flex-start;
+}
+
 @media (prefers-reduced-motion: reduce) {
 	.daily-planner-drag-preview,
 	.daily-planner-time-selection-preview,
@@ -4158,6 +4331,33 @@ body.-is-mobile .monthly-planner-weekend-label {
 .daily-planner-event-title {
 	font-size: inherit;
 	font-weight: 500;
+}
+
+/* The shared external marker is inline-oriented. In the daily planner it
+ * becomes an extra flex/grid item and offsets the chip copy, especially in
+ * the three-day view. The dashed outline and accent edge already identify
+ * external entries here, so keep the marker out of the layout. */
+.daily-planner-container .planner-external-event-chip::before {
+	content: none;
+}
+
+.daily-planner-container
+	.daily-planner-untimed-chip.planner-external-event-chip:not(
+		.daily-planner-range-bar
+	) {
+	display: flex;
+	align-items: center;
+	justify-content: flex-start;
+}
+
+.daily-planner-container
+	.daily-planner-event.planner-external-event-chip
+	:is(.daily-planner-event-time, .daily-planner-event-title),
+.daily-planner-container
+	.daily-planner-event.planner-external-event-chip
+	.daily-planner-range-event-content {
+	width: 100%;
+	text-align: start;
 }
 
 .daily-planner-now-line {

@@ -1,5 +1,6 @@
 import { Platform } from "obsidian";
 import type { DailyPlannerDragDate } from "./drag";
+import { getDailyRangeTimeSlice } from "./range-layout";
 
 const MINUTES_PER_DAY = 24 * 60;
 const SNAP_MINUTES = 15;
@@ -27,8 +28,17 @@ interface ActiveSelection {
 const pad = (value: number) => String(value).padStart(2, "0");
 
 function minutesToTime(minutes: number): string {
+	if (minutes >= MINUTES_PER_DAY) return "24:00";
 	const normalized = Math.max(0, Math.min(MINUTES_PER_DAY - 1, minutes));
 	return `${pad(Math.floor(normalized / 60))}:${pad(normalized % 60)}`;
+}
+
+function compareDateTime(
+	a: { date: DailyPlannerDragDate; minute: number },
+	b: { date: DailyPlannerDragDate; minute: number },
+): number {
+	const dateCompare = a.date.dateString.localeCompare(b.date.dateString);
+	return dateCompare !== 0 ? dateCompare : a.minute - b.minute;
 }
 
 function isMobileSurface(activeDocument: Document): boolean {
@@ -129,24 +139,20 @@ export class DailyPlannerTimeSelectionController {
 		const targetDate = this.readDate(targetLayer);
 		if (!targetDate) return;
 		const currentMinute = this.getSnappedMinute(targetLayer, event.clientY);
-		const startDate =
-			active.startDate.dateString <= targetDate.dateString
-				? active.startDate
-				: targetDate;
-		const endDate =
-			active.startDate.dateString <= targetDate.dateString
-				? targetDate
-				: active.startDate;
-		const startMinutes = Math.min(active.startMinute, currentMinute);
-		const endMinutes = Math.min(
-			MINUTES_PER_DAY - 1,
-			Math.max(active.startMinute, currentMinute, startMinutes + SNAP_MINUTES),
-		);
+		const origin = { date: active.startDate, minute: active.startMinute };
+		const current = { date: targetDate, minute: currentMinute };
+		const [start, end] =
+			compareDateTime(origin, current) <= 0
+				? [origin, current]
+				: [current, origin];
+		const samePoint = compareDateTime(start, end) === 0;
 		active.selection = {
-			startDate,
-			endDate,
-			startMinutes,
-			endMinutes,
+			startDate: start.date,
+			endDate: end.date,
+			startMinutes: start.minute,
+			endMinutes: samePoint
+				? Math.min(MINUTES_PER_DAY - 1, end.minute + SNAP_MINUTES)
+				: end.minute,
 		};
 		this.renderSelection(active.selection);
 	};
@@ -217,21 +223,45 @@ export class DailyPlannerTimeSelectionController {
 			);
 		});
 		for (const layer of layers) {
+			const date = layer.dataset.date;
+			if (!date) continue;
+			const slice = getDailyRangeTimeSlice(
+				date,
+				selection.startDate.dateString,
+				selection.endDate.dateString,
+				selection.startMinutes,
+				selection.endMinutes,
+			);
+			if (!slice) continue;
 			layer.addClass("is-time-selection-target");
 			const preview = layer.createDiv({
-				cls: "daily-planner-time-selection-preview",
+				cls: [
+					"daily-planner-time-selection-preview",
+					date !== selection.startDate.dateString && "continues-before",
+					date !== selection.endDate.dateString && "continues-after",
+				]
+					.filter(Boolean)
+					.join(" "),
 			});
 			preview.style.setProperty(
 				"--daily-start",
-				String(selection.startMinutes),
+				String(slice.start),
 			);
 			preview.style.setProperty(
 				"--daily-duration",
-				String(Math.max(SNAP_MINUTES, selection.endMinutes - selection.startMinutes)),
+				String(Math.max(SNAP_MINUTES, slice.end - slice.start)),
 			);
 			preview.createSpan({
 				cls: "daily-planner-time-selection-preview-time",
-				text: `${minutesToTime(selection.startMinutes)}–${minutesToTime(selection.endMinutes)}`,
+				text: `${minutesToTime(slice.start)}–${minutesToTime(slice.end)}`,
+			});
+			preview.createSpan({
+				cls: "daily-planner-time-selection-preview-range",
+				text: `${selection.startDate.dateString} ${minutesToTime(
+					selection.startMinutes,
+				)} → ${selection.endDate.dateString} ${minutesToTime(
+					selection.endMinutes,
+				)}`,
 			});
 		}
 	}

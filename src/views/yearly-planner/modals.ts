@@ -315,6 +315,19 @@ function isValidRecurrenceInterval(value: string): boolean {
 	return Number.isInteger(parsed) && parsed >= 1 && parsed <= 999;
 }
 
+function syncAllDayTimeInputs(
+	allDayCheckbox: HTMLInputElement,
+	startTimeInput: HTMLInputElement,
+	endTimeInput: HTMLInputElement,
+): void {
+	if (allDayCheckbox.checked) {
+		startTimeInput.value = "";
+		endTimeInput.value = "";
+	}
+	startTimeInput.disabled = allDayCheckbox.checked;
+	endTimeInput.disabled = allDayCheckbox.checked;
+}
+
 function formatOverlayPreview(
 	dateStr: string,
 	calendarOverlay: CalendarOverlayConfig,
@@ -364,6 +377,7 @@ export class CreateFileModal extends Modal {
 	private colorPresetBtns: HTMLButtonElement[] = [];
 	private colorPresets: { hex: string }[] = [];
 	private todoCheckbox!: HTMLInputElement;
+	private allDayCheckbox!: HTMLInputElement;
 	private startTimeInput!: HTMLInputElement;
 	private endTimeInput!: HTMLInputElement;
 	private notifyTimeInput!: HTMLInputElement;
@@ -602,6 +616,25 @@ export class CreateFileModal extends Modal {
 		todoLabel.appendChild(this.todoCheckbox);
 		todoLabel.appendText(` ${t("modal.todoFile")}`);
 
+		const allDayRow = createUiFieldRow(
+			form,
+			"yearly-planner-create-file-row",
+		);
+		this.allDayCheckbox = allDayRow.createEl("input", {
+			type: "checkbox",
+			cls: "yearly-planner-all-day-checkbox",
+		});
+		this.allDayCheckbox.checked = !(
+			this.options.defaultStartTime || this.options.defaultEndTime
+		);
+		const allDayLabel = allDayRow.createEl("label");
+		allDayLabel.appendChild(this.allDayCheckbox);
+		allDayLabel.appendText(` ${t("modal.allDay")}`);
+		allDayRow.createDiv({
+			cls: "yearly-planner-create-file-hint",
+			text: t("modal.allDayDesc"),
+		});
+
 		const startTimeRow = createUiFieldRow(
 			form,
 			"yearly-planner-create-file-row",
@@ -628,6 +661,19 @@ export class CreateFileModal extends Modal {
 		this.endTimeInput.value = this.options.defaultEndTime ?? "";
 		this.endTimeInput.addEventListener("input", () =>
 			this.updateCreateState(),
+		);
+		this.allDayCheckbox.onchange = () => {
+			syncAllDayTimeInputs(
+				this.allDayCheckbox,
+				this.startTimeInput,
+				this.endTimeInput,
+			);
+			this.updateCreateState();
+		};
+		syncAllDayTimeInputs(
+			this.allDayCheckbox,
+			this.startTimeInput,
+			this.endTimeInput,
 		);
 		endTimeRow.createDiv({
 			cls: "yearly-planner-create-file-hint",
@@ -749,6 +795,9 @@ export class CreateFileModal extends Modal {
 		const startTime = normalizeTimeValue(this.startTimeInput?.value ?? "");
 		const endTime = normalizeTimeValue(this.endTimeInput?.value ?? "");
 		if (endTime && !startTime) return t("modal.endTimeRequiresStart");
+		if (this.mode === "range" && startTime && !endTime) {
+			return t("modal.rangeEndTimeRequired");
+		}
 		const isSameDay =
 			this.mode === "single" ||
 			this.startDateInput.value === this.endDateInput.value;
@@ -1111,6 +1160,7 @@ export class FileOptionsModal extends Modal {
 	private colorPresetBtns: HTMLButtonElement[] = [];
 	private colorPresets: { hex: string }[] = [];
 	private todoCheckbox!: HTMLInputElement;
+	private allDayCheckbox!: HTMLInputElement;
 	private startTimeInput!: HTMLInputElement;
 	private endTimeInput!: HTMLInputElement;
 	private notifyTimeInput!: HTMLInputElement;
@@ -1298,6 +1348,24 @@ export class FileOptionsModal extends Modal {
 		this.updateCompletedRowVisibility();
 
 		const existingTimeRange = getPlannerTimeRange(this.app, this.file);
+		const allDayRow = createUiFieldRow(
+			form,
+			"yearly-planner-create-file-row",
+		);
+		this.allDayCheckbox = allDayRow.createEl("input", {
+			type: "checkbox",
+			cls: "yearly-planner-all-day-checkbox",
+		});
+		this.allDayCheckbox.checked = !(
+			existingTimeRange.startTime || existingTimeRange.endTime
+		);
+		const allDayLabel = allDayRow.createEl("label");
+		allDayLabel.appendChild(this.allDayCheckbox);
+		allDayLabel.appendText(` ${t("modal.allDay")}`);
+		allDayRow.createDiv({
+			cls: "yearly-planner-create-file-hint",
+			text: t("modal.allDayDesc"),
+		});
 		const startTimeRow = createUiFieldRow(
 			form,
 			"yearly-planner-create-file-row",
@@ -1324,6 +1392,19 @@ export class FileOptionsModal extends Modal {
 		this.endTimeInput.value = existingTimeRange.endTime ?? "";
 		this.endTimeInput.addEventListener("input", () =>
 			this.updateFileOptionsState(),
+		);
+		this.allDayCheckbox.onchange = () => {
+			syncAllDayTimeInputs(
+				this.allDayCheckbox,
+				this.startTimeInput,
+				this.endTimeInput,
+			);
+			this.updateFileOptionsState();
+		};
+		syncAllDayTimeInputs(
+			this.allDayCheckbox,
+			this.startTimeInput,
+			this.endTimeInput,
 		);
 		endTimeRow.createDiv({
 			cls: "yearly-planner-create-file-hint",
@@ -1661,6 +1742,9 @@ export class FileOptionsModal extends Modal {
 		const startTime = normalizeTimeValue(this.startTimeInput?.value ?? "");
 		const endTime = normalizeTimeValue(this.endTimeInput?.value ?? "");
 		if (endTime && !startTime) return t("modal.endTimeRequiresStart");
+		if (this.startDateInput && this.endDateInput && startTime && !endTime) {
+			return t("modal.rangeEndTimeRequired");
+		}
 		const isSameDay =
 			Boolean(this.singleDateInput) ||
 			this.startDateInput?.value === this.endDateInput?.value;
