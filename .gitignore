@@ -27,5 +27,8 @@ data.json
 # Local planning and idea documents that should not ship with releases
 docs/ideas/
 
+# Local agent instructions
+AGENTS.md
+
 # Local backup of incomplete nested .git (see repo setup)
 .git.broken
