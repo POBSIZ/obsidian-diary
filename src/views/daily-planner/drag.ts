@@ -100,7 +100,7 @@ export class DailyPlannerDragController {
 		if (isMobileSurface(this.contentEl.ownerDocument)) return false;
 		element.setAttribute("draggable", "false");
 		element.addEventListener("mousedown", (event) => {
-			if (event.button !== 0) return;
+			if (event.button !== 0 || event.metaKey || event.ctrlKey) return;
 			this.reset();
 			this.active = {
 				element,
@@ -154,7 +154,7 @@ export class DailyPlannerDragController {
 				attr: { "aria-hidden": "true" },
 			});
 			handle.addEventListener("mousedown", (event) => {
-				if (event.button !== 0) return;
+				if (event.button !== 0 || event.metaKey || event.ctrlKey) return;
 				event.preventDefault();
 				event.stopPropagation();
 				this.reset();

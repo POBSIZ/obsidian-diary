@@ -38,6 +38,12 @@ import {
 	type PlannerViewMode,
 } from "../planner-layout";
 import {
+	handlePlannerClipboardShortcut,
+	isPrimaryMod,
+	makeDateSelectionKey,
+	makeFileSelectionKey,
+} from "../planner-clipboard";
+import {
 	applyExternalEventState,
 	applyPlannerFileState,
 	createAlternateCalendarLabel,
@@ -164,6 +170,21 @@ export class DailyPlannerView extends ItemView {
 	private pendingInitialScroll = true;
 	private readonly dragController: DailyPlannerDragController;
 	private readonly timeSelectionController: DailyPlannerTimeSelectionController;
+	private readonly clipboardSelection = new Set<string>();
+	private readonly pasteUndoBatches: string[][] = [];
+	private clipboardKeydownRegistered = false;
+	private readonly boundClipboardKeydown = (event: KeyboardEvent) => {
+		if (this.app.workspace.getActiveViewOfType(DailyPlannerView) !== this) return;
+		handlePlannerClipboardShortcut(event, {
+			app: this.app,
+			contentEl: this.contentEl,
+			folder: this.plugin.settings.plannerFolder || "Planner",
+			scope: this.plugin.settings.plannerFileScope ?? "vault",
+			selection: this.clipboardSelection,
+			pasteUndoBatches: this.pasteUndoBatches,
+			render: () => this.render(),
+		});
+	};
 
 	constructor(
 		leaf: WorkspaceLeaf,
@@ -229,6 +250,12 @@ export class DailyPlannerView extends ItemView {
 	}
 
 	onOpen(): Promise<void> {
+		if (!this.clipboardKeydownRegistered) {
+			this.registerDomEvent(window, "keydown", this.boundClipboardKeydown, {
+				capture: true,
+			});
+			this.clipboardKeydownRegistered = true;
+		}
 		this.attachResizeObserver();
 		this.render();
 		return Promise.resolve();
@@ -239,6 +266,8 @@ export class DailyPlannerView extends ItemView {
 		this.timeSelectionController.reset();
 		this.resizeObserver?.disconnect();
 		this.resizeObserver = null;
+		this.clipboardSelection.clear();
+		this.pasteUndoBatches.length = 0;
 		return Promise.resolve();
 	}
 
@@ -590,6 +619,18 @@ export class DailyPlannerView extends ItemView {
 		const columns = content.createDiv({ cls: "daily-planner-all-day-columns" });
 		for (const day of days) {
 			const cell = columns.createDiv({ cls: "daily-planner-all-day-cell" });
+			cell.onclick = (event) => {
+				if (!isPrimaryMod(event)) return;
+				event.preventDefault();
+				this.updateClipboardSelection(
+					makeDateSelectionKey(day.dateString),
+					event.shiftKey,
+				);
+			};
+			cell.toggleClass(
+				"daily-planner-clipboard-selected",
+				this.clipboardSelection.has(makeDateSelectionKey(day.dateString)),
+			);
 			const entries = day.entries.filter(
 				(entry) => entry.startMinutes == null && !entry.rangeStart,
 			);
@@ -682,6 +723,14 @@ export class DailyPlannerView extends ItemView {
 			// a follow-up click whose target is the layer rather than the event chip.
 			if (this.dragController.shouldSuppressClick()) return;
 			if (event.target !== layer) return;
+			if (isPrimaryMod(event)) {
+				this.updateClipboardSelection(
+					makeDateSelectionKey(day.dateString),
+					event.shiftKey,
+				);
+				event.preventDefault();
+				return;
+			}
 			const rect = layer.getBoundingClientRect();
 			const minute = Math.max(
 				0,
@@ -693,6 +742,10 @@ export class DailyPlannerView extends ItemView {
 			this.openCreateFileModal({ start: minute, end: minute + 60 }, day);
 		};
 		this.timeSelectionController.bind(layer);
+		layer.toggleClass(
+			"daily-planner-clipboard-selected",
+			this.clipboardSelection.has(makeDateSelectionKey(day.dateString)),
+		);
 		for (const entry of layoutDailyPlannerEntries(
 			day.entries.filter((entry) => entry.startMinutes != null),
 		)) {
@@ -771,6 +824,10 @@ export class DailyPlannerView extends ItemView {
 		});
 		if (entry.file) {
 			applyPlannerFileState(chip, this.app, entry.file);
+			chip.toggleClass(
+				"daily-planner-clipboard-selected",
+				this.clipboardSelection.has(makeFileSelectionKey(entry.file.path)),
+			);
 			if (isTodoCompleted(this.app, entry.file)) {
 				chip.addClass("planner-chip-completed");
 			}
@@ -801,10 +858,29 @@ export class DailyPlannerView extends ItemView {
 		}
 		chip.onclick = (event) => {
 			event.stopPropagation();
+			if (entry.file && isPrimaryMod(event)) {
+				this.updateClipboardSelection(
+					makeFileSelectionKey(entry.file.path),
+					event.shiftKey,
+				);
+				event.preventDefault();
+				return;
+			}
 			this.openEntry(entry);
 		};
 		this.bindEntryDrag(chip, entry, day);
 		return chip;
+	}
+
+	private updateClipboardSelection(key: string, toggle: boolean): void {
+		if (toggle) {
+			if (this.clipboardSelection.has(key)) this.clipboardSelection.delete(key);
+			else this.clipboardSelection.add(key);
+		} else {
+			this.clipboardSelection.clear();
+			this.clipboardSelection.add(key);
+		}
+		this.render();
 	}
 
 	private setRangeHighlight(rangeId: string, highlighted: boolean): void {

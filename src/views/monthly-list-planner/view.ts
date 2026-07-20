@@ -49,6 +49,10 @@ import {
 	renderPlannerSegmentedControl,
 	setupPlannerContainer,
 } from "../planner-layout";
+import {
+	applyClipboardModifierClick,
+	handlePlannerClipboardShortcut,
+} from "../planner-clipboard";
 
 export class MonthlyListPlannerView extends ItemView {
 	year: number;
@@ -64,6 +68,23 @@ export class MonthlyListPlannerView extends ItemView {
 	private compactLayout = Platform.isMobile;
 	private resizeObserver: ResizeObserver | null = null;
 	private visibleExternalEventsById = new Map<string, ExternalCalendarEvent>();
+	private readonly clipboardSelection = new Set<string>();
+	private readonly pasteUndoBatches: string[][] = [];
+	private clipboardKeydownRegistered = false;
+	private readonly boundClipboardKeydown = (event: KeyboardEvent) => {
+		if (
+			this.app.workspace.getActiveViewOfType(MonthlyListPlannerView) !== this
+		) return;
+		handlePlannerClipboardShortcut(event, {
+			app: this.app,
+			contentEl: this.contentEl,
+			folder: this.plugin.settings.plannerFolder || "Planner",
+			scope: this.plugin.settings.plannerFileScope ?? "vault",
+			selection: this.clipboardSelection,
+			pasteUndoBatches: this.pasteUndoBatches,
+			render: () => this.render(),
+		});
+	};
 
 	constructor(
 		leaf: WorkspaceLeaf,
@@ -107,6 +128,12 @@ export class MonthlyListPlannerView extends ItemView {
 	}
 
 	onOpen(): Promise<void> {
+		if (!this.clipboardKeydownRegistered) {
+			this.registerDomEvent(window, "keydown", this.boundClipboardKeydown, {
+				capture: true,
+			});
+			this.clipboardKeydownRegistered = true;
+		}
 		this.pendingScrollToTodayOnOpen = true;
 		this.attachResizeObserver();
 		this.render();
@@ -118,6 +145,8 @@ export class MonthlyListPlannerView extends ItemView {
 		this.touchStartPos = null;
 		this.resizeObserver?.disconnect();
 		this.resizeObserver = null;
+		this.clipboardSelection.clear();
+		this.pasteUndoBatches.length = 0;
 		this.clearInitialScrollToToday();
 		return Promise.resolve();
 	}
@@ -178,6 +207,27 @@ export class MonthlyListPlannerView extends ItemView {
 		clientY: number,
 		e: Event,
 	): void {
+		const MouseEventCtor = this.contentEl.ownerDocument.defaultView?.MouseEvent;
+		if (
+			MouseEventCtor &&
+			e instanceof MouseEventCtor &&
+			applyClipboardModifierClick({
+				contentEl: this.contentEl,
+				clientX,
+				clientY,
+				e,
+				topmostAt: (x, y) =>
+					this.contentEl.ownerDocument
+						.elementsFromPoint(x, y)
+						.find((element) => this.contentEl.contains(element)) ?? null,
+				chipBarSelector:
+					".monthly-planner-cell-file[data-path], .monthly-planner-range-bar[data-path]",
+				cellSelector:
+					".monthly-list-planner-day[data-year][data-month][data-day]",
+				selection: this.clipboardSelection,
+				rerender: () => this.render(),
+			})
+		) return;
 		const elements = this.contentEl.ownerDocument.elementsFromPoint(
 			clientX,
 			clientY,
@@ -748,6 +798,7 @@ export class MonthlyListPlannerView extends ItemView {
 			calendarOverlay: getCalendarOverlayConfig(this.plugin.settings),
 			externalEvents: overlayEvents,
 			filter: this.listFilter,
+			clipboardSelection: this.clipboardSelection,
 		});
 	}
 

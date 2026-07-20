@@ -60,10 +60,26 @@ Diary release version: 1.10.2
 
 /* Planner copy/paste in progress (class on view contentEl) */
 .yearly-planner-container.planner-clipboard-busy,
-.monthly-planner-container.planner-clipboard-busy {
+.monthly-planner-container.planner-clipboard-busy,
+.monthly-list-planner-container.planner-clipboard-busy,
+.daily-planner-container.planner-clipboard-busy {
 	outline: 2px solid var(--interactive-accent);
 	outline-offset: 2px;
 	transition: outline 0.12s ease;
+}
+
+.daily-planner-events-layer.daily-planner-clipboard-selected {
+	box-shadow: inset 0 0 0 2px var(--text-accent);
+}
+
+.daily-planner-all-day-cell.daily-planner-clipboard-selected {
+	box-shadow: inset 0 0 0 2px var(--text-accent);
+}
+
+.daily-planner-event.daily-planner-clipboard-selected,
+.daily-planner-untimed-chip.daily-planner-clipboard-selected {
+	outline: 2px solid var(--text-accent);
+	outline-offset: 1px;
 }
 
 /* Yearly Planner - Obsidian design tokens */
@@ -3130,6 +3146,16 @@ body.-is-mobile .yearly-planner-file-preview {
 
 .monthly-planner-cell-file.monthly-planner-cell-clipboard-selected,
 .monthly-planner-range-bar.monthly-planner-cell-clipboard-selected {
+	outline: 2px solid var(--text-accent);
+	outline-offset: 1px;
+}
+
+.monthly-list-planner-day.monthly-list-planner-clipboard-selected {
+	box-shadow: inset 0 0 0 2px var(--text-accent);
+}
+
+.monthly-list-planner-cell-file.monthly-list-planner-clipboard-selected,
+.monthly-list-planner-range-bar.monthly-list-planner-clipboard-selected {
 	outline: 2px solid var(--text-accent);
 	outline-offset: 1px;
 }

@@ -18,6 +18,10 @@ import {
 } from "../yearly-planner/file-utils";
 import { getWeekdayLabels } from "../monthly-planner/render";
 import {
+	makeDateSelectionKey,
+	makeFileSelectionKey,
+} from "../planner-clipboard";
+import {
 	applyExternalEventState,
 	applyPlannerFileState,
 	createAlternateCalendarLabel,
@@ -45,6 +49,7 @@ export function renderMonthlyListBody(
 		calendarOverlay: CalendarOverlayConfig;
 		externalEvents: ExternalCalendarEvent[];
 		filter: MonthlyListFilter;
+		clipboardSelection: Set<string>;
 	},
 ): void {
 	const {
@@ -59,6 +64,7 @@ export function renderMonthlyListBody(
 		calendarOverlay,
 		externalEvents,
 		filter,
+		clipboardSelection,
 	} = ctx;
 	const daysInMonth = getDaysInMonth(year, month);
 	const weekdayShort = getWeekdayLabels(locale);
@@ -119,6 +125,10 @@ export function renderMonthlyListBody(
 				.filter(Boolean)
 				.join(" "),
 		});
+		dayBlock.toggleClass(
+			"monthly-list-planner-clipboard-selected",
+			clipboardSelection.has(makeDateSelectionKey(dateKey)),
+		);
 		dayBlock.dataset.year = String(year);
 		dayBlock.dataset.month = String(month);
 		dayBlock.dataset.day = String(day);
@@ -183,6 +193,10 @@ export function renderMonthlyListBody(
 				});
 				makePlannerInteractive(barEl);
 				barEl.dataset.path = file.path;
+				barEl.toggleClass(
+					"monthly-list-planner-clipboard-selected",
+					clipboardSelection.has(makeFileSelectionKey(file.path)),
+				);
 				const chipColor = getChipColor(app, file);
 				if (chipColor) {
 					barEl.style.setProperty("--range-color", chipColor);
@@ -252,7 +266,9 @@ export function renderMonthlyListBody(
 					classes: {
 						root: "monthly-planner-cell-file monthly-list-planner-cell-file",
 						completed: "monthly-planner-chip-completed",
+						selected: "monthly-list-planner-clipboard-selected",
 					},
+					selected: clipboardSelection.has(makeFileSelectionKey(file.path)),
 				});
 			}
 		}

@@ -383,6 +383,144 @@ export async function copyPlannerSelectionToClipboard(
 	}
 }
 
+export interface PlannerClipboardShortcutContext {
+	app: App;
+	contentEl: HTMLElement;
+	folder: string;
+	scope: PlannerFileScope;
+	selection: Set<string>;
+	pasteUndoBatches: string[][];
+	render: () => void;
+}
+
+/** Run the planner Cmd/Ctrl+C/V/Z/Delete shortcut set for an active view. */
+export function handlePlannerClipboardShortcut(
+	e: KeyboardEvent,
+	ctx: PlannerClipboardShortcutContext,
+): boolean {
+	if (!isPrimaryMod(e) || e.shiftKey) return false;
+	if (shouldDeferPlannerClipboardToNative(e)) return false;
+
+	const key = e.key.toLowerCase();
+	if (key === "backspace" || key === "delete") {
+		if (ctx.selection.size === 0) return false;
+		e.preventDefault();
+		openPlannerClipboardSelectionTrashModal(
+			ctx.app,
+			resolveClipboardSelectionToFiles(
+				ctx.app,
+				ctx.folder,
+				ctx.scope,
+				ctx.selection,
+			),
+			ctx.selection,
+			ctx.render,
+		);
+		return true;
+	}
+
+	if (key === "z") {
+		e.preventDefault();
+		if (ctx.pasteUndoBatches.length === 0) {
+			new Notice(t("plannerClipboard.undoNothing"));
+			return true;
+		}
+		const batch = ctx.pasteUndoBatches.pop()!;
+		ctx.contentEl.addClass(PLANNER_CLIPBOARD_BUSY_CLASS);
+		void (async () => {
+			try {
+				const result = await undoPlannerPasteBatch(ctx.app, batch);
+				ctx.render();
+				if (!result.ok) {
+					ctx.pasteUndoBatches.push(batch);
+					new Notice(
+						t(result.errorKey, { path: result.path }),
+						PLANNER_CLIPBOARD_ERROR_NOTICE_MS,
+					);
+				} else if (result.trashedCount === 0) {
+					new Notice(
+						t("plannerClipboard.undoMissingFiles"),
+						PLANNER_CLIPBOARD_ERROR_NOTICE_MS,
+					);
+				} else {
+					new Notice(
+						t("plannerClipboard.undoSuccess", {
+							count: result.trashedCount,
+						}),
+						PLANNER_CLIPBOARD_SUCCESS_NOTICE_MS,
+					);
+				}
+			} finally {
+				ctx.contentEl.removeClass(PLANNER_CLIPBOARD_BUSY_CLASS);
+			}
+		})();
+		return true;
+	}
+
+	if (key !== "c" && key !== "v") return false;
+	if (key === "c") {
+		const files = resolveClipboardSelectionToFiles(
+			ctx.app,
+			ctx.folder,
+			ctx.scope,
+			ctx.selection,
+		);
+		e.preventDefault();
+		if (files.length === 0) {
+			new Notice(t("plannerClipboard.emptyCopy"));
+			return true;
+		}
+		ctx.contentEl.addClass(PLANNER_CLIPBOARD_BUSY_CLASS);
+		void (async () => {
+			try {
+				const result = await copyPlannerSelectionToClipboard(ctx.app, files);
+				new Notice(
+					result.ok
+						? t("plannerClipboard.copySuccess", { count: result.noteCount })
+						: t(result.errorKey),
+					result.ok
+						? PLANNER_CLIPBOARD_SUCCESS_NOTICE_MS
+						: PLANNER_CLIPBOARD_ERROR_NOTICE_MS,
+				);
+			} finally {
+				ctx.contentEl.removeClass(PLANNER_CLIPBOARD_BUSY_CLASS);
+			}
+		})();
+		return true;
+	}
+
+	if (ctx.selection.size === 0) return false;
+	e.preventDefault();
+	ctx.contentEl.addClass(PLANNER_CLIPBOARD_BUSY_CLASS);
+	void (async () => {
+		try {
+			const result = await pastePlannerClipboard(
+				ctx.app,
+				ctx.folder,
+				ctx.selection,
+			);
+			if (result.ok) {
+				ctx.pasteUndoBatches.push(result.createdPaths);
+				ctx.render();
+				new Notice(
+					t("plannerClipboard.pasteSuccess", { count: result.fileCount }),
+					PLANNER_CLIPBOARD_SUCCESS_NOTICE_MS,
+				);
+			} else {
+				new Notice(t(result.errorKey), PLANNER_CLIPBOARD_ERROR_NOTICE_MS);
+			}
+		} catch {
+			new Notice(
+				t("plannerClipboard.pasteFailed"),
+				PLANNER_CLIPBOARD_ERROR_NOTICE_MS,
+			);
+		} finally {
+			ctx.contentEl.removeClass(PLANNER_CLIPBOARD_BUSY_CLASS);
+		}
+	})();
+	return true;
+}
+
 const DELETE_PATH_LIST_MAX = 8;
 
 /**

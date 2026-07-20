@@ -63,7 +63,12 @@ export class DailyPlannerTimeSelectionController {
 	bind(layer: HTMLElement): boolean {
 		if (isMobileSurface(this.contentEl.ownerDocument)) return false;
 		layer.addEventListener("mousedown", (event) => {
-			if (event.button !== 0 || event.target !== layer) return;
+			if (
+				event.button !== 0 ||
+				event.metaKey ||
+				event.ctrlKey ||
+				event.target !== layer
+			) return;
 			const startDate = this.readDate(layer);
 			if (!startDate) return;
 			this.reset();
