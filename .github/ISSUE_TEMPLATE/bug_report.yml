@@ -1,0 +1,78 @@
+name: Report a bug
+description: Report a reproducible problem with Diary.
+title: "[Bug]: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a problem.
+
+        Please search existing issues first. Do not include private vault contents, calendar URLs, access tokens, or other sensitive information.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What happened?
+      description: Describe the problem and what you expected instead.
+      placeholder: I expected..., but instead...
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Open...
+        2. Select...
+        3. Observe...
+    validations:
+      required: true
+
+  - type: input
+    id: diary-version
+    attributes:
+      label: Diary version
+      description: You can find this under Settings → Community plugins.
+      placeholder: e.g. 1.10.1
+    validations:
+      required: true
+
+  - type: input
+    id: obsidian-version
+    attributes:
+      label: Obsidian version
+      placeholder: e.g. 1.9.12
+    validations:
+      required: true
+
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Platform
+      options:
+        - Windows
+        - macOS
+        - Linux
+        - iOS
+        - Android
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: Add anonymized screenshots, sample note names, or relevant settings if useful.
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before submitting
+      options:
+        - label: I searched the existing issues for duplicates.
+          required: true
+        - label: I removed private vault content, credentials, and sensitive calendar information.
+          required: true

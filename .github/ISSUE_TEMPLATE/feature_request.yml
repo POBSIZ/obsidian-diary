@@ -1,0 +1,62 @@
+name: Suggest a feature
+description: Suggest an improvement or a new Diary workflow.
+title: "[Feature]: "
+labels:
+  - enhancement
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for sharing an idea. Please describe the workflow or problem first so we can evaluate more than one possible solution.
+
+        Do not include private vault contents, calendar URLs, access tokens, or other sensitive information.
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Yearly planner
+        - Monthly grid planner
+        - Monthly list planner
+        - Daily or multi-day planner
+        - Planner notes and ranges
+        - Calendars and holidays
+        - Reminders
+        - Settings
+        - Mobile experience
+        - Documentation
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem would this solve?
+      description: Describe the workflow, limitation, or recurring task behind the request.
+      placeholder: When I..., I currently have to...
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: What would you like to happen?
+      placeholder: A useful outcome would be...
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Current workaround
+      description: How do you handle this today, if at all?
+
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: Privacy check
+      options:
+        - label: I have removed private vault content, credentials, and sensitive calendar information.
+          required: true
