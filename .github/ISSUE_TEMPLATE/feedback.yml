@@ -1,0 +1,86 @@
+name: Share feedback
+description: Tell us what works well and what could make Diary better.
+title: "[Feedback]: "
+labels:
+  - feedback
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping improve Diary.
+
+        Please do not include private vault contents, calendar URLs, access tokens, or other sensitive information. You can remove or anonymize any example data before posting.
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      description: Which part of Diary is this feedback about?
+      options:
+        - Yearly planner
+        - Monthly grid planner
+        - Monthly list planner
+        - Daily or multi-day planner
+        - Planner notes and ranges
+        - Calendars and holidays
+        - Reminders
+        - Settings
+        - Mobile experience
+        - Documentation
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: feedback
+    attributes:
+      label: Your feedback
+      description: What is working well, and what feels difficult or unclear?
+      placeholder: Tell us about your experience with Diary.
+    validations:
+      required: true
+
+  - type: textarea
+    id: improvement
+    attributes:
+      label: What would improve your workflow?
+      description: Describe the result you would like, rather than only a specific implementation.
+      placeholder: It would help me if...
+
+  - type: dropdown
+    id: usage
+    attributes:
+      label: How often do you use Diary?
+      options:
+        - Every day
+        - A few times a week
+        - A few times a month
+        - Occasionally
+        - I am trying it for the first time
+
+  - type: input
+    id: version
+    attributes:
+      label: Diary version
+      description: You can find this under Settings → Community plugins.
+      placeholder: e.g. 1.10.1
+
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Platform
+      options:
+        - Windows
+        - macOS
+        - Linux
+        - iOS
+        - Android
+        - Multiple platforms
+
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: Privacy check
+      options:
+        - label: I have removed private vault content, credentials, and sensitive calendar information.
+          required: true
