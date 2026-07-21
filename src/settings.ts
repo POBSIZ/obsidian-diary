@@ -19,6 +19,7 @@ import {
 } from "./utils/alternate-calendars";
 import type { CustomCalendarProfile } from "./utils/custom-calendars";
 import { renderCalendarOverlaySettings } from "./settings/custom-calendar-settings";
+import { configureFeedbackSetting } from "./settings/feedback-settings";
 import {
 	createExternalCalendarId,
 	DEFAULT_EXTERNAL_CALENDAR_REFRESH_MINUTES,
@@ -241,6 +242,18 @@ export class DiaryObsidianSettingTab extends PluginSettingTab {
 					step: 0.25,
 				},
 			},
+			{
+				name: t("settings.feedback"),
+				desc: t("settings.feedbackDesc"),
+				aliases: [
+					t("settings.shareFeedback"),
+					t("settings.reportBug"),
+					t("settings.suggestFeature"),
+				],
+				render: (setting: Setting) => {
+					configureFeedbackSetting(setting);
+				},
+			},
 		];
 	}
 
@@ -416,6 +429,8 @@ export class DiaryObsidianSettingTab extends PluginSettingTab {
 						await this.plugin.saveSettings();
 					}),
 				);
+
+		configureFeedbackSetting(new Setting(containerEl));
 	}
 
 	private renderExternalCalendars(containerEl: HTMLElement): void {
