@@ -269,6 +269,7 @@ Paste rules:
 | External calendars | Opt-in `webcal://` or `https://` `.ics` feeds shown as read-only overlays. Each feed has an enabled state, color, refresh interval, description toggle, and per-view visibility settings. |
 | Mobile bottom padding | Minimum bottom padding for every mobile planner. Automatic navbar and safe-area clearance still applies when this value is smaller. |
 | Mobile cell width | Month cell width for the mobile yearly planner. `0` uses the default. |
+| Feedback and support | Opens public GitHub forms for feedback, bug reports, and feature suggestions. |
 
 Diary also stores UI-only state in plugin data: plan note preview expansion, mobile plan note preview expansion, and expanded yearly month-cell widths.
 
@@ -375,6 +376,14 @@ npm test
 - Use `npm version patch|minor|major --no-git-tag-version` so `package.json`, `package-lock.json`, `manifest.json`, and `versions.json` stay in sync.
 - The GitHub release tag must exactly match the `manifest.json` version and should not have a leading `v`.
 - This repository builds `main.js`, `manifest.json`, and `styles.css` from the tagged source in GitHub Actions and publishes them as individual release assets.
+
+## Feedback And Support
+
+- [Share feedback](https://github.com/POBSIZ/obsidian-diary/issues/new?template=feedback.yml)
+- [Report a bug](https://github.com/POBSIZ/obsidian-diary/issues/new?template=bug_report.yml)
+- [Suggest a feature](https://github.com/POBSIZ/obsidian-diary/issues/new?template=feature_request.yml)
+
+These links open public GitHub issues and require a GitHub account. Do not include private vault content, calendar URLs, access tokens, or other sensitive information.
 
 ## Privacy And Network
 

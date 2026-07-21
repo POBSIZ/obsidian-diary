@@ -269,6 +269,7 @@ Reglas de pegado:
 | Calendarios externos | Feeds `.ics` opcionales por `webcal://` o `https://` como superposiciones de solo lectura. Cada feed tiene estado, color, intervalo, descripciones y visibilidad por vista. |
 | Espacio inferior en móvil | Espacio inferior mínimo para todos los planificadores móviles. La separación automática de navbar y safe area sigue activa con valores menores. |
 | Ancho de celda en móvil | Ancho de celdas de mes en el planificador anual móvil. `0` usa el valor predeterminado. |
+| Comentarios y soporte | Abre formularios públicos de GitHub para comentarios, errores y sugerencias de funciones. |
 
 Diary también guarda estado solo de interfaz: expansión del panel de plan, expansión móvil del panel y anchos de meses expandidos en el planificador anual.
 
@@ -375,6 +376,14 @@ npm test
 - Usa `npm version patch|minor|major --no-git-tag-version` para mantener sincronizados `package.json`, `package-lock.json`, `manifest.json` y `versions.json`.
 - La etiqueta de GitHub Release debe coincidir exactamente con la versión de `manifest.json` y no debe llevar `v` inicial.
 - El repositorio publica los assets como archivos individuales y el workflow genera atestación de procedencia para `main.js`, `manifest.json` y `styles.css`.
+
+## Comentarios y soporte
+
+- [Enviar comentarios](https://github.com/POBSIZ/obsidian-diary/issues/new?template=feedback.yml)
+- [Informar de un error](https://github.com/POBSIZ/obsidian-diary/issues/new?template=bug_report.yml)
+- [Sugerir una función](https://github.com/POBSIZ/obsidian-diary/issues/new?template=feature_request.yml)
+
+Estos enlaces abren issues públicos de GitHub y requieren una cuenta de GitHub. No incluyas contenido privado del vault, URL de calendarios, tokens de acceso ni otra información confidencial.
 
 ## Privacidad y red
 

@@ -158,6 +158,14 @@ npm test
 - Version bump helper: `npm version patch|minor|major --no-git-tag-version`
 - Release assets are built from the tagged source in GitHub Actions and uploaded directly to the matching GitHub release.
 
+## Feedback And Support
+
+- [Share feedback](https://github.com/POBSIZ/obsidian-diary/issues/new?template=feedback.yml)
+- [Report a bug](https://github.com/POBSIZ/obsidian-diary/issues/new?template=bug_report.yml)
+- [Suggest a feature](https://github.com/POBSIZ/obsidian-diary/issues/new?template=feature_request.yml)
+
+These links open public GitHub issues and require a GitHub account. Do not include private vault content, calendar URLs, access tokens, or other sensitive information.
+
 ## License
 
 See `LICENSE`.

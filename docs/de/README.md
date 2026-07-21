@@ -269,6 +269,7 @@ Einfügeregeln:
 | Externe Kalender | Optionale `webcal://`- oder `https://`-`.ics`-Feeds als schreibgeschützte Overlays. Jeder Feed hat Aktivierung, Farbe, Aktualisierungsintervall, Beschreibung und Sichtbarkeit pro Ansicht. |
 | Unterer Abstand mobil | Mindestabstand für alle mobilen Planer. Automatischer Navbar- und Safe-Area-Abstand bleibt auch bei einem kleineren Wert aktiv. |
 | Mobile Zellbreite | Breite der Monatszellen im mobilen Jahresplaner. `0` nutzt den Standardwert. |
+| Feedback und Support | Öffnet öffentliche GitHub-Formulare für Feedback, Fehlermeldungen und Funktionsvorschläge. |
 
 Diary speichert außerdem reine UI-Zustände in Plugin-Daten: Plan-Notiz-Vorschau, mobile Plan-Notiz-Vorschau und erweiterte Monatszellenbreiten im Jahresplaner.
 
@@ -375,6 +376,14 @@ npm test
 - Nutze `npm version patch|minor|major --no-git-tag-version`, damit `package.json`, `package-lock.json`, `manifest.json` und `versions.json` synchron bleiben.
 - Der GitHub-Release-Tag muss exakt der Version in `manifest.json` entsprechen und sollte kein führendes `v` haben.
 - Das Repository veröffentlicht Release-Dateien einzeln; der Release-Workflow erzeugt Build-Provenance-Attestierungen für `main.js`, `manifest.json` und `styles.css`.
+
+## Feedback und Support
+
+- [Feedback geben](https://github.com/POBSIZ/obsidian-diary/issues/new?template=feedback.yml)
+- [Fehler melden](https://github.com/POBSIZ/obsidian-diary/issues/new?template=bug_report.yml)
+- [Funktion vorschlagen](https://github.com/POBSIZ/obsidian-diary/issues/new?template=feature_request.yml)
+
+Diese Links öffnen öffentliche GitHub-Issues und erfordern ein GitHub-Konto. Füge keine privaten Vault-Inhalte, Kalender-URLs, Zugriffstoken oder andere vertrauliche Informationen hinzu.
 
 ## Datenschutz und Netzwerk
 
