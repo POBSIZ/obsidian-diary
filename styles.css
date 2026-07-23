@@ -5502,15 +5502,11 @@ body.-is-mobile
 
 body.is-mobile
 	.modal
-	.diary-ui-modal-action-bar:has(
-		> .diary-ui-button:nth-child(3):last-child
-	)
+	.diary-ui-modal-action-bar-three-buttons
 	> .mod-cta,
 body.-is-mobile
 	.modal
-	.diary-ui-modal-action-bar:has(
-		> .diary-ui-button:nth-child(3):last-child
-	)
+	.diary-ui-modal-action-bar-three-buttons
 	> .mod-cta {
 	grid-row: 1;
 	grid-column: 1 / -1;
@@ -5546,9 +5542,7 @@ body.-is-mobile
 	}
 
 	.modal
-		.diary-ui-modal-action-bar:has(
-			> .diary-ui-button:nth-child(3):last-child
-		)
+		.diary-ui-modal-action-bar-three-buttons
 		> .mod-cta {
 		grid-row: 1;
 		grid-column: 1 / -1;

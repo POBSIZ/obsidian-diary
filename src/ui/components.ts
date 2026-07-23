@@ -23,6 +23,18 @@ const BUTTON_VARIANT_CLASS: Record<UiButtonVariant, string> = {
 	warning: "mod-warning",
 };
 
+const MODAL_ACTION_BAR_CLASS = "diary-ui-modal-action-bar";
+const MODAL_ACTION_BAR_THREE_BUTTONS_CLASS =
+	"diary-ui-modal-action-bar-three-buttons";
+
+function updateModalActionBarState(parent: HTMLElement): void {
+	if (!parent.hasClass(MODAL_ACTION_BAR_CLASS)) return;
+	parent.toggleClass(
+		MODAL_ACTION_BAR_THREE_BUTTONS_CLASS,
+		parent.childElementCount === 3,
+	);
+}
+
 /** Single button factory for planner views, modals, and settings surfaces. */
 export function createUiButton(
 	parent: HTMLElement,
@@ -57,6 +69,7 @@ export function createUiButton(
 	if (options.onClick) {
 		button.onclick = (event) => void options.onClick?.(event);
 	}
+	updateModalActionBarState(parent);
 	return button;
 }
 
@@ -80,10 +93,11 @@ export function createUiModalActionBar(
 ): HTMLElement {
 	const actions = createUiButtonRow(
 		parent,
-		`diary-ui-modal-action-bar ${classes}`,
+		`${MODAL_ACTION_BAR_CLASS} ${classes}`,
 	);
-	const scrollRegion = parent.ownerDocument.createElement("div");
-	scrollRegion.className = "diary-ui-modal-scroll-region";
+	const scrollRegion = parent.createDiv({
+		cls: "diary-ui-modal-scroll-region",
+	});
 	parent.insertBefore(scrollRegion, actions);
 	while (parent.firstChild && parent.firstChild !== scrollRegion) {
 		scrollRegion.appendChild(parent.firstChild);

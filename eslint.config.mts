@@ -44,6 +44,15 @@ export default defineConfig([
 		},
 	},
 	{
+		files: ["scripts/**/*.mjs"],
+		languageOptions: {
+			globals: {
+				...globals.node,
+			},
+		},
+		rules: typedObsidianRules,
+	},
+	{
 		files: ["**/*.json"],
 		language: "json/json",
 		plugins: {

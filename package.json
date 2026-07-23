@@ -8,7 +8,8 @@
 		"dev": "node esbuild.config.mjs",
 		"build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production",
 		"version": "node version-bump.mjs && git add manifest.json versions.json styles.css",
-		"lint": "eslint .",
+		"lint": "npm run lint:patterns && eslint . --max-warnings 0",
+		"lint:patterns": "node scripts/check-source-warnings.mjs",
 		"test": "echo \"No tests configured\""
 	},
 	"keywords": [],
