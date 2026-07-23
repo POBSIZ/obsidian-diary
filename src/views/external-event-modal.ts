@@ -4,7 +4,7 @@ import {
 	attachUiPressFeedback,
 	createUiBadge,
 	createUiButton,
-	createUiButtonRow,
+	createUiModalActionBar,
 } from "../ui/components";
 import {
 	getExternalEventDateRangeLabel,
@@ -79,7 +79,7 @@ export class ExternalEventModal extends Modal {
 			});
 		}
 
-		const actions = createUiButtonRow(
+		const actions = createUiModalActionBar(
 			this.contentEl,
 			"yearly-planner-modal-actions",
 		);

@@ -32,9 +32,9 @@ import type { PlannerFileScope } from "./views/yearly-planner/file-utils";
 import {
 	createUiBadge,
 	createUiButton,
-	createUiButtonRow,
 	createUiDisclosure,
 	createUiError,
+	createUiModalActionBar,
 } from "./ui/components";
 
 export interface DiaryObsidianSettings {
@@ -1071,7 +1071,7 @@ class ExternalCalendarFeedModal extends Modal {
 			this.contentEl,
 			"yearly-planner-modal-error",
 		);
-		const actions = createUiButtonRow(
+		const actions = createUiModalActionBar(
 			this.contentEl,
 			"yearly-planner-modal-actions",
 		);

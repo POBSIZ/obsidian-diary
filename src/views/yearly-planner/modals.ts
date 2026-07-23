@@ -59,6 +59,7 @@ import {
 	createUiColorPresetButton,
 	createUiError,
 	createUiFieldRow,
+	createUiModalActionBar,
 } from "../../ui/components";
 
 /** Additional chip color presets (first preset is theme accent, computed at runtime). No duplicates. */
@@ -702,7 +703,11 @@ export class CreateFileModal extends Modal {
 			"yearly-planner-modal-error",
 		);
 
-		this.createBtn = createUiButton(this.contentEl, {
+		const actions = createUiModalActionBar(
+			this.contentEl,
+			"yearly-planner-modal-buttons yearly-planner-create-file-actions",
+		);
+		this.createBtn = createUiButton(actions, {
 			text: t("modal.create"),
 			variant: "cta",
 		});
@@ -1133,7 +1138,7 @@ export class DeleteConfirmModal extends Modal {
 			cls: "yearly-planner-delete-desc",
 			text: this.desc,
 		});
-		const btnRow = createUiButtonRow(
+		const btnRow = createUiModalActionBar(
 			this.contentEl,
 			"yearly-planner-modal-buttons",
 		);
@@ -1444,7 +1449,7 @@ export class FileOptionsModal extends Modal {
 			"yearly-planner-modal-error",
 		);
 
-		const btnRow = createUiButtonRow(
+		const btnRow = createUiModalActionBar(
 			this.contentEl,
 			"yearly-planner-file-options-buttons",
 		);

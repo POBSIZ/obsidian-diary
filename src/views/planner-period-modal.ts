@@ -2,9 +2,9 @@ import { App, Modal } from "obsidian";
 import { t } from "../i18n";
 import {
 	createUiButton,
-	createUiButtonRow,
 	createUiError,
 	createUiFieldRow,
+	createUiModalActionBar,
 } from "../ui/components";
 
 export type PlannerPeriodGranularity = "year" | "month" | "day";
@@ -40,6 +40,7 @@ export class PlannerPeriodModal extends Modal {
 		const form = this.contentEl.createEl("form", {
 			cls: "yearly-planner-create-file-modal planner-period-form",
 		});
+		form.id = `diary-period-form-${this.options.granularity}`;
 		const field = createUiFieldRow(
 			form,
 			"yearly-planner-create-file-row planner-period-field",
@@ -58,19 +59,20 @@ export class PlannerPeriodModal extends Modal {
 			form,
 			"yearly-planner-modal-error planner-period-error is-hidden",
 		);
-		const actions = createUiButtonRow(
-			form,
+		const actions = createUiModalActionBar(
+			this.contentEl,
 			"yearly-planner-modal-buttons planner-period-actions",
 		);
 		const cancel = createUiButton(actions, {
 			text: t("modal.cancel"),
 		});
 		cancel.onclick = () => this.close();
-		createUiButton(actions, {
+		const apply = createUiButton(actions, {
 			text: t("modal.apply"),
 			variant: "cta",
 			type: "submit",
 		});
+		apply.setAttribute("form", form.id);
 
 		form.onsubmit = (event) => {
 			event.preventDefault();

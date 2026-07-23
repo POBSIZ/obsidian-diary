@@ -67,6 +67,31 @@ export function createUiButtonRow(
 	return parent.createDiv({ cls: `diary-ui-button-row ${classes}` });
 }
 
+/**
+ * Creates an action bar outside the modal's scrollable body.
+ *
+ * Call this after rendering the modal body. Existing children are moved into a
+ * dedicated scroll region so the action bar always reserves its own space and
+ * never covers form fields or preview content on small screens.
+ */
+export function createUiModalActionBar(
+	parent: HTMLElement,
+	classes: string,
+): HTMLElement {
+	const actions = createUiButtonRow(
+		parent,
+		`diary-ui-modal-action-bar ${classes}`,
+	);
+	const scrollRegion = parent.ownerDocument.createElement("div");
+	scrollRegion.className = "diary-ui-modal-scroll-region";
+	parent.insertBefore(scrollRegion, actions);
+	while (parent.firstChild && parent.firstChild !== scrollRegion) {
+		scrollRegion.appendChild(parent.firstChild);
+	}
+	parent.addClass("diary-ui-modal-with-actions");
+	return actions;
+}
+
 export function createUiFieldRow(
 	parent: HTMLElement,
 	classes: string,

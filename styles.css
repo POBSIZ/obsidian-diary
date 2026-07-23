@@ -5397,6 +5397,175 @@ button.planner-chip.planner-recurrence-source {
 	flex-wrap: wrap;
 }
 
+/* Modal layout: scroll the content while the elevated action bar owns space. */
+.modal .yearly-planner-modal-content.diary-ui-modal-with-actions {
+	display: flex;
+	flex-direction: column;
+	min-height: 0;
+	max-height: min(82dvh, 48rem);
+	overflow: hidden;
+}
+
+.diary-ui-modal-scroll-region {
+	flex: 1 1 auto;
+	min-width: 0;
+	min-height: 0;
+	overflow-x: hidden;
+	overflow-y: auto;
+	overscroll-behavior: contain;
+	-webkit-overflow-scrolling: touch;
+	scrollbar-gutter: stable;
+}
+
+.diary-ui-modal-action-bar {
+	position: relative;
+	flex: 0 0 auto;
+	align-self: flex-end;
+	width: fit-content;
+	max-width: 100%;
+	margin: 0.5rem 0 0;
+	padding: 0.35rem;
+	gap: 0.375rem;
+	border: 1px solid var(--background-modifier-border);
+	border-radius: var(--modal-radius, 8px);
+	background: color-mix(
+		in srgb,
+		var(--background-secondary) 92%,
+		var(--background-primary)
+	);
+	box-shadow: 0 0.2rem 0.75rem
+		color-mix(
+			in srgb,
+			var(--background-modifier-cover) 18%,
+			transparent
+		);
+}
+
+.diary-ui-modal-action-bar .diary-ui-button {
+	min-height: 2rem;
+	margin: 0;
+	white-space: nowrap;
+}
+
+body.is-mobile
+	.modal
+	.yearly-planner-modal-content.diary-ui-modal-with-actions,
+body.-is-mobile
+	.modal
+	.yearly-planner-modal-content.diary-ui-modal-with-actions {
+	max-height: min(
+		calc(
+			100dvh - max(1rem, env(safe-area-inset-top, 0px)) - max(
+					1rem,
+					env(safe-area-inset-bottom, 0px)
+				)
+		),
+		45rem
+	);
+	overflow: hidden;
+}
+
+body.is-mobile .modal .diary-ui-modal-action-bar,
+body.-is-mobile .modal .diary-ui-modal-action-bar {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	align-items: stretch;
+	align-self: stretch;
+	width: 100%;
+	gap: 0.4rem;
+	margin-top: 0.5rem;
+	padding: 0.45rem;
+	padding-bottom: max(0.45rem, env(safe-area-inset-bottom, 0px));
+}
+
+body.is-mobile .modal .diary-ui-modal-action-bar .diary-ui-button,
+body.-is-mobile .modal .diary-ui-modal-action-bar .diary-ui-button {
+	width: 100%;
+	min-width: 0;
+	min-height: 2.5rem;
+	height: auto;
+	padding: 0.4rem 0.55rem;
+	white-space: normal;
+	line-height: 1.25;
+}
+
+body.is-mobile
+	.modal
+	.diary-ui-modal-action-bar
+	> .diary-ui-button:last-child:nth-child(odd),
+body.-is-mobile
+	.modal
+	.diary-ui-modal-action-bar
+	> .diary-ui-button:last-child:nth-child(odd) {
+	grid-column: 1 / -1;
+}
+
+body.is-mobile
+	.modal
+	.diary-ui-modal-action-bar:has(
+		> .diary-ui-button:nth-child(3):last-child
+	)
+	> .mod-cta,
+body.-is-mobile
+	.modal
+	.diary-ui-modal-action-bar:has(
+		> .diary-ui-button:nth-child(3):last-child
+	)
+	> .mod-cta {
+	grid-row: 1;
+	grid-column: 1 / -1;
+}
+
+@media (max-width: 768px) {
+	.modal .diary-ui-modal-action-bar {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		align-items: stretch;
+		align-self: stretch;
+		width: 100%;
+		gap: 0.4rem;
+		margin-top: 0.5rem;
+		padding: 0.45rem;
+		padding-bottom: max(0.45rem, env(safe-area-inset-bottom, 0px));
+	}
+
+	.modal .diary-ui-modal-action-bar .diary-ui-button {
+		width: 100%;
+		min-width: 0;
+		min-height: 2.5rem;
+		height: auto;
+		padding: 0.4rem 0.55rem;
+		white-space: normal;
+		line-height: 1.25;
+	}
+
+	.modal
+		.diary-ui-modal-action-bar
+		> .diary-ui-button:last-child:nth-child(odd) {
+		grid-column: 1 / -1;
+	}
+
+	.modal
+		.diary-ui-modal-action-bar:has(
+			> .diary-ui-button:nth-child(3):last-child
+		)
+		> .mod-cta {
+		grid-row: 1;
+		grid-column: 1 / -1;
+	}
+}
+
+@media (max-width: 380px) {
+	.modal .diary-ui-modal-action-bar {
+		grid-template-columns: minmax(0, 1fr);
+	}
+
+	.modal .diary-ui-modal-action-bar > .diary-ui-button {
+		grid-row: auto;
+		grid-column: 1;
+	}
+}
+
 :where(.diary-ui-badge) {
 	display: inline-flex;
 	align-items: center;

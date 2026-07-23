@@ -4,10 +4,10 @@ import type DiaryObsidian from "../main";
 import {
 	createUiBadge,
 	createUiButton,
-	createUiButtonRow,
 	createUiDisclosure,
 	createUiError,
 	createUiFieldRow,
+	createUiModalActionBar,
 } from "../ui/components";
 import {
 	ALTERNATE_CALENDAR_OPTIONS,
@@ -603,7 +603,7 @@ class CustomCalendarProfileModal extends Modal {
 			"yearly-planner-modal-error",
 		);
 
-		const actions = createUiButtonRow(
+		const actions = createUiModalActionBar(
 			this.contentEl,
 			"yearly-planner-modal-actions diary-custom-calendar-modal-actions",
 		);
