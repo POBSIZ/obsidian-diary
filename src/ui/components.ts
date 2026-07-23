@@ -28,8 +28,8 @@ const MODAL_ACTION_BAR_THREE_BUTTONS_CLASS =
 	"diary-ui-modal-action-bar-three-buttons";
 
 function updateModalActionBarState(parent: HTMLElement): void {
-	if (!parent.hasClass(MODAL_ACTION_BAR_CLASS)) return;
-	parent.toggleClass(
+	if (!parent.classList.contains(MODAL_ACTION_BAR_CLASS)) return;
+	parent.classList.toggle(
 		MODAL_ACTION_BAR_THREE_BUTTONS_CLASS,
 		parent.childElementCount === 3,
 	);

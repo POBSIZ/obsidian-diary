@@ -15,12 +15,19 @@ async function collectFiles(directory, extension) {
 	return files;
 }
 
+const typescriptFiles = await collectFiles("src", ".ts");
+
 const checks = [
 	{
-		files: await collectFiles("src", ".ts"),
+		files: typescriptFiles,
 		pattern:
 			/\b(?:document|activeDocument|(?:[\w$]+\.)*ownerDocument)\.(?:createElement(?:NS)?|createDocumentFragment)\s*\(/g,
 		message: "Use Obsidian createEl helpers instead of native DOM factories.",
+	},
+	{
+		files: typescriptFiles,
+		pattern: /\.hasClass\s*\(/g,
+		message: "Use classList.contains instead of the untyped hasClass helper.",
 	},
 	{
 		files: ["styles.css"],
