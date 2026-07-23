@@ -1,4 +1,4 @@
-import { setIcon } from "obsidian";
+import { Platform, setIcon } from "obsidian";
 
 export type UiButtonVariant = "default" | "cta" | "danger" | "warning";
 
@@ -26,6 +26,15 @@ const BUTTON_VARIANT_CLASS: Record<UiButtonVariant, string> = {
 const MODAL_ACTION_BAR_CLASS = "diary-ui-modal-action-bar";
 const MODAL_ACTION_BAR_THREE_BUTTONS_CLASS =
 	"diary-ui-modal-action-bar-three-buttons";
+
+function isMobileUi(element: HTMLElement): boolean {
+	const body = element.ownerDocument.body;
+	return (
+		Platform.isMobile ||
+		body.classList.contains("is-mobile") ||
+		body.classList.contains("-is-mobile")
+	);
+}
 
 function updateModalActionBarState(parent: HTMLElement): void {
 	if (!parent.classList.contains(MODAL_ACTION_BAR_CLASS)) return;
@@ -104,6 +113,19 @@ export function createUiModalActionBar(
 	}
 	parent.addClass("diary-ui-modal-with-actions");
 	return actions;
+}
+
+/**
+ * Preserve fast keyboard entry on desktop without opening the software keyboard
+ * as soon as a modal appears on mobile.
+ */
+export function focusUiInputOnDesktop(
+	input: HTMLInputElement,
+	select = false,
+): void {
+	if (isMobileUi(input)) return;
+	input.focus();
+	if (select) input.select();
 }
 
 export function createUiFieldRow(

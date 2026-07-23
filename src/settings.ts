@@ -35,6 +35,7 @@ import {
 	createUiDisclosure,
 	createUiError,
 	createUiModalActionBar,
+	focusUiInputOnDesktop,
 } from "./ui/components";
 
 export interface DiaryObsidianSettings {
@@ -1085,7 +1086,7 @@ class ExternalCalendarFeedModal extends Modal {
 		});
 		cancelButton.onclick = () => this.close();
 		this.updateState();
-		this.nameInput.focus();
+		focusUiInputOnDesktop(this.nameInput);
 	}
 
 	private addToggleSetting(

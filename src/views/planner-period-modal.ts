@@ -5,6 +5,7 @@ import {
 	createUiError,
 	createUiFieldRow,
 	createUiModalActionBar,
+	focusUiInputOnDesktop,
 } from "../ui/components";
 
 export type PlannerPeriodGranularity = "year" | "month" | "day";
@@ -91,8 +92,7 @@ export class PlannerPeriodModal extends Modal {
 			error.addClass("is-hidden");
 			error.empty();
 		});
-		input.focus();
-		input.select();
+		focusUiInputOnDesktop(input, true);
 	}
 
 	private getTitle(): string {

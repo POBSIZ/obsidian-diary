@@ -60,6 +60,7 @@ import {
 	createUiError,
 	createUiFieldRow,
 	createUiModalActionBar,
+	focusUiInputOnDesktop,
 } from "../../ui/components";
 
 /** Additional chip color presets (first preset is theme accent, computed at runtime). No duplicates. */
@@ -720,8 +721,7 @@ export class CreateFileModal extends Modal {
 			void this.handleCreate();
 		});
 		this.updateCreateState();
-		this.filenameInput.focus();
-		this.filenameInput.select();
+		focusUiInputOnDesktop(this.filenameInput, true);
 	}
 
 	private updateFolderOtherVisibility(): void {
@@ -1478,8 +1478,7 @@ export class FileOptionsModal extends Modal {
 			void this.handleApplyChange();
 		});
 		this.updateFileOptionsState();
-		this.titleInput.focus();
-		this.titleInput.select();
+		focusUiInputOnDesktop(this.titleInput, true);
 	}
 
 	private updateDateRelatedFileOptionsState(): void {

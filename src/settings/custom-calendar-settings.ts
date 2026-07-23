@@ -8,6 +8,7 @@ import {
 	createUiError,
 	createUiFieldRow,
 	createUiModalActionBar,
+	focusUiInputOnDesktop,
 } from "../ui/components";
 import {
 	ALTERNATE_CALENDAR_OPTIONS,
@@ -619,7 +620,7 @@ class CustomCalendarProfileModal extends Modal {
 		this.contentEl.addEventListener("input", () => this.updateState());
 		this.leapTypeSelect.addEventListener("change", () => this.updateState());
 		this.updateState();
-		this.nameInput.focus();
+		focusUiInputOnDesktop(this.nameInput);
 	}
 
 	private createTextRow(
