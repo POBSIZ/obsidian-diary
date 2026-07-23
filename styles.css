@@ -3743,6 +3743,24 @@ body.-is-mobile .monthly-planner-weekend-label {
 	font-weight: 600;
 }
 
+.daily-planner-day-heading > span,
+.daily-planner-alt-calendar-container,
+.daily-planner-alt-calendar {
+	min-width: 0;
+	max-width: 100%;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.daily-planner-day-heading > span:first-child {
+	flex: 1 1 auto;
+}
+
+.daily-planner-alt-calendar-container {
+	flex: 0 1 auto;
+}
+
 .daily-planner-untimed-chip {
 	max-width: min(100%, 24rem);
 	min-height: 1.85rem;
@@ -4438,6 +4456,49 @@ body.-is-mobile .monthly-planner-weekend-label {
 .daily-planner-container.planner-container-compact
 	.daily-planner-all-day-label {
 	padding: 0.4rem 0.35rem;
+}
+
+.daily-planner-container.planner-container-compact .daily-planner-event {
+	flex-direction: row;
+	align-items: center;
+	justify-content: flex-start;
+	gap: 0.3rem;
+	overflow: clip;
+	line-height: 1.2;
+}
+
+.daily-planner-container.planner-container-compact
+	.daily-planner-range-event-content {
+	flex: 1 1 auto;
+	flex-direction: row;
+	align-items: center;
+	gap: 0.3rem;
+	max-width: 100%;
+	overflow: hidden;
+}
+
+.daily-planner-container.planner-container-compact
+	.daily-planner-event-time {
+	flex: 0 0 auto;
+	max-width: min(50%, 7.5rem);
+}
+
+.daily-planner-container.planner-container-compact
+	.daily-planner-event-title {
+	flex: 1 1 auto;
+}
+
+.daily-planner-container
+	.daily-planner-event-short
+	.daily-planner-event-time {
+	display: none;
+}
+
+.daily-planner-container.planner-container-compact
+	:is(.daily-planner-event-time, .daily-planner-event-title) {
+	min-width: 0;
+	max-height: 100%;
+	line-height: 1.2;
 }
 
 body.is-mobile .daily-planner-untimed-chip,

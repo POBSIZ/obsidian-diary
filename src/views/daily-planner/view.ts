@@ -779,9 +779,16 @@ export class DailyPlannerView extends ItemView {
 		position?: { column: number; columnCount: number },
 	): HTMLElement {
 		const isTimeline = position != null;
+		const timelineDuration =
+			isTimeline && entry.startMinutes != null && entry.endMinutes != null
+				? entry.endMinutes - entry.startMinutes
+				: null;
 		const chip = createPlannerChip(parent, {
 			classes: [
 				isTimeline ? "daily-planner-event" : "daily-planner-untimed-chip",
+				timelineDuration != null &&
+					timelineDuration <= 30 &&
+					"daily-planner-event-short",
 				isTimeline && entry.rangeStart && "daily-planner-range-event",
 				isTimeline &&
 					entry.rangeStart &&
