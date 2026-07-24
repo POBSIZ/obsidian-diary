@@ -180,6 +180,7 @@ declare module "obsidian" {
 		load(): void;
 		unload(): void;
 		registerEvent(eventRef: EventRef): void;
+		registerInterval(id: number): number;
 		registerDomEvent<K extends keyof WindowEventMap>(
 			el: Window,
 			type: K,

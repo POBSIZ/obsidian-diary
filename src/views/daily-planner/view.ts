@@ -89,6 +89,7 @@ import type { DailyPlannerEntry, DailyPlannerState } from "./types";
 
 const MINUTES_PER_DAY = 24 * 60;
 const DEFAULT_DURATION_MINUTES = 60;
+const NOW_LINE_REFRESH_INTERVAL_MS = 30_000;
 
 export interface DailyPlannerDate {
 	year: number;
@@ -173,6 +174,7 @@ export class DailyPlannerView extends ItemView {
 	private readonly clipboardSelection = new Set<string>();
 	private readonly pasteUndoBatches: string[][] = [];
 	private clipboardKeydownRegistered = false;
+	private nowLineRefreshInterval: number | null = null;
 	private readonly boundClipboardKeydown = (event: KeyboardEvent) => {
 		if (this.app.workspace.getActiveViewOfType(DailyPlannerView) !== this) return;
 		handlePlannerClipboardShortcut(event, {
@@ -258,12 +260,17 @@ export class DailyPlannerView extends ItemView {
 		}
 		this.attachResizeObserver();
 		this.render();
+		this.startNowLineRefresh();
 		return Promise.resolve();
 	}
 
 	onClose(): Promise<void> {
 		this.dragController.reset();
 		this.timeSelectionController.reset();
+		if (this.nowLineRefreshInterval != null) {
+			window.clearInterval(this.nowLineRefreshInterval);
+			this.nowLineRefreshInterval = null;
+		}
 		this.resizeObserver?.disconnect();
 		this.resizeObserver = null;
 		this.clipboardSelection.clear();
@@ -604,7 +611,45 @@ export class DailyPlannerView extends ItemView {
 		}
 		const columns = canvas.createDiv({ cls: "daily-planner-day-columns" });
 		for (const day of days) this.renderTimelineDay(columns, day);
+		this.updateNowLines();
 		this.updateTimelineGeometry(scroll);
+	}
+
+	private startNowLineRefresh(): void {
+		if (this.nowLineRefreshInterval != null) return;
+		this.nowLineRefreshInterval = window.setInterval(
+			() => this.updateNowLines(),
+			NOW_LINE_REFRESH_INTERVAL_MS,
+		);
+		this.registerInterval(this.nowLineRefreshInterval);
+	}
+
+	private updateNowLines(): void {
+		const now = new Date();
+		const today = toDateString(
+			now.getFullYear(),
+			now.getMonth() + 1,
+			now.getDate(),
+		);
+		const currentMinute =
+			now.getHours() * 60 + now.getMinutes() + now.getSeconds() / 60;
+		const layers = Array.from(
+			this.contentEl.querySelectorAll<HTMLElement>(
+				".daily-planner-events-layer",
+			),
+		);
+		for (const layer of layers) {
+			const line = layer.querySelector<HTMLElement>(
+				".daily-planner-now-line",
+			);
+			if (layer.dataset.date !== today) {
+				line?.remove();
+				continue;
+			}
+			const currentLine =
+				line ?? layer.createDiv({ cls: "daily-planner-now-line" });
+			currentLine.style.setProperty("--daily-now", String(currentMinute));
+		}
 	}
 
 	private renderAllDayRow(parent: HTMLElement, days: VisiblePlannerDay[]): void {
@@ -756,18 +801,6 @@ export class DailyPlannerView extends ItemView {
 			block.style.setProperty(
 				"--daily-duration",
 				String(Math.max(30, (entry.endMinutes ?? 0) - (entry.startMinutes ?? 0))),
-			);
-		}
-		const now = new Date();
-		if (
-			day.year === now.getFullYear() &&
-			day.month === now.getMonth() + 1 &&
-			day.day === now.getDate()
-		) {
-			const line = layer.createDiv({ cls: "daily-planner-now-line" });
-			line.style.setProperty(
-				"--daily-now",
-				String(now.getHours() * 60 + now.getMinutes()),
 			);
 		}
 	}
