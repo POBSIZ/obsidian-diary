@@ -1,61 +1,29 @@
 # Diary (Français)
 
-Diary est un plugin communautaire Obsidian qui transforme les fichiers Markdown de votre coffre en vues de planning par date. Il permet de naviguer entre les vues annuelle, mensuelle, liste, quotidienne et sur 3 jours tout en gérant notes, calendriers, tâches et rappels locaux.
+Diary affiche vos notes Markdown sous forme de calendriers et de chronologies dans Obsidian. Passez de l’année au mois, à la journée ou aux 3 jours sans déplacer vos notes vers une base de données ni un format propriétaire.
 
 Documentation complète : [English](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/en/README.md) | [Deutsch](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/de/README.md) | [Español](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/es/README.md) | [Français](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/fr/README.md) | [日本語](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/ja/README.md) | [简体中文](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/zh-CN/README.md) | [繁體中文](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/zh-TW/README.md) | [한국어](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/ko/README.md)
 
-## Informations actuelles
+## En bref
 
 | Élément | Valeur |
 | --- | --- |
 | ID du plugin | `diary` |
-| Version actuelle | `1.15.0` |
+| Version actuelle | `1.15.1` |
 | Version minimale d’Obsidian | `1.7.2` |
 | Plateformes | Bureau / mobile (`isDesktopOnly: false`) |
 | Langue par défaut | `en` |
 | Dossier de planning par défaut | `Planner` |
 
-## Dernière version
+## Nouveautés de la version 1.15.1
 
-- `1.15.0` : conserve les titres des périodes lors d’un changement de semaine, de mois ou d’année. Les options de fichier permettent désormais de convertir une note datée en période et de modifier directement son dossier et son nom complet fondé sur les dates.
-- `1.14.0` : améliore la taille et la disposition des actions de modale sur mobile, supprime le style superflu de leur conteneur et évite qu’elles soient masquées par le clavier.
-- `1.13.3` : révise les textes de l’interface dans toutes les langues prises en charge.
-- `1.13.0` : améliore la disposition quotidienne compacte et les actions de modale sur les petits écrans.
-- `1.12.1` : met à jour des dépendances d’analyse présentant des vulnérabilités connues.
-- `1.12.0` : ajoute dans l’application des liens pour les retours, les bugs et les demandes de fonctionnalité.
-- `1.11.0` : ajoute la navigation jour par jour dans les vues de plusieurs jours, les actions de presse-papiers dans les vues quotidienne et liste mensuelle, et un redimensionnement plus fiable entre colonnes.
-- `1.10.2` : empêche les clics sur la chronologie après un geste de déplacement.
-- `1.10.1` : remplace les helpers de tableau récents du placement quotidien des périodes par une logique typée compatible ES2020, supprime les alertes `no-unsafe-assignment` et `no-unsafe-call`, et exclut les consignes locales d’agent des sources de version.
-- `1.10.0` : affiche les périodes de plusieurs jours comme des barres continues sur toute la journée ou des intervalles date-heure dans les plannings quotidien et sur 3 jours, avec sélection et ajustement des limites entre les dates.
-- `1.9.4` : supprime les attestations d’artefacts facultatives rejetées par l’Obsidian Community Scorecard malgré une vérification cryptographique GitHub réussie.
-- `1.9.3` : aligne la provenance de la version sur la vérification de l’Obsidian Community Scorecard grâce à l’action de provenance de build actuelle et à des tags Git légers.
-- `1.9.2` : marque les ressources JavaScript et CSS avec la version du plugin afin que chaque version possède des condensats uniques et des attestations de provenance sans ambiguïté.
-- `1.9.1` : génère une attestation de provenance distincte et vérifiable par GitHub pour chaque ressource de version avec l’action d’attestation actuelle.
-- `1.9.0` : maintient le contenu mobile, les fins de chronologie et les menus compacts au-dessus de la navigation inférieure normale ou flottante d’Obsidian, tout en conservant une marge minimale configurable.
-- `1.8.3` : supprime entièrement les appels directs de création via `Document` en utilisant les helpers d’instance Obsidian typés puis un détachement immédiat.
-- `1.8.2` : crée le DOM détaché du planificateur avec les helpers Obsidian typés de `DocumentFragment`, supprimant la propagation de types non sûrs dans les audits.
-- `1.8.1` : ajoute des réglages déclaratifs recherchables pour Obsidian 1.13+, conserve la compatibilité avec l’ancien écran de réglages et utilise systématiquement les helpers DOM d’Obsidian.
-- `1.8.0` : uniformise les puces, contrôles, actions de boîtes de dialogue, état de mise en page compacte et focus clavier dans toutes les vues du planificateur, avec des captures actualisées.
-- `1.7.1` : supprime les assertions de type DOM inutiles et stabilise l’analyse typée de la boîte de dialogue de période commune.
-- `1.7.0` : ajoute les plannings chronologiques quotidien et sur 3 jours, la sélection directe de vue, une navigation de période commune, des heures de début/fin indépendantes et les récurrences virtuelles tous les N jours, semaines, mois ou années.
-- `1.6.0` : ajoute une documentation complète pour chaque langue d’interface prise en charge, les jours fériés espagnols et les textes localisés des options de calendrier alternatif.
-- `1.5.0` : ajoute la prise en charge de l’allemand, l’espagnol, le français, le japonais, le chinois simplifié, le chinois traditionnel et le coréen, en plus de l’anglais.
-- `1.4.2` : limite les styles de Diary aux vues de planning, réglages et modales, et ajoute des libellés localisés aux boutons de couleur prédéfinie.
-- `1.4.1` : affine les actions des événements de calendrier externe, le retour visuel au clic et les avis de succès ou d’erreur.
-- `1.4.0` : ajoute les calendriers personnalisés et les flux externes optionnels. Les événements externes `webcal://` ou `https://` `.ics` restent des superpositions en lecture seule jusqu’à la création volontaire d’une note Markdown.
-- `1.3.6` : version de maintenance pour stabiliser les audits typés de plugin communautaire.
-- `1.3.5` : version de maintenance alignant le lint et la validation de release des plugins Obsidian.
-- `1.3.4` : version de maintenance avec câblage explicite du projet TypeScript pour ESLint typé et outils de lint épinglés.
-- `1.3.3` : version de maintenance avec des vérifications ESLint typées plus strictes.
-- `1.3.2` : version de maintenance couvrant documentation, consignes d’agent, types de configuration ESLint et cible TypeScript.
-- `1.3.1` : release avec types Obsidian épinglés, maintenance du lockfile, compatibilité ESLint et nettoyage du style des occurrences.
-- `1.3.0` : ajoute les événements récurrents et les étiquettes de calendrier alternatif aux vues annuelle, grille mensuelle, liste mensuelle et barre latérale.
-- `1.2.1` : version de maintenance pour compatibilité avec le lint des plugins communautaires et dépendance de jours fériés intégrée.
-- `1.2.0` : introduit le planificateur de barre latérale droite, sa mise en place automatique, la commande **Open monthly planner in sidebar** et le changement de vue dans la même feuille latérale.
+- `1.15.1` : révise et allège la documentation dans toutes les langues prises en charge, avec des termes plus clairs et des notes de version plus courtes.
+
+Les changements antérieurs sont disponibles sur la page [Releases](https://github.com/POBSIZ/obsidian-diary/releases).
 
 ## Captures d’écran
 
-Les images proviennent d’un dossier de démonstration isolé contenant des notes sur la journée, horaires, de période, de tâche et de plan. Les données temporaires ont ensuite été supprimées. Les vues étroites montrent l’adaptation de l’en-tête commun et des vues mensuelles lorsque l’espace horizontal est limité.
+Les captures utilisent un dossier temporaire contenant des notes de journée, des horaires, des périodes, des tâches et des plans. Les exemples étroits montrent les mêmes vues avec moins d’espace horizontal ; le dossier a ensuite été supprimé.
 
 ### Bureau
 
@@ -77,33 +45,33 @@ Les images proviennent d’un dossier de démonstration isolé contenant des not
 
 ## Fonctionnalités principales
 
-- **Planning annuel** : affiche les notes datées et les notes de période dans une table `12 mois x 31 jours`. Les largeurs de mois étendues sont conservées après rechargement.
+- **Planning annuel** : affiche les notes datées et les périodes dans une table `12 mois × 31 jours`. La largeur choisie pour chaque mois est conservée après rechargement.
 - **Interface localisée** : basculez Diary entre anglais, allemand, espagnol, français, japonais, chinois simplifié, chinois traditionnel et coréen.
-- **Grille mensuelle** : consultez un mois dans une grande grille avec chips, barres de période, jours fériés, étiquettes de calendrier et calendriers externes.
-- **Liste mensuelle** : parcourez un mois chargé jour par jour, avec les filtres `All`, `With notes` et `Upcoming`.
+- **Grille mensuelle** : consultez un mois dans une grande grille avec pastilles, barres de période, jours fériés, étiquettes de calendrier et calendriers externes.
+- **Liste mensuelle** : parcourez le mois jour par jour, puis filtrez-le avec `All`, `With notes` ou `Upcoming`.
 - **Planning quotidien** : planifiez une journée sur une chronologie de 24 heures. Les plages de plusieurs jours s’affichent comme des barres continues sur la journée entière ou des intervalles date-heure, dont les limites peuvent être ajustées entre les dates.
 - **Planning sur 3 jours** : comparez trois jours consécutifs en colonnes parallèles. Les petits écrans conservent des colonnes lisibles grâce au défilement horizontal.
 - **Sélecteur direct de vue** : passez directement entre année, grille mensuelle, liste mensuelle, jour et 3 jours.
 - **Planificateur latéral droit** : gardez un planning mensuel compact dans la barre latérale droite pendant que les notes s’ouvrent dans l’espace principal.
 - **Panneau de notes de plan** : crée et prévisualise les notes annuelles (`YYYY.md`) et mensuelles (`YYYY-MM.md`) au-dessus du planning. L’état ouvert ou fermé est enregistré, avec un état mobile séparé qui commence fermé.
-- **Notes datées et notes de période** : les fichiers correspondant aux noms de date ou de période apparaissent sous forme de chips. Diary scanne tout le coffre par défaut, ou seulement le dossier de planning si vous le configurez.
+- **Notes datées et notes de période** : les fichiers correspondant aux noms de date ou de période apparaissent sous forme de pastilles. Diary scanne tout le coffre par défaut, ou seulement le dossier de planning si vous le configurez.
 - **Événements récurrents** : répétez tous les N jours, semaines, mois ou années sur base grégorienne ou calendrier alternatif. Les occurrences restent virtuelles jusqu’à leur conversion.
-- **Couleur, tâche et état terminé** : `color`, `todo` et `completed` dans le frontmatter influencent le style et le libellé du chip.
+- **Couleur, tâche et état terminé** : `color`, `todo` et `completed` dans le frontmatter influencent le style et le libellé de la pastille.
 - **Jours fériés** : affiche les jours fériés des régions couvertes par les langues de l’interface. Sélectionnez un badge pour voir son nom.
 - **Étiquette de calendrier alternatif** : affichez une étiquette compacte, par exemple calendrier lunaire coréen, lunaire chinois, Dangi, hébraïque, islamique, persan, national indien, bouddhique, ères japonaises, Minguo, copte ou éthiopien. Les options sont localisées dans toutes les langues prises en charge.
 - **Calendrier personnalisé** : créez des profils locaux pour univers de fiction ou campagnes, avec mois, jours de semaine et règles simples de bissextile. Diary affiche la date personnalisée comme étiquette tout en conservant les fichiers `YYYY-MM-DD`.
-- **Calendriers externes** : ajoutez des flux `.ics` en `webcal://` ou `https://`, actualisez-les manuellement ou à intervalle, et affichez les événements comme chips ou barres en lecture seule. Créez une note Markdown seulement lorsque vous choisissez un événement externe.
+- **Calendriers externes** : ajoutez des flux `.ics` en `webcal://` ou `https://`, actualisez-les manuellement ou à intervalle, et affichez les événements comme pastilles ou barres en lecture seule. Créez une note Markdown seulement lorsque vous choisissez un événement externe.
 - **Styles limités** : le CSS de Diary se limite aux vues de planning, panneaux de réglages et modales du plugin.
 - **Rappels locaux** : les notes avec `notify_minutes` affichent une Notice Obsidian le jour concerné tant qu’Obsidian est ouvert.
-- **Presse-papiers de planning** : sur ordinateur, copiez, collez, supprimez et annulez le collage de dates ou chips sélectionnés.
-- **Clavier et accessibilité** : cellules de date, chips, barres de période, badges fériés, étiquettes et lignes de liste mensuelle sont activables au clavier et exposent des libellés accessibles.
+- **Presse-papiers de planning** : sur ordinateur, copiez, collez, supprimez et annulez le collage de dates ou de pastilles sélectionnées.
+- **Clavier et accessibilité** : cellules de date, pastilles, barres de période, badges fériés, étiquettes et lignes de liste mensuelle sont activables au clavier et exposent des libellés accessibles.
 - **Optimisation mobile** : la grille mensuelle prend en charge le zoom par pincement, la réinitialisation du zoom et le résumé du jour.
 
 ## Installation
 
 1. Téléchargez la dernière release depuis [Releases](https://github.com/POBSIZ/obsidian-diary/releases).
 2. Copiez `main.js`, `manifest.json` et `styles.css` dans `Vault/.obsidian/plugins/diary/`.
-3. Dans Obsidian, ouvrez **Settings -> Community plugins**.
+3. Dans Obsidian, ouvrez **Settings → Community plugins**.
 4. Si Restricted mode est activé, désactivez-le seulement dans les coffres de confiance, puis activez **Diary**.
 5. Ouvrez un planning depuis les icônes du ruban ou la palette de commandes. L’icône mensuelle ouvre le planificateur de droite.
 
@@ -113,7 +81,7 @@ Les images proviennent d’un dossier de démonstration isolé contenant des not
 2. Sélectionnez le bouton d’ajout de fichier dans l’en-tête ou une cellule de date.
 3. Choisissez **Single date** ou **Période**.
 4. Saisissez le dossier, les dates, le nom de fichier, la couleur, l’état de tâche, l’heure de rappel et l’éventuelle répétition.
-5. Sélectionnez **Créer**. Diary crée une note Markdown et l’affiche comme chip ou barre de période.
+5. Sélectionnez **Créer**. Diary crée une note Markdown et l’affiche comme pastille ou barre de période.
 
 Les notes créées sont de simples fichiers Markdown. Elles restent dans votre coffre même si le plugin est désactivé.
 
@@ -148,7 +116,7 @@ Diary crée un planificateur mensuel compact dans la barre latérale droite lors
 
 Cette vue sert d’accompagnement :
 
-- Elle utilise le layout mensuel compact et le résumé du jour.
+- Elle utilise le mise en page mensuel compact et le résumé du jour.
 - Lorsqu’une note est choisie depuis la barre latérale, elle s’ouvre dans l’espace principal.
 - Le bouton de changement de vue alterne entre annuel, grille mensuelle et liste mensuelle.
 - Diary garde une seule feuille latérale et nettoie les anciennes feuilles de versions précédentes.
@@ -165,7 +133,7 @@ Quand la liste s’ouvre sur le mois actuel, Diary fait défiler jusqu’à la l
 
 ## Flux de calendriers externes
 
-Utilisez **Settings -> Diary -> Calendriers externes** pour ajouter une URL `webcal://` publiée ou une URL `.ics` en `https://`.
+Utilisez **Settings → Diary → Calendriers externes** pour ajouter une URL `webcal://` publiée ou une URL `.ics` en `https://`.
 
 - Les URL de flux sont stockées dans les données locales du plugin et peuvent se synchroniser avec votre coffre. Traitez les URL iCal secrètes comme des jetons d’accès.
 - Diary refuse les URL de réseau local ou privé.
@@ -182,8 +150,8 @@ Utilisez **Settings -> Diary -> Calendriers externes** pour ajouter une URL `web
 Sélectionnez une cellule de date ou le bouton d’ajout de fichier, puis utilisez **Single date**.
 
 - Le nom par défaut est `YYYY-MM-DD.md`.
-- Ajoutez un suffixe pour l’utiliser comme titre de chip. Exemple : `2026-05-19-mobile-qa.md` -> `mobile-qa`
-- Une couleur affiche une bordure de chip ou un point mobile.
+- Ajoutez un suffixe pour l’utiliser comme titre de pastille. Exemple : `2026-05-19-mobile-qa.md` -> `mobile-qa`
+- Une couleur affiche une bordure de pastille ou un point mobile.
 - Activez **Todo file** pour afficher l’état de tâche.
 - Définissez **Reminder time** pour enregistrer `notify_minutes`.
 - Activez **Repeat**, choisissez une fréquence quotidienne, hebdomadaire, mensuelle ou annuelle et un intervalle de 1 à 999. Vous pouvez ainsi répéter tous les N jours, semaines, mois ou années.
@@ -195,7 +163,7 @@ Sur ordinateur, faites glisser sur les cellules de date pour préremplir une mod
 - Format : `YYYY-MM-DD--YYYY-MM-DD.md`
 - Ajoutez un suffixe pour le titre. Exemple : `2026-05-21--2026-05-24-family-trip.md` -> `family-trip`
 - `date_start` et `date_end` sont enregistrés automatiquement à la création.
-- Le planificateur annuel affiche les périodes avec des barres verticales et un chip au début. La grille et la liste mensuelles affichent des barres de période.
+- Le planificateur annuel affiche les périodes avec des barres verticales et une pastille au début. La grille et la liste mensuelles affichent des barres de période.
 - Sélectionnez **Toute la journée** pour laisser les deux heures vides, ou renseignez-les toutes les deux pour définir un intervalle continu de `date_start` + `start_time` à `date_end` + `end_time`.
 - Les plannings quotidien et sur 3 jours affichent les plages sur toute la journée comme des barres continues. Faites-en glisser une sur la chronologie pour lui attribuer des heures, puis ajustez sa première ou sa dernière limite avec la date et l’heure correspondantes.
 
@@ -211,13 +179,13 @@ Utilisez le panneau de plan au-dessus de chaque planificateur pour créer des pl
 
 ## Modifier des notes
 
-Sélectionnez un chip ou une barre de période pour ouvrir la modale d’options du fichier.
+Sélectionnez une pastille ou une barre de période pour ouvrir la fenêtre d’options du fichier.
 
 - Passer de **Single date** à **Range**, ou inversement
 - Choisir un dossier existant ou saisir un chemin personnalisé
 - Modifier le nom complet, avec la date ou la période et le suffixe utilisé comme titre
 - Modifier les dates de début et de fin ; le nom reste synchronisé
-- Modifier la couleur du chip
+- Modifier la couleur de la pastille
 - Modifier l’état tâche / terminé
 - Modifier l’heure de rappel
 - Prévisualiser le fichier
@@ -226,11 +194,11 @@ Sélectionnez un chip ou une barre de période pour ouvrir la modale d’options
 
 L’application des changements déplace ou renomme le fichier Markdown. La conversion en période écrit `date_start` et `date_end` ; le retour à une date unique supprime ces champs. Si un fichier du même nom existe déjà dans le dossier cible, Diary bloque l’opération.
 
-Sur ordinateur, faites glisser un chip ou une barre vers une autre date pour le déplacer. Les notes de période se déplacent par date de début et gardent la même durée. Si le chemin cible existe déjà, Diary ne déplace pas le fichier.
+Sur ordinateur, faites glisser une pastille ou une barre vers une autre date pour la déplacer. Les notes de période se déplacent par date de début et gardent la même durée. Si le chemin cible existe déjà, Diary ne déplace pas le fichier.
 
 ## Clavier et accessibilité
 
-- Appuyez sur `Enter` ou `Space` sur une cellule de date, un chip, une barre de période, un badge férié, une ligne de liste mensuelle, une étiquette d’année ou de mois avec le focus.
+- Appuyez sur `Enter` ou `Space` sur une cellule de date, une pastille, une barre de période, un badge férié, une ligne de liste mensuelle, une étiquette d’année ou de mois avec le focus.
 - Les contrôles de planning utilisent rôles de bouton, libellés d’état et textes `aria-label`.
 - Les boutons de couleur dans les modales exposent `aria-label` et `title` localisés.
 - Les filtres de liste mensuelle exposent l’état sélectionné avec `aria-selected`.
@@ -238,7 +206,7 @@ Sur ordinateur, faites glisser un chip ou une barre vers une autre date pour le 
 
 ## Presse-papiers du planning (bureau)
 
-Dans une vue de planning, maintenez `Cmd` sur macOS ou `Ctrl` sur Windows/Linux pendant la sélection de dates ou chips.
+Dans une vue de planning, maintenez `Cmd` sur macOS ou `Ctrl` sur Windows/Linux pendant la sélection de dates ou pastilles.
 
 Diary conserve les notes copiées dans un presse-papiers interne en mémoire pour la session Obsidian en cours. Il ne lit ni n’écrit dans le presse-papiers système.
 
@@ -288,7 +256,7 @@ Diary enregistre aussi des états uniquement UI : expansion du panneau de plan, 
 
 | Clé | Description |
 | --- | --- |
-| `color` | Couleur du chip. Toute couleur CSS valide est acceptée, par exemple `#22c55e`, `red`, `rgb(34, 197, 94)`. |
+| `color` | Couleur de la pastille. Toute couleur CSS valide est acceptée, par exemple `#22c55e`, `red`, `rgb(34, 197, 94)`. |
 | `todo` | Affiche la note comme tâche lorsque `true`. |
 | `completed` | Affiche l’état terminé si `todo: true`. |
 | `start_time` | Heure de début facultative au format `HH:mm`. Pour une note de plage, c’est la limite à `date_start` ; les deux heures doivent être renseignées ou vides. |
@@ -310,7 +278,7 @@ Diary enregistre aussi des états uniquement UI : expansion du panneau de plan, 
 | `diary_external_calendar` | ID du flux externe sur une note créée depuis un événement externe. |
 | `diary_external_event_uid` | UID de l’événement externe. |
 | `diary_external_event_instance` | Clé d’instance, souvent date/heure de début. |
-| `diary_external_event_source` | Clé stable pour masquer les doublons d’overlay. |
+| `diary_external_event_source` | Clé stable pour masquer les doublons de superposition. |
 | `diary_external_event_linked_at` | Horodatage ISO de création de la note Markdown. |
 
 Les rappels ne sont pas des notifications système. Tant qu’Obsidian est ouvert, Diary vérifie environ toutes les 15 secondes et affiche une Notice pendant la minute correspondante le jour de l’événement.
@@ -406,16 +374,16 @@ Ces liens ouvrent des issues GitHub publiques et nécessitent un compte GitHub. 
 
 - Les fonctions de planning travaillent sur des fichiers Markdown locaux dans le coffre.
 - Diary n’a aucune télémétrie ni analyse cachée.
-- Les calculs de jours fériés et d’overlays utilisent des données intégrées, des données du navigateur ou des profils locaux, sans envoyer le contenu du coffre à des services externes.
+- Les calculs de jours fériés et de superpositions utilisent des données intégrées, des données du navigateur ou des profils locaux, sans envoyer le contenu du coffre à des services externes.
 - Les flux externes sont optionnels. Diary récupère seulement l’URL ajoutée, stocke le cache d’événements dans les données du plugin et ne crée de Markdown qu’après sélection de **Create Markdown note**.
 - Les rappels locaux sont traités dans Obsidian et n’envoient aucune donnée sur le réseau.
 
 ## Dépannage
 
 - Si le plugin n’apparaît pas, vérifiez que `main.js`, `manifest.json` et `styles.css` sont directement dans `Vault/.obsidian/plugins/diary/`.
-- Si les commandes manquent, confirmez que **Diary** est activé dans **Settings -> Community plugins**.
+- Si les commandes manquent, confirmez que **Diary** est activé dans **Settings → Community plugins**.
 - Si le planificateur latéral manque, exécutez **Open monthly planner in sidebar** ou rechargez Obsidian après activation.
-- Si les chips n’apparaissent pas, vérifiez que les noms suivent `YYYY-MM-DD` ou `YYYY-MM-DD--YYYY-MM-DD`.
+- Si les pastilles n’apparaissent pas, vérifiez que les noms suivent `YYYY-MM-DD` ou `YYYY-MM-DD--YYYY-MM-DD`.
 - Pour obtenir plus d’espace au-dessus de la navigation mobile automatiquement dégagée, augmentez **Marge inférieure mobile**.
 - Si un rappel ne s’affiche pas, vérifiez qu’Obsidian est ouvert, que l’événement est aujourd’hui et que `notify_minutes` est entre `0` et `1439`.
 

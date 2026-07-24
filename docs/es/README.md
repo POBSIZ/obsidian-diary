@@ -1,61 +1,29 @@
 # Diary (Español)
 
-Diary es un plugin comunitario de Obsidian que convierte archivos Markdown del vault en vistas de planificación por fecha. Permite moverse entre vistas anual, mensual, de lista, diaria y de 3 días mientras gestionas notas, calendarios superpuestos, tareas y recordatorios locales.
+Diary muestra tus notas Markdown como calendarios y líneas de tiempo dentro de Obsidian. Puedes pasar de la vista anual a la mensual, diaria o de 3 días sin trasladar las notas a una base de datos ni a un formato propio.
 
 Documentación completa: [English](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/en/README.md) | [Deutsch](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/de/README.md) | [Español](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/es/README.md) | [Français](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/fr/README.md) | [日本語](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/ja/README.md) | [简体中文](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/zh-CN/README.md) | [繁體中文](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/zh-TW/README.md) | [한국어](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/ko/README.md)
 
-## Información actual
+## De un vistazo
 
 | Elemento | Valor |
 | --- | --- |
 | ID del plugin | `diary` |
-| Versión actual | `1.15.0` |
+| Versión actual | `1.15.1` |
 | Versión mínima de Obsidian | `1.7.2` |
 | Plataformas | Escritorio / móvil (`isDesktopOnly: false`) |
 | Idioma predeterminado | `en` |
 | Carpeta predeterminada del planificador | `Planner` |
 
-## Última versión
+## Novedades de 1.15.1
 
-- `1.15.0`: Mantiene visibles los títulos de rango al cambiar de semana, mes o año. Las opciones de archivo permiten convertir una nota de fecha única en un rango y editar directamente la carpeta y el nombre completo basado en fechas.
-- `1.14.0`: Mejora el tamaño y la distribución de las acciones de los modales en móvil, elimina el estilo adicional del contenedor y evita que el teclado tape los botones.
-- `1.13.3`: Revisa los textos de interfaz en todos los idiomas compatibles.
-- `1.13.0`: Mejora el diseño diario compacto y las acciones de los modales en pantallas pequeñas.
-- `1.12.1`: Actualiza dependencias de análisis con vulnerabilidades conocidas.
-- `1.12.0`: Añade enlaces en la aplicación para enviar comentarios, errores y solicitudes de funciones.
-- `1.11.0`: Añade navegación diaria en vistas de varios días, acciones de portapapeles en las vistas diaria y de lista mensual, y un ajuste de rangos más fiable entre columnas.
-- `1.10.2`: Evita clics en la línea de tiempo después de arrastrar.
-- `1.10.1`: Sustituye helpers de arrays recientes en el diseño diario de rangos por lógica tipada compatible con ES2020, elimina los avisos `no-unsafe-assignment` y `no-unsafe-call`, y excluye las instrucciones locales del agente de las fuentes de la versión.
-- `1.10.0`: Muestra rangos de varios días como barras continuas de todo el día o intervalos de fecha y hora en los planificadores diario y de 3 días, con selección y ajuste de límites entre fechas.
-- `1.9.4`: Elimina las attestations opcionales de artefactos que Obsidian Community Scorecard rechazó pese a superar la verificación criptográfica de GitHub.
-- `1.9.3`: Alinea la procedencia de la versión con la verificación de Obsidian Community Scorecard mediante la acción de procedencia de compilación actual y etiquetas Git ligeras.
-- `1.9.2`: Marca los recursos JavaScript y CSS con la versión del plugin para que cada versión tenga resúmenes únicos y certificaciones de procedencia inequívocas.
-- `1.9.1`: Genera una certificación de procedencia independiente y verificable por GitHub para cada recurso de la versión mediante la acción de certificación actual.
-- `1.9.0`: Mantiene el contenido móvil, los finales de línea de tiempo y los menús compactos por encima de la navegación inferior normal o flotante de Obsidian, conservando un espacio mínimo configurable.
-- `1.8.3`: Elimina por completo las llamadas directas de creación de `Document` mediante helpers de instancia tipados de Obsidian y separación inmediata.
-- `1.8.2`: Crea DOM desconectado del planificador mediante helpers tipados de Obsidian sobre `DocumentFragment`, eliminando la propagación de tipos inseguros en las auditorías.
-- `1.8.1`: Añade ajustes declarativos con búsqueda para Obsidian 1.13+, conserva la compatibilidad anterior y usa de forma coherente los helpers DOM de Obsidian.
-- `1.8.0`: Unifica chips, controles, acciones de diálogos, estado del diseño compacto y foco de teclado en todas las vistas del planificador, y renueva las capturas.
-- `1.7.1`: Elimina aserciones de tipo DOM innecesarias y estabiliza el lint tipado del diálogo de período compartido.
-- `1.7.0`: Añade planificadores de línea de tiempo diaria y de 3 días, selección directa de vista, navegación de período compartida, horas de inicio/fin independientes y repeticiones virtuales cada N días, semanas, meses o años.
-- `1.6.0`: Añade documentación completa para todos los idiomas de interfaz, festivos de España y textos localizados para las opciones de calendarios alternativos.
-- `1.5.0`: Añade soporte de interfaz para alemán, español, francés, japonés, chino simplificado, chino tradicional y coreano, además del inglés.
-- `1.4.2`: Limita los estilos de Diary a planificadores, ajustes y modales, y añade etiquetas localizadas para los botones de colores predefinidos.
-- `1.4.1`: Pule las acciones de eventos de calendarios externos, la respuesta al pulsar y los avisos de éxito o error.
-- `1.4.0`: Añade controles de calendario personalizado y feeds externos opcionales. Los eventos externos `webcal://` o `https://` `.ics` se muestran como superposiciones de solo lectura hasta que decides crear una nota Markdown.
-- `1.3.6`: Versión de mantenimiento para estabilizar las auditorías tipadas de plugin comunitario.
-- `1.3.5`: Versión de mantenimiento que alinea lint y validación de release para plugins de Obsidian.
-- `1.3.4`: Versión de mantenimiento con configuración explícita del proyecto TypeScript para ESLint tipado y herramientas de lint fijadas.
-- `1.3.3`: Versión de mantenimiento con comprobaciones tipadas de ESLint más estrictas.
-- `1.3.2`: Versión de mantenimiento con documentación, guías de agente, tipos de configuración ESLint y limpieza del objetivo TypeScript.
-- `1.3.1`: Release con tipos de Obsidian fijados, mantenimiento del lockfile, compatibilidad ESLint y limpieza del estilo de chips recurrentes.
-- `1.3.0`: Añade eventos recurrentes y etiquetas de calendario alternativo en las vistas anual, cuadrícula mensual, lista mensual y planificador lateral.
-- `1.2.1`: Versión de mantenimiento para compatibilidad con lint de plugins comunitarios y dependencia de festivos empaquetada.
-- `1.2.0`: Introduce el planificador de la barra lateral derecha, la configuración automática, el comando **Open monthly planner in sidebar** y el cambio de vistas en la misma hoja lateral.
+- `1.15.1`: Revisa y simplifica la documentación en todos los idiomas compatibles, con términos más claros y notas de versión más breves.
+
+Los cambios anteriores están disponibles en [Releases](https://github.com/POBSIZ/obsidian-diary/releases).
 
 ## Capturas
 
-Las imágenes se tomaron desde una carpeta de demostración aislada con notas de todo el día, con hora, de rango, de tarea y de planificación. Los datos temporales se eliminaron después. Las vistas estrechas muestran cómo se adaptan el encabezado común y las vistas mensuales cuando falta espacio horizontal.
+Las capturas usan una carpeta temporal con notas de todo el día, con hora, de rango, de tarea y de planificación. Los ejemplos estrechos muestran las mismas vistas con menos espacio horizontal; la carpeta se eliminó después.
 
 ### Escritorio
 
@@ -77,10 +45,10 @@ Las imágenes se tomaron desde una carpeta de demostración aislada con notas de
 
 ## Funciones principales
 
-- **Planificador anual**: Muestra notas de fecha y de rango en una tabla de `12 meses x 31 días`. Los anchos de meses expandidos se conservan al recargar.
+- **Planificador anual**: Muestra notas de fecha y de rango en una tabla de `12 meses × 31 días`. El ancho elegido para cada mes se conserva al recargar.
 - **Interfaz localizada**: Cambia Diary entre inglés, alemán, español, francés, japonés, chino simplificado, chino tradicional y coreano.
 - **Cuadrícula mensual**: Revisa un mes en una cuadrícula grande con chips, barras de rango, festivos, etiquetas de calendario y calendarios externos.
-- **Lista mensual**: Repasa meses cargados en una lista vertical, con filtros `All`, `With notes` y `Upcoming`.
+- **Lista mensual**: Recorre un mes día a día y filtra la lista con `All`, `With notes` o `Upcoming`.
 - **Planificador diario**: Organiza un día en una línea de tiempo de 24 horas. Los rangos de varios días se muestran como barras continuas de todo el día o intervalos de fecha y hora; sus límites temporales se pueden ajustar entre fechas.
 - **Planificador de 3 días**: Compara tres días consecutivos en columnas paralelas. En pantallas estrechas conserva columnas legibles mediante desplazamiento horizontal.
 - **Selector directo de vista**: Cambia directamente entre año, cuadrícula mensual, lista mensual, día y 3 días.
@@ -103,7 +71,7 @@ Las imágenes se tomaron desde una carpeta de demostración aislada con notas de
 
 1. Descarga la última versión desde [Releases](https://github.com/POBSIZ/obsidian-diary/releases).
 2. Copia `main.js`, `manifest.json` y `styles.css` en `Vault/.obsidian/plugins/diary/`.
-3. En Obsidian, abre **Settings -> Community plugins**.
+3. En Obsidian, abre **Settings → Community plugins**.
 4. Si Restricted mode está activo, desactívalo solo en vaults de confianza y activa **Diary**.
 5. Abre un planificador desde los iconos laterales o la paleta de comandos. El icono mensual abre el planificador en la barra lateral derecha.
 
@@ -165,7 +133,7 @@ Cuando la lista abre el mes actual, Diary desplaza la vista hasta la fila de hoy
 
 ## Feeds de calendarios externos
 
-Usa **Settings -> Diary -> Calendarios externos** para añadir una URL `webcal://` publicada o una URL `.ics` por `https://`.
+Usa **Settings → Diary → Calendarios externos** para añadir una URL `webcal://` publicada o una URL `.ics` por `https://`.
 
 - Las URL de feed se guardan en datos locales del plugin y pueden sincronizarse con el vault. Trata las URL secretas de iCal como tokens de acceso.
 - Diary rechaza URL de red local o privada.
@@ -413,7 +381,7 @@ Estos enlaces abren issues públicos de GitHub y requieren una cuenta de GitHub.
 ## Solución de problemas
 
 - Si falta el plugin, comprueba que `main.js`, `manifest.json` y `styles.css` estén directamente en `Vault/.obsidian/plugins/diary/`.
-- Si faltan comandos, confirma que **Diary** esté activo en **Settings -> Community plugins**.
+- Si faltan comandos, confirma que **Diary** esté activo en **Settings → Community plugins**.
 - Si falta el planificador lateral, ejecuta **Open monthly planner in sidebar** o recarga Obsidian tras activar el plugin.
 - Si no aparecen chips, comprueba que los nombres sigan `YYYY-MM-DD` o `YYYY-MM-DD--YYYY-MM-DD`.
 - Si deseas más espacio sobre la navegación móvil reservada automáticamente, aumenta **Espacio inferior en móvil**.

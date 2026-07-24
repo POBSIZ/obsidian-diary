@@ -1,64 +1,31 @@
 # Diary
 
-Diary is an Obsidian community plugin for date-based planning in Markdown.
+Diary turns ordinary Markdown notes into yearly, monthly, daily, and 3-day planner views in Obsidian.
 
-Diary는 Obsidian vault 안의 Markdown 파일을 날짜 기반 플래너로 보여주는 커뮤니티 플러그인입니다.
+Diary는 Obsidian 볼트의 일반 Markdown 노트를 연간·월간·일간·3일 플래너로 보여주는 커뮤니티 플러그인입니다.
 
 📖 Full documentation: [English](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/en/README.md) | [Deutsch](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/de/README.md) | [Español](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/es/README.md) | [Français](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/fr/README.md) | [日本語](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/ja/README.md) | [简体中文](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/zh-CN/README.md) | [繁體中文](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/zh-TW/README.md) | [한국어](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/ko/README.md)
 
-## Snapshot
+## At a glance
 
 | Item | Value |
 | --- | --- |
 | Plugin ID | `diary` |
-| Version | `1.15.0` |
+| Version | `1.15.1` |
 | Minimum Obsidian version | `1.7.2` |
 | Platforms | Desktop and mobile (`isDesktopOnly: false`) |
 | Default language | `en` |
 | Default planner folder | `Planner` |
 
-## Latest Version
+## What's new
 
-- `1.15.0`: keeps range titles visible when weekly, monthly, or yearly boundaries split a range, and lets the file options modal convert single-date notes to ranges while editing the folder and complete date-based filename directly.
-- `1.14.0`: improves mobile modal action sizing and layout, removes the extra action-container styling, and avoids covering actions when the software keyboard opens.
-- `1.13.3`: refines localized UI copy across every supported language.
-- `1.13.0`: improves compact daily layouts and keeps modal actions usable on small screens.
-- `1.12.1`: updates vulnerable parser dependencies.
-- `1.12.0`: adds in-app feedback, bug-report, and feature-request links.
-- `1.11.0`: adds one-day navigation for multi-day planners, planner clipboard actions in daily and monthly-list views, and more reliable cross-column range resizing.
-- `1.10.2`: prevents timeline clicks from firing after drag gestures.
-- `1.10.1`: replaces newer array helpers in daily range layout with ES2020-compatible typed logic, eliminating `no-unsafe-assignment` and `no-unsafe-call` audit warnings; keeps local agent guidance out of release sources.
-- `1.10.0`: renders multi-day ranges as continuous all-day bars or datetime intervals in daily and 3-day planners, with cross-date selection and boundary resizing.
-- `1.9.4`: removes optional artifact attestations that the Obsidian Community Scorecard rejected despite successful GitHub cryptographic verification.
-- `1.9.3`: aligns release provenance with Obsidian Community Scorecard verification by using the current build-provenance action and lightweight Git tags.
-- `1.9.2`: stamps JavaScript and CSS release assets with the plugin version so each release has unique digests and unambiguous provenance attestations.
-- `1.9.1`: generates a separate GitHub-verified provenance attestation for each release asset using the current attestation action.
-- `1.9.0`: keeps mobile planner content, timeline endings, and compact view menus above Obsidian's standard or floating bottom navigation while preserving configurable minimum padding.
-- `1.8.3`: removes direct `Document` creation calls entirely by using typed Obsidian element instance helpers and immediate detachment.
-- `1.8.2`: creates detached planner DOM through typed `DocumentFragment` Obsidian helpers, eliminating unsafe type propagation in community-plugin audits.
-- `1.8.1`: adds searchable declarative settings for Obsidian 1.13+ while preserving legacy settings support, and replaces direct DOM element construction with Obsidian helpers.
-- `1.8.0`: unifies planner chips, controls, modal actions, compact layout state, and keyboard focus behavior across yearly, monthly, list, daily, and 3-day views; refreshes all planner screenshots.
-- `1.7.1`: removes unnecessary DOM type assertions and stabilizes typed lint resolution for the shared planner period modal.
-- `1.7.0`: adds daily and 3-day timeline planners, direct planner view selection, shared period navigation, independent start/end time metadata, and virtual every-N-days/weeks/months/years recurrence.
-- `1.6.0`: adds full documentation for every supported UI language, Spain holiday support, and localized alternate calendar option text.
-- `1.5.0`: adds German, Spanish, French, Japanese, Simplified Chinese, Traditional Chinese, and Korean UI language support alongside English.
-- `1.4.2`: narrows Diary styles to planner, settings, and modal surfaces and adds localized labels for color preset buttons.
-- `1.4.1`: polishes external calendar event actions, press feedback, and success/error notices.
-- `1.4.0`: adds custom calendar overlay controls and opt-in external calendar feeds. External `webcal://` or `https://` `.ics` events render as read-only planner overlays until you choose one and create a Markdown note.
-- `1.3.6`: maintenance release that stabilizes typed community-plugin audit checks.
-- `1.3.5`: maintenance release that aligns Obsidian plugin lint and release validation.
-- `1.3.4`: maintenance release with explicit TypeScript project wiring for typed ESLint checks and pinned lint tooling for reproducible source validation.
-- `1.3.3`: maintenance release with stricter type-aware ESLint safety checks enabled for community-plugin source validation.
-- `1.3.2`: maintenance release with documentation, agent guidance, ESLint config typing, and TypeScript lib target cleanup.
-- `1.3.1`: release with pinned Obsidian typings, dependency lockfile maintenance, ESLint compatibility updates, and recurrence chip styling cleanup.
-- `1.3.0`: added recurring events and alternate calendar labels across yearly, monthly grid, monthly list, and sidebar planner views.
-- `1.2.1`: maintenance release with Obsidian community-plugin lint compatibility and bundled holiday dependency maintenance. User workflows are unchanged from `1.2.0`.
-- `1.2.0`: added the right sidebar planner, including automatic sidebar setup, a dedicated **Open monthly planner in sidebar** command, and side-leaf layout switching.
+- `1.15.1`: rewrites and streamlines the documentation in every supported language, with clearer terminology and shorter release notes.
+
+Older changes are listed on the [Releases page](https://github.com/POBSIZ/obsidian-diary/releases).
 
 ## Screenshots
 
-Captured with an isolated demo folder containing sample all-day, timed, range,
-todo, and plan notes. The temporary demo data was removed after capture.
+These screenshots use temporary demo notes for all-day, timed, range, todo, and plan entries. The demo folder was removed after capture.
 
 ![Monthly grid planner](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/assets/screenshots/monthly-grid.png)
 
@@ -74,9 +41,9 @@ todo, and plan notes. The temporary demo data was removed after capture.
 | --- | --- |
 | ![Narrow monthly grid](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/assets/screenshots/mobile-monthly-grid.png) | ![Narrow monthly list planner](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/assets/screenshots/mobile-monthly-list.png) |
 
-## What It Does
+## Features
 
-- Yearly planner: `12 months x 31 days` overview.
+- Yearly planner: `12 months × 31 days` overview.
 - Localized UI: switch Diary between English, German, Spanish, French, Japanese, Simplified Chinese, Traditional Chinese, and Korean.
 - Monthly grid planner: one-month calendar view with date chips, range bars, holidays, calendar overlay labels, external calendar overlays, and mobile pinch zoom.
 - Monthly list planner: day-by-day list for dense monthly review, with `All`, `With notes`, and `Upcoming` filters.
@@ -97,7 +64,7 @@ todo, and plan notes. The temporary demo data was removed after capture.
 - Desktop workflows: right-sidebar companion planner, drag range selection, chip drag-to-move, keyboard activation, internal planner copy/paste/delete/undo.
 - Mobile workflows: tap a day to open the day summary sheet, create notes from the sheet, pinch zoom the monthly grid, and keep planner content and menus above standard or floating Obsidian navigation with an adjustable minimum bottom gap.
 
-## Quick Usage
+## Quick start
 
 1. Enable **Diary** in **Settings → Community plugins**.
 2. Run **Open monthly planner in sidebar**, **Open monthly planner**, **Open yearly planner**, **Open monthly list planner**, **Open daily planner**, or **Open 3-day planner** from the command palette.
@@ -105,7 +72,7 @@ todo, and plan notes. The temporary demo data was removed after capture.
 4. Choose **Single date** or **Range**, then set the folder, dates, filename, color, todo state, reminder time, and optional every-N-days/weeks/months/years repeat rule, calendar, and end date.
 5. Select **Create**. Diary creates an ordinary Markdown note and renders it in the planner.
 
-한국어 빠른 사용법:
+한국어로 빠르게 시작하기:
 
 1. **Settings → Community plugins**에서 **Diary**를 활성화합니다.
 2. 커맨드 팔레트에서 **Open monthly planner in sidebar**, **Open monthly planner**, **Open yearly planner**, **Open monthly list planner**, **Open daily planner**, **Open 3-day planner** 중 하나를 실행합니다.
@@ -150,7 +117,7 @@ Test:
 npm test
 ```
 
-## Repository Map
+## Repository layout
 
 - `src/main.ts`: plugin lifecycle, view registration, sidebar planner setup, commands, refresh wiring.
 - `src/settings.ts`: settings schema/defaults and settings tab UI.
@@ -175,7 +142,7 @@ npm test
 - Version bump helper: `npm version patch|minor|major --no-git-tag-version`
 - Release assets are built from the tagged source in GitHub Actions and uploaded directly to the matching GitHub release.
 
-## Feedback And Support
+## Feedback and support
 
 - [Share feedback](https://github.com/POBSIZ/obsidian-diary/issues/new?template=feedback.yml)
 - [Report a bug](https://github.com/POBSIZ/obsidian-diary/issues/new?template=bug_report.yml)

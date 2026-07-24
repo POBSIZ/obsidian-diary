@@ -1,61 +1,29 @@
 # Diary (Deutsch)
 
-Diary ist ein Obsidian-Community-Plugin, das Markdown-Dateien im Vault als datumsbasierte Planeransichten darstellt. Du kannst zwischen Jahres-, Monatsraster-, Monatslisten-, Tages- und 3-Tage-Ansicht wechseln und dabei Tagesnotizen, Zeitraum-Notizen, Kalender-Overlays, Todo-Status und lokale Erinnerungen verwalten.
+Diary zeigt gewöhnliche Markdown-Dateien aus deinem Obsidian-Vault als Kalender und Zeitplan an. Du kannst zwischen Jahres-, Monats-, Tages- und 3-Tage-Ansicht wechseln, ohne deine Notizen in ein eigenes Datenformat zu übertragen.
 
 Vollständige Dokumentation: [English](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/en/README.md) | [Deutsch](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/de/README.md) | [Español](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/es/README.md) | [Français](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/fr/README.md) | [日本語](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/ja/README.md) | [简体中文](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/zh-CN/README.md) | [繁體中文](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/zh-TW/README.md) | [한국어](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/ko/README.md)
 
-## Aktuelle Informationen
+## Auf einen Blick
 
 | Eintrag | Wert |
 | --- | --- |
 | Plugin-ID | `diary` |
-| Aktuelle Version | `1.15.0` |
+| Aktuelle Version | `1.15.1` |
 | Minimale Obsidian-Version | `1.7.2` |
 | Plattformen | Desktop / Mobil (`isDesktopOnly: false`) |
 | Standardsprache | `en` |
 | Standardordner für Planer | `Planner` |
 
-## Neueste Version
+## Neu in 1.15.1
 
-- `1.15.0`: Hält Zeitraumtitel über Wochen-, Monats- und Jahresgrenzen hinweg sichtbar. In den Dateioptionen lassen sich Einzeltermine nun in Zeiträume umwandeln sowie Ordner und vollständiger datumsbasierter Dateiname direkt bearbeiten.
-- `1.14.0`: Verbessert Größe und Anordnung der Modalaktionen auf Mobilgeräten, entfernt die zusätzliche Gestaltung des Aktionscontainers und hält die Aktionen oberhalb der Bildschirmtastatur.
-- `1.13.3`: Überarbeitet die UI-Texte in allen unterstützten Sprachen.
-- `1.13.0`: Verbessert kompakte Tageslayouts und Modalaktionen auf kleinen Bildschirmen.
-- `1.12.1`: Aktualisiert Parser-Abhängigkeiten mit bekannten Sicherheitslücken.
-- `1.12.0`: Ergänzt Links für Feedback, Fehlerberichte und Funktionswünsche in den Einstellungen.
-- `1.11.0`: Fügt tageweise Navigation für mehrtägige Ansichten, Zwischenablageaktionen in Tages- und Monatslistenansicht sowie zuverlässigeres Anpassen von Zeiträumen über Spalten hinweg hinzu.
-- `1.10.2`: Verhindert Zeitleistenklicks nach Ziehgesten.
-- `1.10.1`: Ersetzt neuere Array-Helfer im Tagesbereichslayout durch ES2020-kompatible typisierte Logik, beseitigt `no-unsafe-assignment`- und `no-unsafe-call`-Warnungen und hält lokale Agentenanweisungen aus den Release-Quellen heraus.
-- `1.10.0`: Zeigt mehrtägige Bereiche im Tages- und 3-Tage-Planer als durchgehende Ganztagsbalken oder Datums-Zeit-Intervalle mit datumsübergreifender Auswahl und Grenzanpassung.
-- `1.9.4`: Entfernt optionale Artefakt-Attestierungen, die der Obsidian Community Scorecard trotz erfolgreicher kryptografischer GitHub-Prüfung abgelehnt hat.
-- `1.9.3`: Stimmt die Release-Provenienz durch die aktuelle Build-Provenienz-Aktion und Lightweight-Git-Tags auf die Prüfung der Obsidian Community Scorecard ab.
-- `1.9.2`: Kennzeichnet JavaScript- und CSS-Release-Assets mit der Plugin-Version, damit jede Version eindeutige Digests und zweifelsfreie Herkunftsattestierungen erhält.
-- `1.9.1`: Erstellt mit der aktuellen Attestierungsaktion für jedes Release-Asset eine separate, von GitHub verifizierbare Herkunftsattestierung.
-- `1.9.0`: Hält mobile Planerinhalte, Zeitleistenenden und kompakte Ansichtsmenüs über der normalen oder schwebenden unteren Obsidian-Navigation und bewahrt den konfigurierbaren Mindestabstand.
-- `1.8.3`: Entfernt direkte `Document`-Erzeugungsaufrufe vollständig, indem typisierte Obsidian-Elementhelfer mit sofortigem Ablösen verwendet werden.
-- `1.8.2`: Erstellt getrenntes Planer-DOM über typisierte Obsidian-Helfer auf `DocumentFragment` und beseitigt dadurch unsichere Typweitergabe in Community-Plugin-Prüfungen.
-- `1.8.1`: Ergänzt durchsuchbare deklarative Einstellungen für Obsidian 1.13+, behält die bisherige Einstellungsunterstützung bei und verwendet durchgehend Obsidian-DOM-Helfer.
-- `1.8.0`: Vereinheitlicht Planer-Chips, Bedienelemente, Modal-Aktionen, Compact-Layout-Zustand und Tastaturfokus in allen Planeransichten und aktualisiert die Screenshots.
-- `1.7.1`: Entfernt unnötige DOM-Typzusicherungen und stabilisiert die typisierte Lint-Auflösung für den gemeinsamen Planer-Zeitraumdialog.
-- `1.7.0`: Fügt Tages- und 3-Tage-Zeitplaner, eine direkte Ansichtsauswahl, gemeinsame Zeitraum-Navigation, getrennte Start-/Endzeiten und virtuelle Wiederholungen alle N Tage, Wochen, Monate oder Jahre hinzu.
-- `1.6.0`: Ergänzt vollständige Dokumentation für jede unterstützte UI-Sprache, Feiertage für Spanien und lokalisierte Texte für alternative Kalenderoptionen.
-- `1.5.0`: Fügt neben Englisch UI-Sprachen für Deutsch, Spanisch, Französisch, Japanisch, vereinfachtes Chinesisch, traditionelles Chinesisch und Koreanisch hinzu.
-- `1.4.2`: Begrenzt Diary-CSS auf Planer-, Einstellungs- und Modalflächen und ergänzt lokalisierte Beschriftungen für Farbvorgaben.
-- `1.4.1`: Verfeinert Aktionen für externe Kalenderereignisse, Druckfeedback und Erfolgs- bzw. Fehlermeldungen.
-- `1.4.0`: Fügt eigene Kalender-Overlays und optionale externe Kalenderfeeds hinzu. Externe `webcal://`- oder `https://`-`.ics`-Ereignisse bleiben schreibgeschützte Overlays, bis du daraus eine Markdown-Notiz erstellst.
-- `1.3.6`: Wartungsrelease für stabilere typisierte Community-Plugin-Prüfungen.
-- `1.3.5`: Wartungsrelease zur Angleichung von Obsidian-Plugin-Linting und Release-Prüfung.
-- `1.3.4`: Wartungsrelease mit expliziter TypeScript-Projektanbindung für typisiertes ESLint und fixierten Lint-Versionen.
-- `1.3.3`: Wartungsrelease mit strengeren typisierten ESLint-Sicherheitsprüfungen.
-- `1.3.2`: Wartungsrelease für Dokumentation, Agent-Hinweise, ESLint-Konfigurationstypen und TypeScript-Lib-Ziele.
-- `1.3.1`: Release mit fixierten Obsidian-Typen, Dependency-Lockfile-Wartung, ESLint-Kompatibilität und bereinigtem Wiederholungs-Chip-Styling.
-- `1.3.0`: Wiederkehrende Ereignisse und alternative Kalenderbeschriftungen in Jahresplaner, Monatsraster, Monatsliste und Seitenplaner.
-- `1.2.1`: Wartungsrelease für Obsidian-Community-Plugin-Lint-Kompatibilität und gebündelte Feiertagsabhängigkeit.
-- `1.2.0`: Führt den rechten Seitenplaner, automatische Seitenleisten-Einrichtung, den Befehl **Open monthly planner in sidebar** und Layoutwechsel im Seitenblatt ein.
+- `1.15.1`: Überarbeitet und strafft die Dokumentation in allen unterstützten Sprachen, mit klareren Begriffen und kürzeren Versionshinweisen.
+
+Ältere Änderungen stehen auf der [Releases-Seite](https://github.com/POBSIZ/obsidian-diary/releases).
 
 ## Screenshots
 
-Die Screenshots stammen aus einem isolierten Demo-Ordner mit ganztägigen, zeitgebundenen, mehrtägigen, Todo- und Plan-Notizen. Die temporären Daten wurden anschließend entfernt. Die schmalen Ansichten zeigen die Anpassung von gemeinsamem Header und Monatsansichten bei wenig Platz.
+Für die Screenshots wurde ein temporärer Demo-Ordner mit ganztägigen, zeitgebundenen, mehrtägigen, Todo- und Plan-Notizen verwendet. Die schmalen Ansichten zeigen dieselben Oberflächen bei wenig Platz; der Demo-Ordner wurde danach gelöscht.
 
 ### Desktop
 
@@ -77,10 +45,10 @@ Die Screenshots stammen aus einem isolierten Demo-Ordner mit ganztägigen, zeitg
 
 ## Hauptfunktionen
 
-- **Jahresplaner**: Zeigt Tages- und Zeitraum-Notizen in einer Tabelle mit `12 Monaten x 31 Tagen`. Erweiterte Monatszellenbreiten bleiben nach Reloads erhalten.
+- **Jahresplaner**: Zeigt Tages- und Zeitraum-Notizen in einer Tabelle mit `12 Monaten × 31 Tagen`. Verbreiterte Monatszellen bleiben nach dem Neuladen erhalten.
 - **Lokalisierte Oberfläche**: Diary lässt sich zwischen Englisch, Deutsch, Spanisch, Französisch, Japanisch, vereinfachtem Chinesisch, traditionellem Chinesisch und Koreanisch umschalten.
 - **Monatsraster**: Ein großer Monatskalender mit Chips, Zeitraumleisten, Feiertagen, Kalender-Overlay-Beschriftungen und externen Kalender-Overlays.
-- **Monatsliste**: Eine vertikale Tagesliste für volle Monate, mit Filtern für `All`, `With notes` und `Upcoming`.
+- **Monatsliste**: Zeigt volle Monate als Tagesliste und lässt sich mit `All`, `With notes` und `Upcoming` filtern.
 - **Tagesplaner**: Plane einen Tag auf einer 24-Stunden-Zeitleiste. Mehrtägige Bereiche erscheinen als durchgehende ganztägige Balken oder Datums-Zeit-Intervalle; ihre zeitlichen Grenzen lassen sich über Datumsgrenzen hinweg anpassen.
 - **3-Tage-Planer**: Vergleiche drei aufeinanderfolgende Tage in parallelen Spalten. Auf schmalen Bildschirmen bleiben die Spalten per horizontalem Scrollen lesbar.
 - **Direkte Ansichtsauswahl**: Wechsle direkt zwischen Jahr, Monatsraster, Monatsliste, Tag und 3 Tagen.
@@ -103,7 +71,7 @@ Die Screenshots stammen aus einem isolierten Demo-Ordner mit ganztägigen, zeitg
 
 1. Lade die neueste Version unter [Releases](https://github.com/POBSIZ/obsidian-diary/releases) herunter.
 2. Kopiere `main.js`, `manifest.json` und `styles.css` nach `Vault/.obsidian/plugins/diary/`.
-3. Öffne in Obsidian **Settings -> Community plugins**.
+3. Öffne in Obsidian **Settings → Community plugins**.
 4. Falls Restricted mode aktiv ist, deaktiviere ihn nur für Vaults, denen du vertraust, und aktiviere **Diary**.
 5. Öffne einen Planer über die Ribbon-Icons oder die Command Palette. Das Monats-Icon öffnet den rechten Seitenplaner.
 
@@ -165,7 +133,7 @@ Wenn die Monatsliste im aktuellen Monat geöffnet wird, scrollt Diary zur heutig
 
 ## Externe Kalenderfeeds
 
-Nutze **Settings -> Diary -> Externe Kalender**, um eine veröffentlichte `webcal://`-URL oder eine `https://`-`.ics`-URL hinzuzufügen.
+Nutze **Settings → Diary → Externe Kalender**, um eine veröffentlichte `webcal://`-URL oder eine `https://`-`.ics`-URL hinzuzufügen.
 
 - Feed-URLs werden in lokalen Plugin-Daten gespeichert und können mit deinem Vault synchronisiert werden. Behandle geheime iCal-URLs wie Zugriffstoken.
 - Diary blockiert lokale und private Netzwerk-URLs.
@@ -413,7 +381,7 @@ Diese Links öffnen öffentliche GitHub-Issues und erfordern ein GitHub-Konto. F
 ## Fehlerbehebung
 
 - Wenn das Plugin fehlt, prüfe, ob `main.js`, `manifest.json` und `styles.css` direkt in `Vault/.obsidian/plugins/diary/` liegen.
-- Wenn Befehle fehlen, stelle sicher, dass **Diary** unter **Settings -> Community plugins** aktiviert ist.
+- Wenn Befehle fehlen, stelle sicher, dass **Diary** unter **Settings → Community plugins** aktiviert ist.
 - Wenn der Seitenplaner fehlt, führe **Open monthly planner in sidebar** aus oder lade Obsidian nach Aktivierung neu.
 - Wenn Chips nicht erscheinen, prüfe, ob Dateinamen `YYYY-MM-DD` oder `YYYY-MM-DD--YYYY-MM-DD` folgen.
 - Wenn mehr Platz über der automatisch freigehaltenen mobilen Navigation gewünscht ist, erhöhe **Unterer Abstand mobil**.

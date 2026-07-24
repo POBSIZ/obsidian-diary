@@ -1,61 +1,29 @@
 # Diary (English)
 
-Diary is an Obsidian community plugin that turns Markdown files in your vault into date-based planner views. It helps you move between yearly, monthly grid, monthly list, daily, and 3-day views while managing single-date notes, range notes, monthly/yearly plan notes, holidays, calendar overlays, todo state, and local reminders.
+Diary turns ordinary Markdown notes into planner views inside Obsidian. Use the yearly, monthly, daily, or 3-day view without moving your notes into a separate database or proprietary format.
 
 Full documentation: [English](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/en/README.md) | [Deutsch](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/de/README.md) | [Español](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/es/README.md) | [Français](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/fr/README.md) | [日本語](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/ja/README.md) | [简体中文](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/zh-CN/README.md) | [繁體中文](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/zh-TW/README.md) | [한국어](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/ko/README.md)
 
-## Current Info
+## At a glance
 
 | Item | Value |
 | --- | --- |
 | Plugin ID | `diary` |
-| Current version | `1.15.0` |
+| Current version | `1.15.1` |
 | Minimum Obsidian version | `1.7.2` |
 | Supported platforms | Desktop / mobile (`isDesktopOnly: false`) |
 | Default language | `en` |
 | Default planner folder | `Planner` |
 
-## Latest Version
+## What's new
 
-- `1.15.0`: Keeps range titles visible across week, month, and year boundaries. File options can now convert a single-date note to a range and edit its folder and complete date-based filename directly.
-- `1.14.0`: Improves mobile modal action sizing and layout, removes the extra action-container styling, and keeps actions clear of the software keyboard.
-- `1.13.3`: Refines localized UI copy in every supported language.
-- `1.13.0`: Improves compact daily layouts and modal actions on small screens.
-- `1.12.1`: Updates vulnerable parser dependencies.
-- `1.12.0`: Adds in-app feedback, bug-report, and feature-request links.
-- `1.11.0`: Adds one-day multi-day navigation, clipboard actions in daily and monthly-list views, and more reliable cross-column range resizing.
-- `1.10.2`: Prevents timeline clicks after drag gestures.
-- `1.10.1`: Replaces newer array helpers in daily range layout with ES2020-compatible typed logic, eliminating `no-unsafe-assignment` and `no-unsafe-call` audit warnings; local agent guidance no longer ships with release sources.
-- `1.10.0`: Renders multi-day ranges as continuous all-day bars or datetime intervals in daily and 3-day planners, with cross-date selection and boundary resizing.
-- `1.9.4`: Removes optional artifact attestations that the Obsidian Community Scorecard rejected despite successful GitHub cryptographic verification.
-- `1.9.3`: Aligns release provenance with Obsidian Community Scorecard verification by using the current build-provenance action and lightweight Git tags.
-- `1.9.2`: Stamps JavaScript and CSS release assets with the plugin version so each release has unique digests and unambiguous provenance attestations.
-- `1.9.1`: Generates a separate GitHub-verified provenance attestation for each release asset using the current attestation action.
-- `1.9.0`: Keeps mobile planner content, timeline endings, and compact view menus above Obsidian's standard or floating bottom navigation while preserving configurable minimum padding.
-- `1.8.3`: Removes direct `Document` creation calls entirely by using typed Obsidian element instance helpers and immediate detachment.
-- `1.8.2`: Creates detached planner DOM through typed `DocumentFragment` Obsidian helpers, eliminating unsafe type propagation in community-plugin audits.
-- `1.8.1`: Adds searchable declarative settings for Obsidian 1.13+ while retaining legacy settings support, and uses Obsidian DOM helpers consistently.
-- `1.8.0`: Unifies planner chips, controls, modal actions, compact layout state, and keyboard focus behavior across every planner view, with refreshed screenshots.
-- `1.7.1`: Removes unnecessary DOM type assertions and stabilizes typed lint resolution for the shared planner period modal.
-- `1.7.0`: Adds daily and 3-day timeline planners, direct planner view selection, shared period navigation, independent start/end time metadata, and virtual every-N-days/weeks/months/years recurrence.
-- `1.6.0`: Adds full documentation for every supported UI language, Spain holiday support, and localized alternate calendar option text.
-- `1.5.0`: Adds German, Spanish, French, Japanese, Simplified Chinese, Traditional Chinese, and Korean UI language support alongside English.
-- `1.4.2`: Narrows Diary styles to planner, settings, and modal surfaces and adds localized labels for color preset buttons.
-- `1.4.1`: Polishes external calendar event actions, press feedback, and success/error notices.
-- `1.4.0`: Adds custom calendar overlay controls and opt-in external calendar feeds. External `webcal://` or `https://` `.ics` events render as read-only planner overlays until you choose one and create a Markdown note.
-- `1.3.6`: Maintenance release that stabilizes typed community-plugin audit checks.
-- `1.3.5`: Maintenance release that aligns Obsidian plugin lint and release validation.
-- `1.3.4`: Maintenance release with explicit TypeScript project wiring for typed ESLint checks and pinned lint tooling for reproducible source validation.
-- `1.3.3`: Maintenance release with stricter type-aware ESLint safety checks enabled for community-plugin source validation.
-- `1.3.2`: Maintenance release with documentation, agent guidance, ESLint config typing, and TypeScript lib target cleanup.
-- `1.3.1`: Release with pinned Obsidian typings, dependency lockfile maintenance, ESLint compatibility updates, and recurrence chip styling cleanup.
-- `1.3.0`: Added recurring events and alternate calendar labels across yearly, monthly grid, monthly list, and sidebar planner views.
-- `1.2.1`: Maintenance release with Obsidian community-plugin lint compatibility and bundled holiday dependency maintenance. User workflows are unchanged from `1.2.0`.
-- `1.2.0`: Introduced the right sidebar planner, automatic sidebar setup, the **Open monthly planner in sidebar** command, and side-leaf switching between yearly, monthly grid, and monthly list layouts.
+- `1.15.1`: Rewrites and streamlines the documentation in every supported language, with clearer terminology and shorter release notes.
+
+For earlier changes, see the [Releases page](https://github.com/POBSIZ/obsidian-diary/releases).
 
 ## Screenshots
 
-The images below were captured from an isolated demo folder with sample all-day, timed, range, todo, and plan notes. The temporary demo data was removed afterward. The narrow-layout images show how the shared header and monthly views adapt when horizontal space is limited.
+The screenshots use temporary demo notes for all-day, timed, range, todo, and plan entries. The narrow examples show the same views with limited horizontal space; the demo folder was removed after capture.
 
 ### Desktop
 
@@ -75,12 +43,12 @@ The images below were captured from an isolated demo folder with sample all-day,
 | --- | --- |
 | ![Narrow monthly grid](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/assets/screenshots/mobile-monthly-grid.png) | ![Narrow monthly list](https://github.com/POBSIZ/obsidian-diary/blob/main/docs/assets/screenshots/mobile-monthly-list.png) |
 
-## Key Features
+## Features
 
-- **Yearly planner**: View date notes and range notes in a `12 months x 31 days` table. Expanded month-cell widths are saved across reloads.
+- **Yearly planner**: View date and range notes in a `12 months × 31 days` table. Expanded month-cell widths are restored after reloads.
 - **Localized UI**: Switch Diary between English, German, Spanish, French, Japanese, Simplified Chinese, Traditional Chinese, and Korean.
 - **Monthly grid planner**: Inspect one month in a large calendar grid with chips, range bars, holidays, calendar overlay labels, and external calendar overlays.
-- **Monthly list planner**: Review busy months in a day-by-day vertical list with `All`, `With notes`, and `Upcoming` filters.
+- **Monthly list planner**: Review a busy month as a day-by-day list, with `All`, `With notes`, and `Upcoming` filters.
 - **Daily planner**: Plan one day on a 24-hour timeline. Multi-day ranges render as continuous all-day bars or datetime intervals; timed range boundaries can be resized across dates. All-day and untimed notes stay in a separate section.
 - **3-day planner**: Compare three consecutive days in parallel columns on one 24-hour timeline. Narrow screens use horizontal scrolling instead of compressing the day columns.
 - **Direct view selector**: Switch directly among yearly, monthly grid, monthly list, daily, and 3-day views. On narrow screens it stays visible while secondary actions move into **More**.
@@ -90,7 +58,7 @@ The images below were captured from an isolated demo folder with sample all-day,
 - **Recurring events**: Repeat every N days, weeks, months, or years using a Gregorian or alternate-calendar basis. Occurrences remain virtual until selected and converted to Markdown notes.
 - **Color, todo, and completion state**: Reflect `color`, `todo`, and `completed` frontmatter in chip styling and labels.
 - **Holiday overlays**: Show country-specific public holidays for the supported UI-language regions and select holiday badges to see their names.
-- **Alternate calendar label**: Optionally show one compact alternate calendar label at a time, including Korean lunar, Chinese lunar, Dangi, Hebrew, Islamic, Persian, Indian national, Buddhist, Japanese era, Minguo, Coptic, and Ethiopic calendars, with localized option text in every supported UI language.
+- **Alternate calendar label**: Show one secondary date label at a time. Available calendars include Korean lunar, Chinese lunar, Dangi, Hebrew, Islamic, Persian, Indian national, Buddhist, Japanese era, Minguo, Coptic, and Ethiopic.
 - **Custom calendar overlay**: Create local fantasy or campaign calendar profiles with custom months, weekdays, and simple leap rules. Diary shows the custom date as an overlay label while keeping normal `YYYY-MM-DD` note files.
 - **External calendar overlays**: Add `webcal://` or `https://` `.ics` feeds, refresh them manually or on an interval, and show events as read-only chips/ranges in yearly, monthly grid, monthly list, side planner, and day summary surfaces. Select an external event only when you want to create a normal Markdown note for it.
 - **Scoped styling**: Diary's CSS is limited to planner views, settings panels, and plugin modals so it does not restyle ordinary vault content.
@@ -107,7 +75,7 @@ The images below were captured from an isolated demo folder with sample all-day,
 4. If Restricted mode is enabled, turn it off only for vaults you trust, then enable **Diary**.
 5. Open a planner from the left ribbon icons or the command palette. The monthly ribbon icon opens the right sidebar planner.
 
-## Quick Start
+## Quick start
 
 1. Run the **Open monthly planner in sidebar** command for the side planner, or **Open monthly planner** for a full workspace tab.
 2. Select the add-file button in the header or select a date cell.
@@ -117,7 +85,7 @@ The images below were captured from an isolated demo folder with sample all-day,
 
 Created notes are ordinary Markdown files. They remain in your vault even if the plugin is disabled.
 
-## Opening and Switching Views
+## Open and switch views
 
 Ribbon icons:
 
@@ -134,7 +102,7 @@ Command palette:
 - `Open daily planner`
 - `Open 3-day planner`
 
-Select the repeat icon in any planner header to cycle the same leaf through this order.
+Select the view-cycle icon in any planner header to move the current leaf through this order.
 
 ```text
 Yearly -> Monthly Grid -> Monthly List -> Daily -> 3 Days -> Yearly
@@ -142,18 +110,18 @@ Yearly -> Monthly Grid -> Monthly List -> Daily -> 3 Days -> Yearly
 
 Use previous/next buttons to move through years or months, and the calendar icon to return to the current year or month. Select the year or month label to type a specific value.
 
-## Right Sidebar Planner
+## Right sidebar planner
 
 Diary creates one compact monthly planner in the right sidebar when the workspace is ready. Use **Open monthly planner in sidebar** or the monthly ribbon icon to reveal it again.
 
-The side planner is designed as a companion view:
+The sidebar works as a companion view:
 
 - It uses the compact monthly layout and day summary sheet.
 - Selecting a planner note from the sidebar opens the file in the main workspace, so the sidebar remains available.
 - The switch-layout button cycles the side leaf through yearly, monthly grid, and monthly list views.
 - Diary keeps only one planner sidebar leaf and cleans up older right-sidebar monthly planner leaves from previous versions.
 
-## Monthly List Filters
+## Monthly list filters
 
 The monthly list has three filters:
 
@@ -163,7 +131,7 @@ The monthly list has three filters:
 
 When the monthly list opens on the current month, Diary scrolls today's row into view. The current-month button also returns to today.
 
-## External Calendar Feeds
+## External calendar feeds
 
 Use **Settings → Diary → External calendars** to add a published `webcal://` URL or an `https://` `.ics` URL.
 
@@ -175,9 +143,9 @@ Use **Settings → Diary → External calendars** to add a published `webcal://`
 - Selecting an external event opens a details modal with **Create Markdown note**, **Refresh calendar**, and **Copy details** actions, with localized labels plus pressed/loading/completed feedback.
 - When you create a Markdown note from an external event, Diary stores linking frontmatter and hides the duplicate overlay for that event.
 
-## Creating Notes
+## Create notes
 
-### Single-Date Notes
+### Single-date notes
 
 Select a date cell or the add-file button, then use **Single date**.
 
@@ -188,7 +156,7 @@ Select a date cell or the add-file button, then use **Single date**.
 - Set **Reminder time** to save `notify_minutes` frontmatter.
 - Enable **Repeat**, choose **Daily**, **Weekly**, **Monthly**, or **Yearly**, enter an interval from 1 to 999, then choose a calendar basis and optional inclusive end date. This supports every N days, weeks, months, or years. Future occurrences appear as virtual planner items without creating files.
 
-### Range Notes
+### Range notes
 
 On desktop, drag across date cells to prefill a **Range** modal. On mobile, select the add-file button, choose **Range**, and enter the start and end dates manually.
 
@@ -199,7 +167,7 @@ On desktop, drag across date cells to prefill a **Range** modal. On mobile, sele
 - Choose **All day** to keep both times empty, or enter both times to define one continuous interval from `date_start` + `start_time` through `date_end` + `end_time`.
 - The daily and 3-day planners show all-day ranges as spanning bars. Drag an all-day range onto the timeline to assign times, then drag its first or last edge to change the corresponding date and time boundary.
 
-### Plan Notes
+### Plan notes
 
 Use the plan note panel above each planner to create yearly or monthly planning notes.
 
@@ -209,7 +177,7 @@ Use the plan note panel above each planner to create yearly or monthly planning 
 - Desktop and mobile keep separate panel state: desktop defaults expanded, while mobile defaults collapsed until you expand it.
 - If the plan note already exists, Diary shows a preview and an open button.
 
-## Editing Notes
+## Edit notes
 
 Select a chip or range bar in the planner to open the file options modal.
 
@@ -228,7 +196,7 @@ Applying the change moves or renames the Markdown file. Converting to a range wr
 
 On desktop, drag a date chip or range bar to another date to move it. Range notes move by start date and keep the same duration. If the target path already exists, Diary does not move the file.
 
-## Keyboard and Accessibility
+## Keyboard and accessibility
 
 - Press `Enter` or `Space` on a focused date cell, planner chip, range bar, holiday badge, monthly list row, year label, or month label to activate it.
 - Planner controls use button roles, state labels, and `aria-label` text for screen readers.
@@ -236,7 +204,7 @@ On desktop, drag a date chip or range bar to another date to move it. Range note
 - Monthly list filters expose tab-style selected state with `aria-selected`.
 - Modal validation messages are announced with polite live regions.
 
-## Planner Clipboard (Desktop)
+## Planner clipboard (desktop)
 
 In a planner view, hold `Cmd` on macOS or `Ctrl` on Windows/Linux while selecting dates or chips.
 
@@ -256,7 +224,7 @@ Paste rules:
 - Diary blocks many-notes-to-many-dates paste combinations to avoid ambiguous conflicts.
 - If a file already exists, Diary creates a unique path such as `-copy` or `-copy2`.
 
-## Mobile Usage
+## Mobile use
 
 - Tap a date in the monthly grid to open the bottom day summary sheet.
 - Use the summary sheet to review that day's single notes, range notes, and holidays.
@@ -284,7 +252,7 @@ Paste rules:
 
 Diary also stores UI-only state in plugin data: plan note preview expansion, mobile plan note preview expansion, and expanded yearly month-cell widths.
 
-## Frontmatter Reference
+## Frontmatter reference
 
 | Key | Description |
 | --- | --- |
@@ -317,7 +285,7 @@ Reminders are not scheduled OS notifications. While Obsidian is open, Diary chec
 
 Recurring occurrences are virtual by default. Creating one from its planner modal is idempotent: if the occurrence already belongs to the same `recurrence_id`, Diary opens that note; if the target path is an ordinary note or another series, Diary leaves it untouched.
 
-## Filename Rules
+## Filename rules
 
 Diary scans Markdown files across the vault by default and displays notes whose filenames match these rules. In settings, you can limit scanning to the configured **Planner folder** and its subfolders. Newly created notes go into the configured **Planner folder** by default.
 
@@ -394,7 +362,7 @@ npm test
 - The GitHub release tag must exactly match the `manifest.json` version and should not have a leading `v`.
 - This repository builds `main.js`, `manifest.json`, and `styles.css` from the tagged source in GitHub Actions and publishes them as individual release assets.
 
-## Feedback And Support
+## Feedback and support
 
 - [Share feedback](https://github.com/POBSIZ/obsidian-diary/issues/new?template=feedback.yml)
 - [Report a bug](https://github.com/POBSIZ/obsidian-diary/issues/new?template=bug_report.yml)
@@ -402,7 +370,7 @@ npm test
 
 These links open public GitHub issues and require a GitHub account. Do not include private vault content, calendar URLs, access tokens, or other sensitive information.
 
-## Privacy And Network
+## Privacy and network
 
 - Planner features operate on local Markdown files inside the vault.
 - Diary has no hidden telemetry or analytics.
