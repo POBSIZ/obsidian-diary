@@ -142,6 +142,67 @@ export async function moveRangeFileToNewDates(
 	return renamed;
 }
 
+/**
+ * Move or rename a planner file using the folder and complete date-based
+ * basename entered in the file options modal. Range frontmatter is kept in
+ * sync when converting between single-date and range files.
+ */
+export async function movePlannerFileToLocation(
+	app: App,
+	file: TFile,
+	folderRaw: string,
+	basenameRaw: string,
+): Promise<TFile> {
+	const folder = folderRaw.trim().replace(/^\/+|\/+$/g, "");
+	const cleanBasename = basenameRaw.trim().replace(/\.md$/i, "");
+	if (!cleanBasename || /[\\/]/.test(cleanBasename)) {
+		const err = new Error("PLANNER_INVALID_FILENAME");
+		(err as Error & { code?: string }).code = "PLANNER_INVALID_FILENAME";
+		throw err;
+	}
+
+	const filename = `${cleanBasename}.md`;
+	const newPath = folder ? `${folder}/${filename}` : filename;
+	if (newPath !== file.path && app.vault.getAbstractFileByPath(newPath)) {
+		const err = new Error("PLANNER_RENAME_CONFLICT");
+		(err as Error & { code?: string }).code = "PLANNER_RENAME_CONFLICT";
+		throw err;
+	}
+
+	const dir = newPath.split("/").slice(0, -1).join("/");
+	if (dir && !app.vault.getAbstractFileByPath(dir)) {
+		await app.vault.createFolder(dir);
+	}
+	if (newPath !== file.path) {
+		await app.vault.rename(file, newPath);
+	}
+
+	const moved = app.vault.getAbstractFileByPath(newPath);
+	if (!(moved instanceof TFile)) {
+		throw new Error("PLANNER_RENAME_FAILED");
+	}
+
+	const rangeParsed = parseRangeBasename(cleanBasename);
+	const singleParsed = rangeParsed
+		? null
+		: parseSingleDateBasename(cleanBasename);
+	if (rangeParsed || singleParsed) {
+		await app.fileManager.processFrontMatter(
+			moved,
+			(frontmatter: Record<string, unknown>) => {
+				if (rangeParsed) {
+					frontmatter.date_start = rangeParsed.start;
+					frontmatter.date_end = rangeParsed.end;
+					return;
+				}
+				delete frontmatter.date_start;
+				delete frontmatter.date_end;
+			},
+		);
+	}
+	return moved;
+}
+
 export async function openDateNote(
 	app: App,
 	leaf: WorkspaceLeaf,

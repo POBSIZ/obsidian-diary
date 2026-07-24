@@ -33,7 +33,6 @@ import {
 import {
 	getAllFolderPaths,
 	getChipColor,
-	getFileTitle,
 	getNotifyMinutes,
 	getPlannerTimeRange,
 	isTodoCompleted,
@@ -42,13 +41,11 @@ import {
 	type PlannerFileScope,
 } from "./file-utils";
 import {
-	moveFileToDate,
-	moveRangeFileToNewDates,
+	movePlannerFileToLocation,
 	parseSingleDateBasename,
 	updateFileColor,
 	updateFileNotifyMinutes,
 	updateFileTimeRange,
-	updateFileTitle,
 	updateFileTodoStatus,
 } from "./file-operations";
 import { parseRangeBasename } from "../../utils/range";
@@ -1158,8 +1155,14 @@ export class DeleteConfirmModal extends Modal {
 }
 
 export class FileOptionsModal extends Modal {
-	private titleInput!: HTMLInputElement;
-	private initialTitle = "";
+	private mode: "single" | "range" = "single";
+	private folderSelect!: HTMLSelectElement;
+	private folderCustomInput!: HTMLInputElement;
+	private folderOtherRow!: HTMLElement;
+	private filenameInput!: HTMLInputElement;
+	private rangeRow!: HTMLElement;
+	private singleModeBtn!: HTMLButtonElement;
+	private rangeModeBtn!: HTMLButtonElement;
 	private colorInput!: HTMLInputElement;
 	private colorPickerInput!: HTMLInputElement;
 	private colorPresetBtns: HTMLButtonElement[] = [];
@@ -1179,7 +1182,6 @@ export class FileOptionsModal extends Modal {
 	private previewComponent: Component | null = null;
 	private startDateInput?: HTMLInputElement;
 	private endDateInput?: HTMLInputElement;
-	private singleDateInput?: HTMLInputElement;
 	private calendarPreviewEl?: HTMLElement;
 	private applyBtn!: HTMLButtonElement;
 	private fileOptionsErrorEl!: HTMLElement;
@@ -1203,38 +1205,72 @@ export class FileOptionsModal extends Modal {
 			cls: "yearly-planner-create-file-modal yearly-planner-file-options-form",
 		});
 
-		const pathRow = createUiFieldRow(form, "yearly-planner-create-file-row");
-		pathRow.createEl("label", { text: t("modal.filePath") });
-		const pathInput = pathRow.createEl("input", {
-			type: "text",
-			cls: "yearly-planner-filename-input yearly-planner-file-options-path",
-		});
-		pathInput.readOnly = true;
-		pathInput.value = this.file.path;
-		pathInput.title = this.file.path;
+		const rangeParsed = parseRangeBasename(this.file.basename);
+		const singleParsed = rangeParsed
+			? null
+			: parseSingleDateBasename(this.file.basename.replace(/\.md$/i, ""));
+		this.mode = rangeParsed ? "range" : "single";
 
-		const titleRow = createUiFieldRow(form, "yearly-planner-create-file-row");
-		titleRow.createEl("label", { text: t("modal.displayTitle") });
-		this.titleInput = titleRow.createEl("input", {
-			type: "text",
-			cls: "yearly-planner-filename-input",
+		const modeRow = createUiFieldRow(form, "yearly-planner-create-file-row");
+		modeRow.createEl("label", { text: t("modal.mode") });
+		const modeBtnsWrap = modeRow.createDiv({
+			cls: "yearly-planner-mode-btns",
 		});
-		this.initialTitle = getFileTitle(this.app, this.file);
-		this.titleInput.value = this.initialTitle;
-		this.titleInput.placeholder = t("modal.displayTitle");
-		this.titleInput.addEventListener("input", () =>
+		this.singleModeBtn = createUiButton(modeBtnsWrap, {
+			classes: "yearly-planner-mode-btn",
+			text: t("modal.singleDate"),
+		});
+		this.rangeModeBtn = createUiButton(modeBtnsWrap, {
+			classes: "yearly-planner-mode-btn",
+			text: t("modal.range"),
+		});
+		this.singleModeBtn.onclick = () => this.setFileOptionsMode("single");
+		this.rangeModeBtn.onclick = () => this.setFileOptionsMode("range");
+
+		const currentFolder = this.file.parent?.path ?? "";
+		const folderRow = createUiFieldRow(form, "yearly-planner-create-file-row");
+		folderRow.createEl("label", { text: t("modal.folder") });
+		const folderPaths = getAllFolderPaths(this.app, currentFolder, "vault");
+		this.folderSelect = folderRow.createEl("select", {
+			cls: "yearly-planner-folder-select",
+		});
+		for (const path of folderPaths) {
+			this.folderSelect.createEl("option", {
+				value: path,
+				text: path || t("modal.root"),
+			});
+		}
+		this.folderSelect.createEl("option", {
+			value: FOLDER_OTHER,
+			text: t("modal.other"),
+		});
+		this.folderSelect.value = folderPaths.includes(currentFolder)
+			? currentFolder
+			: FOLDER_OTHER;
+		this.folderSelect.onchange = () => {
+			this.updateFileOptionsFolderVisibility();
+			this.updateFileOptionsState();
+		};
+
+		this.folderOtherRow = createUiFieldRow(
+			form,
+			"yearly-planner-create-file-row yearly-planner-folder-other-row",
+		);
+		this.folderOtherRow.createEl("label", {
+			text: t("modal.customFolderPath"),
+		});
+		this.folderCustomInput = this.folderOtherRow.createEl("input", {
+			type: "text",
+			cls: "yearly-planner-folder-input",
+		});
+		this.folderCustomInput.value = currentFolder;
+		this.folderCustomInput.placeholder = "Planner";
+		this.folderCustomInput.addEventListener("input", () =>
 			this.updateFileOptionsState(),
 		);
-		titleRow.createDiv({
-			cls: "yearly-planner-create-file-hint",
-			text: t("modal.displayTitleHint"),
-		});
+		this.updateFileOptionsFolderVisibility();
 
-		const rangeParsed = parseRangeBasename(this.file.basename);
-		const singleParsed =
-			!rangeParsed &&
-			parseSingleDateBasename(this.file.basename.replace(/\.md$/i, ""));
-		if (rangeParsed) {
+		if (rangeParsed || singleParsed) {
 			const startRow = createUiFieldRow(
 				form,
 				"yearly-planner-create-file-row",
@@ -1244,46 +1280,58 @@ export class FileOptionsModal extends Modal {
 				type: "date",
 				cls: "yearly-planner-date-input",
 			});
-			this.startDateInput.value = rangeParsed.start;
-			this.startDateInput.addEventListener("input", () =>
-				this.updateDateRelatedFileOptionsState(),
-			);
-			const endRow = createUiFieldRow(
-				form,
-				"yearly-planner-create-file-row",
-			);
-			endRow.createEl("label", { text: t("modal.endDate") });
-			this.endDateInput = endRow.createEl("input", {
-				type: "date",
-				cls: "yearly-planner-date-input",
+			this.startDateInput.value =
+				rangeParsed?.start ?? singleParsed?.date ?? "";
+			this.startDateInput.addEventListener("input", () => {
+				this.syncFileOptionsFilename();
+				this.updateDateRelatedFileOptionsState();
 			});
-			this.endDateInput.value = rangeParsed.end;
-			this.endDateInput.addEventListener("input", () =>
-				this.updateDateRelatedFileOptionsState(),
-			);
-		} else if (singleParsed) {
-			const dateRow = createUiFieldRow(
-				form,
-				"yearly-planner-create-file-row",
-			);
-			dateRow.createEl("label", { text: t("modal.changeDate") });
-			this.singleDateInput = dateRow.createEl("input", {
-				type: "date",
-				cls: "yearly-planner-date-input",
-			});
-			this.singleDateInput.value = singleParsed.date;
-			this.singleDateInput.addEventListener("input", () =>
-				this.updateDateRelatedFileOptionsState(),
-			);
-		}
 
-		if (this.singleDateInput || this.startDateInput) {
+			this.rangeRow = createUiFieldRow(
+				form,
+				"yearly-planner-create-file-row",
+			);
+			this.rangeRow.createEl("label", { text: t("modal.endDate") });
+			this.endDateInput = this.rangeRow.createEl("input", {
+				type: "date",
+				cls: "yearly-planner-date-input",
+			});
+			this.endDateInput.value =
+				rangeParsed?.end ?? singleParsed?.date ?? "";
+			this.endDateInput.addEventListener("input", () => {
+				this.syncFileOptionsFilename();
+				this.updateDateRelatedFileOptionsState();
+			});
+
 			this.calendarPreviewEl = createUiFieldRow(
 				form,
 				"yearly-planner-create-file-row yearly-planner-calendar-preview-row",
 			);
 			this.updateCalendarPreview();
 		}
+
+		const filenameRow = createUiFieldRow(
+			form,
+			"yearly-planner-create-file-row",
+		);
+		filenameRow.createEl("label", { text: t("modal.fileName") });
+		this.filenameInput = filenameRow.createEl("input", {
+			type: "text",
+			cls: "yearly-planner-filename-input",
+		});
+		this.filenameInput.value = this.file.basename;
+		this.filenameInput.placeholder = t("modal.fileNamePlaceholder");
+		this.filenameInput.addEventListener("input", () => {
+			this.syncFileOptionsDatesFromFilename();
+			this.updateFileOptionsState();
+		});
+		const filenameHint = filenameRow.createDiv({
+			cls: "yearly-planner-create-file-hint",
+		});
+		filenameHint.appendText(t("modal.suffixAsTitle"));
+		filenameHint.appendText(" ");
+		filenameHint.appendText(t("modal.suffixExample"));
+		this.updateFileOptionsModeUI();
 
 		this.colorPresets = getChipColorPresets(this.contentEl.ownerDocument);
 		const defaultColor = this.colorPresets[0]!.hex;
@@ -1478,7 +1526,84 @@ export class FileOptionsModal extends Modal {
 			void this.handleApplyChange();
 		});
 		this.updateFileOptionsState();
-		focusUiInputOnDesktop(this.titleInput, true);
+		focusUiInputOnDesktop(this.filenameInput, true);
+	}
+
+	private updateFileOptionsFolderVisibility(): void {
+		const isOther = this.folderSelect.value === FOLDER_OTHER;
+		this.folderOtherRow.toggleClass("is-hidden", !isOther);
+	}
+
+	private getFileOptionsFolderValue(): string {
+		const value =
+			this.folderSelect.value === FOLDER_OTHER
+				? this.folderCustomInput.value
+				: this.folderSelect.value;
+		return value.trim().replace(/^\/+|\/+$/g, "");
+	}
+
+	private setFileOptionsMode(mode: "single" | "range"): void {
+		this.mode = mode;
+		if (
+			mode === "range" &&
+			this.endDateInput &&
+			!this.endDateInput.value
+		) {
+			this.endDateInput.value = this.startDateInput?.value ?? "";
+		}
+		this.updateFileOptionsModeUI();
+		this.syncFileOptionsFilename();
+		this.updateDateRelatedFileOptionsState();
+	}
+
+	private updateFileOptionsModeUI(): void {
+		this.singleModeBtn.toggleClass("is-active", this.mode === "single");
+		this.rangeModeBtn.toggleClass("is-active", this.mode === "range");
+		this.rangeRow?.toggleClass("is-hidden", this.mode === "single");
+	}
+
+	private getFileOptionsFilenameSuffix(): string | undefined {
+		const filename = this.filenameInput.value.trim().replace(/\.md$/i, "");
+		const range = parseRangeBasename(filename);
+		if (range) return range.suffix;
+		return parseSingleDateBasename(filename)?.suffix;
+	}
+
+	private syncFileOptionsFilename(): void {
+		if (!this.startDateInput) return;
+		const start = this.startDateInput.value;
+		const end = this.endDateInput?.value ?? "";
+		const suffix = this.getFileOptionsFilenameSuffix();
+		const suffixText = suffix ? `-${suffix}` : "";
+		this.filenameInput.value =
+			this.mode === "range"
+				? start && end
+					? `${start}--${end}${suffixText}`
+					: ""
+				: start
+					? `${start}${suffixText}`
+					: "";
+	}
+
+	private syncFileOptionsDatesFromFilename(): void {
+		const filename = this.filenameInput.value.trim().replace(/\.md$/i, "");
+		const range = parseRangeBasename(filename);
+		if (range && this.startDateInput && this.endDateInput) {
+			this.mode = "range";
+			this.startDateInput.value = range.start;
+			this.endDateInput.value = range.end;
+			this.updateFileOptionsModeUI();
+			this.updateCalendarPreview();
+			return;
+		}
+		const single = parseSingleDateBasename(filename);
+		if (single && this.startDateInput) {
+			this.mode = "single";
+			this.startDateInput.value = single.date;
+			if (this.endDateInput) this.endDateInput.value = single.date;
+			this.updateFileOptionsModeUI();
+			this.updateCalendarPreview();
+		}
 	}
 
 	private updateDateRelatedFileOptionsState(): void {
@@ -1488,11 +1613,10 @@ export class FileOptionsModal extends Modal {
 
 	private updateCalendarPreview(): void {
 		if (!this.calendarPreviewEl || !this.calendarOverlay) return;
-		const startValue =
-			this.singleDateInput?.value ?? this.startDateInput?.value ?? "";
+		const startValue = this.startDateInput?.value ?? "";
 		const startLabel = formatOverlayPreview(startValue, this.calendarOverlay);
 		const endLabel =
-			this.startDateInput && this.endDateInput
+			this.mode === "range" && this.endDateInput
 				? formatOverlayPreview(this.endDateInput.value, this.calendarOverlay)
 				: null;
 		const text = endLabel
@@ -1698,7 +1822,6 @@ export class FileOptionsModal extends Modal {
 	}
 
 	private getRecurrenceAnchorDate(file: TFile): string | null {
-		if (this.singleDateInput?.value) return this.singleDateInput.value;
 		if (this.startDateInput?.value) return this.startDateInput.value;
 		return (
 			getRecurrenceSourceDefinition(this.app, file)?.anchorDate ??
@@ -1743,14 +1866,46 @@ export class FileOptionsModal extends Modal {
 	}
 
 	private getFileOptionsValidationError(): string | null {
+		if (
+			this.folderSelect.value === FOLDER_OTHER &&
+			!this.folderCustomInput.value.trim()
+		) {
+			return t("modal.folderRequired");
+		}
+		const filename = this.filenameInput.value.trim().replace(/\.md$/i, "");
+		if (!filename) return t("modal.fileNameRequired");
+		if (/[\\/]/.test(filename)) return t("modal.fileNameNoPathSeparators");
+		if (this.mode === "single") {
+			const dateStr = getSingleDateFromFilename(filename);
+			if (!dateStr || !isValidDateStr(dateStr)) {
+				return t("modal.invalidDateFileName");
+			}
+		} else {
+			const range = parseRangeBasename(filename);
+			if (
+				!range ||
+				!isValidDateStr(range.start) ||
+				!isValidDateStr(range.end)
+			) {
+				return t("modal.invalidRangeFileName");
+			}
+			if (range.start > range.end) return t("modal.invalidDateRange");
+		}
+		const folder = this.getFileOptionsFolderValue();
+		const targetPath = folder ? `${folder}/${filename}.md` : `${filename}.md`;
+		const target = this.app.vault.getAbstractFileByPath(targetPath);
+		if (target && target.path !== this.file.path) {
+			return t("modal.fileMoveConflict");
+		}
+
 		const startTime = normalizeTimeValue(this.startTimeInput?.value ?? "");
 		const endTime = normalizeTimeValue(this.endTimeInput?.value ?? "");
 		if (endTime && !startTime) return t("modal.endTimeRequiresStart");
-		if (this.startDateInput && this.endDateInput && startTime && !endTime) {
+		if (this.mode === "range" && startTime && !endTime) {
 			return t("modal.rangeEndTimeRequired");
 		}
 		const isSameDay =
-			Boolean(this.singleDateInput) ||
+			this.mode === "single" ||
 			this.startDateInput?.value === this.endDateInput?.value;
 		if (isSameDay && startTime && endTime && endTime < startTime) {
 			return t("modal.endTimeBeforeStart");
@@ -1763,8 +1918,7 @@ export class FileOptionsModal extends Modal {
 		) {
 			return t("modal.repeatIntervalInvalid");
 		}
-		const recurrenceAnchor =
-			this.singleDateInput?.value ?? this.startDateInput?.value ?? "";
+		const recurrenceAnchor = this.startDateInput?.value ?? "";
 		if (
 			this.sourceRepeatCheckbox?.checked &&
 			this.sourceRecurrenceUntilDateInput?.value &&
@@ -1773,15 +1927,10 @@ export class FileOptionsModal extends Modal {
 		) {
 			return t("modal.repeatUntilBeforeStart");
 		}
-		if (this.singleDateInput) {
-			if (!isValidDateStr(this.singleDateInput.value)) {
-				return t("modal.invalidDate");
-			}
-			return null;
-		}
-		if (this.startDateInput && this.endDateInput) {
+		if (this.startDateInput) {
 			const start = this.startDateInput.value;
-			const end = this.endDateInput.value;
+			const end =
+				this.mode === "range" ? (this.endDateInput?.value ?? "") : start;
 			if (!isValidDateStr(start) || !isValidDateStr(end)) {
 				return t("modal.invalidDate");
 			}
@@ -1799,73 +1948,25 @@ export class FileOptionsModal extends Modal {
 		}
 		let fileToUpdate: TFile = this.file;
 
-		if (this.singleDateInput) {
-			const dateStr = this.singleDateInput.value;
-			const m = dateStr.match(/^(\d{4})-(\d{2})-(\d{2})$/);
-			if (!m) return;
-			const year = parseInt(m[1] ?? "", 10);
-			const month = parseInt(m[2] ?? "", 10);
-			const day = parseInt(m[3] ?? "", 10);
-			const result = await moveFileToDate(
-				this.app,
-				this.file,
-				year,
-				month,
-				day,
-			);
-			if (result === null) {
-				new Notice(t("modal.dateChangeConflict"));
-				return;
-			}
-			fileToUpdate = result;
-		} else if (this.startDateInput && this.endDateInput) {
-			const startStr = this.startDateInput.value;
-			const endStr = this.endDateInput.value;
-			const startM = startStr.match(/^(\d{4})-(\d{2})-(\d{2})$/);
-			const endM = endStr.match(/^(\d{4})-(\d{2})-(\d{2})$/);
-			if (!startM || !endM || startStr > endStr) return;
-			const startYear = parseInt(startM[1] ?? "", 10);
-			const startMonth = parseInt(startM[2] ?? "", 10);
-			const startDay = parseInt(startM[3] ?? "", 10);
-			const endYear = parseInt(endM[1] ?? "", 10);
-			const endMonth = parseInt(endM[2] ?? "", 10);
-			const endDay = parseInt(endM[3] ?? "", 10);
-			const result = await moveRangeFileToNewDates(
-				this.app,
-				this.file,
-				startYear,
-				startMonth,
-				startDay,
-				endYear,
-				endMonth,
-				endDay,
-			);
-			if (result === null) {
-				new Notice(t("modal.dateChangeConflict"));
-				return;
-			}
-			fileToUpdate = result;
-		}
-
-		const rawColor = this.colorInput.value.trim();
-		const themeHex = getThemeAccentHex(
-			this.contentEl.ownerDocument,
-		).toLowerCase();
-		const color =
-			rawColor &&
-			(toHex6(rawColor) ?? rawColor).toLowerCase() !== themeHex
-				? rawColor
-				: undefined;
-		const todo = this.todoCheckbox.checked;
-		const completed = this.completedCheckbox.checked;
 		try {
-			if (this.titleInput.value !== this.initialTitle) {
-				fileToUpdate = await updateFileTitle(
-					this.app,
-					fileToUpdate,
-					this.titleInput.value,
-				);
-			}
+			fileToUpdate = await movePlannerFileToLocation(
+				this.app,
+				this.file,
+				this.getFileOptionsFolderValue(),
+				this.filenameInput.value,
+			);
+			this.file = fileToUpdate;
+			const rawColor = this.colorInput.value.trim();
+			const themeHex = getThemeAccentHex(
+				this.contentEl.ownerDocument,
+			).toLowerCase();
+			const color =
+				rawColor &&
+				(toHex6(rawColor) ?? rawColor).toLowerCase() !== themeHex
+					? rawColor
+					: undefined;
+			const todo = this.todoCheckbox.checked;
+			const completed = this.completedCheckbox.checked;
 			await updateFileColor(this.app, fileToUpdate, color);
 			await updateFileTodoStatus(this.app, fileToUpdate, todo, completed);
 			await updateFileNotifyMinutes(
@@ -1904,7 +2005,14 @@ export class FileOptionsModal extends Modal {
 				(err as Error & { code?: string }).code ===
 				"PLANNER_RENAME_CONFLICT"
 			) {
-				new Notice(t("modal.titleRenameConflict"));
+				new Notice(t("modal.fileMoveConflict"));
+				return;
+			}
+			if (
+				(err as Error & { code?: string }).code ===
+				"PLANNER_INVALID_FILENAME"
+			) {
+				new Notice(t("modal.fileNameNoPathSeparators"));
 				return;
 			}
 			const msg =
