@@ -24,9 +24,6 @@ data.json
 # Exclude Cursor plans
 .cursor
 
-# Local planning and idea documents that should not ship with releases
-docs/ideas/
-
 # Local agent instructions
 AGENTS.md
 

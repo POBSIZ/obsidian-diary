@@ -11,7 +11,7 @@ Diary는 Obsidian vault 안의 Markdown 파일을 날짜 기반 플래너로 보
 | Item | Value |
 | --- | --- |
 | Plugin ID | `diary` |
-| Version | `1.10.1` |
+| Version | `1.15.0` |
 | Minimum Obsidian version | `1.7.2` |
 | Platforms | Desktop and mobile (`isDesktopOnly: false`) |
 | Default language | `en` |
@@ -19,6 +19,14 @@ Diary는 Obsidian vault 안의 Markdown 파일을 날짜 기반 플래너로 보
 
 ## Latest Version
 
+- `1.15.0`: keeps range titles visible when weekly, monthly, or yearly boundaries split a range, and lets the file options modal convert single-date notes to ranges while editing the folder and complete date-based filename directly.
+- `1.14.0`: improves mobile modal action sizing and layout, removes the extra action-container styling, and avoids covering actions when the software keyboard opens.
+- `1.13.3`: refines localized UI copy across every supported language.
+- `1.13.0`: improves compact daily layouts and keeps modal actions usable on small screens.
+- `1.12.1`: updates vulnerable parser dependencies.
+- `1.12.0`: adds in-app feedback, bug-report, and feature-request links.
+- `1.11.0`: adds one-day navigation for multi-day planners, planner clipboard actions in daily and monthly-list views, and more reliable cross-column range resizing.
+- `1.10.2`: prevents timeline clicks from firing after drag gestures.
 - `1.10.1`: replaces newer array helpers in daily range layout with ES2020-compatible typed logic, eliminating `no-unsafe-assignment` and `no-unsafe-call` audit warnings; keeps local agent guidance out of release sources.
 - `1.10.0`: renders multi-day ranges as continuous all-day bars or datetime intervals in daily and 3-day planners, with cross-date selection and boundary resizing.
 - `1.9.4`: removes optional artifact attestations that the Obsidian Community Scorecard rejected despite successful GitHub cryptographic verification.
@@ -77,6 +85,8 @@ todo, and plan notes. The temporary demo data was removed after capture.
 - Direct view selector: switch directly among yearly, monthly grid, monthly list, daily, and 3-day views. In narrow layouts it remains visible while secondary actions move into **More**.
 - Sidebar planner: a compact monthly planner opens in the right sidebar by default, can be revealed from the ribbon or command palette, and can cycle through yearly, monthly grid, and monthly list layouts in the same side leaf.
 - Date notes and range notes: recognized by `YYYY-MM-DD` and `YYYY-MM-DD--YYYY-MM-DD` filenames. By default Diary scans the entire vault, with an optional planner-folder-only scope. Title suffixes can keep visible spaces.
+- File options: switch an existing planner note between single-date and range modes, choose its folder, and edit the complete date-based filename. Diary moves the file and synchronizes `date_start` / `date_end` metadata.
+- Range title continuity: monthly range bars repeat their title at new week and month boundaries, while yearly cells repeat it at month and year boundaries.
 - Plan notes: yearly `{plannerFolder}/{year}.md` and monthly `{plannerFolder}/{year}-{month}.md` notes, with persisted preview state on desktop and separate mobile state.
 - Remembered yearly cell width: expanded month-cell widths are saved across reloads.
 - Chip metadata: `color`, `todo`, `completed`, `start_time`, `end_time`, `notify_minutes`, `title`, `date_start`, `date_end`, and recurrence frontmatter. For range files, `date_start` + `start_time` and `date_end` + `end_time` define one continuous datetime interval; times remain independent from reminders.
@@ -128,6 +138,12 @@ Lint:
 npm run lint
 ```
 
+Design document lint:
+
+```bash
+npm run design:lint
+```
+
 Test:
 
 ```bash
@@ -149,6 +165,7 @@ npm test
 - `src/planner-reminders.ts`: runtime reminders based on `notify_minutes`.
 - `src/i18n.ts`, `locales/*`: English, German, Spanish, French, Japanese, Simplified Chinese, Traditional Chinese, and Korean localization.
 - `docs/*/README.md`: full documentation for each supported UI language.
+- `design.md`: current planner design rules; runtime tokens and component primitives live in `styles.css`, `src/ui/components.ts`, and `src/views/planner-components.ts`.
 - `styles.css`: shared styling tokens and per-view UI styles.
 
 ## Release

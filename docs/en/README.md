@@ -9,7 +9,7 @@ Full documentation: [English](https://github.com/POBSIZ/obsidian-diary/blob/main
 | Item | Value |
 | --- | --- |
 | Plugin ID | `diary` |
-| Current version | `1.10.1` |
+| Current version | `1.15.0` |
 | Minimum Obsidian version | `1.7.2` |
 | Supported platforms | Desktop / mobile (`isDesktopOnly: false`) |
 | Default language | `en` |
@@ -17,6 +17,14 @@ Full documentation: [English](https://github.com/POBSIZ/obsidian-diary/blob/main
 
 ## Latest Version
 
+- `1.15.0`: Keeps range titles visible across week, month, and year boundaries. File options can now convert a single-date note to a range and edit its folder and complete date-based filename directly.
+- `1.14.0`: Improves mobile modal action sizing and layout, removes the extra action-container styling, and keeps actions clear of the software keyboard.
+- `1.13.3`: Refines localized UI copy in every supported language.
+- `1.13.0`: Improves compact daily layouts and modal actions on small screens.
+- `1.12.1`: Updates vulnerable parser dependencies.
+- `1.12.0`: Adds in-app feedback, bug-report, and feature-request links.
+- `1.11.0`: Adds one-day multi-day navigation, clipboard actions in daily and monthly-list views, and more reliable cross-column range resizing.
+- `1.10.2`: Prevents timeline clicks after drag gestures.
 - `1.10.1`: Replaces newer array helpers in daily range layout with ES2020-compatible typed logic, eliminating `no-unsafe-assignment` and `no-unsafe-call` audit warnings; local agent guidance no longer ships with release sources.
 - `1.10.0`: Renders multi-day ranges as continuous all-day bars or datetime intervals in daily and 3-day planners, with cross-date selection and boundary resizing.
 - `1.9.4`: Removes optional artifact attestations that the Obsidian Community Scorecard rejected despite successful GitHub cryptographic verification.
@@ -205,15 +213,18 @@ Use the plan note panel above each planner to create yearly or monthly planning 
 
 Select a chip or range bar in the planner to open the file options modal.
 
-- Check the file path
-- Change the display title
-- Change a single date or range dates
+- Switch between **Single date** and **Range**
+- Choose an existing folder or enter a custom folder path
+- Edit the complete filename, including its date or range and title suffix
+- Change the start and end dates; the filename stays synchronized
 - Change the chip color
 - Change todo / completed state
 - Change reminder time
 - Preview the file
 - Open the file
 - Delete the file
+
+Applying the change moves or renames the Markdown file. Converting to a range writes `date_start` and `date_end`; converting back to a single date removes those range fields. Diary blocks the change if the destination already contains a file with the same name.
 
 On desktop, drag a date chip or range bar to another date to move it. Range notes move by start date and keep the same duration. If the target path already exists, Diary does not move the file.
 
@@ -363,6 +374,12 @@ Lint:
 npm run lint
 ```
 
+Design document lint:
+
+```bash
+npm run design:lint
+```
+
 Test:
 
 ```bash
@@ -391,7 +408,7 @@ These links open public GitHub issues and require a GitHub account. Do not inclu
 - Diary has no hidden telemetry or analytics.
 - Holiday and calendar-overlay calculation use bundled, browser-provided, or locally saved profile data and do not send vault content to external services for planner rendering.
 - External calendar feeds are opt-in. Diary fetches only the feed URL you add, stores fetched event cache in plugin data, and does not create Markdown files unless you select **Create Markdown note**.
-- `obsidian-reminder-endpoint-spec.md` is a future reminder endpoint design note. The released plugin currently does not send reminder data over the network.
+- Local reminders are processed inside Obsidian and do not send reminder data over the network.
 
 ## Troubleshooting
 

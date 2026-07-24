@@ -9,7 +9,7 @@ Vollständige Dokumentation: [English](https://github.com/POBSIZ/obsidian-diary/
 | Eintrag | Wert |
 | --- | --- |
 | Plugin-ID | `diary` |
-| Aktuelle Version | `1.10.1` |
+| Aktuelle Version | `1.15.0` |
 | Minimale Obsidian-Version | `1.7.2` |
 | Plattformen | Desktop / Mobil (`isDesktopOnly: false`) |
 | Standardsprache | `en` |
@@ -17,6 +17,14 @@ Vollständige Dokumentation: [English](https://github.com/POBSIZ/obsidian-diary/
 
 ## Neueste Version
 
+- `1.15.0`: Hält Zeitraumtitel über Wochen-, Monats- und Jahresgrenzen hinweg sichtbar. In den Dateioptionen lassen sich Einzeltermine nun in Zeiträume umwandeln sowie Ordner und vollständiger datumsbasierter Dateiname direkt bearbeiten.
+- `1.14.0`: Verbessert Größe und Anordnung der Modalaktionen auf Mobilgeräten, entfernt die zusätzliche Gestaltung des Aktionscontainers und hält die Aktionen oberhalb der Bildschirmtastatur.
+- `1.13.3`: Überarbeitet die UI-Texte in allen unterstützten Sprachen.
+- `1.13.0`: Verbessert kompakte Tageslayouts und Modalaktionen auf kleinen Bildschirmen.
+- `1.12.1`: Aktualisiert Parser-Abhängigkeiten mit bekannten Sicherheitslücken.
+- `1.12.0`: Ergänzt Links für Feedback, Fehlerberichte und Funktionswünsche in den Einstellungen.
+- `1.11.0`: Fügt tageweise Navigation für mehrtägige Ansichten, Zwischenablageaktionen in Tages- und Monatslistenansicht sowie zuverlässigeres Anpassen von Zeiträumen über Spalten hinweg hinzu.
+- `1.10.2`: Verhindert Zeitleistenklicks nach Ziehgesten.
 - `1.10.1`: Ersetzt neuere Array-Helfer im Tagesbereichslayout durch ES2020-kompatible typisierte Logik, beseitigt `no-unsafe-assignment`- und `no-unsafe-call`-Warnungen und hält lokale Agentenanweisungen aus den Release-Quellen heraus.
 - `1.10.0`: Zeigt mehrtägige Bereiche im Tages- und 3-Tage-Planer als durchgehende Ganztagsbalken oder Datums-Zeit-Intervalle mit datumsübergreifender Auswahl und Grenzanpassung.
 - `1.9.4`: Entfernt optionale Artefakt-Attestierungen, die der Obsidian Community Scorecard trotz erfolgreicher kryptografischer GitHub-Prüfung abgelehnt hat.
@@ -205,15 +213,18 @@ Nutze das Plan-Notiz-Panel oberhalb jedes Planers, um Jahres- oder Monatspläne 
 
 Wähle einen Chip oder eine Zeitraumleiste, um das Dateioptionen-Modal zu öffnen.
 
-- Dateipfad prüfen
-- Anzeigetitel ändern
-- Datum oder Zeitraum ändern
+- Zwischen **Single date** und **Range** wechseln
+- Einen vorhandenen Ordner wählen oder einen eigenen Ordnerpfad eingeben
+- Den vollständigen Dateinamen einschließlich Datum bzw. Zeitraum und Titelzusatz bearbeiten
+- Start- und Enddatum ändern; der Dateiname wird dabei synchron gehalten
 - Chip-Farbe ändern
 - Todo- und Erledigt-Status ändern
 - Erinnerungszeit ändern
 - Datei vorschauen
 - Datei öffnen
 - Datei löschen
+
+Beim Anwenden wird die Markdown-Datei verschoben oder umbenannt. Die Umwandlung in einen Zeitraum schreibt `date_start` und `date_end`; beim Wechsel zurück zu einem Einzeltermin werden diese Felder entfernt. Existiert am Ziel bereits eine gleichnamige Datei, wird die Änderung blockiert.
 
 Auf dem Desktop kannst du einen Chip oder eine Zeitraumleiste auf ein anderes Datum ziehen. Zeitraum-Notizen werden über das Startdatum verschoben und behalten ihre Dauer. Wenn der Zielpfad existiert, verschiebt Diary die Datei nicht.
 
@@ -363,6 +374,12 @@ Lint:
 npm run lint
 ```
 
+Design-Dokument prüfen:
+
+```bash
+npm run design:lint
+```
+
 Test:
 
 ```bash
@@ -375,7 +392,7 @@ npm test
 - Release-Dateien: `main.js`, `manifest.json`, `styles.css`
 - Nutze `npm version patch|minor|major --no-git-tag-version`, damit `package.json`, `package-lock.json`, `manifest.json` und `versions.json` synchron bleiben.
 - Der GitHub-Release-Tag muss exakt der Version in `manifest.json` entsprechen und sollte kein führendes `v` haben.
-- Das Repository veröffentlicht Release-Dateien einzeln; der Release-Workflow erzeugt Build-Provenance-Attestierungen für `main.js`, `manifest.json` und `styles.css`.
+- Das Repository baut `main.js`, `manifest.json` und `styles.css` in GitHub Actions aus dem getaggten Quellstand und veröffentlicht sie als einzelne Release-Dateien.
 
 ## Feedback und Support
 
@@ -391,7 +408,7 @@ Diese Links öffnen öffentliche GitHub-Issues und erfordern ein GitHub-Konto. F
 - Diary enthält keine versteckte Telemetrie oder Analytics.
 - Feiertags- und Kalender-Overlay-Berechnung nutzt gebündelte Daten, Browserdaten oder lokal gespeicherte Profile und sendet keine Vault-Inhalte an externe Dienste.
 - Externe Kalenderfeeds sind optional. Diary ruft nur die Feed-URL ab, die du hinzufügst, speichert Ereigniscaches in Plugin-Daten und erstellt Markdown-Dateien nur nach Auswahl von **Create Markdown note**.
-- `obsidian-reminder-endpoint-spec.md` ist eine zukünftige Designnotiz. Das veröffentlichte Plugin sendet derzeit keine Erinnerungsdaten über das Netzwerk.
+- Lokale Erinnerungen werden innerhalb von Obsidian verarbeitet und senden keine Erinnerungsdaten über das Netzwerk.
 
 ## Fehlerbehebung
 

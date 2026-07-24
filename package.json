@@ -10,6 +10,7 @@
 		"version": "node version-bump.mjs && git add manifest.json versions.json styles.css",
 		"lint": "npm run lint:patterns && eslint . --max-warnings 0",
 		"lint:patterns": "node scripts/check-source-warnings.mjs",
+		"design:lint": "npx --yes -p @google/design.md@0.3.0 designmd lint design.md",
 		"test": "echo \"No tests configured\""
 	},
 	"keywords": [],

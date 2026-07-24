@@ -9,7 +9,7 @@ Documentation complète : [English](https://github.com/POBSIZ/obsidian-diary/blo
 | Élément | Valeur |
 | --- | --- |
 | ID du plugin | `diary` |
-| Version actuelle | `1.10.1` |
+| Version actuelle | `1.15.0` |
 | Version minimale d’Obsidian | `1.7.2` |
 | Plateformes | Bureau / mobile (`isDesktopOnly: false`) |
 | Langue par défaut | `en` |
@@ -17,6 +17,14 @@ Documentation complète : [English](https://github.com/POBSIZ/obsidian-diary/blo
 
 ## Dernière version
 
+- `1.15.0` : conserve les titres des périodes lors d’un changement de semaine, de mois ou d’année. Les options de fichier permettent désormais de convertir une note datée en période et de modifier directement son dossier et son nom complet fondé sur les dates.
+- `1.14.0` : améliore la taille et la disposition des actions de modale sur mobile, supprime le style superflu de leur conteneur et évite qu’elles soient masquées par le clavier.
+- `1.13.3` : révise les textes de l’interface dans toutes les langues prises en charge.
+- `1.13.0` : améliore la disposition quotidienne compacte et les actions de modale sur les petits écrans.
+- `1.12.1` : met à jour des dépendances d’analyse présentant des vulnérabilités connues.
+- `1.12.0` : ajoute dans l’application des liens pour les retours, les bugs et les demandes de fonctionnalité.
+- `1.11.0` : ajoute la navigation jour par jour dans les vues de plusieurs jours, les actions de presse-papiers dans les vues quotidienne et liste mensuelle, et un redimensionnement plus fiable entre colonnes.
+- `1.10.2` : empêche les clics sur la chronologie après un geste de déplacement.
 - `1.10.1` : remplace les helpers de tableau récents du placement quotidien des périodes par une logique typée compatible ES2020, supprime les alertes `no-unsafe-assignment` et `no-unsafe-call`, et exclut les consignes locales d’agent des sources de version.
 - `1.10.0` : affiche les périodes de plusieurs jours comme des barres continues sur toute la journée ou des intervalles date-heure dans les plannings quotidien et sur 3 jours, avec sélection et ajustement des limites entre les dates.
 - `1.9.4` : supprime les attestations d’artefacts facultatives rejetées par l’Obsidian Community Scorecard malgré une vérification cryptographique GitHub réussie.
@@ -205,15 +213,18 @@ Utilisez le panneau de plan au-dessus de chaque planificateur pour créer des pl
 
 Sélectionnez un chip ou une barre de période pour ouvrir la modale d’options du fichier.
 
-- Vérifier le chemin du fichier
-- Modifier le titre affiché
-- Modifier une date ou une période
+- Passer de **Single date** à **Range**, ou inversement
+- Choisir un dossier existant ou saisir un chemin personnalisé
+- Modifier le nom complet, avec la date ou la période et le suffixe utilisé comme titre
+- Modifier les dates de début et de fin ; le nom reste synchronisé
 - Modifier la couleur du chip
 - Modifier l’état tâche / terminé
 - Modifier l’heure de rappel
 - Prévisualiser le fichier
 - Ouvrir le fichier
 - Supprimer le fichier
+
+L’application des changements déplace ou renomme le fichier Markdown. La conversion en période écrit `date_start` et `date_end` ; le retour à une date unique supprime ces champs. Si un fichier du même nom existe déjà dans le dossier cible, Diary bloque l’opération.
 
 Sur ordinateur, faites glisser un chip ou une barre vers une autre date pour le déplacer. Les notes de période se déplacent par date de début et gardent la même durée. Si le chemin cible existe déjà, Diary ne déplace pas le fichier.
 
@@ -363,6 +374,12 @@ Lint :
 npm run lint
 ```
 
+Validation du document de design :
+
+```bash
+npm run design:lint
+```
+
 Test :
 
 ```bash
@@ -391,7 +408,7 @@ Ces liens ouvrent des issues GitHub publiques et nécessitent un compte GitHub. 
 - Diary n’a aucune télémétrie ni analyse cachée.
 - Les calculs de jours fériés et d’overlays utilisent des données intégrées, des données du navigateur ou des profils locaux, sans envoyer le contenu du coffre à des services externes.
 - Les flux externes sont optionnels. Diary récupère seulement l’URL ajoutée, stocke le cache d’événements dans les données du plugin et ne crée de Markdown qu’après sélection de **Create Markdown note**.
-- `obsidian-reminder-endpoint-spec.md` est une note de conception future. Le plugin publié n’envoie actuellement aucune donnée de rappel sur le réseau.
+- Les rappels locaux sont traités dans Obsidian et n’envoient aucune donnée sur le réseau.
 
 ## Dépannage
 

@@ -9,7 +9,7 @@ Documentación completa: [English](https://github.com/POBSIZ/obsidian-diary/blob
 | Elemento | Valor |
 | --- | --- |
 | ID del plugin | `diary` |
-| Versión actual | `1.10.1` |
+| Versión actual | `1.15.0` |
 | Versión mínima de Obsidian | `1.7.2` |
 | Plataformas | Escritorio / móvil (`isDesktopOnly: false`) |
 | Idioma predeterminado | `en` |
@@ -17,6 +17,14 @@ Documentación completa: [English](https://github.com/POBSIZ/obsidian-diary/blob
 
 ## Última versión
 
+- `1.15.0`: Mantiene visibles los títulos de rango al cambiar de semana, mes o año. Las opciones de archivo permiten convertir una nota de fecha única en un rango y editar directamente la carpeta y el nombre completo basado en fechas.
+- `1.14.0`: Mejora el tamaño y la distribución de las acciones de los modales en móvil, elimina el estilo adicional del contenedor y evita que el teclado tape los botones.
+- `1.13.3`: Revisa los textos de interfaz en todos los idiomas compatibles.
+- `1.13.0`: Mejora el diseño diario compacto y las acciones de los modales en pantallas pequeñas.
+- `1.12.1`: Actualiza dependencias de análisis con vulnerabilidades conocidas.
+- `1.12.0`: Añade enlaces en la aplicación para enviar comentarios, errores y solicitudes de funciones.
+- `1.11.0`: Añade navegación diaria en vistas de varios días, acciones de portapapeles en las vistas diaria y de lista mensual, y un ajuste de rangos más fiable entre columnas.
+- `1.10.2`: Evita clics en la línea de tiempo después de arrastrar.
 - `1.10.1`: Sustituye helpers de arrays recientes en el diseño diario de rangos por lógica tipada compatible con ES2020, elimina los avisos `no-unsafe-assignment` y `no-unsafe-call`, y excluye las instrucciones locales del agente de las fuentes de la versión.
 - `1.10.0`: Muestra rangos de varios días como barras continuas de todo el día o intervalos de fecha y hora en los planificadores diario y de 3 días, con selección y ajuste de límites entre fechas.
 - `1.9.4`: Elimina las attestations opcionales de artefactos que Obsidian Community Scorecard rechazó pese a superar la verificación criptográfica de GitHub.
@@ -205,15 +213,18 @@ Usa el panel de notas de plan encima de cada planificador para crear planes anua
 
 Selecciona un chip o una barra de rango para abrir el modal de opciones de archivo.
 
-- Revisar la ruta del archivo
-- Cambiar el título visible
-- Cambiar una fecha o rango
+- Cambiar entre **Single date** y **Range**
+- Elegir una carpeta existente o escribir una ruta personalizada
+- Editar el nombre completo, incluidas las fechas y el sufijo usado como título
+- Cambiar las fechas de inicio y fin; el nombre se mantiene sincronizado
 - Cambiar el color del chip
 - Cambiar estado de tarea o completado
 - Cambiar hora de recordatorio
 - Previsualizar el archivo
 - Abrir el archivo
 - Eliminar el archivo
+
+Al aplicar los cambios, Diary mueve o renombra el archivo Markdown. Al convertirlo en rango se escriben `date_start` y `date_end`; al volver a una sola fecha se eliminan esos campos. Si ya existe un archivo con el mismo nombre en el destino, la operación se bloquea.
 
 En escritorio, arrastra un chip o una barra a otra fecha para moverla. Las notas de rango se mueven por fecha inicial y conservan su duración. Si la ruta de destino ya existe, Diary no mueve el archivo.
 
@@ -363,6 +374,12 @@ Lint:
 npm run lint
 ```
 
+Validación del documento de diseño:
+
+```bash
+npm run design:lint
+```
+
 Test:
 
 ```bash
@@ -375,7 +392,7 @@ npm test
 - Archivos de release: `main.js`, `manifest.json`, `styles.css`
 - Usa `npm version patch|minor|major --no-git-tag-version` para mantener sincronizados `package.json`, `package-lock.json`, `manifest.json` y `versions.json`.
 - La etiqueta de GitHub Release debe coincidir exactamente con la versión de `manifest.json` y no debe llevar `v` inicial.
-- El repositorio publica los assets como archivos individuales y el workflow genera atestación de procedencia para `main.js`, `manifest.json` y `styles.css`.
+- El repositorio compila `main.js`, `manifest.json` y `styles.css` desde el código etiquetado en GitHub Actions y los publica como archivos individuales de la versión.
 
 ## Comentarios y soporte
 
@@ -391,7 +408,7 @@ Estos enlaces abren issues públicos de GitHub y requieren una cuenta de GitHub.
 - Diary no tiene telemetría ni analíticas ocultas.
 - Los cálculos de festivos y calendarios usan datos empaquetados, datos del navegador o perfiles locales, y no envían contenido del vault a servicios externos.
 - Los feeds externos son opcionales. Diary solo solicita la URL que añades, guarda caché de eventos en datos del plugin y no crea Markdown salvo que selecciones **Create Markdown note**.
-- `obsidian-reminder-endpoint-spec.md` es una nota de diseño futura. El plugin publicado no envía actualmente datos de recordatorios por red.
+- Los recordatorios locales se procesan dentro de Obsidian y no envían datos por la red.
 
 ## Solución de problemas
 
