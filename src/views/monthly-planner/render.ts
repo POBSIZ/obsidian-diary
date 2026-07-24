@@ -294,6 +294,7 @@ export function createMonthlyCell(
 			),
 		);
 		rangeFiles.forEach(({ file, runPos, isFirst }) => {
+			const shouldShowLabel = isFirst || day === 1 || isSunday;
 			const barClasses = [
 				PLANNER_UI_CLASSES.range,
 				"monthly-planner-range-bar",
@@ -323,7 +324,7 @@ export function createMonthlyCell(
 			if (ctx.clipboardSelection.has(makeFileSelectionKey(file.path))) {
 				barEl.addClass("monthly-planner-cell-clipboard-selected");
 			}
-			if (isFirst) {
+			if (shouldShowLabel) {
 				const display = getPlannerFileDisplay(ctx.app, file);
 				const displayTitle = display.text;
 				barEl.ariaLabel = t("a11y.openPlannerNote", {
@@ -346,6 +347,7 @@ export function createMonthlyCell(
 		});
 		externalDateEvents.rangeEvents.forEach(
 			({ event, runPos, isFirst }, index) => {
+				const shouldShowLabel = isFirst || day === 1 || isSunday;
 				const isVirtualRecurrence = isRecurrenceVirtualEvent(event);
 				const barClasses = [
 					PLANNER_UI_CLASSES.range,
@@ -375,7 +377,7 @@ export function createMonthlyCell(
 				if (event.color) {
 					barEl.style.setProperty("--range-color", event.color);
 				}
-				if (isFirst) {
+				if (shouldShowLabel) {
 					barEl.createSpan({
 						cls: "monthly-planner-range-label",
 						text: event.title,

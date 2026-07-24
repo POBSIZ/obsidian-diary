@@ -386,12 +386,20 @@ export function createPlannerCell(
 		cell.dataset.hasHoliday = "true";
 	}
 
-	const startDateRangeFiles = rangeFiles.filter((r) => r.isFirst).map((r) => r.file);
-	const allFiles = [...singleFiles, ...startDateRangeFiles];
+	const rangeLabelFiles = rangeFiles
+		.filter(({ isFirst }) => isFirst || day === 1)
+		.map(({ file }) => file);
+	const externalRangeLabelEvents = externalDateEvents.rangeEvents
+		.filter(({ isFirst }) => isFirst || day === 1)
+		.map(({ event }) => event);
+	const allFiles = [...singleFiles, ...rangeLabelFiles];
 	cell.ariaLabel = t("a11y.yearlyDateCell", {
 		date: dateKey,
 		calendars: formatCalendarOverlayAria(alternateCalendarLabel),
-		notes: allFiles.length + externalDateEvents.singleEvents.length,
+		notes:
+			allFiles.length +
+			externalDateEvents.singleEvents.length +
+			externalRangeLabelEvents.length,
 		ranges: rangeFiles.length + externalDateEvents.rangeEvents.length,
 		holidays: holidayNames.length,
 	});
@@ -405,7 +413,11 @@ export function createPlannerCell(
 		});
 	}
 
-	if (allFiles.length > 0 || externalDateEvents.singleEvents.length > 0) {
+	if (
+		allFiles.length > 0 ||
+		externalDateEvents.singleEvents.length > 0 ||
+		externalRangeLabelEvents.length > 0
+	) {
 		const listEl = cell.createDiv({
 			cls: `${PLANNER_UI_CLASSES.entryList} yearly-planner-cell-files`,
 		});
@@ -427,6 +439,14 @@ export function createPlannerCell(
 			});
 		}
 		for (const event of externalDateEvents.singleEvents) {
+			createExternalEventChip(listEl, {
+				event,
+				classes:
+					"yearly-planner-cell-file yearly-planner-external-event-chip",
+				showTitle: true,
+			});
+		}
+		for (const event of externalRangeLabelEvents) {
 			createExternalEventChip(listEl, {
 				event,
 				classes:
