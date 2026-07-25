@@ -9,7 +9,7 @@ Full documentation: [English](https://github.com/POBSIZ/obsidian-diary/blob/main
 | Item | Value |
 | --- | --- |
 | Plugin ID | `diary` |
-| Current version | `1.16.0` |
+| Current version | `1.16.1` |
 | Minimum Obsidian version | `1.7.2` |
 | Supported platforms | Desktop / mobile (`isDesktopOnly: false`) |
 | Default language | `en` |
@@ -17,7 +17,7 @@ Full documentation: [English](https://github.com/POBSIZ/obsidian-diary/blob/main
 
 ## What's new
 
-- `1.16.0`: Optimizes planner buttons, settings actions, and all eight modal surfaces for mobile with 44/48 px touch targets, responsive action layouts, safe-area-aware sizing, and keyboard-safe scrolling.
+- `1.16.1`: Fixes modal action layouts at iPhone widths and closes open planner popovers before a modal appears.
 
 For earlier changes, see the [Releases page](https://github.com/POBSIZ/obsidian-diary/releases).
 

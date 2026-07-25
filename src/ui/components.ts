@@ -55,6 +55,11 @@ export function configureUiModalSurface(
 	contentEl: HTMLElement,
 	shellClasses: string[] = [],
 ): void {
+	contentEl.ownerDocument
+		.querySelectorAll<HTMLDetailsElement>(
+			"details.planner-view-switcher[open], details.planner-more-menu[open]",
+		)
+		.forEach((menu) => menu.removeAttribute("open"));
 	contentEl.addClass("yearly-planner-modal-content", MODAL_CONTENT_CLASS);
 	const shell =
 		contentEl.closest<HTMLElement>(".modal") ?? contentEl.parentElement;

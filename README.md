@@ -11,7 +11,7 @@ Diary는 Obsidian 볼트의 일반 Markdown 노트를 연간·월간·일간·3�
 | Item | Value |
 | --- | --- |
 | Plugin ID | `diary` |
-| Version | `1.16.0` |
+| Version | `1.16.1` |
 | Minimum Obsidian version | `1.7.2` |
 | Platforms | Desktop and mobile (`isDesktopOnly: false`) |
 | Default language | `en` |
@@ -19,7 +19,7 @@ Diary는 Obsidian 볼트의 일반 Markdown 노트를 연간·월간·일간·3�
 
 ## What's new
 
-- `1.16.0`: optimizes planner buttons, settings actions, and all eight modal surfaces for mobile with 44/48 px touch targets, responsive action layouts, safe-area-aware sizing, and keyboard-safe scrolling.
+- `1.16.1`: fixes modal action layouts at iPhone widths and closes open planner popovers before a modal appears.
 
 Older changes are listed on the [Releases page](https://github.com/POBSIZ/obsidian-diary/releases).
 

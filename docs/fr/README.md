@@ -9,15 +9,15 @@ Documentation complète : [English](https://github.com/POBSIZ/obsidian-diary/blo
 | Élément | Valeur |
 | --- | --- |
 | ID du plugin | `diary` |
-| Version actuelle | `1.16.0` |
+| Version actuelle | `1.16.1` |
 | Version minimale d’Obsidian | `1.7.2` |
 | Plateformes | Bureau / mobile (`isDesktopOnly: false`) |
 | Langue par défaut | `en` |
 | Dossier de planning par défaut | `Planner` |
 
-## Nouveautés de la version 1.16.0
+## Nouveautés de la version 1.16.1
 
-- `1.16.0` : optimise les boutons du planning, les actions des réglages et les huit fenêtres modales sur mobile avec des cibles tactiles de 44/48 px, des actions adaptatives, un dimensionnement tenant compte des zones sûres et un défilement protégé du clavier.
+- `1.16.1` : corrige la disposition des actions des fenêtres modales aux largeurs d’iPhone et ferme les menus contextuels ouverts du planning avant l’affichage d’une fenêtre modale.
 
 Les changements antérieurs sont disponibles sur la page [Releases](https://github.com/POBSIZ/obsidian-diary/releases).
 

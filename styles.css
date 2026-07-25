@@ -1,7 +1,7 @@
 /*
 This CSS file is included with your plugin, and
 available in the app when your plugin is enabled.
-Diary release version: 1.16.0
+Diary release version: 1.16.1
 */
 
 :where(
@@ -5533,17 +5533,6 @@ body.-is-mobile .modal .diary-ui-modal-action-bar-three-buttons {
 	}
 }
 
-@media (max-width: 380px) {
-	.modal .diary-ui-modal-action-bar {
-		grid-template-columns: minmax(0, 1fr);
-	}
-
-	.modal .diary-ui-modal-action-bar > .diary-ui-button {
-		grid-row: auto;
-		grid-column: 1;
-	}
-}
-
 :where(.diary-ui-badge) {
 	display: inline-flex;
 	align-items: center;
@@ -5942,6 +5931,13 @@ body.-is-mobile .diary-feedback-setting .setting-item-control button {
 		overflow-wrap: anywhere;
 	}
 
+	.modal
+		.diary-ui-modal-action-bar
+		> .diary-ui-button {
+		grid-column: auto;
+		grid-row: auto;
+	}
+
 	.modal .diary-ui-modal-action-bar-three-buttons {
 		grid-template-columns: repeat(2, minmax(0, 1fr));
 	}
@@ -5978,6 +5974,13 @@ body.-is-mobile .diary-feedback-setting .setting-item-control button {
 		.diary-ui-modal-action-bar-three-buttons
 		> .mod-cta {
 		grid-column: 1;
+	}
+
+	.modal
+		.diary-ui-modal-action-bar
+		> .diary-ui-button {
+		grid-column: 1 / -1;
+		grid-row: auto;
 	}
 }
 

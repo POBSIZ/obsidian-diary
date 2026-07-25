@@ -9,15 +9,15 @@ Vollständige Dokumentation: [English](https://github.com/POBSIZ/obsidian-diary/
 | Eintrag | Wert |
 | --- | --- |
 | Plugin-ID | `diary` |
-| Aktuelle Version | `1.16.0` |
+| Aktuelle Version | `1.16.1` |
 | Minimale Obsidian-Version | `1.7.2` |
 | Plattformen | Desktop / Mobil (`isDesktopOnly: false`) |
 | Standardsprache | `en` |
 | Standardordner für Planer | `Planner` |
 
-## Neu in 1.16.0
+## Neu in 1.16.1
 
-- `1.16.0`: Optimiert Planer-Schaltflächen, Einstellungsaktionen und alle acht Modalfenster für Mobilgeräte mit 44/48-px-Touch-Zielen, responsiven Aktionslayouts, Safe-Area-Größen und tastatursicherem Scrollen.
+- `1.16.1`: Korrigiert die Anordnung der Modalaktionen bei iPhone-Breiten und schließt offene Planer-Popover, bevor ein Modalfenster erscheint.
 
 Ältere Änderungen stehen auf der [Releases-Seite](https://github.com/POBSIZ/obsidian-diary/releases).
 
