@@ -51,6 +51,5 @@
 			"picomatch@2": "2.3.2",
 			"yaml": "2.9.0"
 		}
-	},
-	"packageManager": "pnpm@10.12.3+sha256.e97173946a1f175e1d6c224527967a5f468b4821572faf6ac527fdecefac64cd"
+	}
 }
