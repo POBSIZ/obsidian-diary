@@ -9,15 +9,15 @@ Vollständige Dokumentation: [English](https://github.com/POBSIZ/obsidian-diary/
 | Eintrag | Wert |
 | --- | --- |
 | Plugin-ID | `diary` |
-| Aktuelle Version | `1.16.1` |
+| Aktuelle Version | `1.16.2` |
 | Minimale Obsidian-Version | `1.7.2` |
 | Plattformen | Desktop / Mobil (`isDesktopOnly: false`) |
 | Standardsprache | `en` |
 | Standardordner für Planer | `Planner` |
 
-## Neu in 1.16.1
+## Neu in 1.16.2
 
-- `1.16.1`: Korrigiert die Anordnung der Modalaktionen bei iPhone-Breiten und schließt offene Planer-Popover, bevor ein Modalfenster erscheint.
+- `1.16.2`: Sorgt für einen einheitlichen unteren Abstand in mobilen Modalaktionsbereichen und berücksichtigt dabei die sicheren Gerätebereiche.
 
 Ältere Änderungen stehen auf der [Releases-Seite](https://github.com/POBSIZ/obsidian-diary/releases).
 

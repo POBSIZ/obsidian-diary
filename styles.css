@@ -1,7 +1,7 @@
 /*
 This CSS file is included with your plugin, and
 available in the app when your plugin is enabled.
-Diary release version: 1.16.1
+Diary release version: 1.16.2
 */
 
 :where(
@@ -38,6 +38,7 @@ Diary release version: 1.16.1
 	--planner-touch-target-min: 2.75rem;
 	--planner-touch-target-comfortable: 3rem;
 	--planner-mobile-control-gap: 0.5rem;
+	--planner-modal-action-bottom-padding: 0.75rem;
 	--planner-container-padding: 1rem;
 	--planner-container-padding-mobile: 0.5rem;
 	--planner-header-margin: 1rem;
@@ -6120,7 +6121,10 @@ body:is(.is-mobile, .-is-mobile)
 	.diary-ui-modal-action-bar {
 	margin-top: 0.65rem;
 	padding-top: 0.65rem;
-	padding-bottom: max(0.1rem, env(safe-area-inset-bottom, 0px));
+	padding-bottom: max(
+		var(--planner-modal-action-bottom-padding),
+		env(safe-area-inset-bottom, 0px)
+	);
 	border-top: 1px solid var(--background-modifier-border);
 }
 
@@ -6202,6 +6206,7 @@ body:is(.is-mobile, .-is-mobile)
 	.modal .diary-ui-modal-action-bar {
 		margin-top: 0.65rem;
 		padding-top: 0.65rem;
+		padding-bottom: var(--planner-modal-action-bottom-padding);
 		border-top: 1px solid var(--background-modifier-border);
 	}
 

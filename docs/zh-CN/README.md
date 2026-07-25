@@ -9,15 +9,15 @@ Diary 是一款 Obsidian 社区插件，可把仓库中的普通 Markdown 笔记
 | 项目 | 值 |
 | --- | --- |
 | 插件 ID | `diary` |
-| 当前版本 | `1.16.1` |
+| 当前版本 | `1.16.2` |
 | 最低 Obsidian 版本 | `1.7.2` |
 | 支持平台 | 桌面 / 移动端 (`isDesktopOnly: false`) |
 | 默认语言 | `en` |
 | 默认计划文件夹 | `Planner` |
 
-## 1.16.1 更新
+## 1.16.2 更新
 
-- `1.16.1`：修复 iPhone 宽度下模态框操作按钮的布局，并在显示模态框前关闭已打开的计划器弹出菜单。
+- `1.16.2`：为移动端模态框操作区域添加一致的底部间距，并兼顾设备安全区域。
 
 更早的变更请参阅 [Releases](https://github.com/POBSIZ/obsidian-diary/releases)。
 
