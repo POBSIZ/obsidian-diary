@@ -35,6 +35,7 @@ import {
 	createUiDisclosure,
 	createUiError,
 	createUiModalActionBar,
+	configureUiModalSurface,
 	focusUiInputOnDesktop,
 } from "./ui/components";
 
@@ -934,10 +935,9 @@ class ExternalCalendarFeedModal extends Modal {
 	}
 
 	onOpen(): void {
-		this.contentEl.parentElement?.addClass(
+		configureUiModalSurface(this.contentEl, [
 			"diary-external-calendar-modal-shell",
-		);
-		this.contentEl.addClass("yearly-planner-modal-content");
+		]);
 		this.contentEl.createEl("h2", {
 			text: this.calendar
 				? t("settings.externalCalendarEdit")

@@ -9,7 +9,7 @@ Full documentation: [English](https://github.com/POBSIZ/obsidian-diary/blob/main
 | Item | Value |
 | --- | --- |
 | Plugin ID | `diary` |
-| Current version | `1.15.1` |
+| Current version | `1.16.0` |
 | Minimum Obsidian version | `1.7.2` |
 | Supported platforms | Desktop / mobile (`isDesktopOnly: false`) |
 | Default language | `en` |
@@ -17,7 +17,7 @@ Full documentation: [English](https://github.com/POBSIZ/obsidian-diary/blob/main
 
 ## What's new
 
-- `1.15.1`: Rewrites and streamlines the documentation in every supported language, with clearer terminology and shorter release notes.
+- `1.16.0`: Optimizes planner buttons, settings actions, and all eight modal surfaces for mobile with 44/48 px touch targets, responsive action layouts, safe-area-aware sizing, and keyboard-safe scrolling.
 
 For earlier changes, see the [Releases page](https://github.com/POBSIZ/obsidian-diary/releases).
 
@@ -65,7 +65,7 @@ The screenshots use temporary demo notes for all-day, timed, range, todo, and pl
 - **Local reminders**: Notes with `notify_minutes` show an Obsidian Notice on the event date while Obsidian is open.
 - **Planner clipboard**: On desktop, copy, paste, delete, and undo pasted planner notes from selected dates or chips.
 - **Keyboard and accessibility support**: Date cells, chips, range bars, holiday badges, planner labels, and monthly list rows expose keyboard activation and accessible labels.
-- **Mobile optimization**: Monthly grid supports pinch zoom, reset zoom, and a day summary sheet.
+- **Mobile optimization**: Standalone controls use 44/48 px touch targets; modal actions reflow responsively; modal sizing respects safe areas and the software keyboard; the monthly grid also supports pinch zoom, reset zoom, and a day summary sheet.
 
 ## Install
 

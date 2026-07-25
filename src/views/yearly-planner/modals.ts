@@ -57,6 +57,7 @@ import {
 	createUiError,
 	createUiFieldRow,
 	createUiModalActionBar,
+	configureUiModalSurface,
 	focusUiInputOnDesktop,
 } from "../../ui/components";
 
@@ -225,7 +226,7 @@ export class HolidayInfoModal extends Modal {
 	}
 
 	onOpen(): void {
-		this.contentEl.addClass("yearly-planner-modal-content");
+		configureUiModalSurface(this.contentEl);
 		this.contentEl.createEl("h2", { text: t("modal.holidayTitle") });
 		this.contentEl.createEl("p", {
 			cls: "yearly-planner-holiday-modal-date",
@@ -401,7 +402,7 @@ export class CreateFileModal extends Modal {
 	}
 
 	onOpen(): void {
-		this.contentEl.addClass("yearly-planner-modal-content");
+		configureUiModalSurface(this.contentEl);
 		this.contentEl.addClass("yearly-planner-modal-create-file");
 		const { bounds, defaultFolder } = this.options;
 		const today = new Date();
@@ -611,7 +612,9 @@ export class CreateFileModal extends Modal {
 			type: "checkbox",
 			cls: "yearly-planner-todo-checkbox",
 		});
-		const todoLabel = todoRow.createEl("label");
+		const todoLabel = todoRow.createEl("label", {
+			cls: "yearly-planner-checkbox-label",
+		});
 		todoLabel.appendChild(this.todoCheckbox);
 		todoLabel.appendText(` ${t("modal.todoFile")}`);
 
@@ -626,7 +629,9 @@ export class CreateFileModal extends Modal {
 		this.allDayCheckbox.checked = !(
 			this.options.defaultStartTime || this.options.defaultEndTime
 		);
-		const allDayLabel = allDayRow.createEl("label");
+		const allDayLabel = allDayRow.createEl("label", {
+			cls: "yearly-planner-checkbox-label",
+		});
 		allDayLabel.appendChild(this.allDayCheckbox);
 		allDayLabel.appendText(` ${t("modal.allDay")}`);
 		allDayRow.createDiv({
@@ -824,7 +829,9 @@ export class CreateFileModal extends Modal {
 			type: "checkbox",
 			cls: "yearly-planner-repeat-checkbox",
 		});
-		const repeatLabel = repeatRow.createEl("label");
+		const repeatLabel = repeatRow.createEl("label", {
+			cls: "yearly-planner-checkbox-label",
+		});
 		repeatLabel.appendChild(this.repeatCheckbox);
 		repeatLabel.appendText(` ${t("modal.repeatEvent")}`);
 		this.repeatCheckbox.onchange = () => {
@@ -1129,7 +1136,7 @@ export class DeleteConfirmModal extends Modal {
 	}
 
 	onOpen(): void {
-		this.contentEl.addClass("yearly-planner-modal-content");
+		configureUiModalSurface(this.contentEl);
 		this.contentEl.createEl("h2", { text: this.titleText });
 		this.contentEl.createEl("p", {
 			cls: "yearly-planner-delete-desc",
@@ -1198,7 +1205,7 @@ export class FileOptionsModal extends Modal {
 	}
 
 	onOpen(): void {
-		this.contentEl.addClass("yearly-planner-modal-content");
+		configureUiModalSurface(this.contentEl);
 		this.contentEl.createEl("h2", { text: t("modal.fileOptions") });
 
 		const form = this.contentEl.createDiv({
@@ -1381,7 +1388,9 @@ export class FileOptionsModal extends Modal {
 			cls: "yearly-planner-todo-checkbox",
 		});
 		this.todoCheckbox.checked = isTodoFile(this.app, this.file);
-		const todoLabel = todoRow.createEl("label");
+		const todoLabel = todoRow.createEl("label", {
+			cls: "yearly-planner-checkbox-label",
+		});
 		todoLabel.appendChild(this.todoCheckbox);
 		todoLabel.appendText(` ${t("modal.todoFile")}`);
 		this.todoCheckbox.onchange = () => this.updateCompletedRowVisibility();
@@ -1395,7 +1404,9 @@ export class FileOptionsModal extends Modal {
 			cls: "yearly-planner-completed-checkbox",
 		});
 		this.completedCheckbox.checked = isTodoCompleted(this.app, this.file);
-		const completedLabel = this.completedRow.createEl("label");
+		const completedLabel = this.completedRow.createEl("label", {
+			cls: "yearly-planner-checkbox-label",
+		});
 		completedLabel.appendChild(this.completedCheckbox);
 		completedLabel.appendText(` ${t("modal.completed")}`);
 		this.updateCompletedRowVisibility();
@@ -1412,7 +1423,9 @@ export class FileOptionsModal extends Modal {
 		this.allDayCheckbox.checked = !(
 			existingTimeRange.startTime || existingTimeRange.endTime
 		);
-		const allDayLabel = allDayRow.createEl("label");
+		const allDayLabel = allDayRow.createEl("label", {
+			cls: "yearly-planner-checkbox-label",
+		});
 		allDayLabel.appendChild(this.allDayCheckbox);
 		allDayLabel.appendText(` ${t("modal.allDay")}`);
 		allDayRow.createDiv({
@@ -1682,7 +1695,9 @@ export class FileOptionsModal extends Modal {
 			cls: "yearly-planner-repeat-checkbox",
 		});
 		this.sourceRepeatCheckbox.checked = Boolean(source);
-		const label = section.createEl("label");
+		const label = section.createEl("label", {
+			cls: "yearly-planner-checkbox-label",
+		});
 		label.appendChild(this.sourceRepeatCheckbox);
 		label.appendText(` ${t("modal.repeatEvent")}`);
 

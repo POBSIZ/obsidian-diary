@@ -9,15 +9,15 @@ Vollständige Dokumentation: [English](https://github.com/POBSIZ/obsidian-diary/
 | Eintrag | Wert |
 | --- | --- |
 | Plugin-ID | `diary` |
-| Aktuelle Version | `1.15.1` |
+| Aktuelle Version | `1.16.0` |
 | Minimale Obsidian-Version | `1.7.2` |
 | Plattformen | Desktop / Mobil (`isDesktopOnly: false`) |
 | Standardsprache | `en` |
 | Standardordner für Planer | `Planner` |
 
-## Neu in 1.15.1
+## Neu in 1.16.0
 
-- `1.15.1`: Überarbeitet und strafft die Dokumentation in allen unterstützten Sprachen, mit klareren Begriffen und kürzeren Versionshinweisen.
+- `1.16.0`: Optimiert Planer-Schaltflächen, Einstellungsaktionen und alle acht Modalfenster für Mobilgeräte mit 44/48-px-Touch-Zielen, responsiven Aktionslayouts, Safe-Area-Größen und tastatursicherem Scrollen.
 
 Ältere Änderungen stehen auf der [Releases-Seite](https://github.com/POBSIZ/obsidian-diary/releases).
 
@@ -65,7 +65,7 @@ Für die Screenshots wurde ein temporärer Demo-Ordner mit ganztägigen, zeitgeb
 - **Lokale Erinnerungen**: Notizen mit `notify_minutes` zeigen eine Obsidian Notice am Ereignistag, solange Obsidian geöffnet ist.
 - **Planer-Zwischenablage**: Auf dem Desktop kannst du ausgewählte Termine oder Chips kopieren, einfügen, löschen und Einfügungen rückgängig machen.
 - **Tastatur und Barrierefreiheit**: Datumszellen, Chips, Zeitraumleisten, Feiertags-Badges, Planerbeschriftungen und Monatslistenzeilen sind per Tastatur aktivierbar und haben zugängliche Labels.
-- **Mobile Optimierung**: Das Monatsraster unterstützt Pinch-Zoom, Zoom-Reset und eine Tagesübersicht.
+- **Mobile Optimierung**: Eigenständige Bedienelemente verwenden 44/48-px-Touch-Ziele; Modalaktionen ordnen sich responsiv an; Modalfenster berücksichtigen Safe Areas und die Bildschirmtastatur. Das Monatsraster unterstützt außerdem Pinch-Zoom, Zoom-Reset und eine Tagesübersicht.
 
 ## Installation
 

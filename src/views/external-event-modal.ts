@@ -5,6 +5,7 @@ import {
 	createUiBadge,
 	createUiButton,
 	createUiModalActionBar,
+	configureUiModalSurface,
 } from "../ui/components";
 import {
 	getExternalEventDateRangeLabel,
@@ -35,7 +36,7 @@ export class ExternalEventModal extends Modal {
 
 	onOpen(): void {
 		const { event, calendarName, locale } = this.options;
-		this.contentEl.addClass("yearly-planner-modal-content");
+		configureUiModalSurface(this.contentEl);
 		this.contentEl.addClass("planner-external-event-modal");
 		const header = this.contentEl.createDiv({
 			cls: "planner-external-event-modal-header",

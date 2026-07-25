@@ -9,15 +9,15 @@ Documentación completa: [English](https://github.com/POBSIZ/obsidian-diary/blob
 | Elemento | Valor |
 | --- | --- |
 | ID del plugin | `diary` |
-| Versión actual | `1.15.1` |
+| Versión actual | `1.16.0` |
 | Versión mínima de Obsidian | `1.7.2` |
 | Plataformas | Escritorio / móvil (`isDesktopOnly: false`) |
 | Idioma predeterminado | `en` |
 | Carpeta predeterminada del planificador | `Planner` |
 
-## Novedades de 1.15.1
+## Novedades de 1.16.0
 
-- `1.15.1`: Revisa y simplifica la documentación en todos los idiomas compatibles, con términos más claros y notas de versión más breves.
+- `1.16.0`: Optimiza los botones del planificador, las acciones de ajustes y los ocho modales para móvil con objetivos táctiles de 44/48 px, acciones adaptables, tamaño compatible con áreas seguras y desplazamiento que evita el teclado.
 
 Los cambios anteriores están disponibles en [Releases](https://github.com/POBSIZ/obsidian-diary/releases).
 
@@ -65,7 +65,7 @@ Las capturas usan una carpeta temporal con notas de todo el día, con hora, de r
 - **Recordatorios locales**: Las notas con `notify_minutes` muestran un aviso de Obsidian en la fecha del evento mientras Obsidian está abierto.
 - **Portapapeles del planificador**: En escritorio puedes copiar, pegar, eliminar y deshacer pegados de fechas o chips seleccionados.
 - **Teclado y accesibilidad**: Celdas de fecha, chips, barras de rango, insignias de festivos, etiquetas y filas de lista mensual tienen activación por teclado y etiquetas accesibles.
-- **Optimización móvil**: La cuadrícula mensual admite pellizcar para hacer zoom, restablecer zoom y abrir una hoja de resumen del día.
+- **Optimización móvil**: Los controles independientes usan objetivos táctiles de 44/48 px; las acciones de los modales se reorganizan según el ancho; el tamaño respeta las áreas seguras y el teclado virtual. La cuadrícula mensual también admite zoom con pellizco, restablecer zoom y el resumen del día.
 
 ## Instalación
 

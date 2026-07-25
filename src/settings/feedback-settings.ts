@@ -10,6 +10,7 @@ const FEEDBACK_URLS = {
 } as const;
 
 export function configureFeedbackSetting(setting: Setting): void {
+	setting.settingEl.addClass("diary-feedback-setting");
 	setting
 		.setName(t("settings.feedback"))
 		.setDesc(t("settings.feedbackDesc"))

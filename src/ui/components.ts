@@ -26,6 +26,8 @@ const BUTTON_VARIANT_CLASS: Record<UiButtonVariant, string> = {
 const MODAL_ACTION_BAR_CLASS = "diary-ui-modal-action-bar";
 const MODAL_ACTION_BAR_THREE_BUTTONS_CLASS =
 	"diary-ui-modal-action-bar-three-buttons";
+const MODAL_SHELL_CLASS = "diary-ui-modal-shell";
+const MODAL_CONTENT_CLASS = "diary-ui-modal-content";
 
 function isMobileUi(element: HTMLElement): boolean {
 	const body = element.ownerDocument.body;
@@ -42,6 +44,23 @@ function updateModalActionBarState(parent: HTMLElement): void {
 		MODAL_ACTION_BAR_THREE_BUTTONS_CLASS,
 		parent.childElementCount === 3,
 	);
+}
+
+/**
+ * Applies the shared modal surface contract without depending on Obsidian's
+ * internal Modal fields. The nearest `.modal` is stable across desktop and
+ * mobile; the parent fallback also keeps lightweight test fixtures working.
+ */
+export function configureUiModalSurface(
+	contentEl: HTMLElement,
+	shellClasses: string[] = [],
+): void {
+	contentEl.addClass("yearly-planner-modal-content", MODAL_CONTENT_CLASS);
+	const shell =
+		contentEl.closest<HTMLElement>(".modal") ?? contentEl.parentElement;
+	if (!shell) return;
+	shell.addClass(MODAL_SHELL_CLASS);
+	for (const shellClass of shellClasses) shell.addClass(shellClass);
 }
 
 /** Single button factory for planner views, modals, and settings surfaces. */

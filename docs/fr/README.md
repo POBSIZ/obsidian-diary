@@ -9,15 +9,15 @@ Documentation complète : [English](https://github.com/POBSIZ/obsidian-diary/blo
 | Élément | Valeur |
 | --- | --- |
 | ID du plugin | `diary` |
-| Version actuelle | `1.15.1` |
+| Version actuelle | `1.16.0` |
 | Version minimale d’Obsidian | `1.7.2` |
 | Plateformes | Bureau / mobile (`isDesktopOnly: false`) |
 | Langue par défaut | `en` |
 | Dossier de planning par défaut | `Planner` |
 
-## Nouveautés de la version 1.15.1
+## Nouveautés de la version 1.16.0
 
-- `1.15.1` : révise et allège la documentation dans toutes les langues prises en charge, avec des termes plus clairs et des notes de version plus courtes.
+- `1.16.0` : optimise les boutons du planning, les actions des réglages et les huit fenêtres modales sur mobile avec des cibles tactiles de 44/48 px, des actions adaptatives, un dimensionnement tenant compte des zones sûres et un défilement protégé du clavier.
 
 Les changements antérieurs sont disponibles sur la page [Releases](https://github.com/POBSIZ/obsidian-diary/releases).
 
@@ -65,7 +65,7 @@ Les captures utilisent un dossier temporaire contenant des notes de journée, de
 - **Rappels locaux** : les notes avec `notify_minutes` affichent une Notice Obsidian le jour concerné tant qu’Obsidian est ouvert.
 - **Presse-papiers de planning** : sur ordinateur, copiez, collez, supprimez et annulez le collage de dates ou de pastilles sélectionnées.
 - **Clavier et accessibilité** : cellules de date, pastilles, barres de période, badges fériés, étiquettes et lignes de liste mensuelle sont activables au clavier et exposent des libellés accessibles.
-- **Optimisation mobile** : la grille mensuelle prend en charge le zoom par pincement, la réinitialisation du zoom et le résumé du jour.
+- **Optimisation mobile** : les commandes autonomes utilisent des cibles tactiles de 44/48 px ; les actions des fenêtres modales se réorganisent selon la largeur ; leur taille tient compte des zones sûres et du clavier logiciel. La grille mensuelle conserve aussi le zoom par pincement, sa réinitialisation et le résumé du jour.
 
 ## Installation
 

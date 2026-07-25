@@ -5,6 +5,7 @@ import {
 	createUiError,
 	createUiFieldRow,
 	createUiModalActionBar,
+	configureUiModalSurface,
 	focusUiInputOnDesktop,
 } from "../ui/components";
 
@@ -33,10 +34,8 @@ export class PlannerPeriodModal extends Modal {
 	}
 
 	onOpen(): void {
-		this.contentEl.addClass(
-			"yearly-planner-modal-content",
-			"planner-period-modal",
-		);
+		configureUiModalSurface(this.contentEl);
+		this.contentEl.addClass("planner-period-modal");
 		this.contentEl.createEl("h2", { text: this.getTitle() });
 		const form = this.contentEl.createEl("form", {
 			cls: "yearly-planner-create-file-modal planner-period-form",

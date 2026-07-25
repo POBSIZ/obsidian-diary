@@ -11,7 +11,7 @@ Diary는 Obsidian 볼트의 일반 Markdown 노트를 연간·월간·일간·3�
 | Item | Value |
 | --- | --- |
 | Plugin ID | `diary` |
-| Version | `1.15.1` |
+| Version | `1.16.0` |
 | Minimum Obsidian version | `1.7.2` |
 | Platforms | Desktop and mobile (`isDesktopOnly: false`) |
 | Default language | `en` |
@@ -19,7 +19,7 @@ Diary는 Obsidian 볼트의 일반 Markdown 노트를 연간·월간·일간·3�
 
 ## What's new
 
-- `1.15.1`: rewrites and streamlines the documentation in every supported language, with clearer terminology and shorter release notes.
+- `1.16.0`: optimizes planner buttons, settings actions, and all eight modal surfaces for mobile with 44/48 px touch targets, responsive action layouts, safe-area-aware sizing, and keyboard-safe scrolling.
 
 Older changes are listed on the [Releases page](https://github.com/POBSIZ/obsidian-diary/releases).
 
@@ -62,7 +62,7 @@ These screenshots use temporary demo notes for all-day, timed, range, todo, and 
 - External calendar overlays: add opt-in `webcal://` or `https://` `.ics` feeds, refresh them manually or on an interval, and show events as read-only chips/ranges. Select an external event only when you want to create a normal Markdown note for it.
 - Scoped styling: Diary's CSS is limited to planner views, settings panels, and plugin modals so it does not restyle ordinary vault content.
 - Desktop workflows: right-sidebar companion planner, drag range selection, chip drag-to-move, keyboard activation, internal planner copy/paste/delete/undo.
-- Mobile workflows: tap a day to open the day summary sheet, create notes from the sheet, pinch zoom the monthly grid, and keep planner content and menus above standard or floating Obsidian navigation with an adjustable minimum bottom gap.
+- Mobile workflows: use 44/48 px standalone controls, responsive modal action layouts, safe-area-aware modal sizing, keyboard-safe form scrolling, day summary sheets, monthly-grid pinch zoom, and automatic clearance above standard or floating Obsidian navigation.
 
 ## Quick start
 

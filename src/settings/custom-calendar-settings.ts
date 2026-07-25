@@ -8,6 +8,7 @@ import {
 	createUiError,
 	createUiFieldRow,
 	createUiModalActionBar,
+	configureUiModalSurface,
 	focusUiInputOnDesktop,
 } from "../ui/components";
 import {
@@ -438,10 +439,9 @@ class CustomCalendarProfileModal extends Modal {
 	}
 
 	onOpen(): void {
-		this.contentEl.parentElement?.addClass(
+		configureUiModalSurface(this.contentEl, [
 			"diary-custom-calendar-modal-shell",
-		);
-		this.contentEl.addClass("yearly-planner-modal-content");
+		]);
 		this.contentEl.createEl("h2", {
 			text: this.isNewProfile
 				? t("settings.customCalendarCreate")

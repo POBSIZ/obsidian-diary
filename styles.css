@@ -1,7 +1,7 @@
 /*
 This CSS file is included with your plugin, and
 available in the app when your plugin is enabled.
-Diary release version: 1.15.2
+Diary release version: 1.16.0
 */
 
 :where(
@@ -34,7 +34,10 @@ Diary release version: 1.15.2
 :root {
 	--planner-header-gap: 0.25rem;
 	--planner-btn-size: 2rem;
-	--planner-btn-size-mobile: 2.5rem;
+	--planner-btn-size-mobile: 2.75rem;
+	--planner-touch-target-min: 2.75rem;
+	--planner-touch-target-comfortable: 3rem;
+	--planner-mobile-control-gap: 0.5rem;
 	--planner-container-padding: 1rem;
 	--planner-container-padding-mobile: 0.5rem;
 	--planner-header-margin: 1rem;
@@ -5561,4 +5564,666 @@ body.-is-mobile .modal .diary-ui-modal-action-bar-three-buttons {
 
 :where(.diary-ui-disclosure) {
 	min-width: 0;
+}
+
+/*
+ * Mobile control system
+ *
+ * Calendar chips inside grid and timeline cells deliberately keep their
+ * compact visual height. Their containing date/event surface owns the touch
+ * target. Standalone controls use a 44px minimum and comfortable action bars
+ * use 48px so every planner surface follows the same interaction rhythm.
+ */
+:where(
+		.planner-container-compact,
+		.yearly-planner-modal-content,
+		.diary-calendar-overlay-settings-mount,
+		.diary-external-calendar-settings-mount,
+		.diary-feedback-setting
+	)
+	:where(button, summary) {
+	touch-action: manipulation;
+	-webkit-tap-highlight-color: transparent;
+}
+
+.planner-container-compact .planner-view-switcher-trigger {
+	max-width: 100%;
+	min-height: var(--planner-touch-target-min);
+	padding: 0.5rem 0.65rem;
+}
+
+.planner-container-compact .planner-view-switcher-trigger-label {
+	min-width: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.planner-container-compact .planner-header-period-display {
+	min-height: var(--planner-touch-target-min);
+}
+
+.planner-container-compact .planner-more-menu-popover {
+	width: min(17rem, calc(100vw - 1rem));
+	max-width: calc(100vw - 1rem);
+	padding: 0.35rem;
+}
+
+.planner-container-compact button.planner-more-menu-item {
+	min-height: var(--planner-touch-target-comfortable);
+	padding: 0.65rem 0.7rem;
+	font-size: var(--font-ui-small);
+}
+
+.planner-container-compact button.planner-view-switcher-item {
+	min-height: 3.25rem;
+	padding: 0.55rem 0.65rem;
+}
+
+.planner-container-compact .planner-segmented-control {
+	width: 100%;
+	align-items: stretch;
+}
+
+.planner-container-compact .planner-segmented-control-item {
+	flex: 1 1 0;
+	min-width: 0;
+	min-height: var(--planner-touch-target-min);
+	height: auto;
+	padding: 0.5rem 0.45rem;
+	line-height: 1.15;
+	white-space: normal;
+}
+
+body.is-mobile .yearly-planner-month-header-content,
+body.-is-mobile .yearly-planner-month-header-content,
+.yearly-planner-container.yearly-planner-container-compact
+	.yearly-planner-month-header-content {
+	min-height: 4.25rem;
+	justify-content: flex-start;
+}
+
+body.is-mobile button.yearly-planner-month-header-label,
+body.-is-mobile button.yearly-planner-month-header-label,
+.yearly-planner-container.yearly-planner-container-compact
+	button.yearly-planner-month-header-label {
+	width: 100%;
+	min-height: 1.5rem;
+}
+
+body.is-mobile .yearly-planner-month-width-btn,
+body.-is-mobile .yearly-planner-month-width-btn,
+.yearly-planner-container.yearly-planner-container-compact
+	.yearly-planner-month-width-btn {
+	width: var(--planner-touch-target-min);
+	height: var(--planner-touch-target-min);
+	min-width: var(--planner-touch-target-min);
+	min-height: var(--planner-touch-target-min);
+	border-radius: var(--planner-radius-sm);
+	background: var(--background-modifier-form-field);
+	opacity: 1;
+}
+
+body.is-mobile .yearly-planner-month-width-btn svg,
+body.-is-mobile .yearly-planner-month-width-btn svg,
+.yearly-planner-container.yearly-planner-container-compact
+	.yearly-planner-month-width-btn
+	svg {
+	width: 1rem;
+	height: 1rem;
+}
+
+body.is-mobile .monthly-planner-day-summary-sheet,
+body.-is-mobile .monthly-planner-day-summary-sheet,
+.monthly-planner-container-compact .monthly-planner-day-summary-sheet {
+	gap: 0.6rem;
+	padding: 0.65rem 0.7rem
+		calc(0.65rem + env(safe-area-inset-bottom, 0px));
+}
+
+body.is-mobile .monthly-planner-day-summary-close,
+body.-is-mobile .monthly-planner-day-summary-close,
+.monthly-planner-container-compact .monthly-planner-day-summary-close {
+	width: var(--planner-touch-target-min);
+	height: var(--planner-touch-target-min);
+	min-width: var(--planner-touch-target-min);
+	min-height: var(--planner-touch-target-min);
+	padding: 0;
+}
+
+body.is-mobile .monthly-planner-day-summary-body > button,
+body.-is-mobile .monthly-planner-day-summary-body > button,
+.monthly-planner-container-compact .monthly-planner-day-summary-body > button {
+	min-height: var(--planner-touch-target-min);
+	padding-top: 0.55rem;
+	padding-bottom: 0.55rem;
+}
+
+body.is-mobile .monthly-planner-day-summary-footer,
+body.-is-mobile .monthly-planner-day-summary-footer,
+.monthly-planner-container-compact .monthly-planner-day-summary-footer {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: var(--planner-mobile-control-gap);
+	width: 100%;
+}
+
+body.is-mobile .monthly-planner-day-summary-footer > button,
+body.-is-mobile .monthly-planner-day-summary-footer > button,
+.monthly-planner-container-compact
+	.monthly-planner-day-summary-footer
+	> button {
+	width: 100%;
+	min-width: 0;
+	min-height: var(--planner-touch-target-min);
+	height: auto;
+	margin: 0;
+	padding: 0.55rem 0.6rem;
+	line-height: 1.15;
+	white-space: normal;
+}
+
+body.is-mobile .plan-note-panel-header,
+body.-is-mobile .plan-note-panel-header,
+.planner-container-compact .plan-note-panel-header {
+	min-height: var(--planner-touch-target-min);
+	padding: 0.25rem 0.35rem;
+}
+
+body.is-mobile .plan-note-panel-toggle-btn,
+body.is-mobile .plan-note-panel-open-btn,
+body.-is-mobile .plan-note-panel-toggle-btn,
+body.-is-mobile .plan-note-panel-open-btn,
+.planner-container-compact .plan-note-panel-toggle-btn,
+.planner-container-compact .plan-note-panel-open-btn {
+	width: var(--planner-touch-target-min);
+	height: var(--planner-touch-target-min);
+	min-width: var(--planner-touch-target-min);
+	min-height: var(--planner-touch-target-min);
+	opacity: 0.85;
+}
+
+body.is-mobile .plan-note-panel-empty,
+body.-is-mobile .plan-note-panel-empty,
+.planner-container-compact .plan-note-panel-empty {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr);
+	gap: 0.5rem;
+	padding: 0.65rem;
+}
+
+body.is-mobile .plan-note-panel-create-btn,
+body.-is-mobile .plan-note-panel-create-btn,
+.planner-container-compact .plan-note-panel-create-btn {
+	width: 100%;
+	min-height: var(--planner-touch-target-min);
+	margin: 0;
+	padding: 0.55rem 0.75rem;
+}
+
+body.is-mobile .yearly-planner-mode-btn,
+body.-is-mobile .yearly-planner-mode-btn {
+	flex: 1 1 0;
+	min-width: 0;
+	min-height: var(--planner-touch-target-min);
+	height: auto;
+	margin: 0;
+	padding: 0.55rem 0.65rem;
+	line-height: 1.15;
+	white-space: normal;
+}
+
+body.is-mobile .yearly-planner-color-preset-btn,
+body.-is-mobile .yearly-planner-color-preset-btn {
+	width: var(--planner-touch-target-min);
+	height: var(--planner-touch-target-min);
+	min-width: var(--planner-touch-target-min);
+	min-height: var(--planner-touch-target-min);
+}
+
+body.is-mobile .yearly-planner-color-picker,
+body.-is-mobile .yearly-planner-color-picker {
+	width: var(--planner-touch-target-min);
+	height: var(--planner-touch-target-min);
+	min-width: var(--planner-touch-target-min);
+	min-height: var(--planner-touch-target-min);
+}
+
+body.is-mobile
+	.yearly-planner-file-options-repeat-action-buttons
+	> button,
+body.-is-mobile
+	.yearly-planner-file-options-repeat-action-buttons
+	> button {
+	flex: 1 1 9rem;
+	min-height: var(--planner-touch-target-min);
+	margin: 0;
+	white-space: normal;
+}
+
+body.is-mobile .modal .diary-ui-modal-action-bar,
+body.-is-mobile .modal .diary-ui-modal-action-bar {
+	grid-auto-rows: auto;
+	gap: var(--planner-mobile-control-gap);
+}
+
+body.is-mobile .modal .diary-ui-modal-action-bar .diary-ui-button,
+body.-is-mobile .modal .diary-ui-modal-action-bar .diary-ui-button {
+	min-height: var(--planner-touch-target-comfortable);
+	height: auto;
+	padding: 0.65rem 0.6rem;
+	overflow-wrap: anywhere;
+}
+
+body.is-mobile .modal .diary-ui-modal-action-bar-three-buttons,
+body.-is-mobile .modal .diary-ui-modal-action-bar-three-buttons {
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+body.is-mobile
+	.modal
+	.diary-ui-modal-action-bar-three-buttons
+	> .mod-cta,
+body.-is-mobile
+	.modal
+	.diary-ui-modal-action-bar-three-buttons
+	> .mod-cta {
+	grid-column: 1 / -1;
+	grid-row: 1;
+}
+
+body.is-mobile
+	:where(
+		.diary-calendar-overlay-settings-mount,
+		.diary-external-calendar-settings-mount,
+		.diary-feedback-setting
+	)
+	:where(.setting-item-control button, .diary-calendar-action-button),
+body.-is-mobile
+	:where(
+		.diary-calendar-overlay-settings-mount,
+		.diary-external-calendar-settings-mount,
+		.diary-feedback-setting
+	)
+	:where(.setting-item-control button, .diary-calendar-action-button) {
+	min-height: var(--planner-touch-target-min);
+	height: auto;
+	margin: 0;
+	padding: 0.55rem 0.7rem;
+	line-height: 1.15;
+	white-space: normal;
+}
+
+body.is-mobile .diary-calendar-profile-actions-controls,
+body.-is-mobile .diary-calendar-profile-actions-controls {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	width: 100%;
+	gap: var(--planner-mobile-control-gap);
+}
+
+body.is-mobile .diary-calendar-profile-actions-controls > button,
+body.-is-mobile .diary-calendar-profile-actions-controls > button {
+	width: 100%;
+	min-width: 0;
+	overflow-wrap: anywhere;
+}
+
+body.is-mobile .diary-calendar-action-label,
+body.-is-mobile .diary-calendar-action-label {
+	min-width: 0;
+	white-space: normal;
+	overflow-wrap: anywhere;
+}
+
+body.is-mobile
+	:where(
+		.diary-calendar-overlay-settings-mount,
+		.diary-external-calendar-settings-mount
+	)
+	.setting-item-control,
+body.-is-mobile
+	:where(
+		.diary-calendar-overlay-settings-mount,
+		.diary-external-calendar-settings-mount
+	)
+	.setting-item-control {
+	width: 100%;
+	align-items: stretch;
+}
+
+body.is-mobile
+	:where(
+		.diary-calendar-overlay-settings-mount,
+		.diary-external-calendar-settings-mount
+	)
+	.setting-item-control
+	button,
+body.-is-mobile
+	:where(
+		.diary-calendar-overlay-settings-mount,
+		.diary-external-calendar-settings-mount
+	)
+	.setting-item-control
+	button {
+	width: 100%;
+}
+
+body.is-mobile .diary-feedback-setting,
+body.-is-mobile .diary-feedback-setting {
+	align-items: stretch;
+	flex-direction: column;
+	gap: 0.55rem;
+}
+
+body.is-mobile .diary-feedback-setting .setting-item-control,
+body.-is-mobile .diary-feedback-setting .setting-item-control {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr);
+	width: 100%;
+	gap: var(--planner-mobile-control-gap);
+}
+
+body.is-mobile .diary-feedback-setting .setting-item-control button,
+body.-is-mobile .diary-feedback-setting .setting-item-control button {
+	width: 100%;
+}
+
+@media (max-width: 768px) {
+	.modal .diary-ui-modal-action-bar {
+		grid-auto-rows: auto;
+		gap: var(--planner-mobile-control-gap);
+	}
+
+	.modal .diary-ui-modal-action-bar .diary-ui-button {
+		min-height: var(--planner-touch-target-comfortable);
+		height: auto;
+		padding: 0.65rem 0.6rem;
+		overflow-wrap: anywhere;
+	}
+
+	.modal .diary-ui-modal-action-bar-three-buttons {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+
+	.modal
+		.diary-ui-modal-action-bar-three-buttons
+		> .mod-cta {
+		grid-column: 1 / -1;
+		grid-row: 1;
+	}
+}
+
+@media (max-width: 360px) {
+	body.is-mobile .monthly-planner-day-summary-footer,
+	body.-is-mobile .monthly-planner-day-summary-footer,
+	.monthly-planner-container-compact .monthly-planner-day-summary-footer,
+	body.is-mobile .modal .diary-ui-modal-action-bar,
+	body.-is-mobile .modal .diary-ui-modal-action-bar,
+	.modal .diary-ui-modal-action-bar,
+	body.is-mobile .diary-calendar-profile-actions-controls,
+	body.-is-mobile .diary-calendar-profile-actions-controls {
+		grid-template-columns: minmax(0, 1fr);
+	}
+
+	body.is-mobile
+		.modal
+		.diary-ui-modal-action-bar-three-buttons
+		> .mod-cta,
+	body.-is-mobile
+		.modal
+		.diary-ui-modal-action-bar-three-buttons
+		> .mod-cta,
+	.modal
+		.diary-ui-modal-action-bar-three-buttons
+		> .mod-cta {
+		grid-column: 1;
+	}
+}
+
+/*
+ * Mobile modal surfaces
+ *
+ * Every Diary modal opts into the same bounded shell. The body scrolls while
+ * actions remain in their own row, so software keyboards and home indicators
+ * cannot cover the final field or primary action.
+ */
+.modal.diary-ui-modal-shell,
+.modal.diary-ui-modal-shell .diary-ui-modal-content {
+	box-sizing: border-box;
+	min-width: 0;
+}
+
+.modal.diary-ui-modal-shell .modal-close-button {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	z-index: 2;
+}
+
+.diary-ui-modal-content > h2:first-child,
+.diary-ui-modal-scroll-region > h2:first-child {
+	max-width: 100%;
+	margin-top: 0;
+	margin-right: 2.75rem;
+	overflow-wrap: anywhere;
+}
+
+.diary-ui-modal-content:not(.diary-ui-modal-with-actions) {
+	overflow-x: hidden;
+	overflow-y: auto;
+	overscroll-behavior: contain;
+	-webkit-overflow-scrolling: touch;
+}
+
+.diary-ui-modal-scroll-region {
+	scroll-padding-block: 0.75rem
+		calc(var(--planner-touch-target-comfortable) + 1rem);
+}
+
+body:is(.is-mobile, .-is-mobile) .modal.diary-ui-modal-shell {
+	width: calc(
+		100vw -
+			max(
+				1rem,
+				calc(
+					env(safe-area-inset-left, 0px) +
+						env(safe-area-inset-right, 0px)
+				)
+			)
+	);
+	max-width: calc(
+		100vw -
+			max(
+				1rem,
+				calc(
+					env(safe-area-inset-left, 0px) +
+						env(safe-area-inset-right, 0px)
+				)
+			)
+	);
+	max-height: calc(
+		100dvh - max(0.5rem, env(safe-area-inset-top, 0px)) -
+			max(0.5rem, env(safe-area-inset-bottom, 0px))
+	);
+	margin: 0;
+	border-radius: var(--planner-radius-sm);
+	overflow: hidden;
+}
+
+body:is(.is-mobile, .-is-mobile)
+	.modal.diary-ui-modal-shell
+	.modal-content.diary-ui-modal-content {
+	width: 100%;
+	max-width: 100%;
+	max-height: calc(
+		100dvh - max(1rem, env(safe-area-inset-top, 0px)) -
+			max(1rem, env(safe-area-inset-bottom, 0px))
+	);
+	padding: 0.8rem;
+}
+
+body:is(.is-mobile, .-is-mobile)
+	.modal.diary-ui-modal-shell
+	.modal-close-button {
+	top: 0.25rem;
+	right: max(0.25rem, env(safe-area-inset-right, 0px));
+	width: var(--planner-touch-target-min);
+	height: var(--planner-touch-target-min);
+	min-width: var(--planner-touch-target-min);
+	min-height: var(--planner-touch-target-min);
+	padding: 0;
+	border-radius: var(--planner-radius-sm);
+	touch-action: manipulation;
+}
+
+body:is(.is-mobile, .-is-mobile)
+	.modal.diary-ui-modal-shell
+	.diary-ui-modal-content
+	:is(
+		input:not([type="checkbox"]):not([type="radio"]):not([type="color"]),
+		select,
+		textarea
+	) {
+	box-sizing: border-box;
+	width: 100%;
+	max-width: 100%;
+	min-height: var(--planner-touch-target-min);
+	font-size: 1rem;
+}
+
+body:is(.is-mobile, .-is-mobile)
+	.diary-ui-modal-content
+	.yearly-planner-checkbox-label {
+	display: inline-flex;
+	align-items: center;
+	width: 100%;
+	min-height: var(--planner-touch-target-min);
+	gap: 0.45rem;
+	padding-block: 0.3rem;
+	color: var(--text-normal);
+	touch-action: manipulation;
+}
+
+body:is(.is-mobile, .-is-mobile)
+	.diary-ui-modal-content
+	:where(input[type="checkbox"], input[type="radio"]) {
+	flex: 0 0 auto;
+	margin: 0;
+}
+
+body:is(.is-mobile, .-is-mobile)
+	.modal
+	.diary-ui-modal-action-bar {
+	margin-top: 0.65rem;
+	padding-top: 0.65rem;
+	padding-bottom: max(0.1rem, env(safe-area-inset-bottom, 0px));
+	border-top: 1px solid var(--background-modifier-border);
+}
+
+body:is(.is-mobile, .-is-mobile)
+	.diary-custom-calendar-modal-section,
+body:is(.is-mobile, .-is-mobile)
+	.diary-external-calendar-modal-section {
+	gap: 0.55rem;
+	padding: 0.65rem;
+}
+
+body:is(.is-mobile, .-is-mobile)
+	.diary-custom-calendar-textarea {
+	max-height: min(11rem, 32dvh);
+}
+
+body:is(.is-mobile, .-is-mobile)
+	.planner-external-event-modal-header {
+	padding-right: 2.75rem;
+}
+
+body:is(.is-mobile, .-is-mobile)
+	.planner-external-event-detail-row {
+	grid-template-columns: minmax(0, 1fr);
+	gap: 0.15rem;
+	padding-block: 0.2rem;
+}
+
+body:is(.is-mobile, .-is-mobile)
+	.planner-external-event-description {
+	max-height: min(12rem, 30dvh);
+	margin: 0;
+	padding: 0.65rem;
+}
+
+body:is(.is-mobile, .-is-mobile)
+	.yearly-planner-holiday-modal-names {
+	overflow-wrap: anywhere;
+}
+
+@media (max-width: 768px) {
+	.modal.diary-ui-modal-shell {
+		width: calc(100vw - 1rem);
+		max-width: calc(100vw - 1rem);
+		max-height: calc(100dvh - 1rem);
+		margin: 0;
+		overflow: hidden;
+	}
+
+	.modal.diary-ui-modal-shell
+		.modal-content.diary-ui-modal-content {
+		width: 100%;
+		max-width: 100%;
+		max-height: calc(100dvh - 1rem);
+		padding: 0.8rem;
+	}
+
+	.modal.diary-ui-modal-shell .modal-close-button {
+		width: var(--planner-touch-target-min);
+		height: var(--planner-touch-target-min);
+		min-width: var(--planner-touch-target-min);
+		min-height: var(--planner-touch-target-min);
+	}
+
+	.modal.diary-ui-modal-shell
+		.diary-ui-modal-content
+		:is(
+			input:not([type="checkbox"]):not([type="radio"]):not([type="color"]),
+			select,
+			textarea
+		) {
+		box-sizing: border-box;
+		width: 100%;
+		max-width: 100%;
+		min-height: var(--planner-touch-target-min);
+		font-size: 1rem;
+	}
+
+	.modal .diary-ui-modal-action-bar {
+		margin-top: 0.65rem;
+		padding-top: 0.65rem;
+		border-top: 1px solid var(--background-modifier-border);
+	}
+
+	.planner-external-event-detail-row {
+		grid-template-columns: minmax(0, 1fr);
+		gap: 0.15rem;
+	}
+}
+
+@media (max-width: 380px) {
+	.modal.diary-ui-modal-shell {
+		width: calc(100vw - 0.5rem);
+		max-width: calc(100vw - 0.5rem);
+		max-height: calc(100dvh - 0.5rem);
+	}
+
+	.modal.diary-ui-modal-shell
+		.modal-content.diary-ui-modal-content {
+		max-height: calc(100dvh - 0.5rem);
+		padding: 0.65rem;
+	}
+
+	.diary-ui-modal-content > h2:first-child,
+	.diary-ui-modal-scroll-region > h2:first-child {
+		margin-right: 2.5rem;
+		font-size: var(--font-ui-large);
+	}
 }
