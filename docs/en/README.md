@@ -9,7 +9,7 @@ Full documentation: [English](https://github.com/POBSIZ/obsidian-diary/blob/main
 | Item | Value |
 | --- | --- |
 | Plugin ID | `diary` |
-| Current version | `1.16.2` |
+| Current version | `1.17.0` |
 | Minimum Obsidian version | `1.7.2` |
 | Supported platforms | Desktop / mobile (`isDesktopOnly: false`) |
 | Default language | `en` |
@@ -17,7 +17,7 @@ Full documentation: [English](https://github.com/POBSIZ/obsidian-diary/blob/main
 
 ## What's new
 
-- `1.16.2`: Adds consistent bottom spacing to mobile modal action sections while respecting device safe areas.
+- `1.17.0`: Adds a collapsible all-day section with event counts to the daily and 3-day planners, and improves sub-20-minute events with readable compact cards, time tooltips, and collision-aware layout.
 
 For earlier changes, see the [Releases page](https://github.com/POBSIZ/obsidian-diary/releases).
 
@@ -49,7 +49,7 @@ The screenshots use temporary demo notes for all-day, timed, range, todo, and pl
 - **Localized UI**: Switch Diary between English, German, Spanish, French, Japanese, Simplified Chinese, Traditional Chinese, and Korean.
 - **Monthly grid planner**: Inspect one month in a large calendar grid with chips, range bars, holidays, calendar overlay labels, and external calendar overlays.
 - **Monthly list planner**: Review a busy month as a day-by-day list, with `All`, `With notes`, and `Upcoming` filters.
-- **Daily planner**: Plan one day on a 24-hour timeline. Multi-day ranges render as continuous all-day bars or datetime intervals; timed range boundaries can be resized across dates. All-day and untimed notes stay in a separate section.
+- **Daily planner**: Plan one day on a 24-hour timeline. The all-day section shows the event count, can be collapsed, and remembers its state. Multi-day ranges render as continuous all-day bars or datetime intervals; timed range boundaries can be resized across dates. Events shorter than 20 minutes use readable compact cards with time tooltips and collision-aware columns.
 - **3-day planner**: Compare three consecutive days in parallel columns on one 24-hour timeline. Narrow screens use horizontal scrolling instead of compressing the day columns.
 - **Direct view selector**: Switch directly among yearly, monthly grid, monthly list, daily, and 3-day views. On narrow screens it stays visible while secondary actions move into **More**.
 - **Right sidebar planner**: Keep a compact monthly planner open in the right sidebar while notes remain open in the main workspace.

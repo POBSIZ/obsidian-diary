@@ -1,4 +1,5 @@
 import { Platform } from "obsidian";
+import { MIN_VISUAL_EVENT_DURATION_MINUTES } from "./constants";
 import type { DailyPlannerEntry } from "./types";
 import { getDailyRangeTimeSlice } from "./range-layout";
 
@@ -414,7 +415,12 @@ export class DailyPlannerDragController {
 		);
 		active.element.style.setProperty(
 			"--daily-duration",
-			String(Math.max(30, active.endMinutes - active.startMinutes)),
+			String(
+				Math.max(
+					MIN_VISUAL_EVENT_DURATION_MINUTES,
+					active.endMinutes - active.startMinutes,
+				),
+			),
 		);
 		const time = active.element.querySelector<HTMLElement>(
 			".daily-planner-event-time",
@@ -463,7 +469,12 @@ export class DailyPlannerDragController {
 			preview.style.setProperty("--daily-start", String(slice.start));
 			preview.style.setProperty(
 				"--daily-duration",
-				String(Math.max(30, slice.end - slice.start)),
+				String(
+					Math.max(
+						MIN_VISUAL_EVENT_DURATION_MINUTES,
+						slice.end - slice.start,
+					),
+				),
 			);
 			preview.createSpan({
 				cls: "daily-planner-drag-preview-time",
@@ -481,7 +492,12 @@ export class DailyPlannerDragController {
 		active.element.style.setProperty("--daily-start", String(active.originalStart));
 		active.element.style.setProperty(
 			"--daily-duration",
-			String(Math.max(30, active.originalEnd - active.originalStart)),
+			String(
+				Math.max(
+					MIN_VISUAL_EVENT_DURATION_MINUTES,
+					active.originalEnd - active.originalStart,
+				),
+			),
 		);
 		const time = active.element.querySelector<HTMLElement>(
 			".daily-planner-event-time",
@@ -630,7 +646,12 @@ export class DailyPlannerDragController {
 			preview.style.setProperty("--daily-start", String(slice.start));
 			preview.style.setProperty(
 				"--daily-duration",
-				String(Math.max(30, slice.end - slice.start)),
+				String(
+					Math.max(
+						MIN_VISUAL_EVENT_DURATION_MINUTES,
+						slice.end - slice.start,
+					),
+				),
 			);
 			preview.createSpan({
 				cls: "daily-planner-drag-preview-time",

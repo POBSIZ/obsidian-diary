@@ -9,15 +9,15 @@ Documentation complète : [English](https://github.com/POBSIZ/obsidian-diary/blo
 | Élément | Valeur |
 | --- | --- |
 | ID du plugin | `diary` |
-| Version actuelle | `1.16.2` |
+| Version actuelle | `1.17.0` |
 | Version minimale d’Obsidian | `1.7.2` |
 | Plateformes | Bureau / mobile (`isDesktopOnly: false`) |
 | Langue par défaut | `en` |
 | Dossier de planning par défaut | `Planner` |
 
-## Nouveautés de la version 1.16.2
+## Nouveautés de la version 1.17.0
 
-- `1.16.2` : ajoute un espacement inférieur uniforme aux zones d’action des fenêtres modales mobiles tout en respectant les zones sûres de l’appareil.
+- `1.17.0` : ajoute une section « journée entière » repliable avec le nombre d’événements dans les plannings quotidien et sur 3 jours, et améliore les événements de moins de 20 minutes avec des cartes compactes lisibles, des infobulles horaires et des colonnes sans chevauchement.
 
 Les changements antérieurs sont disponibles sur la page [Releases](https://github.com/POBSIZ/obsidian-diary/releases).
 
@@ -49,7 +49,7 @@ Les captures utilisent un dossier temporaire contenant des notes de journée, de
 - **Interface localisée** : basculez Diary entre anglais, allemand, espagnol, français, japonais, chinois simplifié, chinois traditionnel et coréen.
 - **Grille mensuelle** : consultez un mois dans une grande grille avec pastilles, barres de période, jours fériés, étiquettes de calendrier et calendriers externes.
 - **Liste mensuelle** : parcourez le mois jour par jour, puis filtrez-le avec `All`, `With notes` ou `Upcoming`.
-- **Planning quotidien** : planifiez une journée sur une chronologie de 24 heures. Les plages de plusieurs jours s’affichent comme des barres continues sur la journée entière ou des intervalles date-heure, dont les limites peuvent être ajustées entre les dates.
+- **Planning quotidien** : planifiez une journée sur une chronologie de 24 heures. La section « journée entière » affiche le nombre d’événements, peut être repliée et mémorise son état. Les plages de plusieurs jours s’affichent comme des barres continues sur la journée entière ou des intervalles date-heure, dont les limites peuvent être ajustées entre les dates. Les événements de moins de 20 minutes utilisent des cartes compactes lisibles avec infobulle horaire et colonnes sans chevauchement.
 - **Planning sur 3 jours** : comparez trois jours consécutifs en colonnes parallèles. Les petits écrans conservent des colonnes lisibles grâce au défilement horizontal.
 - **Sélecteur direct de vue** : passez directement entre année, grille mensuelle, liste mensuelle, jour et 3 jours.
 - **Planificateur latéral droit** : gardez un planning mensuel compact dans la barre latérale droite pendant que les notes s’ouvrent dans l’espace principal.

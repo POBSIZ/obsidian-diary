@@ -2,8 +2,22 @@ import type {
 	DailyPlannerEntry,
 	PositionedDailyPlannerEntry,
 } from "./types";
+import { MIN_VISUAL_EVENT_DURATION_MINUTES } from "./constants";
 
-/** Assign overlapping timed entries to side-by-side columns. */
+function getVisualEnd(entry: DailyPlannerEntry & {
+	startMinutes: number;
+	endMinutes: number;
+}): number {
+	return (
+		entry.startMinutes +
+		Math.max(
+			MIN_VISUAL_EVENT_DURATION_MINUTES,
+			entry.endMinutes - entry.startMinutes,
+		)
+	);
+}
+
+/** Assign visually overlapping timed entries to side-by-side columns. */
 export function layoutDailyPlannerEntries(
 	entries: DailyPlannerEntry[],
 ): PositionedDailyPlannerEntry[] {
@@ -35,10 +49,11 @@ export function layoutDailyPlannerEntries(
 
 	for (const entry of timed) {
 		if (group.length > 0 && entry.startMinutes >= groupEnd) finishGroup();
+		const visualEnd = getVisualEnd(entry);
 		let column = columnEnds.findIndex((end) => end <= entry.startMinutes);
 		if (column < 0) column = columnEnds.length;
-		columnEnds[column] = entry.endMinutes;
-		groupEnd = Math.max(groupEnd, entry.endMinutes);
+		columnEnds[column] = visualEnd;
+		groupEnd = Math.max(groupEnd, visualEnd);
 		const positioned: PositionedDailyPlannerEntry = {
 			...entry,
 			column,

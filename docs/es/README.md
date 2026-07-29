@@ -9,15 +9,15 @@ Documentación completa: [English](https://github.com/POBSIZ/obsidian-diary/blob
 | Elemento | Valor |
 | --- | --- |
 | ID del plugin | `diary` |
-| Versión actual | `1.16.2` |
+| Versión actual | `1.17.0` |
 | Versión mínima de Obsidian | `1.7.2` |
 | Plataformas | Escritorio / móvil (`isDesktopOnly: false`) |
 | Idioma predeterminado | `en` |
 | Carpeta predeterminada del planificador | `Planner` |
 
-## Novedades de 1.16.2
+## Novedades de 1.17.0
 
-- `1.16.2`: Añade un espacio inferior uniforme a las secciones de acciones de los modales móviles, respetando las áreas seguras del dispositivo.
+- `1.17.0`: Añade una sección de todo el día plegable con recuento de eventos a los planificadores diario y de 3 días, y mejora los eventos de menos de 20 minutos con tarjetas compactas legibles, información horaria y columnas sin solapamientos.
 
 Los cambios anteriores están disponibles en [Releases](https://github.com/POBSIZ/obsidian-diary/releases).
 
@@ -49,7 +49,7 @@ Las capturas usan una carpeta temporal con notas de todo el día, con hora, de r
 - **Interfaz localizada**: Cambia Diary entre inglés, alemán, español, francés, japonés, chino simplificado, chino tradicional y coreano.
 - **Cuadrícula mensual**: Revisa un mes en una cuadrícula grande con chips, barras de rango, festivos, etiquetas de calendario y calendarios externos.
 - **Lista mensual**: Recorre un mes día a día y filtra la lista con `All`, `With notes` o `Upcoming`.
-- **Planificador diario**: Organiza un día en una línea de tiempo de 24 horas. Los rangos de varios días se muestran como barras continuas de todo el día o intervalos de fecha y hora; sus límites temporales se pueden ajustar entre fechas.
+- **Planificador diario**: Organiza un día en una línea de tiempo de 24 horas. La sección de todo el día muestra el número de eventos, se puede contraer y recuerda su estado. Los rangos de varios días se muestran como barras continuas de todo el día o intervalos de fecha y hora; sus límites temporales se pueden ajustar entre fechas. Los eventos de menos de 20 minutos usan tarjetas compactas legibles con información horaria y columnas que evitan solapamientos.
 - **Planificador de 3 días**: Compara tres días consecutivos en columnas paralelas. En pantallas estrechas conserva columnas legibles mediante desplazamiento horizontal.
 - **Selector directo de vista**: Cambia directamente entre año, cuadrícula mensual, lista mensual, día y 3 días.
 - **Planificador lateral derecho**: Mantén un planificador mensual compacto en la barra lateral derecha mientras las notas se abren en el área principal.

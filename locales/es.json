@@ -35,6 +35,8 @@
 	"daily.selectDate": "Elegir fecha",
 	"daily.untimed": "Todo el día y sin hora",
 	"daily.allDayLane": "Todo el día",
+	"daily.collapseAllDay": "Contraer planes de todo el día ({count})",
+	"daily.expandAllDay": "Expandir planes de todo el día ({count})",
 	"daily.noUntimed": "No hay planes de todo el día o sin hora",
 	"daily.timeline": "Línea de tiempo",
 	"daily.openDate": "Abrir {date} en el planificador diario",

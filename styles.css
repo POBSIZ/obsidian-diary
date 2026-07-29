@@ -1,7 +1,7 @@
 /*
 This CSS file is included with your plugin, and
 available in the app when your plugin is enabled.
-Diary release version: 1.16.2
+Diary release version: 1.17.0
 */
 
 :where(
@@ -3846,9 +3846,9 @@ body.-is-mobile .monthly-planner-weekend-label {
 
 .daily-planner-all-day-label {
 	display: flex;
-	align-items: flex-start;
-	justify-content: flex-end;
-	padding: 0.5rem;
+	align-items: stretch;
+	justify-content: flex-start;
+	padding: 0.2rem;
 	border-right: 1px solid var(--background-modifier-border);
 	background: var(--background-secondary);
 	color: var(--text-muted);
@@ -3858,12 +3858,116 @@ body.-is-mobile .monthly-planner-weekend-label {
 	text-align: right;
 }
 
+.daily-planner-all-day-toggle,
+button.daily-planner-all-day-toggle {
+	display: grid;
+	width: 100%;
+	height: 100%;
+	min-width: 0;
+	min-height: 0;
+	grid-template-areas:
+		"label label"
+		"icon count";
+	grid-template-columns: minmax(0, 1fr) auto;
+	grid-template-rows: auto auto;
+	align-content: start;
+	align-items: center;
+	gap: 0.08rem 0.15rem;
+	padding: 0.1rem;
+	border: 0;
+	border-radius: var(--planner-radius-sm);
+	background: transparent;
+	box-shadow: none;
+	color: inherit;
+	font: inherit;
+	cursor: pointer;
+}
+
+.daily-planner-all-day-toggle:hover,
+.daily-planner-all-day-toggle:focus-visible {
+	background: var(--background-modifier-hover);
+	box-shadow: none;
+	color: var(--text-normal);
+}
+
+.daily-planner-all-day-toggle .diary-ui-button-icon {
+	grid-area: icon;
+	justify-self: end;
+}
+
+.daily-planner-all-day-toggle .diary-ui-button-icon svg {
+	width: 0.8rem;
+	height: 0.8rem;
+}
+
+.daily-planner-all-day-toggle .diary-ui-button-label {
+	grid-area: label;
+	min-width: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.daily-planner-all-day-count {
+	grid-area: count;
+	min-width: 1.1rem;
+	padding: 0.02rem 0.22rem;
+	border-radius: 999px;
+	background: var(--background-modifier-hover);
+	color: var(--text-muted);
+	font-size: 0.82em;
+	font-variant-numeric: tabular-nums;
+	line-height: 1.25;
+	text-align: center;
+}
+
 .daily-planner-all-day-content {
 	display: flex;
 	min-width: 0;
 	min-height: 0;
 	flex-direction: column;
 	overflow-y: auto;
+}
+
+.daily-planner-all-day-content[hidden] {
+	display: none;
+}
+
+.daily-planner-all-day-row.is-collapsed {
+	min-height: 2.25rem;
+	max-height: 2.25rem;
+	grid-template-columns: minmax(0, 1fr);
+}
+
+.daily-planner-all-day-row.is-collapsed .daily-planner-all-day-label {
+	grid-column: 1 / -1;
+	padding: 0.15rem;
+	border-right: 0;
+}
+
+.daily-planner-all-day-row.is-collapsed .daily-planner-all-day-toggle {
+	display: flex;
+	width: auto;
+	justify-content: flex-start;
+	gap: 0.35rem;
+	padding: 0.2rem 0.5rem;
+	text-align: left;
+}
+
+.daily-planner-all-day-row.is-collapsed
+	.daily-planner-all-day-toggle
+	.diary-ui-button-icon {
+	flex: 0 0 auto;
+}
+
+.daily-planner-all-day-row.is-collapsed
+	.daily-planner-all-day-toggle
+	.diary-ui-button-label {
+	flex: 0 1 auto;
+}
+
+.daily-planner-all-day-row.is-collapsed .daily-planner-all-day-count {
+	flex: 0 0 auto;
 }
 
 .daily-planner-range-lanes {
@@ -4084,7 +4188,7 @@ body.-is-mobile .monthly-planner-weekend-label {
 	);
 	width: calc(100% / var(--daily-column-count) - 4px);
 	height: calc(var(--daily-duration) * 1px - 2px);
-	min-height: 1.75rem;
+	min-height: 24px;
 	overflow: hidden;
 	z-index: 2;
 }
@@ -4462,47 +4566,28 @@ body.-is-mobile .monthly-planner-weekend-label {
 	padding: 0.4rem 0.35rem;
 }
 
-.daily-planner-container.planner-container-compact .daily-planner-event {
-	flex-direction: row;
-	align-items: center;
-	justify-content: flex-start;
-	gap: 0.3rem;
-	overflow: clip;
-	line-height: 1.2;
-}
-
-.daily-planner-container.planner-container-compact
-	.daily-planner-range-event-content {
-	flex: 1 1 auto;
-	flex-direction: row;
-	align-items: center;
-	gap: 0.3rem;
-	max-width: 100%;
-	overflow: hidden;
-}
-
-.daily-planner-container.planner-container-compact
-	.daily-planner-event-time {
-	flex: 0 0 auto;
-	max-width: min(50%, 7.5rem);
-}
-
-.daily-planner-container.planner-container-compact
-	.daily-planner-event-title {
-	flex: 1 1 auto;
-}
-
 .daily-planner-container
 	.daily-planner-event-short
 	.daily-planner-event-time {
 	display: none;
 }
 
+.daily-planner-container .daily-planner-event-very-short {
+	padding-block: 0.08rem;
+}
+
+.daily-planner-container
+	.daily-planner-event-very-short
+	.daily-planner-event-title {
+	font-size: max(0.75rem, 1em);
+	font-weight: 600;
+	line-height: 1.1;
+}
+
 .daily-planner-container.planner-container-compact
-	:is(.daily-planner-event-time, .daily-planner-event-title) {
-	min-width: 0;
-	max-height: 100%;
-	line-height: 1.2;
+	.daily-planner-all-day-row.is-collapsed {
+	min-height: var(--planner-touch-target-min);
+	max-height: var(--planner-touch-target-min);
 }
 
 body.is-mobile .daily-planner-untimed-chip,

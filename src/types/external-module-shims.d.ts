@@ -156,6 +156,7 @@ declare module "obsidian" {
 			type: ConstructorPrototype<T>,
 		): T | null;
 		revealLeaf(leaf: WorkspaceLeaf): Promise<void>;
+		requestSaveLayout(): Promise<void>;
 		onLayoutReady(callback: () => unknown): void;
 		ensureSideLeaf(
 			type: string,

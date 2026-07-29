@@ -76,6 +76,12 @@ import {
 	type DailyPlannerDragItem,
 	type DailyPlannerDrop,
 } from "./drag";
+import {
+	COMPACT_EVENT_THRESHOLD_MINUTES,
+	MIN_VISUAL_EVENT_DURATION_MINUTES,
+	SHORT_EVENT_THRESHOLD_MINUTES,
+} from "./constants";
+import { renderDailyPlannerAllDaySection } from "./all-day-section";
 import { layoutDailyPlannerEntries } from "./layout";
 import {
 	getDailyRangeTimeSlice,
@@ -90,6 +96,7 @@ import type { DailyPlannerEntry, DailyPlannerState } from "./types";
 const MINUTES_PER_DAY = 24 * 60;
 const DEFAULT_DURATION_MINUTES = 60;
 const NOW_LINE_REFRESH_INTERVAL_MS = 30_000;
+let dailyPlannerViewInstanceCount = 0;
 
 export interface DailyPlannerDate {
 	year: number;
@@ -169,6 +176,8 @@ export class DailyPlannerView extends ItemView {
 	private compactLayout = Platform.isMobile;
 	private resizeObserver: ResizeObserver | null = null;
 	private pendingInitialScroll = true;
+	private allDayCollapsed: boolean | null = null;
+	private readonly allDayContentId = `diary-all-day-content-${++dailyPlannerViewInstanceCount}`;
 	private readonly dragController: DailyPlannerDragController;
 	private readonly timeSelectionController: DailyPlannerTimeSelectionController;
 	private readonly clipboardSelection = new Set<string>();
@@ -234,13 +243,24 @@ export class DailyPlannerView extends ItemView {
 	}
 
 	getState(): DailyPlannerState {
-		return { year: this.year, month: this.month, day: this.day };
+		const state: DailyPlannerState = {
+			year: this.year,
+			month: this.month,
+			day: this.day,
+		};
+		if (this.allDayCollapsed != null) {
+			state.allDayCollapsed = this.allDayCollapsed;
+		}
+		return state;
 	}
 
 	async setState(
 		state: DailyPlannerState,
 		result: { history: boolean },
 	): Promise<void> {
+		if (typeof state?.allDayCollapsed === "boolean") {
+			this.allDayCollapsed = state.allDayCollapsed;
+		}
 		if (state?.year && state?.month && state?.day) {
 			this.year = state.year;
 			this.month = state.month;
@@ -653,12 +673,25 @@ export class DailyPlannerView extends ItemView {
 	}
 
 	private renderAllDayRow(parent: HTMLElement, days: VisiblePlannerDay[]): void {
-		const row = parent.createDiv({ cls: "daily-planner-all-day-row" });
-		row.createDiv({
-			cls: "daily-planner-all-day-label",
-			text: t("daily.allDayLane"),
+		const allDayEntryIds = new Set(
+			days.flatMap((day) =>
+				day.entries
+					.filter((entry) => entry.startMinutes == null)
+					.map((entry) => entry.id),
+			),
+		);
+		const allDayCount = allDayEntryIds.size;
+		const collapsed = this.allDayCollapsed ?? allDayCount === 0;
+		const content = renderDailyPlannerAllDaySection(parent, {
+			count: allDayCount,
+			collapsed,
+			contentId: this.allDayContentId,
+			onToggle: (nextCollapsed) => {
+				this.allDayCollapsed = nextCollapsed;
+				this.render();
+				void this.app.workspace.requestSaveLayout();
+			},
 		});
-		const content = row.createDiv({ cls: "daily-planner-all-day-content" });
 		this.renderRangeBars(content, days);
 		const columns = content.createDiv({ cls: "daily-planner-all-day-columns" });
 		for (const day of days) {
@@ -800,7 +833,12 @@ export class DailyPlannerView extends ItemView {
 			block.style.setProperty("--daily-start", String(entry.startMinutes));
 			block.style.setProperty(
 				"--daily-duration",
-				String(Math.max(30, (entry.endMinutes ?? 0) - (entry.startMinutes ?? 0))),
+				String(
+					Math.max(
+						MIN_VISUAL_EVENT_DURATION_MINUTES,
+						(entry.endMinutes ?? 0) - (entry.startMinutes ?? 0),
+					),
+				),
 			);
 		}
 	}
@@ -816,12 +854,25 @@ export class DailyPlannerView extends ItemView {
 			isTimeline && entry.startMinutes != null && entry.endMinutes != null
 				? entry.endMinutes - entry.startMinutes
 				: null;
+		const isCompactTimelineEvent =
+			timelineDuration != null &&
+			timelineDuration <= COMPACT_EVENT_THRESHOLD_MINUTES;
+		const isShortTimelineEvent =
+			timelineDuration != null &&
+			timelineDuration < SHORT_EVENT_THRESHOLD_MINUTES;
+		const timelineTimeLabel = isTimeline
+			? `${minutesToDisplayTime(
+					entry.startMinutes ?? 0,
+				)}–${minutesToDisplayTime(entry.endMinutes ?? 0)}`
+			: null;
+		const timelineAccessibleLabel = timelineTimeLabel
+			? `${timelineTimeLabel} · ${entry.title}`
+			: entry.title;
 		const chip = createPlannerChip(parent, {
 			classes: [
 				isTimeline ? "daily-planner-event" : "daily-planner-untimed-chip",
-				timelineDuration != null &&
-					timelineDuration <= 30 &&
-					"daily-planner-event-short",
+				isCompactTimelineEvent && "daily-planner-event-short",
+				isShortTimelineEvent && "daily-planner-event-very-short",
 				isTimeline && entry.rangeStart && "daily-planner-range-event",
 				isTimeline &&
 					entry.rangeStart &&
@@ -840,7 +891,8 @@ export class DailyPlannerView extends ItemView {
 			color: entry.color,
 			tag: "button",
 			variant: isTimeline ? "timeline" : "all-day",
-			ariaLabel: entry.title,
+			ariaLabel: timelineAccessibleLabel,
+			title: isShortTimelineEvent ? timelineAccessibleLabel : undefined,
 			renderContent: isTimeline
 				? (element) => {
 						const content = entry.rangeStart
@@ -850,9 +902,7 @@ export class DailyPlannerView extends ItemView {
 							: element;
 						content.createSpan({
 							cls: "planner-chip-meta daily-planner-event-time",
-							text: `${minutesToDisplayTime(
-								entry.startMinutes ?? 0,
-							)}–${minutesToDisplayTime(entry.endMinutes ?? 0)}`,
+							text: timelineTimeLabel ?? "",
 						});
 						content.createSpan({
 							cls: "planner-chip-label daily-planner-event-title",

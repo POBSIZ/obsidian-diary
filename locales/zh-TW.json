@@ -35,6 +35,8 @@
 	"daily.selectDate": "選擇日期",
 	"daily.untimed": "全天與未指定時間",
 	"daily.allDayLane": "全天",
+	"daily.collapseAllDay": "收合全天計畫（{count} 項）",
+	"daily.expandAllDay": "展開全天計畫（{count} 項）",
 	"daily.noUntimed": "沒有全天或未指定時間的計畫",
 	"daily.timeline": "時間軸",
 	"daily.openDate": "在每日計畫中開啟 {date}",

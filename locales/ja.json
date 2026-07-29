@@ -35,6 +35,8 @@
 	"daily.selectDate": "日付を選択",
 	"daily.untimed": "終日・時刻なし",
 	"daily.allDayLane": "終日",
+	"daily.collapseAllDay": "終日予定を折りたたむ（{count}件）",
+	"daily.expandAllDay": "終日予定を展開する（{count}件）",
 	"daily.noUntimed": "終日または時刻なしの予定はありません",
 	"daily.timeline": "タイムライン",
 	"daily.openDate": "{date} をデイリープランナーで開く",

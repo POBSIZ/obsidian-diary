@@ -35,6 +35,8 @@
 	"daily.selectDate": "날짜 선택",
 	"daily.untimed": "종일 및 시간 미지정",
 	"daily.allDayLane": "종일",
+	"daily.collapseAllDay": "종일 일정 접기({count}개)",
+	"daily.expandAllDay": "종일 일정 펼치기({count}개)",
 	"daily.noUntimed": "종일 또는 시간 미지정 계획이 없습니다",
 	"daily.timeline": "시간대별 일정",
 	"daily.openDate": "{date} 일간 플래너 열기",

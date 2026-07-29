@@ -35,6 +35,8 @@
 	"daily.selectDate": "Choose date",
 	"daily.untimed": "All-day and untimed",
 	"daily.allDayLane": "All day",
+	"daily.collapseAllDay": "Collapse all-day plans ({count})",
+	"daily.expandAllDay": "Expand all-day plans ({count})",
 	"daily.noUntimed": "No all-day or untimed plans",
 	"daily.timeline": "Timeline",
 	"daily.openDate": "Open {date} in daily planner",

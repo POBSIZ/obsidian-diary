@@ -35,6 +35,8 @@
 	"daily.selectDate": "选择日期",
 	"daily.untimed": "全天及未指定时间",
 	"daily.allDayLane": "全天",
+	"daily.collapseAllDay": "收起全天计划（{count} 项）",
+	"daily.expandAllDay": "展开全天计划（{count} 项）",
 	"daily.noUntimed": "没有全天或未指定时间的计划",
 	"daily.timeline": "时间轴",
 	"daily.openDate": "在每日计划中打开 {date}",

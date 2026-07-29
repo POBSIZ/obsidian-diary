@@ -5,6 +5,7 @@ export interface DailyPlannerState extends Record<string, unknown> {
 	year: number;
 	month: number;
 	day: number;
+	allDayCollapsed?: boolean;
 }
 
 export interface DailyPlannerEntry {

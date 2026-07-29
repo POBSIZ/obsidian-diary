@@ -9,15 +9,15 @@ Vollständige Dokumentation: [English](https://github.com/POBSIZ/obsidian-diary/
 | Eintrag | Wert |
 | --- | --- |
 | Plugin-ID | `diary` |
-| Aktuelle Version | `1.16.2` |
+| Aktuelle Version | `1.17.0` |
 | Minimale Obsidian-Version | `1.7.2` |
 | Plattformen | Desktop / Mobil (`isDesktopOnly: false`) |
 | Standardsprache | `en` |
 | Standardordner für Planer | `Planner` |
 
-## Neu in 1.16.2
+## Neu in 1.17.0
 
-- `1.16.2`: Sorgt für einen einheitlichen unteren Abstand in mobilen Modalaktionsbereichen und berücksichtigt dabei die sicheren Gerätebereiche.
+- `1.17.0`: Fügt dem Tages- und 3-Tage-Planer einen einklappbaren Ganztagsbereich mit Terminanzahl hinzu und verbessert Termine unter 20 Minuten mit lesbaren Kompaktkarten, Zeit-Tooltips und kollisionsbewusster Spaltenanordnung.
 
 Ältere Änderungen stehen auf der [Releases-Seite](https://github.com/POBSIZ/obsidian-diary/releases).
 
@@ -49,7 +49,7 @@ Für die Screenshots wurde ein temporärer Demo-Ordner mit ganztägigen, zeitgeb
 - **Lokalisierte Oberfläche**: Diary lässt sich zwischen Englisch, Deutsch, Spanisch, Französisch, Japanisch, vereinfachtem Chinesisch, traditionellem Chinesisch und Koreanisch umschalten.
 - **Monatsraster**: Ein großer Monatskalender mit Chips, Zeitraumleisten, Feiertagen, Kalender-Overlay-Beschriftungen und externen Kalender-Overlays.
 - **Monatsliste**: Zeigt volle Monate als Tagesliste und lässt sich mit `All`, `With notes` und `Upcoming` filtern.
-- **Tagesplaner**: Plane einen Tag auf einer 24-Stunden-Zeitleiste. Mehrtägige Bereiche erscheinen als durchgehende ganztägige Balken oder Datums-Zeit-Intervalle; ihre zeitlichen Grenzen lassen sich über Datumsgrenzen hinweg anpassen.
+- **Tagesplaner**: Plane einen Tag auf einer 24-Stunden-Zeitleiste. Der Ganztagsbereich zeigt die Terminanzahl, lässt sich einklappen und merkt sich seinen Zustand. Mehrtägige Bereiche erscheinen als durchgehende ganztägige Balken oder Datums-Zeit-Intervalle; ihre zeitlichen Grenzen lassen sich über Datumsgrenzen hinweg anpassen. Termine unter 20 Minuten erscheinen als lesbare Kompaktkarten mit Zeit-Tooltip und kollisionsbewussten Spalten.
 - **3-Tage-Planer**: Vergleiche drei aufeinanderfolgende Tage in parallelen Spalten. Auf schmalen Bildschirmen bleiben die Spalten per horizontalem Scrollen lesbar.
 - **Direkte Ansichtsauswahl**: Wechsle direkt zwischen Jahr, Monatsraster, Monatsliste, Tag und 3 Tagen.
 - **Rechter Seitenplaner**: Ein kompakter Monatsplaner bleibt in der rechten Seitenleiste geöffnet, während Notizen im Hauptbereich geöffnet werden.

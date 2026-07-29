@@ -35,6 +35,8 @@
 	"daily.selectDate": "Datum wählen",
 	"daily.untimed": "Ganztägig und ohne Zeit",
 	"daily.allDayLane": "Ganztägig",
+	"daily.collapseAllDay": "Ganztägige Pläne einklappen ({count})",
+	"daily.expandAllDay": "Ganztägige Pläne ausklappen ({count})",
 	"daily.noUntimed": "Keine ganztägigen oder zeitlosen Pläne",
 	"daily.timeline": "Zeitachse",
 	"daily.openDate": "{date} im Tagesplaner öffnen",
