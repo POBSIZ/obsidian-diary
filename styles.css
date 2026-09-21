@@ -1,7 +1,7 @@
 /*
 This CSS file is included with your plugin, and
 available in the app when your plugin is enabled.
-Diary release version: 1.17.0
+Diary release version: 1.17.1
 */
 
 :where(
@@ -464,6 +464,12 @@ body.-is-mobile .planner-container-compact .planner-view-switcher-popover {
 	height: var(--planner-btn-size-mobile);
 	min-width: var(--planner-btn-size-mobile);
 	min-height: var(--planner-btn-size-mobile);
+}
+
+.planner-container-compact .planner-header-nav-btn .diary-ui-button-icon svg,
+.planner-container-compact .planner-more-menu-trigger svg {
+	width: 1.125rem;
+	height: 1.125rem;
 }
 
 .planner-container-compact .planner-header-period-display {
@@ -3834,6 +3840,7 @@ body.-is-mobile .monthly-planner-weekend-label {
 	display: grid;
 	flex: 0 0 auto;
 	grid-template-columns: var(--daily-planner-time-gutter) minmax(0, 1fr);
+	grid-template-rows: minmax(0, 1fr);
 	min-height: 2.75rem;
 	max-height: 8rem;
 	padding-right: var(--daily-planner-scrollbar-width);
@@ -3893,11 +3900,12 @@ button.daily-planner-all-day-toggle {
 .daily-planner-all-day-toggle .diary-ui-button-icon {
 	grid-area: icon;
 	justify-self: end;
+	flex: 0 0 auto;
 }
 
 .daily-planner-all-day-toggle .diary-ui-button-icon svg {
-	width: 0.8rem;
-	height: 0.8rem;
+	width: 1rem;
+	height: 1rem;
 }
 
 .daily-planner-all-day-toggle .diary-ui-button-label {
@@ -3927,6 +3935,8 @@ button.daily-planner-all-day-toggle {
 	min-height: 0;
 	flex-direction: column;
 	overflow-y: auto;
+	overscroll-behavior-y: contain;
+	-webkit-overflow-scrolling: touch;
 }
 
 .daily-planner-all-day-content[hidden] {
@@ -4076,7 +4086,7 @@ button.daily-planner-all-day-toggle {
 }
 
 .daily-planner-all-day-columns {
-	flex: 1 0 auto;
+	flex: 0 0 auto;
 	display: grid;
 	grid-template-columns: repeat(
 		var(--daily-planner-day-count),
@@ -4088,11 +4098,9 @@ button.daily-planner-all-day-toggle {
 
 .daily-planner-all-day-cell {
 	min-width: 0;
-	min-height: 0;
 	padding: 0.35rem;
 	border-right: 1px solid var(--background-modifier-border);
 	overflow-x: hidden;
-	overflow-y: auto;
 }
 
 .daily-planner-all-day-cell:last-child {
@@ -4101,7 +4109,6 @@ button.daily-planner-all-day-toggle {
 
 .daily-planner-all-day-cell .daily-planner-untimed-list {
 	align-content: flex-start;
-	max-height: 7.25rem;
 }
 
 .daily-planner-all-day-cell .daily-planner-untimed-chip {
@@ -5473,9 +5480,14 @@ button.planner-chip.planner-recurrence-source {
 	align-items: center;
 }
 
+:where(.diary-ui-button-icon) {
+	flex: 0 0 auto;
+}
+
 :where(.diary-ui-button-icon) svg {
 	width: 1em;
 	height: 1em;
+	flex: 0 0 auto;
 }
 
 :where(.diary-ui-button-row) {
