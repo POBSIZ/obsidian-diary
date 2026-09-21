@@ -1,7 +1,7 @@
 /*
 This CSS file is included with your plugin, and
 available in the app when your plugin is enabled.
-Diary release version: 1.17.3
+Diary release version: 1.17.4
 */
 
 :where(
@@ -4602,7 +4602,6 @@ body.-is-mobile .daily-planner-untimed-chip {
 
 body.is-mobile .daily-planner-all-day-row:not(.is-collapsed),
 body.-is-mobile .daily-planner-all-day-row:not(.is-collapsed) {
-	max-height: 18rem;
 	max-height: min(35dvh, 18rem);
 }
 
