@@ -197,8 +197,8 @@ export function createPlannerHeaderIconButton(
 	const button = createUiButton(parent, {
 		classes: "planner-header-nav-btn",
 		ariaLabel: action.label,
+		icon: action.icon,
 	});
-	setIcon(button, action.icon);
 	if (action.title) button.title = action.title;
 	button.onclick = action.onClick;
 	return button;
@@ -229,7 +229,8 @@ export function renderPlannerHeaderActions(
 			role: "button",
 		},
 	});
-	setIcon(trigger, "ellipsis");
+	const triggerIcon = trigger.createSpan({ cls: "diary-ui-button-icon" });
+	setIcon(triggerIcon, "ellipsis");
 
 	const popover = moreMenu.createDiv({ cls: "planner-more-menu-popover" });
 	for (const action of actions) {
