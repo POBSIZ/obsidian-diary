@@ -9,7 +9,7 @@ Diary는 Obsidian 볼트의 일반 Markdown 노트를 날짜별 플래너로 보
 | 항목 | 값 |
 | --- | --- |
 | 플러그인 ID | `diary` |
-| 현재 버전 | `1.17.2` |
+| 현재 버전 | `1.17.3` |
 | 최소 Obsidian 버전 | `1.7.2` |
 | 지원 플랫폼 | 데스크톱 / 모바일 (`isDesktopOnly: false`) |
 | 기본 언어 | `en` |

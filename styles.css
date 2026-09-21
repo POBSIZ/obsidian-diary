@@ -1,7 +1,7 @@
 /*
 This CSS file is included with your plugin, and
 available in the app when your plugin is enabled.
-Diary release version: 1.17.2
+Diary release version: 1.17.3
 */
 
 :where(
@@ -4093,14 +4093,12 @@ button.daily-planner-all-day-toggle {
 		minmax(0, 1fr)
 	);
 	min-width: 0;
-	min-height: 0;
 }
 
 .daily-planner-all-day-cell {
 	min-width: 0;
 	padding: 0.35rem;
 	border-right: 1px solid var(--background-modifier-border);
-	overflow-x: hidden;
 }
 
 .daily-planner-all-day-cell:last-child {
@@ -4600,6 +4598,12 @@ button.daily-planner-all-day-toggle {
 body.is-mobile .daily-planner-untimed-chip,
 body.-is-mobile .daily-planner-untimed-chip {
 	min-height: 2.5rem;
+}
+
+body.is-mobile .daily-planner-all-day-row:not(.is-collapsed),
+body.-is-mobile .daily-planner-all-day-row:not(.is-collapsed) {
+	max-height: 18rem;
+	max-height: min(35dvh, 18rem);
 }
 
 body.is-mobile .daily-planner-timeline-scroll,

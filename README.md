@@ -11,7 +11,7 @@ Diary는 Obsidian 볼트의 일반 Markdown 노트를 연간·월간·일간·3�
 | Item | Value |
 | --- | --- |
 | Plugin ID | `diary` |
-| Version | `1.17.2` |
+| Version | `1.17.3` |
 | Minimum Obsidian version | `1.7.2` |
 | Platforms | Desktop and mobile (`isDesktopOnly: false`) |
 | Default language | `en` |
@@ -19,6 +19,7 @@ Diary는 Obsidian 볼트의 일반 Markdown 노트를 연간·월간·일간·3�
 
 ## What's new
 
+- `1.17.3`: fixes clipped and hard-to-scroll all-day entries on mobile daily and 3-day views.
 - `1.17.2`: updates transitive dependencies to resolve the security advisory reported for `js-yaml`.
 - `1.17.1`: fixes scrolling and overlapping items in the all-day section of the daily and 3-day planners on mobile, and keeps button icons readable in narrow layouts.
 - `1.17.0`: adds a collapsible all-day section with event counts to the daily and 3-day planners, and improves sub-20-minute events with readable compact cards, time tooltips, and collision-aware layout.
