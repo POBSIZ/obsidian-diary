@@ -11,7 +11,7 @@ Diary는 Obsidian 볼트의 일반 Markdown 노트를 연간·월간·일간·3�
 | Item | Value |
 | --- | --- |
 | Plugin ID | `diary` |
-| Version | `1.17.6` |
+| Version | `1.17.7` |
 | Minimum Obsidian version | `1.7.2` |
 | Platforms | Desktop and mobile (`isDesktopOnly: false`) |
 | Default language | `en` |
@@ -19,6 +19,7 @@ Diary는 Obsidian 볼트의 일반 Markdown 노트를 연간·월간·일간·3�
 
 ## What's new
 
+- `1.17.7`: aligns all-day range chips with regular chips on mobile, including horizontal insets, text padding, and vertical spacing.
 - `1.17.6`: prevents mobile all-day range bars from overlapping entries and keeps the 00:00 label visible.
 - `1.17.5`: fixes iPad all-day clipping and restores readable planner header icons.
 - `1.17.4`: removes the mobile all-day CSS lint warning.

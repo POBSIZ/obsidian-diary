@@ -1,7 +1,7 @@
 /*
 This CSS file is included with your plugin, and
 available in the app when your plugin is enabled.
-Diary release version: 1.17.6
+Diary release version: 1.17.7
 */
 
 :where(
@@ -3945,6 +3945,8 @@ button.daily-planner-all-day-toggle {
 }
 
 .daily-planner-all-day-content {
+	--daily-planner-all-day-inset: 0.35rem;
+	--daily-planner-all-day-gap: 0.3rem;
 	display: flex;
 	min-width: 0;
 	min-height: 0;
@@ -4006,9 +4008,8 @@ button.daily-planner-all-day-toggle {
 		var(--daily-planner-range-lane-count),
 		1.75rem
 	);
-	gap: 0.18rem 0;
-	padding: 0.35rem 0 0.18rem;
-	border-bottom: 1px solid var(--background-modifier-border);
+	gap: var(--daily-planner-all-day-gap) 0;
+	padding: var(--daily-planner-all-day-inset) 0 0;
 }
 
 .daily-planner-range-lanes::after {
@@ -4040,7 +4041,8 @@ button.daily-planner-all-day-toggle {
 	max-width: none;
 	min-width: 0;
 	min-height: 1.75rem;
-	margin: 0 0.35rem;
+	margin: 0 var(--daily-planner-all-day-inset);
+	padding: 0;
 	justify-content: flex-start;
 	border-radius: 0;
 	overflow: hidden;
@@ -4049,8 +4051,10 @@ button.daily-planner-all-day-toggle {
 }
 
 .daily-planner-range-day-label {
+	display: flex;
+	align-items: center;
 	min-width: 0;
-	padding: 0 0.35rem;
+	padding: var(--planner-chip-padding);
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
@@ -4072,12 +4076,10 @@ button.daily-planner-all-day-toggle {
 }
 
 .daily-planner-range-bar.continues-before {
-	margin-left: 0.12rem;
 	border-left: 0;
 }
 
 .daily-planner-range-bar.continues-after {
-	margin-right: 0.12rem;
 	border-right: 0;
 }
 
@@ -4112,8 +4114,12 @@ button.daily-planner-all-day-toggle {
 
 .daily-planner-all-day-cell {
 	min-width: 0;
-	padding: 0.35rem;
+	padding: var(--daily-planner-all-day-inset);
 	border-right: 1px solid var(--background-modifier-border);
+}
+
+.daily-planner-range-lanes + .daily-planner-all-day-columns .daily-planner-all-day-cell {
+	padding-top: var(--daily-planner-all-day-gap);
 }
 
 .daily-planner-all-day-cell:last-child {
@@ -4580,9 +4586,8 @@ button.daily-planner-all-day-toggle {
 	scroll-snap-align: start;
 }
 
-.daily-planner-container.planner-container-compact
-	.daily-planner-all-day-cell {
-	padding: 0.25rem;
+.daily-planner-container.planner-container-compact .daily-planner-all-day-content {
+	--daily-planner-all-day-inset: 0.25rem;
 }
 
 .daily-planner-container.planner-container-compact
