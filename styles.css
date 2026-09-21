@@ -1,7 +1,7 @@
 /*
 This CSS file is included with your plugin, and
 available in the app when your plugin is enabled.
-Diary release version: 1.17.5
+Diary release version: 1.17.6
 */
 
 :where(
@@ -4166,6 +4166,10 @@ button.daily-planner-all-day-toggle {
 	font-variant-numeric: tabular-nums;
 }
 
+.daily-planner-time-label:first-child {
+	transform: none;
+}
+
 .daily-planner-day-columns {
 	position: absolute;
 	inset: 0 0 0 var(--daily-planner-time-gutter);
@@ -4612,6 +4616,13 @@ button.daily-planner-all-day-toggle {
 
 .daily-planner-container.planner-container-compact .daily-planner-untimed-chip {
 	min-height: 2.5rem;
+}
+
+.daily-planner-container.planner-container-compact .daily-planner-range-lanes {
+	grid-template-rows: repeat(
+		var(--daily-planner-range-lane-count),
+		2.5rem
+	);
 }
 
 .daily-planner-container.planner-container-compact
