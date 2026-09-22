@@ -198,7 +198,7 @@ export class MonthlyPlannerView
 	}
 
 	isRangeBarInteractionEnabled(): boolean {
-		return true;
+		return !this.compactLayout;
 	}
 
 	/** Update chip-drag state without full render: add chip-dragging class and drop-target. */

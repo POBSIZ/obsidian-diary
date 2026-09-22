@@ -9,7 +9,7 @@ Diary 是一款 Obsidian 社区插件，可把仓库中的普通 Markdown 笔记
 | 项目 | 值 |
 | --- | --- |
 | 插件 ID | `diary` |
-| 当前版本 | `1.17.8` |
+| 当前版本 | `1.17.9` |
 | 最低 Obsidian 版本 | `1.7.2` |
 | 支持平台 | 桌面 / 移动端 (`isDesktopOnly: false`) |
 | 默认语言 | `en` |

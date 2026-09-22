@@ -11,7 +11,7 @@ Diary는 Obsidian 볼트의 일반 Markdown 노트를 연간·월간·일간·3�
 | Item | Value |
 | --- | --- |
 | Plugin ID | `diary` |
-| Version | `1.17.8` |
+| Version | `1.17.9` |
 | Minimum Obsidian version | `1.7.2` |
 | Platforms | Desktop and mobile (`isDesktopOnly: false`) |
 | Default language | `en` |
@@ -19,6 +19,7 @@ Diary는 Obsidian 볼트의 일반 Markdown 노트를 연간·월간·일간·3�
 
 ## What's new
 
+- `1.17.9`: opens the selected day's summary when a range chip is tapped in the compact monthly grid.
 - `1.17.8`: keeps the intended gap below all-day range chips when mobile button heights grow beyond the minimum.
 - `1.17.7`: aligns all-day range chips with regular chips on mobile, including horizontal insets, text padding, and vertical spacing.
 - `1.17.6`: prevents mobile all-day range bars from overlapping entries and keeps the 00:00 label visible.
