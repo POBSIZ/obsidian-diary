@@ -1,7 +1,7 @@
 /*
 This CSS file is included with your plugin, and
 available in the app when your plugin is enabled.
-Diary release version: 1.18.0
+Diary release version: 1.18.1
 */
 
 :where(
@@ -6360,4 +6360,8 @@ body:is(.is-mobile, .-is-mobile)
 		margin-right: 2.5rem;
 		font-size: var(--font-ui-large);
 	}
+}
+
+.diary-plan-note-path-setting.is-invalid .setting-item-description {
+	color: var(--text-error);
 }

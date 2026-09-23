@@ -325,6 +325,7 @@
 	"country.AU": "호주",
 	"country.CA": "캐나다",
 	"country.TW": "대만",
+	"planNote.createError": "계획 노트를 만들지 못했습니다. 경로를 확인하고 다시 시도하세요.",
 	"planNote.createButton": "계획 노트 만들기",
 	"planNote.openButton": "계획 노트 열기",
 	"planNote.collapse": "미리보기 접기",
@@ -382,6 +383,8 @@
 	"settings.monday": "월요일",
 	"settings.yearlyPlanNotePath": "연간 계획 노트 경로",
 	"settings.yearlyPlanNotePathDesc": "보관함 기준 상대 경로입니다. 연도에는 YYYY를 사용하세요. 비워두면 플래너 폴더를 사용합니다.",
+	"settings.yearlyPlanNotePathError": "YYYY가 포함된 상대 .md 경로를 입력하세요. MM이나 지원하지 않는 날짜 토큰은 사용할 수 없습니다.",
 	"settings.monthlyPlanNotePath": "월간 계획 노트 경로",
+	"settings.monthlyPlanNotePathError": "YYYY와 MM이 포함된 상대 .md 경로를 입력하세요. 다른 날짜 토큰은 지원하지 않습니다.",
 	"settings.monthlyPlanNotePathDesc": "보관함 기준 상대 경로입니다. YYYY와 MM을 사용하세요. 비워두면 플래너 폴더를 사용합니다."
 }

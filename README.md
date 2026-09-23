@@ -11,7 +11,7 @@ Diary는 Obsidian 볼트의 일반 Markdown 노트를 연간·월간·일간·3�
 | Item | Value |
 | --- | --- |
 | Plugin ID | `diary` |
-| Version | `1.18.0` |
+| Version | `1.18.1` |
 | Minimum Obsidian version | `1.7.2` |
 | Platforms | Desktop and mobile (`isDesktopOnly: false`) |
 | Default language | `en` |
@@ -19,6 +19,7 @@ Diary는 Obsidian 볼트의 일반 Markdown 노트를 연간·월간·일간·3�
 
 ## What's new
 
+- `1.18.1`: fixes plan note path token handling, reports invalid paths and create failures, and refreshes previews after plan notes change.
 - `1.18.0`: adds a Monday-first monthly grid option, clearer weekend shading, and custom yearly and monthly plan note paths.
 - `1.17.9`: opens the selected day's summary when a range chip is tapped in the compact monthly grid.
 - `1.17.8`: keeps the intended gap below all-day range chips when mobile button heights grow beyond the minimum.

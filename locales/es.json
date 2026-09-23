@@ -324,6 +324,7 @@
 	"country.AU": "Australia",
 	"country.CA": "Canadá",
 	"country.TW": "Taiwán",
+	"planNote.createError": "No se pudo crear la nota del plan. Revisa la ruta e inténtalo de nuevo.",
 	"planNote.createButton": "Crear nota de plan",
 	"planNote.openButton": "Abrir nota de plan",
 	"planNote.collapse": "Contraer vista previa",
@@ -381,6 +382,8 @@
 	"settings.monday": "Lunes",
 	"settings.yearlyPlanNotePath": "Ruta de la nota anual",
 	"settings.yearlyPlanNotePathDesc": "Ruta relativa a la bóveda. Usa YYYY para el año. Déjala vacía para usar la carpeta del planificador.",
+	"settings.yearlyPlanNotePathError": "Introduce una ruta relativa .md con YYYY, sin MM ni otros códigos de fecha.",
 	"settings.monthlyPlanNotePath": "Ruta de la nota mensual",
+	"settings.monthlyPlanNotePathError": "Introduce una ruta relativa .md con YYYY y MM. No se admiten otros códigos de fecha.",
 	"settings.monthlyPlanNotePathDesc": "Ruta relativa a la bóveda. Usa YYYY y MM. Déjala vacía para usar la carpeta del planificador."
 }

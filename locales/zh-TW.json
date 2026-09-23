@@ -324,6 +324,7 @@
 	"country.AU": "澳洲",
 	"country.CA": "加拿大",
 	"country.TW": "台灣",
+	"planNote.createError": "無法建立計畫筆記。請檢查路徑後重試。",
 	"planNote.createButton": "建立計畫筆記",
 	"planNote.openButton": "開啟計畫筆記",
 	"planNote.collapse": "收合預覽",
@@ -381,6 +382,8 @@
 	"settings.monday": "星期一",
 	"settings.yearlyPlanNotePath": "年度計畫筆記路徑",
 	"settings.yearlyPlanNotePathDesc": "相對於儲存庫的路徑。用 YYYY 表示年份；留空則使用規劃資料夾。",
+	"settings.yearlyPlanNotePathError": "請輸入包含 YYYY 的相對 .md 路徑，不要使用 MM 或其他日期標記。",
 	"settings.monthlyPlanNotePath": "月度計畫筆記路徑",
+	"settings.monthlyPlanNotePathError": "請輸入包含 YYYY 和 MM 的相對 .md 路徑。不支援其他日期標記。",
 	"settings.monthlyPlanNotePathDesc": "相對於儲存庫的路徑。使用 YYYY 和 MM；留空則使用規劃資料夾。"
 }

@@ -324,6 +324,7 @@
 	"country.AU": "Australie",
 	"country.CA": "Canada",
 	"country.TW": "Taïwan",
+	"planNote.createError": "Impossible de créer la note de plan. Vérifiez le chemin et réessayez.",
 	"planNote.createButton": "Créer une note de plan",
 	"planNote.openButton": "Ouvrir la note de plan",
 	"planNote.collapse": "Replier l’aperçu",
@@ -381,6 +382,8 @@
 	"settings.monday": "Lundi",
 	"settings.yearlyPlanNotePath": "Chemin de la note annuelle",
 	"settings.yearlyPlanNotePathDesc": "Chemin relatif au coffre avec YYYY pour l’année. Laissez vide pour utiliser le dossier du planificateur.",
+	"settings.yearlyPlanNotePathError": "Saisissez un chemin relatif .md avec YYYY, sans MM ni autre code de date.",
 	"settings.monthlyPlanNotePath": "Chemin de la note mensuelle",
+	"settings.monthlyPlanNotePathError": "Saisissez un chemin relatif .md avec YYYY et MM. Les autres codes de date ne sont pas pris en charge.",
 	"settings.monthlyPlanNotePathDesc": "Chemin relatif au coffre avec YYYY et MM. Laissez vide pour utiliser le dossier du planificateur."
 }

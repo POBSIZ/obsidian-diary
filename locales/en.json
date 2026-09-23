@@ -325,6 +325,7 @@
 	"country.AU": "Australia",
 	"country.CA": "Canada",
 	"country.TW": "Taiwan",
+	"planNote.createError": "Could not create the plan note. Check the path and try again.",
 	"planNote.createButton": "Create plan note",
 	"planNote.openButton": "Open plan note",
 	"planNote.collapse": "Collapse preview",
@@ -382,6 +383,8 @@
 	"settings.monday": "Monday",
 	"settings.yearlyPlanNotePath": "Yearly plan note path",
 	"settings.yearlyPlanNotePathDesc": "Vault-relative path. Use YYYY for the year. Leave blank to use the planner folder.",
+	"settings.yearlyPlanNotePathError": "Enter a relative .md path with YYYY, without MM or unsupported date tokens.",
 	"settings.monthlyPlanNotePath": "Monthly plan note path",
+	"settings.monthlyPlanNotePathError": "Enter a relative .md path with YYYY and MM; other date tokens are not supported.",
 	"settings.monthlyPlanNotePathDesc": "Vault-relative path. Use YYYY and MM. Leave blank to use the planner folder."
 }

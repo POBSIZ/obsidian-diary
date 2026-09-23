@@ -77,6 +77,7 @@ declare module "obsidian" {
 	export class TFile extends TAbstractFile {
 		basename: string;
 		extension: string;
+		stat: { mtime: number; size: number };
 	}
 
 	export class TFolder extends TAbstractFile {

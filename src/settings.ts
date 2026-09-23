@@ -180,11 +180,8 @@ export class DiaryObsidianSettingTab extends PluginSettingTab {
 			...(["yearly", "monthly"] as const).map((kind) => ({
 				name: t(`settings.${kind}PlanNotePath`),
 				desc: t(`settings.${kind}PlanNotePathDesc`),
-				control: {
-					type: "text" as const,
-					key: `${kind}PlanNotePath`,
-					placeholder: kind === "yearly" ? "Notes/Yearly/YYYY.md" : "Notes/Monthly/YYYY-MM.md",
-				},
+				render: (setting: Setting) =>
+					this.renderPlanNotePathSetting(setting, kind),
 			})),
 			{
 				name: t("settings.dateFormat"),
@@ -310,7 +307,10 @@ export class DiaryObsidianSettingTab extends PluginSettingTab {
 			case "monthlyPlanNotePath": {
 				const kind = key === "yearlyPlanNotePath" ? "yearly" : "monthly";
 				const template = String(value).trim();
-				if (!isValidPlanNoteTemplate(template, kind)) return;
+				if (!isValidPlanNoteTemplate(template, kind)) {
+					new Notice(t(`settings.${kind}PlanNotePathError`));
+					return;
+				}
 				this.plugin.settings[key] = template;
 				break;
 			}
@@ -333,6 +333,33 @@ export class DiaryObsidianSettingTab extends PluginSettingTab {
 				return;
 		}
 		await this.plugin.saveSettings();
+	}
+
+	private renderPlanNotePathSetting(
+		setting: Setting,
+		kind: "yearly" | "monthly",
+	): void {
+		const key = `${kind}PlanNotePath` as const;
+		const description = t(`settings.${kind}PlanNotePathDesc`);
+		setting.settingEl.addClass("diary-plan-note-path-setting");
+		setting
+			.setName(t(`settings.${kind}PlanNotePath`))
+			.setDesc(description)
+			.addText((text) => text
+				.setPlaceholder(kind === "yearly" ? "Notes/Yearly/YYYY.md" : "Notes/Monthly/YYYY-MM.md")
+				.setValue(this.plugin.settings[key] ?? "")
+				.onChange(async (value) => {
+					const template = value.trim();
+					const valid = isValidPlanNoteTemplate(template, kind);
+					setting.settingEl.toggleClass("is-invalid", !valid);
+					text.inputEl.setAttribute("aria-invalid", String(!valid));
+					setting.setDesc(valid
+						? description
+						: t(`settings.${kind}PlanNotePathError`));
+					if (!valid) return;
+					this.plugin.settings[key] = template;
+					await this.plugin.saveSettings();
+				}));
 	}
 
 	display(): void {
@@ -401,19 +428,7 @@ export class DiaryObsidianSettingTab extends PluginSettingTab {
 				}));
 
 		for (const kind of ["yearly", "monthly"] as const) {
-			const key = `${kind}PlanNotePath` as const;
-			new Setting(containerEl)
-				.setName(t(`settings.${kind}PlanNotePath`))
-				.setDesc(t(`settings.${kind}PlanNotePathDesc`))
-				.addText((text) => text
-					.setPlaceholder(kind === "yearly" ? "Notes/Yearly/YYYY.md" : "Notes/Monthly/YYYY-MM.md")
-					.setValue(this.plugin.settings[key] ?? "")
-					.onChange(async (value) => {
-						const template = value.trim();
-						if (!isValidPlanNoteTemplate(template, kind)) return;
-						this.plugin.settings[key] = template;
-						await this.plugin.saveSettings();
-					}));
+			this.renderPlanNotePathSetting(new Setting(containerEl), kind);
 		}
 
 		new Setting(containerEl)

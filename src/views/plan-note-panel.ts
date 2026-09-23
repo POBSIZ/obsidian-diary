@@ -1,4 +1,4 @@
-import { App, Component, MarkdownRenderer, setIcon, TFile } from "obsidian";
+import { App, Component, MarkdownRenderer, Notice, setIcon, TFile } from "obsidian";
 import { t } from "../i18n";
 import { createUiButton } from "../ui/components";
 
@@ -16,7 +16,13 @@ export interface PlanNotePanelOptions {
 export interface PlanNotePeriod {
 	year: number;
 	path: string;
+	revision: string;
 	month?: number;
+}
+
+export function getPlanNoteFileRevision(app: App, path: string): string {
+	const file = app.vault.getAbstractFileByPath(path);
+	return file instanceof TFile ? `${file.stat.mtime}:${file.stat.size}` : "missing";
 }
 
 /** Detach a matching rendered panel so a view refresh can reuse its markdown DOM. */
@@ -31,6 +37,7 @@ export function detachReusablePlanNotePanel(
 		!wrapper?.hasChildNodes() ||
 		wrapper.dataset.year !== String(period.year) ||
 		wrapper.dataset.path !== period.path ||
+		wrapper.dataset.revision !== period.revision ||
 		(period.month != null && wrapper.dataset.month !== String(period.month))
 	) {
 		return null;
@@ -57,6 +64,7 @@ export function mountPlanNotePanel(
 	const wrapper = contentEl.createDiv({ cls: "plan-note-panel-wrapper" });
 	wrapper.dataset.year = String(options.period.year);
 	wrapper.dataset.path = options.period.path;
+	wrapper.dataset.revision = options.period.revision;
 	if (options.period.month != null) {
 		wrapper.dataset.month = String(options.period.month);
 	}
@@ -142,7 +150,11 @@ export async function renderPlanNotePanel(
 			classes: "plan-note-panel-create-btn",
 			text: t("planNote.createButton"),
 		});
-		createBtn.addEventListener("click", () => void opts.onCreate());
+		createBtn.addEventListener("click", () => {
+			void opts.onCreate().catch(() => {
+				new Notice(t("planNote.createError"));
+			});
+		});
 	}
 }
 

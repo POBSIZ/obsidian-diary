@@ -324,6 +324,7 @@
 	"country.AU": "澳大利亚",
 	"country.CA": "加拿大",
 	"country.TW": "台湾",
+	"planNote.createError": "无法创建计划笔记。请检查路径后重试。",
 	"planNote.createButton": "创建计划笔记",
 	"planNote.openButton": "打开计划笔记",
 	"planNote.collapse": "收起预览",
@@ -381,6 +382,8 @@
 	"settings.monday": "星期一",
 	"settings.yearlyPlanNotePath": "年度计划笔记路径",
 	"settings.yearlyPlanNotePathDesc": "相对于仓库的路径。用 YYYY 表示年份；留空则使用计划文件夹。",
+	"settings.yearlyPlanNotePathError": "请输入包含 YYYY 的相对 .md 路径，不要使用 MM 或其他日期标记。",
 	"settings.monthlyPlanNotePath": "月度计划笔记路径",
+	"settings.monthlyPlanNotePathError": "请输入包含 YYYY 和 MM 的相对 .md 路径。不支持其他日期标记。",
 	"settings.monthlyPlanNotePathDesc": "相对于仓库的路径。使用 YYYY 和 MM；留空则使用计划文件夹。"
 }

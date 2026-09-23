@@ -324,6 +324,7 @@
 	"country.AU": "オーストラリア",
 	"country.CA": "カナダ",
 	"country.TW": "台湾",
+	"planNote.createError": "計画ノートを作成できませんでした。パスを確認して再試行してください。",
 	"planNote.createButton": "プランノートを作成",
 	"planNote.openButton": "プランノートを開く",
 	"planNote.collapse": "プレビューを折りたたむ",
@@ -381,6 +382,8 @@
 	"settings.monday": "月曜日",
 	"settings.yearlyPlanNotePath": "年間計画ノートのパス",
 	"settings.yearlyPlanNotePathDesc": "保管庫内の相対パス。年には YYYY を使用。空欄の場合はプランナーフォルダを使用。",
+	"settings.yearlyPlanNotePathError": "YYYY を含む相対 .md パスを入力してください。MM や他の日付トークンは使用できません。",
 	"settings.monthlyPlanNotePath": "月間計画ノートのパス",
+	"settings.monthlyPlanNotePathError": "YYYY と MM を含む相対 .md パスを入力してください。他の日付トークンは使用できません。",
 	"settings.monthlyPlanNotePathDesc": "保管庫内の相対パス。YYYY と MM を使用。空欄の場合はプランナーフォルダを使用。"
 }

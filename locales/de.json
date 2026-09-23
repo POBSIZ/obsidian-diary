@@ -324,6 +324,7 @@
 	"country.AU": "Australien",
 	"country.CA": "Kanada",
 	"country.TW": "Taiwan",
+	"planNote.createError": "Die Plannotiz konnte nicht erstellt werden. Prüfe den Pfad und versuche es erneut.",
 	"planNote.createButton": "Plan-Notiz erstellen",
 	"planNote.openButton": "Plan-Notiz öffnen",
 	"planNote.collapse": "Vorschau einklappen",
@@ -381,6 +382,8 @@
 	"settings.monday": "Montag",
 	"settings.yearlyPlanNotePath": "Pfad der Jahresplan-Notiz",
 	"settings.yearlyPlanNotePathDesc": "Pfad im Vault mit YYYY für das Jahr. Leer lassen für den Planerordner.",
+	"settings.yearlyPlanNotePathError": "Gib einen relativen .md-Pfad mit YYYY ein, ohne MM oder nicht unterstützte Datumscodes.",
 	"settings.monthlyPlanNotePath": "Pfad der Monatsplan-Notiz",
+	"settings.monthlyPlanNotePathError": "Gib einen relativen .md-Pfad mit YYYY und MM ein. Andere Datumscodes werden nicht unterstützt.",
 	"settings.monthlyPlanNotePathDesc": "Pfad im Vault mit YYYY und MM. Leer lassen für den Planerordner."
 }

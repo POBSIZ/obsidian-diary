@@ -13,6 +13,7 @@ import {
 } from "../yearly-planner/file-utils";
 import {
 	detachReusablePlanNotePanel,
+	getPlanNoteFileRevision,
 	mountPlanNotePanel,
 	renderPlanNotePanel,
 } from "../plan-note-panel";
@@ -418,8 +419,10 @@ export class MonthlyListPlannerView extends ItemView {
 			this.year,
 			this.month,
 		);
+		const planNoteRevision = getPlanNoteFileRevision(this.app, planNotePath);
 		const planNoteWrapper = detachReusablePlanNotePanel(contentEl, {
 			path: planNotePath,
+			revision: planNoteRevision,
 			year: this.year,
 			month: this.month,
 		});
@@ -436,7 +439,7 @@ export class MonthlyListPlannerView extends ItemView {
 
 		this.renderHeader(contentEl);
 		mountPlanNotePanel(contentEl, {
-			period: { path: planNotePath, year: this.year, month: this.month },
+			period: { path: planNotePath, revision: planNoteRevision, year: this.year, month: this.month },
 			preserved: planNoteWrapper,
 			expanded: this.plugin.isPlanNotePanelExpanded(),
 			render: (container) => this.renderMonthNotePanel(container),

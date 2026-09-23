@@ -46,6 +46,7 @@ import {
 import { ExternalEventModal } from "../external-event-modal";
 import {
 	detachReusablePlanNotePanel,
+	getPlanNoteFileRevision,
 	mountPlanNotePanel,
 	renderPlanNotePanel,
 } from "../plan-note-panel";
@@ -313,8 +314,10 @@ export class YearlyPlannerView
 			this.plugin.settings.yearlyPlanNotePath ?? "",
 			this.year,
 		);
+		const planNoteRevision = getPlanNoteFileRevision(this.app, planNotePath);
 		const planNoteWrapper = detachReusablePlanNotePanel(contentEl, {
 			path: planNotePath,
+			revision: planNoteRevision,
 			year: this.year,
 		});
 
@@ -347,7 +350,7 @@ export class YearlyPlannerView
 
 		this.renderHeader(contentEl);
 		mountPlanNotePanel(contentEl, {
-			period: { path: planNotePath, year: this.year },
+			period: { path: planNotePath, revision: planNoteRevision, year: this.year },
 			preserved: planNoteWrapper,
 			expanded: this.plugin.isPlanNotePanelExpanded(),
 			render: (container) => this.renderYearNotePanel(container),
