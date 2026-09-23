@@ -22,6 +22,8 @@ export interface DailyPlannerDragItem {
 	sourceDate: DailyPlannerDragDate;
 	/** Keep a range file's existing calendar bounds while assigning its times. */
 	preserveDateRange?: boolean;
+	/** Move a timed range as one continuous interval, including its date bounds. */
+	moveRange?: boolean;
 }
 
 export interface DailyPlannerDrop {
@@ -39,6 +41,7 @@ interface ActiveDrag {
 	item: DailyPlannerDragItem;
 	startX: number;
 	startY: number;
+	rangeDragOffsetMs: number | null;
 	dragging: boolean;
 	targetLayer: HTMLElement | null;
 	drop: DailyPlannerDrop | null;
@@ -72,6 +75,29 @@ function minutesToTime(minutes: number): string {
 	if (minutes >= MINUTES_PER_DAY) return "24:00";
 	const normalized = Math.max(0, Math.min(MINUTES_PER_DAY - 1, minutes));
 	return `${pad(Math.floor(normalized / 60))}:${pad(normalized % 60)}`;
+}
+
+function getDateAtMinute(dateString: string, minutes: number): Date | null {
+	const match = dateString.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+	if (!match) return null;
+	const year = Number(match[1]);
+	const month = Number(match[2]);
+	const day = Number(match[3]);
+	if (![year, month, day].every(Number.isFinite)) return null;
+	const date = new Date(year, month - 1, day);
+	if (
+		date.getFullYear() !== year ||
+		date.getMonth() !== month - 1 ||
+		date.getDate() !== day
+	) {
+		return null;
+	}
+	date.setMinutes(Math.max(0, Math.min(MINUTES_PER_DAY - 1, minutes)));
+	return date;
+}
+
+function formatDateString(date: Date): string {
+	return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
 }
 
 function isMobileSurface(activeDocument: Document): boolean {
@@ -108,6 +134,11 @@ export class DailyPlannerDragController {
 				item,
 				startX: event.clientX,
 				startY: event.clientY,
+				rangeDragOffsetMs: this.getRangeDragOffsetMs(
+					item,
+					element,
+					event.clientY,
+				),
 				dragging: false,
 				targetLayer: null,
 				drop: null,
@@ -121,6 +152,10 @@ export class DailyPlannerDragController {
 				"mouseup",
 				this.handleMouseUp,
 				true,
+			);
+			this.contentEl.ownerDocument.defaultView?.addEventListener(
+				"blur",
+				this.handleWindowBlur,
 			);
 		});
 		element.addEventListener(
@@ -280,6 +315,10 @@ export class DailyPlannerDragController {
 	private readonly handleMouseMove = (event: MouseEvent): void => {
 		const active = this.active;
 		if (!active) return;
+		if ((event.buttons & 1) === 0) {
+			this.reset();
+			return;
+		}
 		if (!active.dragging) {
 			const distance = Math.hypot(
 				event.clientX - active.startX,
@@ -296,8 +335,15 @@ export class DailyPlannerDragController {
 	};
 
 	private readonly handleMouseUp = (event: MouseEvent): void => {
-		const drop = this.active?.dragging ? this.active.drop : null;
-		const dragged = this.active?.dragging === true;
+		const active = this.active;
+		if (active?.dragging) {
+			// A final movement can be coalesced with mouseup, particularly while the
+			// three-day viewport is scrolling. Resolve the release point explicitly
+			// instead of relying only on the previous mousemove event.
+			this.updateDropTarget(event.clientX, event.clientY);
+		}
+		const drop = active?.dragging ? active.drop : null;
+		const dragged = active?.dragging === true;
 		this.reset();
 		if (!dragged) return;
 		event.preventDefault();
@@ -315,7 +361,11 @@ export class DailyPlannerDragController {
 		}
 		event.preventDefault();
 		this.autoScroll(event.clientX, event.clientY);
-		const targetLayer = this.getLayerAtPoint(event.clientX, event.clientY);
+		const targetLayer = this.getLayerAtPoint(
+			event.clientX,
+			event.clientY,
+			true,
+		);
 		const targetDate = targetLayer ? this.readTargetDate(targetLayer) : null;
 		if (active.item.preserveDateRange && (!targetLayer || !targetDate)) return;
 		const layer = targetLayer ?? active.layer;
@@ -508,13 +558,7 @@ export class DailyPlannerDragController {
 	private updateDropTarget(clientX: number, clientY: number): void {
 		const active = this.active;
 		if (!active) return;
-		const layer = this.contentEl.ownerDocument
-			.elementsFromPoint(clientX, clientY)
-			.map((element) => element.closest<HTMLElement>(".daily-planner-events-layer"))
-			.find(
-				(candidate): candidate is HTMLElement =>
-					candidate != null && this.contentEl.contains(candidate),
-			);
+		const layer = this.getLayerAtPoint(clientX, clientY);
 		if (active.targetLayer !== layer) {
 			this.contentEl
 				.querySelectorAll(".daily-planner-events-layer.is-drop-target")
@@ -533,9 +577,10 @@ export class DailyPlannerDragController {
 		}
 		const rect = layer.getBoundingClientRect();
 		const rawMinutes = ((clientY - rect.top) / rect.height) * MINUTES_PER_DAY;
-		const originalDuration =
-			(active.item.entry.endMinutes ?? 0) -
-			(active.item.entry.startMinutes ?? 0);
+		const originalDuration = active.item.moveRange
+			? SNAP_MINUTES
+			: (active.item.entry.endMinutes ?? 0) -
+				(active.item.entry.startMinutes ?? 0);
 		const duration = Math.max(
 			SNAP_MINUTES,
 			originalDuration || DEFAULT_DURATION_MINUTES,
@@ -552,16 +597,107 @@ export class DailyPlannerDragController {
 			MINUTES_PER_DAY - 1,
 			startMinutes + duration,
 		);
+		const movedRange = this.getMovedRangeBounds(
+			active.item,
+			targetDate,
+			startMinutes,
+			active.rangeDragOffsetMs,
+		);
 		active.drop = {
 			item: active.item,
 			targetDate,
 			startMinutes,
 			endMinutes,
+			...movedRange,
 		};
 		this.renderPreview(layer, active.drop);
 	}
 
-	private getLayerAtPoint(clientX: number, clientY: number): HTMLElement | null {
+	private getMovedRangeBounds(
+		item: DailyPlannerDragItem,
+		targetDate: DailyPlannerDragDate,
+		targetMinutes: number,
+		rangeDragOffsetMs: number | null,
+	): Pick<
+		DailyPlannerDrop,
+		"rangeStartDate" | "rangeEndDate" | "startMinutes" | "endMinutes"
+	> | null {
+		const { entry } = item;
+		if (
+			!item.moveRange ||
+			!entry.rangeStart ||
+			!entry.rangeEnd ||
+			entry.rangeStartMinutes == null ||
+			entry.rangeEndMinutes == null
+		) {
+			return null;
+		}
+		const originalStart = getDateAtMinute(
+			entry.rangeStart,
+			entry.rangeStartMinutes,
+		);
+		const originalEnd = getDateAtMinute(
+			entry.rangeEnd,
+			entry.rangeEndMinutes,
+		);
+		const targetPoint = getDateAtMinute(targetDate.dateString, targetMinutes);
+		if (!originalStart || !originalEnd || !targetPoint) return null;
+		const duration = originalEnd.getTime() - originalStart.getTime();
+		if (duration <= 0) return null;
+		const movedStart = new Date(
+			targetPoint.getTime() - (rangeDragOffsetMs ?? 0),
+		);
+		const movedEnd = new Date(movedStart.getTime() + duration);
+		return {
+			rangeStartDate: formatDateString(movedStart),
+			rangeEndDate: formatDateString(movedEnd),
+			startMinutes: movedStart.getHours() * 60 + movedStart.getMinutes(),
+			endMinutes: movedEnd.getHours() * 60 + movedEnd.getMinutes(),
+		};
+	}
+
+	private getRangeDragOffsetMs(
+		item: DailyPlannerDragItem,
+		element: HTMLElement,
+		clientY: number,
+	): number | null {
+		const { entry } = item;
+		if (
+			!item.moveRange ||
+			!entry.rangeStart ||
+			entry.rangeStartMinutes == null
+		) {
+			return null;
+		}
+		const layer = element.closest<HTMLElement>(
+			".daily-planner-events-layer",
+		);
+		const sourceDate = layer ? this.readTargetDate(layer) : null;
+		if (!layer || !sourceDate) return null;
+		const rect = layer.getBoundingClientRect();
+		if (rect.height <= 0) return null;
+		const rawMinutes = ((clientY - rect.top) / rect.height) * MINUTES_PER_DAY;
+		const pointerMinutes = Math.max(
+			0,
+			Math.min(
+				MINUTES_PER_DAY - 1,
+				Math.round(rawMinutes / SNAP_MINUTES) * SNAP_MINUTES,
+			),
+		);
+		const originalStart = getDateAtMinute(
+			entry.rangeStart,
+			entry.rangeStartMinutes,
+		);
+		const pointer = getDateAtMinute(sourceDate.dateString, pointerMinutes);
+		if (!originalStart || !pointer) return null;
+		return pointer.getTime() - originalStart.getTime();
+	}
+
+	private getLayerAtPoint(
+		clientX: number,
+		clientY: number,
+		allowOutsideVerticalBounds = false,
+	): HTMLElement | null {
 		const direct =
 			this.contentEl.ownerDocument
 				.elementsFromPoint(clientX, clientY)
@@ -574,9 +710,9 @@ export class DailyPlannerDragController {
 				) ?? null;
 		if (direct) return direct;
 
-		// Range sources become pointer-transparent while resizing, and the pointer
-		// can briefly sit on a column seam. Keep resolving the target by horizontal
-		// column bounds so moving a boundary across dates remains continuous.
+		// Previews and column borders can leave elementsFromPoint without a layer
+		// under the cursor. Keep resolving from the visible column bounds; range
+		// resizing intentionally allows vertical overflow while a drag does not.
 		return (
 			Array.from(
 				this.contentEl.querySelectorAll<HTMLElement>(
@@ -584,7 +720,12 @@ export class DailyPlannerDragController {
 				),
 			).find((layer) => {
 				const rect = layer.getBoundingClientRect();
-				return clientX >= rect.left && clientX <= rect.right;
+				return (
+					clientX >= rect.left &&
+					clientX <= rect.right &&
+					(allowOutsideVerticalBounds ||
+						(clientY >= rect.top && clientY <= rect.bottom))
+				);
 			}) ?? null
 		);
 	}
@@ -604,6 +745,8 @@ export class DailyPlannerDragController {
 		const isRangeDrop = Boolean(
 			drop.item.preserveDateRange && entry.rangeStart && entry.rangeEnd,
 		);
+		const rangeStartDate = drop.rangeStartDate ?? entry.rangeStart;
+		const rangeEndDate = drop.rangeEndDate ?? entry.rangeEnd;
 		const layers = isRangeDrop
 			? Array.from(
 					this.contentEl.querySelectorAll<HTMLElement>(
@@ -613,8 +756,8 @@ export class DailyPlannerDragController {
 					const date = candidate.dataset.date;
 					return (
 						date != null &&
-						date >= (entry.rangeStart ?? "") &&
-						date <= (entry.rangeEnd ?? "")
+						date >= (rangeStartDate ?? "") &&
+						date <= (rangeEndDate ?? "")
 					);
 				})
 			: [layer];
@@ -625,8 +768,8 @@ export class DailyPlannerDragController {
 			const slice = isRangeDrop
 				? getDailyRangeTimeSlice(
 						date,
-						entry.rangeStart ?? date,
-						entry.rangeEnd ?? date,
+						rangeStartDate ?? date,
+						rangeEndDate ?? date,
 						drop.startMinutes,
 						drop.endMinutes,
 					)
@@ -637,8 +780,8 @@ export class DailyPlannerDragController {
 				cls: [
 					"daily-planner-drag-preview",
 					isRangeDrop && "daily-planner-range-drag-preview",
-					isRangeDrop && date !== entry.rangeStart && "continues-before",
-					isRangeDrop && date !== entry.rangeEnd && "continues-after",
+					isRangeDrop && date !== rangeStartDate && "continues-before",
+					isRangeDrop && date !== rangeEndDate && "continues-after",
 				]
 					.filter(Boolean)
 					.join(" "),

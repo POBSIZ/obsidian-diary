@@ -1005,13 +1005,18 @@ export class DailyPlannerView extends ItemView {
 			entry,
 			sourceDate,
 			preserveDateRange: Boolean(entry.rangeStart),
+			moveRange:
+				Boolean(entry.rangeStart) &&
+				entry.rangeStartMinutes != null &&
+				entry.rangeEndMinutes != null,
 		};
-		// A range is one continuous datetime interval. A per-day slice cannot be
-		// moved or resized independently. Its all-day bar can still be dropped on
-		// the timeline to assign the interval's start and end times.
+		// A range moves as one continuous datetime interval. Dragging a timed
+		// slice shifts both date boundaries and its times; its ends still resize
+		// independently. An all-day range can be dropped on the timeline to assign
+		// its start and end times while retaining its current date boundaries.
 		if (entry.rangeStart) {
 			if (
-				entry.startMinutes == null &&
+				(entry.startMinutes == null || item.moveRange) &&
 				this.dragController.bind(element, item)
 			) {
 				element.addClass("is-draggable");
@@ -1044,12 +1049,27 @@ export class DailyPlannerView extends ItemView {
 	}
 
 	private async handlePlannerDrop(drop: DailyPlannerDrop): Promise<void> {
+		const entry = drop.item.entry;
 		const sameDate =
 			drop.item.sourceDate.dateString === drop.targetDate.dateString;
 		const sameTime =
-			drop.item.entry.startMinutes === drop.startMinutes &&
-			drop.item.entry.endMinutes === drop.endMinutes;
-		if (drop.item.entry.file && sameDate && sameTime) return;
+			entry.startMinutes === drop.startMinutes &&
+			entry.endMinutes === drop.endMinutes;
+		const rangeMove = Boolean(
+			drop.item.moveRange &&
+			!drop.resizeEdge &&
+			drop.rangeStartDate &&
+			drop.rangeEndDate,
+		);
+		const rangeMoveUnchanged =
+			rangeMove &&
+			drop.rangeStartDate === entry.rangeStart &&
+			drop.rangeEndDate === entry.rangeEnd &&
+			drop.startMinutes === entry.rangeStartMinutes &&
+			drop.endMinutes === entry.rangeEndMinutes;
+		if (drop.item.entry.file && (rangeMove ? rangeMoveUnchanged : sameDate && sameTime)) {
+			return;
+		}
 
 		try {
 			let file = await this.materializeDragItem(drop.item);
@@ -1067,10 +1087,9 @@ export class DailyPlannerView extends ItemView {
 				}
 				file = moved;
 			}
-			const entry = drop.item.entry;
 			const rangeResize = Boolean(entry.rangeStart && drop.resizeEdge);
 			if (
-				rangeResize &&
+				(rangeResize || rangeMove) &&
 				drop.rangeStartDate &&
 				drop.rangeEndDate &&
 				(drop.rangeStartDate !== entry.rangeStart ||

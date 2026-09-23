@@ -9,7 +9,7 @@ Documentation complète : [English](https://github.com/POBSIZ/obsidian-diary/blo
 | Élément | Valeur |
 | --- | --- |
 | ID du plugin | `diary` |
-| Version actuelle | `1.18.1` |
+| Version actuelle | `1.19.0` |
 | Version minimale d’Obsidian | `1.7.2` |
 | Plateformes | Bureau / mobile (`isDesktopOnly: false`) |
 | Langue par défaut | `en` |

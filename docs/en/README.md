@@ -9,7 +9,7 @@ Full documentation: [English](https://github.com/POBSIZ/obsidian-diary/blob/main
 | Item | Value |
 | --- | --- |
 | Plugin ID | `diary` |
-| Current version | `1.18.1` |
+| Current version | `1.19.0` |
 | Minimum Obsidian version | `1.7.2` |
 | Supported platforms | Desktop / mobile (`isDesktopOnly: false`) |
 | Default language | `en` |
@@ -165,7 +165,7 @@ On desktop, drag across date cells to prefill a **Range** modal. On mobile, sele
 - `date_start` and `date_end` frontmatter are saved automatically when the range note is created.
 - The yearly planner shows range notes with vertical bars and a start-date chip. The monthly grid and list show them as range bars.
 - Choose **All day** to keep both times empty, or enter both times to define one continuous interval from `date_start` + `start_time` through `date_end` + `end_time`.
-- The daily and 3-day planners show all-day ranges as spanning bars. Drag an all-day range onto the timeline to assign times, then drag its first or last edge to change the corresponding date and time boundary.
+- The daily and 3-day planners show all-day ranges as spanning bars. Drag an all-day range onto the timeline to assign times. Drag a timed range slice to move the whole interval across dates, or drag its first or last edge to change the corresponding date and time boundary.
 
 ### Plan notes
 

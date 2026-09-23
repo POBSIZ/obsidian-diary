@@ -9,7 +9,7 @@ Diary 是一款 Obsidian 社群外掛，可把儲存庫中的一般 Markdown 筆
 | 項目 | 值 |
 | --- | --- |
 | 外掛 ID | `diary` |
-| 目前版本 | `1.18.1` |
+| 目前版本 | `1.19.0` |
 | 最低 Obsidian 版本 | `1.7.2` |
 | 支援平台 | 桌面 / 行動裝置 (`isDesktopOnly: false`) |
 | 預設語言 | `en` |

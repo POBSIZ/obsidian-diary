@@ -11,7 +11,7 @@ Diary는 Obsidian 볼트의 일반 Markdown 노트를 연간·월간·일간·3�
 | Item | Value |
 | --- | --- |
 | Plugin ID | `diary` |
-| Version | `1.18.1` |
+| Version | `1.19.0` |
 | Minimum Obsidian version | `1.7.2` |
 | Platforms | Desktop and mobile (`isDesktopOnly: false`) |
 | Default language | `en` |
@@ -19,6 +19,7 @@ Diary는 Obsidian 볼트의 일반 Markdown 노트를 연간·월간·일간·3�
 
 ## What's new
 
+- `1.19.0`: moves timed multi-day ranges across dates as one interval in the daily and 3-day planners, with drag previews and protection for ranges with incomplete time fields.
 - `1.18.1`: fixes plan note path token handling, reports invalid paths and create failures, and refreshes previews after plan notes change.
 - `1.18.0`: adds a Monday-first monthly grid option, clearer weekend shading, and custom yearly and monthly plan note paths.
 - `1.17.9`: opens the selected day's summary when a range chip is tapped in the compact monthly grid.
@@ -58,7 +59,7 @@ These screenshots use temporary demo notes for all-day, timed, range, todo, and 
 - Localized UI: switch Diary between English, German, Spanish, French, Japanese, Simplified Chinese, Traditional Chinese, and Korean.
 - Monthly grid planner: one-month calendar view with date chips, range bars, holidays, calendar overlay labels, external calendar overlays, and mobile pinch zoom.
 - Monthly list planner: day-by-day list for dense monthly review, with `All`, `With notes`, and `Upcoming` filters.
-- Daily planner: a 24-hour timeline that separates timed plans from all-day and untimed notes. Collapse the all-day section to reclaim timeline space; its saved state and event count remain visible. Multi-day ranges render as continuous all-day bars or datetime slices, with cross-date time selection and boundary resizing. Events shorter than 20 minutes use readable compact cards with time tooltips and collision-aware columns. Select an empty time slot to create a note with start and end times prefilled.
+- Daily planner: a 24-hour timeline that separates timed plans from all-day and untimed notes. Collapse the all-day section to reclaim timeline space; its saved state and event count remain visible. Multi-day ranges render as continuous all-day bars or datetime slices, with cross-date time selection, interval dragging, and boundary resizing. Events shorter than 20 minutes use readable compact cards with time tooltips and collision-aware columns. Select an empty time slot to create a note with start and end times prefilled.
 - 3-day planner: compare three consecutive days in parallel columns on the same 24-hour timeline. Narrow screens keep readable column widths with horizontal scrolling.
 - Direct view selector: switch directly among yearly, monthly grid, monthly list, daily, and 3-day views. In narrow layouts it remains visible while secondary actions move into **More**.
 - Sidebar planner: a compact monthly planner opens in the right sidebar by default, can be revealed from the ribbon or command palette, and can cycle through yearly, monthly grid, and monthly list layouts in the same side leaf.
