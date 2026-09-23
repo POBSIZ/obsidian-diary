@@ -374,5 +374,13 @@
 	"externalEvent.copyDetails": "复制详情",
 	"externalEvent.copySuccess": "已复制事件详情。",
 	"externalEvent.createSuccess": "已从外部事件创建 Markdown 笔记。",
-	"externalEvent.createFailed": "无法创建笔记：{message}"
+	"externalEvent.createFailed": "无法创建笔记：{message}",
+	"settings.weekStart": "每周起始日",
+	"settings.weekStartDesc": "选择月度网格的首日。",
+	"settings.sunday": "星期日",
+	"settings.monday": "星期一",
+	"settings.yearlyPlanNotePath": "年度计划笔记路径",
+	"settings.yearlyPlanNotePathDesc": "相对于仓库的路径。用 YYYY 表示年份；留空则使用计划文件夹。",
+	"settings.monthlyPlanNotePath": "月度计划笔记路径",
+	"settings.monthlyPlanNotePathDesc": "相对于仓库的路径。使用 YYYY 和 MM；留空则使用计划文件夹。"
 }

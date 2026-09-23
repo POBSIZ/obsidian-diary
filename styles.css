@@ -1,7 +1,7 @@
 /*
 This CSS file is included with your plugin, and
 available in the app when your plugin is enabled.
-Diary release version: 1.17.9
+Diary release version: 1.18.0
 */
 
 :where(
@@ -3132,7 +3132,7 @@ body.-is-mobile .yearly-planner-file-preview {
 	td.monthly-planner-cell-saturday:not(.monthly-planner-cell-invalid) {
 	background: color-mix(
 		in srgb,
-		var(--planner-weekend-saturday) 3%,
+		var(--planner-weekend-saturday) 8%,
 		var(--table-background, var(--background-primary))
 	);
 }
@@ -3142,18 +3142,21 @@ body.-is-mobile .yearly-planner-file-preview {
 	td.monthly-planner-cell-sunday:not(.monthly-planner-cell-invalid) {
 	background: color-mix(
 		in srgb,
-		var(--planner-weekend-sunday) 3%,
+		var(--planner-weekend-sunday) 8%,
 		var(--table-background, var(--background-primary))
 	);
 }
 
-/* Ensure drag selection highlight overrides weekend background colors */
-.monthly-planner-cell-selected.monthly-planner-cell-saturday:not(
-		.monthly-planner-cell-invalid
-	),
-.monthly-planner-cell-selected.monthly-planner-cell-sunday:not(
-		.monthly-planner-cell-invalid
-	) {
+.monthly-planner-table tbody td.monthly-planner-cell-active-date:is(.monthly-planner-cell-saturday, .monthly-planner-cell-sunday) {
+	background: color-mix(in srgb, var(--text-accent) 12%, var(--table-background, var(--background-primary)));
+}
+
+.monthly-planner-table tbody td.monthly-planner-cell-drop-target:is(.monthly-planner-cell-saturday, .monthly-planner-cell-sunday) {
+	background: color-mix(in srgb, var(--interactive-accent) 25%, var(--table-background, var(--background-primary)));
+}
+
+/* Interactive selection wins over the weekend tint. */
+.monthly-planner-table tbody td.monthly-planner-cell-selected:is(.monthly-planner-cell-saturday, .monthly-planner-cell-sunday) {
 	background: var(--interactive-accent);
 	color: var(--text-on-accent, var(--text-normal));
 	opacity: 0.4;

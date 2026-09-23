@@ -9,7 +9,7 @@ Full documentation: [English](https://github.com/POBSIZ/obsidian-diary/blob/main
 | Item | Value |
 | --- | --- |
 | Plugin ID | `diary` |
-| Current version | `1.17.9` |
+| Current version | `1.18.0` |
 | Minimum Obsidian version | `1.7.2` |
 | Supported platforms | Desktop / mobile (`isDesktopOnly: false`) |
 | Default language | `en` |
@@ -173,6 +173,7 @@ Use the plan note panel above each planner to create yearly or monthly planning 
 
 - Yearly plan note: `{plannerFolder}/{year}.md`
 - Monthly plan note: `{plannerFolder}/{year}-{month}.md`
+- In Diary settings, set **Yearly plan note path** or **Monthly plan note path** to a vault-relative template such as `Notes/Yearly/YYYY.md` or `Notes/Monthly/YYYY-MM.md`. `YYYY` is the four-digit year and `MM` is the two-digit month. Leave either setting empty to keep its default path. Nested folders are created when you create a note.
 - The panel can be collapsed or expanded, and that state is saved in plugin data.
 - Desktop and mobile keep separate panel state: desktop defaults expanded, while mobile defaults collapsed until you expand it.
 - If the plan note already exists, Diary shows a preview and an open button.
@@ -238,7 +239,10 @@ Paste rules:
 | Setting | Description |
 | --- | --- |
 | Language | Plugin UI language. Default: `en`. Supports `en`, `de`, `es`, `fr`, `ja`, `zh-CN`, `zh-TW`, and `ko`. |
-| Planner folder | Default folder for new planner notes and plan notes. Also used when scan scope is set to planner folder only. Default: `Planner`. |
+| Planner folder | Default folder for new planner notes and plan notes unless a plan note path is set. Also used when scan scope is set to planner folder only. Default: `Planner`. |
+| Week starts on | Sunday or Monday for the monthly grid. Default: Sunday. |
+| Yearly plan note path | Optional vault-relative template using `YYYY`. |
+| Monthly plan note path | Optional vault-relative template using `YYYY` and `MM`. |
 | Planner note scan scope | Controls whether Diary finds planner notes across the entire vault or only inside **Planner folder** and its subfolders. Default: `Entire vault`. |
 | Date format | Stored date format setting. Planner filenames currently use the `YYYY-MM-DD` rule. |
 | Show holidays | Turns holiday rendering on or off. |

@@ -453,6 +453,7 @@ export default class DiaryObsidian extends Plugin {
 			(await this.loadData()) as Partial<DiaryObsidianSettings>,
 		);
 		this.settings.locale = normalizeLocale(this.settings.locale);
+		this.settings.weekStart = this.settings.weekStart === 1 ? 1 : 0;
 		const legacyEnabledAlternateCalendars =
 			this.settings.enabledAlternateCalendars;
 		const legacyShowLunarDates = this.settings.showLunarDates;

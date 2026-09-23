@@ -1,3 +1,4 @@
+import { createPlanNoteFile, getPlanNotePath } from "../../utils/plan-note-path";
 import { ItemView, Notice, Platform, TFile, WorkspaceLeaf } from "obsidian";
 import { t } from "../../i18n";
 import DiaryObsidian from "../../main";
@@ -30,7 +31,6 @@ import {
 	getRangesForYear,
 	getRangeLaneMap,
 	getPlannerMarkdownFiles,
-	getYearNoteFilePath,
 } from "./file-utils";
 import {
 	createRecurrenceOccurrenceFile,
@@ -307,7 +307,14 @@ export class YearlyPlannerView
 			".yearly-planner-scroll",
 		);
 
+		const planNotePath = getPlanNotePath(
+			"yearly",
+			this.plugin.settings.plannerFolder || "Planner",
+			this.plugin.settings.yearlyPlanNotePath ?? "",
+			this.year,
+		);
 		const planNoteWrapper = detachReusablePlanNotePanel(contentEl, {
+			path: planNotePath,
 			year: this.year,
 		});
 
@@ -340,7 +347,7 @@ export class YearlyPlannerView
 
 		this.renderHeader(contentEl);
 		mountPlanNotePanel(contentEl, {
-			period: { year: this.year },
+			period: { path: planNotePath, year: this.year },
 			preserved: planNoteWrapper,
 			expanded: this.plugin.isPlanNotePanelExpanded(),
 			render: (container) => this.renderYearNotePanel(container),
@@ -352,17 +359,16 @@ export class YearlyPlannerView
 
 	private async renderYearNotePanel(container: HTMLElement): Promise<void> {
 		const folder = this.plugin.settings.plannerFolder || "Planner";
-		const filePath = getYearNoteFilePath(folder, this.year);
+		const filePath = getPlanNotePath(
+			"yearly", folder, this.plugin.settings.yearlyPlanNotePath ?? "", this.year,
+		);
 		await renderPlanNotePanel(container, this.app, filePath, this, {
 			label: String(this.year),
 			expanded: this.plugin.isPlanNotePanelExpanded(),
 			onToggle: () => void this.plugin.togglePlanNotePanelExpanded(),
 			onCreate: async () => {
-				const dir = filePath.split("/").slice(0, -1).join("/");
-				if (dir && !this.app.vault.getAbstractFileByPath(dir)) {
-					await this.app.vault.createFolder(dir);
-				}
-				const newFile = await this.app.vault.create(
+				const newFile = await createPlanNoteFile(
+					this.app,
 					filePath,
 					`# ${this.year}\n\n`,
 				);

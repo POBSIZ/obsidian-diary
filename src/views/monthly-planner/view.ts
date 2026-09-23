@@ -1,3 +1,4 @@
+import { createPlanNoteFile, getPlanNotePath } from "../../utils/plan-note-path";
 import { ItemView, Notice, Platform, TFile, WorkspaceLeaf } from "obsidian";
 import { formatDateForLocale, t } from "../../i18n";
 import DiaryObsidian from "../../main";
@@ -12,7 +13,6 @@ import {
 	getRangeLaneMap,
 	getRangesForYear,
 	getPlannerMarkdownFiles,
-	getMonthNoteFilePath,
 } from "../yearly-planner/file-utils";
 import {
 	detachReusablePlanNotePanel,
@@ -243,7 +243,15 @@ export class MonthlyPlannerView
 		this.pinchZoom?.detach();
 		this.pinchZoom = null;
 
+		const planNotePath = getPlanNotePath(
+			"monthly",
+			this.plugin.settings.plannerFolder || "Planner",
+			this.plugin.settings.monthlyPlanNotePath ?? "",
+			this.year,
+			this.month,
+		);
 		const planNoteWrapper = detachReusablePlanNotePanel(contentEl, {
+			path: planNotePath,
 			year: this.year,
 			month: this.month,
 		});
@@ -271,7 +279,7 @@ export class MonthlyPlannerView
 
 		this.renderHeader(contentEl);
 		mountPlanNotePanel(contentEl, {
-			period: { year: this.year, month: this.month },
+			period: { path: planNotePath, year: this.year, month: this.month },
 			preserved: planNoteWrapper,
 			expanded: this.plugin.isPlanNotePanelExpanded(),
 			render: (container) => this.renderMonthNotePanel(container),
@@ -311,7 +319,9 @@ export class MonthlyPlannerView
 
 	private async renderMonthNotePanel(container: HTMLElement): Promise<void> {
 		const folder = this.plugin.settings.plannerFolder || "Planner";
-		const filePath = getMonthNoteFilePath(folder, this.year, this.month);
+		const filePath = getPlanNotePath(
+			"monthly", folder, this.plugin.settings.monthlyPlanNotePath ?? "", this.year, this.month,
+		);
 		const locale = this.plugin.settings.locale ?? "en";
 		const monthLabel = getMonthLabel(locale, this.month);
 		const label = `${monthLabel} ${this.year}`;
@@ -320,11 +330,8 @@ export class MonthlyPlannerView
 			expanded: this.plugin.isPlanNotePanelExpanded(),
 			onToggle: () => void this.plugin.togglePlanNotePanelExpanded(),
 			onCreate: async () => {
-				const dir = filePath.split("/").slice(0, -1).join("/");
-				if (dir && !this.app.vault.getAbstractFileByPath(dir)) {
-					await this.app.vault.createFolder(dir);
-				}
-				const newFile = await this.app.vault.create(
+				const newFile = await createPlanNoteFile(
+					this.app,
 					filePath,
 					`# ${label}\n\n`,
 				);
@@ -485,10 +492,12 @@ export class MonthlyPlannerView
 
 		const locale = this.plugin.settings.locale ?? "en";
 		const weekdayLabels = getWeekdayLabels(locale);
+		const weekStart = this.plugin.settings.weekStart ?? 0;
 
 		const thead = table.createEl("thead");
 		const headerRow = thead.createEl("tr");
-		for (const label of weekdayLabels) {
+		for (let index = 0; index < 7; index++) {
+			const label = weekdayLabels[(index + weekStart) % 7] ?? "";
 			headerRow.createEl("th", { text: label });
 		}
 
@@ -548,9 +557,10 @@ export class MonthlyPlannerView
 			rangeLaneMap,
 			selectedDate: this.daySummaryOpen ? this.selectedDate : null,
 			isCompactLayout: this.compactLayout,
+			weekStart,
 		};
 
-		const cells = getMonthCalendarCells(this.year, this.month);
+		const cells = getMonthCalendarCells(this.year, this.month, weekStart);
 		let row: HTMLTableRowElement | null = null;
 		for (let i = 0; i < cells.length; i++) {
 			if (i % 7 === 0) {

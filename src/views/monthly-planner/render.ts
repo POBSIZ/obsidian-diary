@@ -152,6 +152,7 @@ export interface CreateMonthlyCellContext {
 	rangeLaneMap: Map<string, number>;
 	selectedDate: MonthlyPlannerSelectedDate | null;
 	isCompactLayout: boolean;
+	weekStart: 0 | 1;
 }
 
 export function createMonthlyCell(
@@ -294,7 +295,7 @@ export function createMonthlyCell(
 			),
 		);
 		rangeFiles.forEach(({ file, runPos, isFirst }) => {
-			const shouldShowLabel = isFirst || day === 1 || isSunday;
+			const shouldShowLabel = isFirst || day === 1 || dayOfWeek === ctx.weekStart;
 			const barClasses = [
 				PLANNER_UI_CLASSES.range,
 				"monthly-planner-range-bar",
@@ -347,7 +348,7 @@ export function createMonthlyCell(
 		});
 		externalDateEvents.rangeEvents.forEach(
 			({ event, runPos, isFirst }, index) => {
-				const shouldShowLabel = isFirst || day === 1 || isSunday;
+				const shouldShowLabel = isFirst || day === 1 || dayOfWeek === ctx.weekStart;
 				const isVirtualRecurrence = isRecurrenceVirtualEvent(event);
 				const barClasses = [
 					PLANNER_UI_CLASSES.range,

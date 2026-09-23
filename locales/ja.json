@@ -374,5 +374,13 @@
 	"externalEvent.copyDetails": "詳細をコピー",
 	"externalEvent.copySuccess": "イベント詳細をコピーしました。",
 	"externalEvent.createSuccess": "外部イベントから Markdown ノートを作成しました。",
-	"externalEvent.createFailed": "ノートを作成できませんでした: {message}"
+	"externalEvent.createFailed": "ノートを作成できませんでした: {message}",
+	"settings.weekStart": "週の開始日",
+	"settings.weekStartDesc": "月間グリッドの最初の曜日。",
+	"settings.sunday": "日曜日",
+	"settings.monday": "月曜日",
+	"settings.yearlyPlanNotePath": "年間計画ノートのパス",
+	"settings.yearlyPlanNotePathDesc": "保管庫内の相対パス。年には YYYY を使用。空欄の場合はプランナーフォルダを使用。",
+	"settings.monthlyPlanNotePath": "月間計画ノートのパス",
+	"settings.monthlyPlanNotePathDesc": "保管庫内の相対パス。YYYY と MM を使用。空欄の場合はプランナーフォルダを使用。"
 }

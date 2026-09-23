@@ -28,6 +28,7 @@ import {
 	type ExternalCalendarCache,
 	type ExternalCalendarSettings,
 } from "./utils/external-calendars";
+import { isValidPlanNoteTemplate } from "./utils/plan-note-path";
 import type { PlannerFileScope } from "./views/yearly-planner/file-utils";
 import {
 	createUiBadge,
@@ -43,6 +44,9 @@ export interface DiaryObsidianSettings {
 	locale: Locale;
 	plannerFolder: string;
 	plannerFileScope: PlannerFileScope;
+	weekStart: 0 | 1;
+	yearlyPlanNotePath: string;
+	monthlyPlanNotePath: string;
 	dateFormat: string;
 	showHolidays: boolean;
 	holidayCountry: string;
@@ -73,6 +77,9 @@ export const DEFAULT_SETTINGS: DiaryObsidianSettings = {
 	locale: "en",
 	plannerFolder: "Planner",
 	plannerFileScope: "vault",
+	weekStart: 0,
+	yearlyPlanNotePath: "",
+	monthlyPlanNotePath: "",
 	dateFormat: "YYYY-MM-DD",
 	showHolidays: true,
 	holidayCountry: "KR",
@@ -161,6 +168,24 @@ export class DiaryObsidianSettingTab extends PluginSettingTab {
 					},
 				},
 			},
+			{
+				name: t("settings.weekStart"),
+				desc: t("settings.weekStartDesc"),
+				control: {
+					type: "dropdown",
+					key: "weekStart",
+					options: { "0": t("settings.sunday"), "1": t("settings.monday") },
+				},
+			},
+			...(["yearly", "monthly"] as const).map((kind) => ({
+				name: t(`settings.${kind}PlanNotePath`),
+				desc: t(`settings.${kind}PlanNotePathDesc`),
+				control: {
+					type: "text" as const,
+					key: `${kind}PlanNotePath`,
+					placeholder: kind === "yearly" ? "Notes/Yearly/YYYY.md" : "Notes/Monthly/YYYY-MM.md",
+				},
+			})),
 			{
 				name: t("settings.dateFormat"),
 				desc: t("settings.dateFormatDesc"),
@@ -278,6 +303,17 @@ export class DiaryObsidianSettingTab extends PluginSettingTab {
 				this.plugin.settings.plannerFileScope =
 					value === "plannerFolder" ? "plannerFolder" : "vault";
 				break;
+			case "weekStart":
+				this.plugin.settings.weekStart = Number(value) === 1 ? 1 : 0;
+				break;
+			case "yearlyPlanNotePath":
+			case "monthlyPlanNotePath": {
+				const kind = key === "yearlyPlanNotePath" ? "yearly" : "monthly";
+				const template = String(value).trim();
+				if (!isValidPlanNoteTemplate(template, kind)) return;
+				this.plugin.settings[key] = template;
+				break;
+			}
 			case "dateFormat":
 				this.plugin.settings.dateFormat = String(value).trim() || "YYYY-MM-DD";
 				break;
@@ -351,6 +387,34 @@ export class DiaryObsidianSettingTab extends PluginSettingTab {
 						await this.plugin.saveSettings();
 					}),
 			);
+
+		new Setting(containerEl)
+			.setName(t("settings.weekStart"))
+			.setDesc(t("settings.weekStartDesc"))
+			.addDropdown((dropdown) => dropdown
+				.addOption("0", t("settings.sunday"))
+				.addOption("1", t("settings.monday"))
+				.setValue(String(this.plugin.settings.weekStart ?? 0))
+				.onChange(async (value) => {
+					this.plugin.settings.weekStart = value === "1" ? 1 : 0;
+					await this.plugin.saveSettings();
+				}));
+
+		for (const kind of ["yearly", "monthly"] as const) {
+			const key = `${kind}PlanNotePath` as const;
+			new Setting(containerEl)
+				.setName(t(`settings.${kind}PlanNotePath`))
+				.setDesc(t(`settings.${kind}PlanNotePathDesc`))
+				.addText((text) => text
+					.setPlaceholder(kind === "yearly" ? "Notes/Yearly/YYYY.md" : "Notes/Monthly/YYYY-MM.md")
+					.setValue(this.plugin.settings[key] ?? "")
+					.onChange(async (value) => {
+						const template = value.trim();
+						if (!isValidPlanNoteTemplate(template, kind)) return;
+						this.plugin.settings[key] = template;
+						await this.plugin.saveSettings();
+					}));
+		}
 
 		new Setting(containerEl)
 			.setName(t("settings.dateFormat"))

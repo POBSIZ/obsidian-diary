@@ -36,8 +36,9 @@ export interface CalendarCell {
 export function getMonthCalendarCells(
 	year: number,
 	month: number,
+	weekStart: 0 | 1 = 0,
 ): (CalendarCell | null)[] {
-	const firstDay = getFirstDayOfMonth(year, month);
+	const firstDay = (getFirstDayOfMonth(year, month) - weekStart + 7) % 7;
 	const daysInMonth = getDaysInMonth(year, month);
 	const totalSlots = 6 * 7;
 	const cells: (CalendarCell | null)[] = [];

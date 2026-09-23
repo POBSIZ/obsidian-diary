@@ -15,6 +15,7 @@ export interface PlanNotePanelOptions {
 
 export interface PlanNotePeriod {
 	year: number;
+	path: string;
 	month?: number;
 }
 
@@ -29,6 +30,7 @@ export function detachReusablePlanNotePanel(
 	if (
 		!wrapper?.hasChildNodes() ||
 		wrapper.dataset.year !== String(period.year) ||
+		wrapper.dataset.path !== period.path ||
 		(period.month != null && wrapper.dataset.month !== String(period.month))
 	) {
 		return null;
@@ -54,6 +56,7 @@ export function mountPlanNotePanel(
 	}
 	const wrapper = contentEl.createDiv({ cls: "plan-note-panel-wrapper" });
 	wrapper.dataset.year = String(options.period.year);
+	wrapper.dataset.path = options.period.path;
 	if (options.period.month != null) {
 		wrapper.dataset.month = String(options.period.month);
 	}

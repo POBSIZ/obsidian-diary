@@ -375,5 +375,13 @@
 	"externalEvent.copyDetails": "상세 복사",
 	"externalEvent.copySuccess": "일정 상세를 복사했습니다.",
 	"externalEvent.createSuccess": "외부 일정으로 Markdown 노트를 만들었습니다.",
-	"externalEvent.createFailed": "노트를 만들지 못했습니다: {message}"
+	"externalEvent.createFailed": "노트를 만들지 못했습니다: {message}",
+	"settings.weekStart": "한 주의 시작 요일",
+	"settings.weekStartDesc": "월간 그리드의 첫 요일을 선택합니다.",
+	"settings.sunday": "일요일",
+	"settings.monday": "월요일",
+	"settings.yearlyPlanNotePath": "연간 계획 노트 경로",
+	"settings.yearlyPlanNotePathDesc": "보관함 기준 상대 경로입니다. 연도에는 YYYY를 사용하세요. 비워두면 플래너 폴더를 사용합니다.",
+	"settings.monthlyPlanNotePath": "월간 계획 노트 경로",
+	"settings.monthlyPlanNotePathDesc": "보관함 기준 상대 경로입니다. YYYY와 MM을 사용하세요. 비워두면 플래너 폴더를 사용합니다."
 }

@@ -374,5 +374,13 @@
 	"externalEvent.copyDetails": "Copier les détails",
 	"externalEvent.copySuccess": "Détails de l’événement copiés.",
 	"externalEvent.createSuccess": "Note Markdown créée à partir de l’événement externe.",
-	"externalEvent.createFailed": "Impossible de créer la note : {message}"
+	"externalEvent.createFailed": "Impossible de créer la note : {message}",
+	"settings.weekStart": "Début de la semaine",
+	"settings.weekStartDesc": "Premier jour dans la grille mensuelle.",
+	"settings.sunday": "Dimanche",
+	"settings.monday": "Lundi",
+	"settings.yearlyPlanNotePath": "Chemin de la note annuelle",
+	"settings.yearlyPlanNotePathDesc": "Chemin relatif au coffre avec YYYY pour l’année. Laissez vide pour utiliser le dossier du planificateur.",
+	"settings.monthlyPlanNotePath": "Chemin de la note mensuelle",
+	"settings.monthlyPlanNotePathDesc": "Chemin relatif au coffre avec YYYY et MM. Laissez vide pour utiliser le dossier du planificateur."
 }

@@ -11,7 +11,7 @@ Diary는 Obsidian 볼트의 일반 Markdown 노트를 연간·월간·일간·3�
 | Item | Value |
 | --- | --- |
 | Plugin ID | `diary` |
-| Version | `1.17.9` |
+| Version | `1.18.0` |
 | Minimum Obsidian version | `1.7.2` |
 | Platforms | Desktop and mobile (`isDesktopOnly: false`) |
 | Default language | `en` |
@@ -19,6 +19,7 @@ Diary는 Obsidian 볼트의 일반 Markdown 노트를 연간·월간·일간·3�
 
 ## What's new
 
+- `1.18.0`: adds a Monday-first monthly grid option, clearer weekend shading, and custom yearly and monthly plan note paths.
 - `1.17.9`: opens the selected day's summary when a range chip is tapped in the compact monthly grid.
 - `1.17.8`: keeps the intended gap below all-day range chips when mobile button heights grow beyond the minimum.
 - `1.17.7`: aligns all-day range chips with regular chips on mobile, including horizontal insets, text padding, and vertical spacing.
@@ -63,7 +64,7 @@ These screenshots use temporary demo notes for all-day, timed, range, todo, and 
 - Date notes and range notes: recognized by `YYYY-MM-DD` and `YYYY-MM-DD--YYYY-MM-DD` filenames. By default Diary scans the entire vault, with an optional planner-folder-only scope. Title suffixes can keep visible spaces.
 - File options: switch an existing planner note between single-date and range modes, choose its folder, and edit the complete date-based filename. Diary moves the file and synchronizes `date_start` / `date_end` metadata.
 - Range title continuity: monthly range bars repeat their title at new week and month boundaries, while yearly cells repeat it at month and year boundaries.
-- Plan notes: yearly `{plannerFolder}/{year}.md` and monthly `{plannerFolder}/{year}-{month}.md` notes, with persisted preview state on desktop and separate mobile state.
+- Plan notes: yearly `{plannerFolder}/{year}.md` and monthly `{plannerFolder}/{year}-{month}.md` notes by default. Set vault-relative path templates separately using `YYYY` and `MM` to match other periodic note folders and filenames. Preview state persists on desktop and separately on mobile.
 - Remembered yearly cell width: expanded month-cell widths are saved across reloads.
 - Chip metadata: `color`, `todo`, `completed`, `start_time`, `end_time`, `notify_minutes`, `title`, `date_start`, `date_end`, and recurrence frontmatter. For range files, `date_start` + `start_time` and `date_end` + `end_time` define one continuous datetime interval; times remain independent from reminders.
 - Recurring events: repeat every N days, weeks, months, or years with a Gregorian or alternate-calendar basis. Occurrences stay virtual until you explicitly create Markdown notes from them.

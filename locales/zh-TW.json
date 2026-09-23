@@ -374,5 +374,13 @@
 	"externalEvent.copyDetails": "複製詳細資料",
 	"externalEvent.copySuccess": "已複製事件詳細資料。",
 	"externalEvent.createSuccess": "已從外部事件建立 Markdown 筆記。",
-	"externalEvent.createFailed": "無法建立筆記：{message}"
+	"externalEvent.createFailed": "無法建立筆記：{message}",
+	"settings.weekStart": "每週起始日",
+	"settings.weekStartDesc": "選擇月曆格的首日。",
+	"settings.sunday": "星期日",
+	"settings.monday": "星期一",
+	"settings.yearlyPlanNotePath": "年度計畫筆記路徑",
+	"settings.yearlyPlanNotePathDesc": "相對於儲存庫的路徑。用 YYYY 表示年份；留空則使用規劃資料夾。",
+	"settings.monthlyPlanNotePath": "月度計畫筆記路徑",
+	"settings.monthlyPlanNotePathDesc": "相對於儲存庫的路徑。使用 YYYY 和 MM；留空則使用規劃資料夾。"
 }

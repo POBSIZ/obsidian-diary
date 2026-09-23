@@ -374,5 +374,13 @@
 	"externalEvent.copyDetails": "Copiar detalles",
 	"externalEvent.copySuccess": "Detalles del evento copiados.",
 	"externalEvent.createSuccess": "Nota Markdown creada desde el evento externo.",
-	"externalEvent.createFailed": "No se pudo crear la nota: {message}"
+	"externalEvent.createFailed": "No se pudo crear la nota: {message}",
+	"settings.weekStart": "Inicio de la semana",
+	"settings.weekStartDesc": "Primer día en la cuadrícula mensual.",
+	"settings.sunday": "Domingo",
+	"settings.monday": "Lunes",
+	"settings.yearlyPlanNotePath": "Ruta de la nota anual",
+	"settings.yearlyPlanNotePathDesc": "Ruta relativa a la bóveda. Usa YYYY para el año. Déjala vacía para usar la carpeta del planificador.",
+	"settings.monthlyPlanNotePath": "Ruta de la nota mensual",
+	"settings.monthlyPlanNotePathDesc": "Ruta relativa a la bóveda. Usa YYYY y MM. Déjala vacía para usar la carpeta del planificador."
 }
