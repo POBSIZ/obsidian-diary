@@ -847,9 +847,9 @@ export default class DiaryObsidian extends Plugin {
 	}
 
 	private isSidebarLeaf(leaf: WorkspaceLeaf): boolean {
-		return Boolean(
-			leaf.view.containerEl.closest(".mod-left-split, .mod-right-split"),
-		);
+		const root = leaf.getRoot();
+		const { leftSplit, rightSplit } = this.app.workspace;
+		return root === leftSplit || root === rightSplit;
 	}
 
 	private debounce(fn: () => void, delayMs: number): () => void {

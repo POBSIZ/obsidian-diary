@@ -150,6 +150,8 @@ declare module "obsidian" {
 	export interface Workspace {
 		containerEl: HTMLElement;
 		rootSplit: unknown;
+		leftSplit: unknown;
+		rightSplit: unknown;
 		getLeaf(newLeaf?: string | boolean): WorkspaceLeaf;
 		getMostRecentLeaf(rootSplit?: unknown): WorkspaceLeaf | null;
 		getLeavesOfType(type: string): WorkspaceLeaf[];
@@ -222,6 +224,7 @@ declare module "obsidian" {
 
 	export interface WorkspaceLeaf {
 		view: View;
+		getRoot(): unknown;
 		setViewState(state: ViewState): Promise<void>;
 		openFile(file: TFile): Promise<void>;
 		detach(): void;

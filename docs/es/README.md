@@ -9,15 +9,15 @@ Documentación completa: [English](https://github.com/POBSIZ/obsidian-diary/blob
 | Elemento | Valor |
 | --- | --- |
 | ID del plugin | `diary` |
-| Versión actual | `1.20.1` |
+| Versión actual | `1.20.2` |
 | Versión mínima de Obsidian | `1.7.2` |
 | Plataformas | Escritorio / móvil (`isDesktopOnly: false`) |
 | Idioma predeterminado | `en` |
 | Carpeta predeterminada del planificador | `Planner` |
 
-## Novedades de 1.17.0
+## Novedades de 1.20.2
 
-- `1.17.0`: Añade una sección de todo el día plegable con recuento de eventos a los planificadores diario y de 3 días, y mejora los eventos de menos de 20 minutos con tarjetas compactas legibles, información horaria y columnas sin solapamientos.
+- `1.20.2`: Corrige la detección del panel lateral en móvil para abrir las notas creadas o seleccionadas en una pestaña nueva del área principal y conservar el planificador lateral.
 
 Los cambios anteriores están disponibles en [Releases](https://github.com/POBSIZ/obsidian-diary/releases).
 
@@ -117,7 +117,7 @@ Diary crea un planificador mensual compacto en la barra lateral derecha cuando e
 El planificador lateral está pensado como vista de apoyo:
 
 - Usa el diseño mensual compacto y la hoja de resumen del día.
-- Al seleccionar una nota desde la barra lateral, el archivo se abre en el área principal.
+- En escritorio y móvil, crear o abrir una nota desde el planificador anual, la cuadrícula mensual o la lista mensual de la barra lateral la abre en una pestaña nueva del área principal. El planificador lateral y las pestañas existentes se mantienen.
 - El botón de cambio de vista alterna entre planificador anual, cuadrícula mensual y lista mensual.
 - Diary mantiene una sola hoja lateral y limpia hojas antiguas de versiones anteriores.
 

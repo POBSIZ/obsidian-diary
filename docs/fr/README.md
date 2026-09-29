@@ -9,15 +9,15 @@ Documentation complète : [English](https://github.com/POBSIZ/obsidian-diary/blo
 | Élément | Valeur |
 | --- | --- |
 | ID du plugin | `diary` |
-| Version actuelle | `1.20.1` |
+| Version actuelle | `1.20.2` |
 | Version minimale d’Obsidian | `1.7.2` |
 | Plateformes | Bureau / mobile (`isDesktopOnly: false`) |
 | Langue par défaut | `en` |
 | Dossier de planning par défaut | `Planner` |
 
-## Nouveautés de la version 1.17.0
+## Nouveautés de la version 1.20.2
 
-- `1.17.0` : ajoute une section « journée entière » repliable avec le nombre d’événements dans les plannings quotidien et sur 3 jours, et améliore les événements de moins de 20 minutes avec des cartes compactes lisibles, des infobulles horaires et des colonnes sans chevauchement.
+- `1.20.2`: Corrige la détection du panneau latéral sur mobile pour ouvrir les notes créées ou sélectionnées dans un nouvel onglet principal et conserver le planificateur latéral.
 
 Les changements antérieurs sont disponibles sur la page [Releases](https://github.com/POBSIZ/obsidian-diary/releases).
 
@@ -117,7 +117,7 @@ Diary crée un planificateur mensuel compact dans la barre latérale droite lors
 Cette vue sert d’accompagnement :
 
 - Elle utilise le mise en page mensuel compact et le résumé du jour.
-- Lorsqu’une note est choisie depuis la barre latérale, elle s’ouvre dans l’espace principal.
+- Sur ordinateur et mobile, créer ou ouvrir une note depuis le planificateur annuel, la grille mensuelle ou la liste mensuelle de la barre latérale l’ouvre dans un nouvel onglet de l’espace principal. Le planificateur latéral et les onglets existants sont conservés.
 - Le bouton de changement de vue alterne entre annuel, grille mensuelle et liste mensuelle.
 - Diary garde une seule feuille latérale et nettoie les anciennes feuilles de versions précédentes.
 

@@ -9,15 +9,15 @@ Vollständige Dokumentation: [English](https://github.com/POBSIZ/obsidian-diary/
 | Eintrag | Wert |
 | --- | --- |
 | Plugin-ID | `diary` |
-| Aktuelle Version | `1.20.1` |
+| Aktuelle Version | `1.20.2` |
 | Minimale Obsidian-Version | `1.7.2` |
 | Plattformen | Desktop / Mobil (`isDesktopOnly: false`) |
 | Standardsprache | `en` |
 | Standardordner für Planer | `Planner` |
 
-## Neu in 1.17.0
+## Neu in 1.20.2
 
-- `1.17.0`: Fügt dem Tages- und 3-Tage-Planer einen einklappbaren Ganztagsbereich mit Terminanzahl hinzu und verbessert Termine unter 20 Minuten mit lesbaren Kompaktkarten, Zeit-Tooltips und kollisionsbewusster Spaltenanordnung.
+- `1.20.2`: Behebt die Erkennung des Seitenplaners auf Mobilgeräten, damit neue oder ausgewählte Notizen in einem neuen Haupt-Tab geöffnet werden und der Seitenplaner erhalten bleibt.
 
 Ältere Änderungen stehen auf der [Releases-Seite](https://github.com/POBSIZ/obsidian-diary/releases).
 
@@ -117,7 +117,7 @@ Diary erstellt einen kompakten Monatsplaner in der rechten Seitenleiste, sobald 
 Der Seitenplaner ist als Begleitansicht gedacht:
 
 - Er nutzt das kompakte Monatslayout und die Tagesübersicht.
-- Wenn du eine Planernotiz aus der Seitenleiste auswählst, öffnet sich die Datei im Hauptbereich.
+- Auf Desktop und Mobilgeräten öffnen sich neue oder ausgewählte Notizen aus dem Jahresplaner, Monatsraster oder der Monatsliste in der Seitenleiste in einem neuen Tab im Hauptbereich. Der Seitenplaner und bestehende Haupt-Tabs bleiben erhalten.
 - Die Layout-Schaltfläche wechselt das Seitenblatt zwischen Jahresplaner, Monatsraster und Monatsliste.
 - Diary hält nur ein Seitenleistenblatt aktiv und räumt ältere Monatsplaner-Blätter aus früheren Versionen auf.
 

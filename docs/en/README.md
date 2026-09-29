@@ -9,7 +9,7 @@ Full documentation: [English](https://github.com/POBSIZ/obsidian-diary/blob/main
 | Item | Value |
 | --- | --- |
 | Plugin ID | `diary` |
-| Current version | `1.20.1` |
+| Current version | `1.20.2` |
 | Minimum Obsidian version | `1.7.2` |
 | Supported platforms | Desktop / mobile (`isDesktopOnly: false`) |
 | Default language | `en` |
@@ -17,7 +17,7 @@ Full documentation: [English](https://github.com/POBSIZ/obsidian-diary/blob/main
 
 ## What's new
 
-- `1.17.0`: Adds a collapsible all-day section with event counts to the daily and 3-day planners, and improves sub-20-minute events with readable compact cards, time tooltips, and collision-aware layout.
+- `1.20.2`: Fixes sidebar detection on mobile so creating or opening notes opens a new main workspace tab and preserves the sidebar planner.
 
 For earlier changes, see the [Releases page](https://github.com/POBSIZ/obsidian-diary/releases).
 
@@ -117,7 +117,7 @@ Diary creates one compact monthly planner in the right sidebar when the workspac
 The sidebar works as a companion view:
 
 - It uses the compact monthly layout and day summary sheet.
-- Creating or opening a planner note from the sidebar opens the file in a new main workspace tab, so the sidebar remains available.
+- On desktop and mobile, creating or opening a note from the yearly, monthly grid, or monthly list sidebar planner opens it in a new main workspace tab. The sidebar planner and existing main tabs remain available.
 - The switch-layout button cycles the side leaf through yearly, monthly grid, and monthly list views.
 - Diary keeps only one planner sidebar leaf and cleans up older right-sidebar monthly planner leaves from previous versions.
 
