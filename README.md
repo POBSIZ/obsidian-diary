@@ -11,7 +11,7 @@ Diary는 Obsidian 볼트의 일반 Markdown 노트를 연간·월간·일간·3�
 | Item | Value |
 | --- | --- |
 | Plugin ID | `diary` |
-| Version | `1.20.0` |
+| Version | `1.20.1` |
 | Minimum Obsidian version | `1.7.2` |
 | Platforms | Desktop and mobile (`isDesktopOnly: false`) |
 | Default language | `en` |
@@ -19,6 +19,7 @@ Diary는 Obsidian 볼트의 일반 Markdown 노트를 연간·월간·일간·3�
 
 ## What's new
 
+- `1.20.1`: removes the obsolete pnpm lockfile and declares npm as the package manager so community source reviews install the release dependencies consistently.
 - `1.20.0`: opens notes created or selected in the sidebar planner in a new main-area tab, keeping the sidebar planner in place.
 - `1.19.0`: moves timed multi-day ranges across dates as one interval in the daily and 3-day planners, with drag previews and protection for ranges with incomplete time fields.
 - `1.18.1`: fixes plan note path token handling, reports invalid paths and create failures, and refreshes previews after plan notes change.
