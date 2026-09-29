@@ -9,7 +9,7 @@ Full documentation: [English](https://github.com/POBSIZ/obsidian-diary/blob/main
 | Item | Value |
 | --- | --- |
 | Plugin ID | `diary` |
-| Current version | `1.19.0` |
+| Current version | `1.20.0` |
 | Minimum Obsidian version | `1.7.2` |
 | Supported platforms | Desktop / mobile (`isDesktopOnly: false`) |
 | Default language | `en` |
@@ -117,7 +117,7 @@ Diary creates one compact monthly planner in the right sidebar when the workspac
 The sidebar works as a companion view:
 
 - It uses the compact monthly layout and day summary sheet.
-- Selecting a planner note from the sidebar opens the file in the main workspace, so the sidebar remains available.
+- Creating or opening a planner note from the sidebar opens the file in a new main workspace tab, so the sidebar remains available.
 - The switch-layout button cycles the side leaf through yearly, monthly grid, and monthly list views.
 - Diary keeps only one planner sidebar leaf and cleans up older right-sidebar monthly planner leaves from previous versions.
 

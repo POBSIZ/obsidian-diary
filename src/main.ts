@@ -244,10 +244,7 @@ export default class DiaryObsidian extends Plugin {
 
 	getPlannerFileOpenLeaf(sourceLeaf: WorkspaceLeaf): WorkspaceLeaf {
 		if (!this.isSidebarLeaf(sourceLeaf)) return sourceLeaf;
-		return (
-			this.app.workspace.getMostRecentLeaf(this.app.workspace.rootSplit) ??
-			this.app.workspace.getLeaf("tab")
-		);
+		return this.app.workspace.getLeaf("tab");
 	}
 
 	async openPlannerFile(
