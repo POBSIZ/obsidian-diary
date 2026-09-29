@@ -380,6 +380,7 @@ npm test
 
 ## 故障排查
 
+- 如果笔记在侧边栏计划器内打开，请将 Diary 更新到 **1.20.2 或更高版本**并重新加载 Obsidian。从侧边栏创建或打开笔记时，应在主工作区的新标签页中打开，并保留计划器。
 - 如果插件缺失，请确认 `main.js`、`manifest.json` 和 `styles.css` 直接位于 `Vault/.obsidian/plugins/diary/`。
 - 如果命令缺失，请确认 **Diary** 已在 **Settings → Community plugins** 中启用。
 - 如果侧边栏计划器缺失，请运行 **Open monthly planner in sidebar**，或在启用插件后重新加载 Obsidian。

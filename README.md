@@ -101,6 +101,8 @@ These screenshots use temporary demo notes for all-day, timed, range, todo, and 
 2. Copy `main.js`, `manifest.json`, and `styles.css` to `Vault/.obsidian/plugins/diary/`.
 3. Enable **Diary** in **Settings → Community plugins**.
 
+After updating, reload Obsidian to load the installed build. If notes still open inside the sidebar planner, confirm Diary is **1.20.2 or later**; sidebar notes should open in a new main workspace tab on desktop and mobile.
+
 ## Development
 
 ```bash

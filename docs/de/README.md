@@ -380,6 +380,7 @@ Diese Links öffnen öffentliche GitHub-Issues und erfordern ein GitHub-Konto. F
 
 ## Fehlerbehebung
 
+- Wenn Notizen im Seitenplaner geöffnet werden, aktualisiere Diary auf **1.20.2 oder neuer** und lade Obsidian neu. Neue oder ausgewählte Notizen sollten in einem neuen Haupt-Tab geöffnet werden, während der Seitenplaner sichtbar bleibt.
 - Wenn das Plugin fehlt, prüfe, ob `main.js`, `manifest.json` und `styles.css` direkt in `Vault/.obsidian/plugins/diary/` liegen.
 - Wenn Befehle fehlen, stelle sicher, dass **Diary** unter **Settings → Community plugins** aktiviert ist.
 - Wenn der Seitenplaner fehlt, führe **Open monthly planner in sidebar** aus oder lade Obsidian nach Aktivierung neu.

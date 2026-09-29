@@ -384,6 +384,7 @@ These links open public GitHub issues and require a GitHub account. Do not inclu
 
 ## Troubleshooting
 
+- If notes open inside the sidebar planner, update Diary to **1.20.2 or later** and reload Obsidian. Creating or opening a sidebar note should open a new main workspace tab and keep the planner visible.
 - If the plugin is missing, make sure `main.js`, `manifest.json`, and `styles.css` are directly inside `Vault/.obsidian/plugins/diary/`.
 - If commands are missing, confirm that **Diary** is enabled in **Settings → Community plugins**.
 - If the sidebar planner is missing, run **Open monthly planner in sidebar** or reload Obsidian after enabling the plugin.

@@ -380,6 +380,7 @@ npm test
 
 ## トラブルシューティング
 
+- ノートがサイドプランナー内に開く場合は、Diary を **1.20.2 以降**に更新して Obsidian を再読み込みしてください。サイドバーからノートを作成または開くと、メイン領域の新しいタブに開き、プランナーは維持されます。
 - プラグインが見つからない場合は、`main.js`, `manifest.json`, `styles.css` が `Vault/.obsidian/plugins/diary/` 直下にあるか確認してください。
 - コマンドが出ない場合は、**Settings → Community plugins** で **Diary** が有効か確認してください。
 - サイドバープランナーが見つからない場合は、**Open monthly planner in sidebar** を実行するか、プラグイン有効化後に Obsidian を再読み込みしてください。

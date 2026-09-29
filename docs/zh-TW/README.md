@@ -380,6 +380,7 @@ npm test
 
 ## 疑難排解
 
+- 如果筆記在側邊欄規劃器內開啟，請將 Diary 更新至 **1.20.2 或更新版本**並重新載入 Obsidian。從側邊欄建立或開啟筆記時，應在主工作區的新分頁中開啟，並保留規劃器。
 - 如果外掛缺失，請確認 `main.js`、`manifest.json` 和 `styles.css` 直接位於 `Vault/.obsidian/plugins/diary/`。
 - 如果命令缺失，請確認 **Diary** 已在 **Settings → Community plugins** 中啟用。
 - 如果側邊欄規劃器缺失，請執行 **Open monthly planner in sidebar**，或在啟用外掛後重新載入 Obsidian。

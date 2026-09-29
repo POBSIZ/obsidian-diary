@@ -380,6 +380,7 @@ npm test
 
 ## 문제 해결
 
+- 문서가 사이드 플래너 안에서 열리면 Diary를 **1.20.2 이상**으로 업데이트하고 Obsidian을 다시 로드합니다. 사이드 플래너에서 문서를 만들거나 열면 메인 영역의 새 탭에 열리고 플래너는 유지되어야 합니다.
 - 플러그인이 보이지 않으면 `main.js`, `manifest.json`, `styles.css`가 `Vault/.obsidian/plugins/diary/` 바로 아래에 있는지 확인합니다.
 - 명령이 보이지 않으면 **Settings → Community plugins**에서 **Diary**가 활성화되어 있는지 확인합니다.
 - 사이드바 플래너가 보이지 않으면 **Open monthly planner in sidebar** 명령을 실행하거나 플러그인을 활성화한 뒤 Obsidian을 다시 로드합니다.

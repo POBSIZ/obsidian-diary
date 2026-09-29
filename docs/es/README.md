@@ -380,6 +380,7 @@ Estos enlaces abren issues públicos de GitHub y requieren una cuenta de GitHub.
 
 ## Solución de problemas
 
+- Si las notas se abren dentro del planificador lateral, actualiza Diary a **1.20.2 o posterior** y recarga Obsidian. Crear o abrir una nota desde la barra lateral debe abrir una pestaña nueva del área principal y conservar el planificador.
 - Si falta el plugin, comprueba que `main.js`, `manifest.json` y `styles.css` estén directamente en `Vault/.obsidian/plugins/diary/`.
 - Si faltan comandos, confirma que **Diary** esté activo en **Settings → Community plugins**.
 - Si falta el planificador lateral, ejecuta **Open monthly planner in sidebar** o recarga Obsidian tras activar el plugin.
