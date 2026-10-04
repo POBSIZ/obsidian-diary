@@ -9,7 +9,7 @@ Documentation complète : [English](https://github.com/POBSIZ/obsidian-diary/blo
 | Élément | Valeur |
 | --- | --- |
 | ID du plugin | `diary` |
-| Version actuelle | `1.21.0` |
+| Version actuelle | `1.22.0` |
 | Version minimale d’Obsidian | `1.7.2` |
 | Plateformes | Bureau / mobile (`isDesktopOnly: false`) |
 | Langue par défaut | `en` |
@@ -17,6 +17,7 @@ Documentation complète : [English](https://github.com/POBSIZ/obsidian-diary/blo
 
 ## Nouveautés de la version 1.21.0
 
+- `1.22.0`: Affiche une grille mensuelle fixe de six semaines avec les dates, notes, événements et jours fériés des mois voisins. La sélection et la création de notes utilisent la date réelle, même entre deux années.
 - `1.21.0`: L’icône mensuelle ouvre la grille mensuelle dans l’espace principal. Pour la barre latérale, utilisez **Open monthly planner in sidebar**.
 - `1.20.2`: Corrige la détection du panneau latéral sur mobile pour ouvrir les notes créées ou sélectionnées dans un nouvel onglet principal et conserver le planificateur latéral.
 
@@ -48,7 +49,7 @@ Les captures utilisent un dossier temporaire contenant des notes de journée, de
 
 - **Planning annuel** : affiche les notes datées et les périodes dans une table `12 mois × 31 jours`. La largeur choisie pour chaque mois est conservée après rechargement.
 - **Interface localisée** : basculez Diary entre anglais, allemand, espagnol, français, japonais, chinois simplifié, chinois traditionnel et coréen.
-- **Grille mensuelle** : consultez un mois dans une grande grille avec pastilles, barres de période, jours fériés, étiquettes de calendrier et calendriers externes.
+- **Grille mensuelle** : consultez un mois dans une grande grille avec pastilles, barres de période, jours fériés, étiquettes de calendrier et calendriers externes. La grille affiche toujours six semaines (42 jours), avec les dates, notes, événements et jours fériés des mois voisins. Un fond discret et le mois distinguent ces dates ; les actions utilisent leur date réelle.
 - **Liste mensuelle** : parcourez le mois jour par jour, puis filtrez-le avec `All`, `With notes` ou `Upcoming`.
 - **Planning quotidien** : planifiez une journée sur une chronologie de 24 heures. La section « journée entière » affiche le nombre d’événements, peut être repliée et mémorise son état. Les plages de plusieurs jours s’affichent comme des barres continues sur la journée entière ou des intervalles date-heure, dont les limites peuvent être ajustées entre les dates. Les événements de moins de 20 minutes utilisent des cartes compactes lisibles avec infobulle horaire et colonnes sans chevauchement.
 - **Planning sur 3 jours** : comparez trois jours consécutifs en colonnes parallèles. Les petits écrans conservent des colonnes lisibles grâce au défilement horizontal.

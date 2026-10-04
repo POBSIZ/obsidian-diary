@@ -9,7 +9,7 @@ Documentación completa: [English](https://github.com/POBSIZ/obsidian-diary/blob
 | Elemento | Valor |
 | --- | --- |
 | ID del plugin | `diary` |
-| Versión actual | `1.21.0` |
+| Versión actual | `1.22.0` |
 | Versión mínima de Obsidian | `1.7.2` |
 | Plataformas | Escritorio / móvil (`isDesktopOnly: false`) |
 | Idioma predeterminado | `en` |
@@ -17,6 +17,7 @@ Documentación completa: [English](https://github.com/POBSIZ/obsidian-diary/blob
 
 ## Novedades de 1.21.0
 
+- `1.22.0`: Muestra una cuadrícula mensual fija de seis semanas con fechas, notas, eventos y festivos de los meses adyacentes. La selección y creación de notas usan la fecha real, incluso entre años.
 - `1.21.0`: El icono mensual abre la cuadrícula mensual en el área principal. Para la barra lateral, usa **Open monthly planner in sidebar**.
 - `1.20.2`: Corrige la detección del panel lateral en móvil para abrir las notas creadas o seleccionadas en una pestaña nueva del área principal y conservar el planificador lateral.
 
@@ -48,7 +49,7 @@ Las capturas usan una carpeta temporal con notas de todo el día, con hora, de r
 
 - **Planificador anual**: Muestra notas de fecha y de rango en una tabla de `12 meses × 31 días`. El ancho elegido para cada mes se conserva al recargar.
 - **Interfaz localizada**: Cambia Diary entre inglés, alemán, español, francés, japonés, chino simplificado, chino tradicional y coreano.
-- **Cuadrícula mensual**: Revisa un mes en una cuadrícula grande con chips, barras de rango, festivos, etiquetas de calendario y calendarios externos.
+- **Cuadrícula mensual**: Revisa un mes en una cuadrícula grande con chips, barras de rango, festivos, etiquetas de calendario y calendarios externos. La cuadrícula siempre muestra seis semanas (42 días), con fechas, notas, eventos y festivos de los meses adyacentes. Estos días tienen un fondo tenue y muestran el mes; las acciones usan su fecha real.
 - **Lista mensual**: Recorre un mes día a día y filtra la lista con `All`, `With notes` o `Upcoming`.
 - **Planificador diario**: Organiza un día en una línea de tiempo de 24 horas. La sección de todo el día muestra el número de eventos, se puede contraer y recuerda su estado. Los rangos de varios días se muestran como barras continuas de todo el día o intervalos de fecha y hora; sus límites temporales se pueden ajustar entre fechas. Los eventos de menos de 20 minutos usan tarjetas compactas legibles con información horaria y columnas que evitan solapamientos.
 - **Planificador de 3 días**: Compara tres días consecutivos en columnas paralelas. En pantallas estrechas conserva columnas legibles mediante desplazamiento horizontal.

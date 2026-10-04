@@ -28,29 +28,30 @@ export interface CalendarCell {
 	day: number;
 }
 
-/**
- * Returns a flat array of calendar cells for the month grid.
- * Includes leading empty slots (null) for days before the 1st.
- * Uses 6 rows × 7 columns = 42 cells.
- */
+/** Returns six complete weeks, including dates from adjacent months. */
 export function getMonthCalendarCells(
 	year: number,
 	month: number,
 	weekStart: 0 | 1 = 0,
-): (CalendarCell | null)[] {
+): CalendarCell[] {
 	const firstDay = (getFirstDayOfMonth(year, month) - weekStart + 7) % 7;
-	const daysInMonth = getDaysInMonth(year, month);
-	const totalSlots = 6 * 7;
-	const cells: (CalendarCell | null)[] = [];
+	return Array.from({ length: 42 }, (_, index) => {
+		const date = new Date(year, month - 1, 1 - firstDay + index);
+		return { year: date.getFullYear(), month: date.getMonth() + 1, day: date.getDate() };
+	});
+}
 
-	for (let i = 0; i < firstDay; i++) {
-		cells.push(null);
-	}
-	for (let day = 1; day <= daysInMonth; day++) {
-		cells.push({ year, month, day });
-	}
-	while (cells.length < totalSlots) {
-		cells.push(null);
-	}
-	return cells;
+export function getCalendarDateKey(date: CalendarCell): string {
+	return `${date.year}-${String(date.month).padStart(2, "0")}-${String(date.day).padStart(2, "0")}`;
+}
+
+export function getMonthCalendarRange(year: number, month: number, weekStart: 0 | 1 = 0): { start: string; end: string } {
+	const cells = getMonthCalendarCells(year, month, weekStart);
+	return { start: getCalendarDateKey(cells[0]!), end: getCalendarDateKey(cells[41]!) };
+}
+
+export function isDateInMonthCalendar(date: CalendarCell, year: number, month: number, weekStart: 0 | 1 = 0): boolean {
+	return getMonthCalendarCells(year, month, weekStart).some(
+		(cell) => cell.year === date.year && cell.month === date.month && cell.day === date.day,
+	);
 }

@@ -5,6 +5,7 @@ import {
 	getWeekendLabels,
 	t,
 } from "../../i18n";
+import { parseRangeBasename } from "../../utils/range";
 import { getDayOfWeek } from "../../utils/date";
 import type { ChipDragState, DragState } from "../yearly-planner/types";
 import type { HolidayData } from "../../utils/holidays";
@@ -139,6 +140,8 @@ export function renderMonthlyPlannerHeader(
 }
 
 export interface CreateMonthlyCellContext {
+	displayYear: number;
+	displayMonth: number;
 	app: App;
 	folder: string;
 	plannerFileScope: PlannerFileScope;
@@ -169,6 +172,7 @@ export function createMonthlyCell(
 	}
 
 	const { year, month, day } = cellData;
+	const isOutsideMonth = year !== ctx.displayYear || month !== ctx.displayMonth;
 	const isSelected = isDateInSelection(year, month, day, ctx.dragState);
 	const isDropTarget =
 		ctx.chipDragState &&
@@ -195,6 +199,7 @@ export function createMonthlyCell(
 
 	cell.className = [
 		"monthly-planner-cell",
+		isOutsideMonth && "monthly-planner-cell-outside-month",
 		isSelected && "monthly-planner-cell-selected",
 		isClipboardDate && "monthly-planner-cell-clipboard-selected",
 		isDropTarget && "monthly-planner-cell-drop-target",
@@ -215,7 +220,7 @@ export function createMonthlyCell(
 
 	const inner = cell.createDiv({ cls: "monthly-planner-cell-inner" });
 	const dayNumEl = inner.createDiv({ cls: "monthly-planner-cell-day" });
-	dayNumEl.textContent = String(day);
+	dayNumEl.textContent = isOutsideMonth ? `${month}/${day}` : String(day);
 	dayNumEl.dataset.dailyDate = dateKey;
 	dayNumEl.tabIndex = 0;
 	dayNumEl.setAttribute("role", "button");
@@ -294,7 +299,11 @@ export function createMonthlyCell(
 				10,
 			),
 		);
-		rangeFiles.forEach(({ file, runPos, isFirst }) => {
+		rangeFiles.forEach(({ file, runPos: monthRunPos, isFirst }) => {
+			const range = parseRangeBasename(file.basename);
+			const runPos = range
+				? { runStart: dateKey === range.start, runEnd: dateKey === range.end }
+				: monthRunPos;
 			const shouldShowLabel = isFirst || day === 1 || dayOfWeek === ctx.weekStart;
 			const barClasses = [
 				PLANNER_UI_CLASSES.range,

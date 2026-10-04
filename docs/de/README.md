@@ -9,7 +9,7 @@ Vollständige Dokumentation: [English](https://github.com/POBSIZ/obsidian-diary/
 | Eintrag | Wert |
 | --- | --- |
 | Plugin-ID | `diary` |
-| Aktuelle Version | `1.21.0` |
+| Aktuelle Version | `1.22.0` |
 | Minimale Obsidian-Version | `1.7.2` |
 | Plattformen | Desktop / Mobil (`isDesktopOnly: false`) |
 | Standardsprache | `en` |
@@ -17,6 +17,7 @@ Vollständige Dokumentation: [English](https://github.com/POBSIZ/obsidian-diary/
 
 ## Neu in 1.21.0
 
+- `1.22.0`: Zeigt ein festes Monatsraster mit sechs Wochen und den Daten, Notizen, Terminen und Feiertagen angrenzender Monate. Auswahl und Notizerstellung verwenden auch über Jahresgrenzen hinweg das tatsächliche Datum.
 - `1.21.0`: Das Monats-Ribbon-Icon öffnet das Monatsraster im Hauptbereich. Für die Seitenleiste verwende **Open monthly planner in sidebar**.
 - `1.20.2`: Behebt die Erkennung des Seitenplaners auf Mobilgeräten, damit neue oder ausgewählte Notizen in einem neuen Haupt-Tab geöffnet werden und der Seitenplaner erhalten bleibt.
 
@@ -48,7 +49,7 @@ Für die Screenshots wurde ein temporärer Demo-Ordner mit ganztägigen, zeitgeb
 
 - **Jahresplaner**: Zeigt Tages- und Zeitraum-Notizen in einer Tabelle mit `12 Monaten × 31 Tagen`. Verbreiterte Monatszellen bleiben nach dem Neuladen erhalten.
 - **Lokalisierte Oberfläche**: Diary lässt sich zwischen Englisch, Deutsch, Spanisch, Französisch, Japanisch, vereinfachtem Chinesisch, traditionellem Chinesisch und Koreanisch umschalten.
-- **Monatsraster**: Ein großer Monatskalender mit Chips, Zeitraumleisten, Feiertagen, Kalender-Overlay-Beschriftungen und externen Kalender-Overlays.
+- **Monatsraster**: Ein großer Monatskalender mit Chips, Zeitraumleisten, Feiertagen, Kalender-Overlay-Beschriftungen und externen Kalender-Overlays. Das Raster zeigt immer sechs Wochen (42 Tage), einschließlich der Daten, Notizen, Termine und Feiertage der angrenzenden Monate. Ein dezenter Hintergrund und die Monatsangabe kennzeichnen diese Tage; Aktionen verwenden das tatsächliche Datum.
 - **Monatsliste**: Zeigt volle Monate als Tagesliste und lässt sich mit `All`, `With notes` und `Upcoming` filtern.
 - **Tagesplaner**: Plane einen Tag auf einer 24-Stunden-Zeitleiste. Der Ganztagsbereich zeigt die Terminanzahl, lässt sich einklappen und merkt sich seinen Zustand. Mehrtägige Bereiche erscheinen als durchgehende ganztägige Balken oder Datums-Zeit-Intervalle; ihre zeitlichen Grenzen lassen sich über Datumsgrenzen hinweg anpassen. Termine unter 20 Minuten erscheinen als lesbare Kompaktkarten mit Zeit-Tooltip und kollisionsbewussten Spalten.
 - **3-Tage-Planer**: Vergleiche drei aufeinanderfolgende Tage in parallelen Spalten. Auf schmalen Bildschirmen bleiben die Spalten per horizontalem Scrollen lesbar.

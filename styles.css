@@ -1,7 +1,7 @@
 /*
 This CSS file is included with your plugin, and
 available in the app when your plugin is enabled.
-Diary release version: 1.21.0
+Diary release version: 1.22.0
 */
 
 :where(
@@ -3068,6 +3068,23 @@ body.-is-mobile .yearly-planner-file-preview {
 	margin-bottom: 0.2rem;
 }
 
+.monthly-planner-table tbody td.monthly-planner-cell-outside-month {
+	--monthly-planner-cell-background: color-mix(in srgb, var(--text-muted) 8%, var(--table-background, var(--background-primary)));
+	background: var(--monthly-planner-cell-background);
+}
+
+.monthly-planner-table tbody td.monthly-planner-cell-outside-month:hover:where(:not(.monthly-planner-cell-active-date, .monthly-planner-cell-selected, .monthly-planner-cell-drop-target)) {
+	background: var(--background-modifier-hover);
+}
+
+.monthly-planner-cell-outside-month .monthly-planner-cell-day {
+	color: var(--text-muted);
+}
+
+.monthly-planner-cell-outside-month.monthly-planner-cell-selected .monthly-planner-cell-day {
+	color: inherit;
+}
+
 .monthly-planner-alt-calendar-labels {
 	display: flex;
 	flex-direction: column;
@@ -3133,7 +3150,7 @@ body.-is-mobile .yearly-planner-file-preview {
 	background: color-mix(
 		in srgb,
 		var(--planner-weekend-saturday) 8%,
-		var(--table-background, var(--background-primary))
+		var(--monthly-planner-cell-background, var(--table-background, var(--background-primary)))
 	);
 }
 
@@ -3143,7 +3160,7 @@ body.-is-mobile .yearly-planner-file-preview {
 	background: color-mix(
 		in srgb,
 		var(--planner-weekend-sunday) 8%,
-		var(--table-background, var(--background-primary))
+		var(--monthly-planner-cell-background, var(--table-background, var(--background-primary)))
 	);
 }
 

@@ -9,7 +9,7 @@ Full documentation: [English](https://github.com/POBSIZ/obsidian-diary/blob/main
 | Item | Value |
 | --- | --- |
 | Plugin ID | `diary` |
-| Current version | `1.21.0` |
+| Current version | `1.22.0` |
 | Minimum Obsidian version | `1.7.2` |
 | Supported platforms | Desktop / mobile (`isDesktopOnly: false`) |
 | Default language | `en` |
@@ -17,6 +17,7 @@ Full documentation: [English](https://github.com/POBSIZ/obsidian-diary/blob/main
 
 ## What's new
 
+- `1.22.0`: Shows a fixed six-week monthly grid with adjacent-month dates, notes, events and holidays. Date selection and note creation use the actual selected date, including across year boundaries.
 - `1.21.0`: Opens the monthly grid from its ribbon icon in the main workspace. Use **Open monthly planner in sidebar** for the sidebar.
 - `1.20.2`: Fixes sidebar detection on mobile so creating or opening notes opens a new main workspace tab and preserves the sidebar planner.
 
@@ -48,7 +49,7 @@ The screenshots use temporary demo notes for all-day, timed, range, todo, and pl
 
 - **Yearly planner**: View date and range notes in a `12 months × 31 days` table. Expanded month-cell widths are restored after reloads.
 - **Localized UI**: Switch Diary between English, German, Spanish, French, Japanese, Simplified Chinese, Traditional Chinese, and Korean.
-- **Monthly grid planner**: Inspect one month in a large calendar grid with chips, range bars, holidays, calendar overlay labels, and external calendar overlays.
+- **Monthly grid planner**: Inspect one month in a large calendar grid with chips, range bars, holidays, calendar overlay labels, and external calendar overlays. The grid always shows six weeks (42 dates), including dates, notes, events and holidays from adjacent months. Adjacent dates use a muted background and show their month; selecting them uses their actual date.
 - **Monthly list planner**: Review a busy month as a day-by-day list, with `All`, `With notes`, and `Upcoming` filters.
 - **Daily planner**: Plan one day on a 24-hour timeline. The all-day section shows the event count, can be collapsed, and remembers its state. Multi-day ranges render as continuous all-day bars or datetime intervals; timed range boundaries can be resized across dates. Events shorter than 20 minutes use readable compact cards with time tooltips and collision-aware columns.
 - **3-day planner**: Compare three consecutive days in parallel columns on one 24-hour timeline. Narrow screens use horizontal scrolling instead of compressing the day columns.

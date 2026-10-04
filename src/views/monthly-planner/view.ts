@@ -11,7 +11,6 @@ import type {
 import {
 	getFilesForDate,
 	getRangeLaneMap,
-	getRangesForYear,
 	getPlannerMarkdownFiles,
 } from "../yearly-planner/file-utils";
 import {
@@ -38,7 +37,8 @@ import {
 import { CreateFileModal, FileOptionsModal } from "../yearly-planner/modals";
 import { getSelectionBounds } from "../yearly-planner/selection";
 import { getHolidaysForYear } from "../../utils/holidays";
-import { getDaysInMonth, getMonthCalendarCells } from "../../utils/date";
+import { getMonthCalendarCells, getMonthCalendarRange, isDateInMonthCalendar } from "../../utils/date";
+import { getCalendarHolidays, getCalendarRanges } from "./calendar-data";
 import {
 	getCalendarOverlayConfig,
 	getCalendarOverlayLabel,
@@ -154,8 +154,7 @@ export class MonthlyPlannerView
 			const selectedDate = state.selectedDate;
 			if (
 				selectedDate &&
-				selectedDate.year === this.year &&
-				selectedDate.month === this.month
+				isDateInMonthCalendar(selectedDate, this.year, this.month, this.plugin.settings.weekStart ?? 0)
 			) {
 				this.selectedDate = selectedDate;
 			} else {
@@ -273,8 +272,7 @@ export class MonthlyPlannerView
 
 		if (
 			this.selectedDate &&
-			(this.selectedDate.year !== this.year ||
-				this.selectedDate.month !== this.month)
+			!isDateInMonthCalendar(this.selectedDate, this.year, this.month, this.plugin.settings.weekStart ?? 0)
 		) {
 			this.selectedDate = null;
 			this.daySummaryOpen = false;
@@ -369,8 +367,8 @@ export class MonthlyPlannerView
 							? now.getDate()
 							: 1);
 					void this.plugin.selectPlannerView(this.leaf, mode, {
-						year: this.year,
-						month: this.month,
+						year: this.selectedDate?.year ?? this.year,
+						month: this.selectedDate?.month ?? this.month,
 						day: selectedDay,
 					});
 				},
@@ -507,22 +505,17 @@ export class MonthlyPlannerView
 		const tbody = table.createEl("tbody");
 		const folder = this.plugin.settings.plannerFolder || "Planner";
 		const { showHolidays, holidayCountry } = this.plugin.settings;
-		const holidaysData =
-			showHolidays && holidayCountry
-				? getHolidaysForYear(holidayCountry, this.year)
-				: null;
+		const cells = getMonthCalendarCells(this.year, this.month, weekStart);
+		const holidaysData = showHolidays && holidayCountry
+			? getCalendarHolidays(holidayCountry, cells)
+			: null;
 		const plannerFileScope = this.plugin.settings.plannerFileScope ?? "vault";
 		const plannerFiles = getPlannerMarkdownFiles(
 			this.app,
 			folder,
 			plannerFileScope,
 		);
-		const visibleRange = {
-			start: `${this.year}-${String(this.month).padStart(2, "0")}-01`,
-			end: `${this.year}-${String(this.month).padStart(2, "0")}-${String(
-				getDaysInMonth(this.year, this.month),
-			).padStart(2, "0")}`,
-		};
+		const visibleRange = getMonthCalendarRange(this.year, this.month, weekStart);
 		const externalEvents = getExternalEventsForRange(
 			this.app,
 			this.plugin.settings,
@@ -537,16 +530,10 @@ export class MonthlyPlannerView
 		});
 		const overlayEvents = [...externalEvents, ...recurrenceEvents];
 		this.visibleExternalEventsById = createExternalEventLookup(overlayEvents);
-		const rangeLaneMap = getRangeLaneMap(
-			getRangesForYear(
-				this.app,
-				this.year,
-				folder,
-				plannerFileScope,
-				plannerFiles,
-			),
-		);
+		const rangeLaneMap = getRangeLaneMap(getCalendarRanges(plannerFiles, visibleRange));
 		const cellCtx = {
+			displayYear: this.year,
+			displayMonth: this.month,
 			app: this.app,
 			folder,
 			plannerFileScope,
@@ -563,7 +550,6 @@ export class MonthlyPlannerView
 			weekStart,
 		};
 
-		const cells = getMonthCalendarCells(this.year, this.month, weekStart);
 		let row: HTMLTableRowElement | null = null;
 		for (let i = 0; i < cells.length; i++) {
 			if (i % 7 === 0) {
@@ -948,12 +934,7 @@ export class MonthlyPlannerView
 			folder,
 			plannerFileScope,
 		);
-		const range = {
-			start: `${this.year}-${String(this.month).padStart(2, "0")}-01`,
-			end: `${this.year}-${String(this.month).padStart(2, "0")}-${String(
-				getDaysInMonth(this.year, this.month),
-			).padStart(2, "0")}`,
-		};
+		const range = getMonthCalendarRange(this.year, this.month, this.plugin.settings.weekStart ?? 0);
 		return [
 			...getExternalEventsForRange(
 				this.app,
