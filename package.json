@@ -1,6 +1,6 @@
 {
 	"name": "diary-obsidian",
-	"version": "1.20.2",
+	"version": "1.21.0",
 	"description": "This is a diary obsidian plugin for Obsidian (https://obsidian.md)",
 	"main": "main.js",
 	"type": "module",
@@ -36,5 +36,10 @@
 		"date-holidays": "^3.30.2",
 		"korean-lunar-calendar": "0.3.6"
 	},
-	"packageManager": "npm@10.9.4"
+	"packageManager": "npm@10.9.4",
+	"overrides": {
+		"moment-timezone": {
+			"moment": "^2.31.0"
+		}
+	}
 }

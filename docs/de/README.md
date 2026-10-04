@@ -9,14 +9,15 @@ Vollständige Dokumentation: [English](https://github.com/POBSIZ/obsidian-diary/
 | Eintrag | Wert |
 | --- | --- |
 | Plugin-ID | `diary` |
-| Aktuelle Version | `1.20.2` |
+| Aktuelle Version | `1.21.0` |
 | Minimale Obsidian-Version | `1.7.2` |
 | Plattformen | Desktop / Mobil (`isDesktopOnly: false`) |
 | Standardsprache | `en` |
 | Standardordner für Planer | `Planner` |
 
-## Neu in 1.20.2
+## Neu in 1.21.0
 
+- `1.21.0`: Das Monats-Ribbon-Icon öffnet das Monatsraster im Hauptbereich. Für die Seitenleiste verwende **Open monthly planner in sidebar**.
 - `1.20.2`: Behebt die Erkennung des Seitenplaners auf Mobilgeräten, damit neue oder ausgewählte Notizen in einem neuen Haupt-Tab geöffnet werden und der Seitenplaner erhalten bleibt.
 
 Ältere Änderungen stehen auf der [Releases-Seite](https://github.com/POBSIZ/obsidian-diary/releases).
@@ -73,7 +74,7 @@ Für die Screenshots wurde ein temporärer Demo-Ordner mit ganztägigen, zeitgeb
 2. Kopiere `main.js`, `manifest.json` und `styles.css` nach `Vault/.obsidian/plugins/diary/`.
 3. Öffne in Obsidian **Settings → Community plugins**.
 4. Falls Restricted mode aktiv ist, deaktiviere ihn nur für Vaults, denen du vertraust, und aktiviere **Diary**.
-5. Öffne einen Planer über die Ribbon-Icons oder die Command Palette. Das Monats-Icon öffnet den rechten Seitenplaner.
+5. Öffne einen Planer über die Ribbon-Icons oder die Command Palette. Alle Planer-Ribbon-Icons öffnen Planer im Hauptbereich.
 
 ## Schnellstart
 
@@ -90,7 +91,7 @@ Erstellte Notizen sind normale Markdown-Dateien. Sie bleiben im Vault, auch wenn
 Ribbon-Icons:
 
 - `calendar-range`: Jahresplaner im Hauptbereich öffnen
-- `calendar-days`: Monatsplaner in der rechten Seitenleiste öffnen oder anzeigen
+- `calendar-days`: Monatsraster im Hauptbereich öffnen
 - `list-ordered`: Monatsliste im Hauptbereich öffnen
 
 Command Palette:
@@ -112,7 +113,7 @@ Mit Zurück/Vorwärts wechselst du Jahre oder Monate. Das Kalender-Icon springt 
 
 ## Rechter Seitenplaner
 
-Diary erstellt einen kompakten Monatsplaner in der rechten Seitenleiste, sobald der Workspace bereit ist. Mit **Open monthly planner in sidebar** oder dem Monats-Ribbon-Icon kannst du ihn wieder anzeigen.
+Diary erstellt einen kompakten Monatsplaner in der rechten Seitenleiste, sobald der Workspace bereit ist. Mit dem Befehl **Open monthly planner in sidebar** kannst du ihn wieder anzeigen.
 
 Der Seitenplaner ist als Begleitansicht gedacht:
 

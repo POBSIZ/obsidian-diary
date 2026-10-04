@@ -9,14 +9,15 @@ Diary는 Obsidian 볼트의 일반 Markdown 노트를 날짜별 플래너로 보
 | 항목 | 값 |
 | --- | --- |
 | 플러그인 ID | `diary` |
-| 현재 버전 | `1.20.2` |
+| 현재 버전 | `1.21.0` |
 | 최소 Obsidian 버전 | `1.7.2` |
 | 지원 플랫폼 | 데스크톱 / 모바일 (`isDesktopOnly: false`) |
 | 기본 언어 | `en` |
 | 기본 플래너 폴더 | `Planner` |
 
-## 1.20.2 변경 사항
+## 1.21.0 변경 사항
 
+- `1.21.0`: 월간 리본 아이콘이 메인 작업 영역에서 월간 그리드 플래너를 엽니다. 사이드바는 **Open monthly planner in sidebar** 명령으로 엽니다.
 - `1.20.2`: 모바일에서 사이드 패널 판별이 실패하던 문제를 수정했습니다. 사이드 플래너에서 문서를 만들거나 열면 메인 영역의 새 탭에 열리고 사이드 플래너가 유지됩니다.
 
 이전 변경 사항은 [Releases](https://github.com/POBSIZ/obsidian-diary/releases)에서 확인할 수 있습니다.
@@ -73,7 +74,7 @@ Diary는 Obsidian 볼트의 일반 Markdown 노트를 날짜별 플래너로 보
 2. `main.js`, `manifest.json`, `styles.css`를 볼트의 `Vault/.obsidian/plugins/diary/` 폴더에 복사합니다.
 3. Obsidian에서 **Settings → Community plugins**를 엽니다.
 4. Restricted mode가 켜져 있다면 신뢰하는 vault에서만 끄고, **Diary**를 활성화합니다.
-5. 왼쪽 리본 아이콘 또는 커맨드 팔레트에서 플래너를 엽니다. 월간 리본 아이콘은 오른쪽 사이드바 플래너를 엽니다.
+5. 왼쪽 리본 아이콘 또는 커맨드 팔레트에서 플래너를 엽니다. 모든 플래너 리본 아이콘은 메인 작업 영역에 플래너를 엽니다.
 
 ## 빠른 시작
 
@@ -90,7 +91,7 @@ Diary는 Obsidian 볼트의 일반 Markdown 노트를 날짜별 플래너로 보
 리본 아이콘:
 
 - `calendar-range`: 메인 작업 영역에 연간 플래너 열기
-- `calendar-days`: 오른쪽 사이드바의 월간 플래너 열기 또는 다시 보이기
+- `calendar-days`: 메인 작업 영역에서 월간 그리드 플래너 열기
 - `list-ordered`: 메인 작업 영역에 월간 목록 플래너 열기
 
 커맨드 팔레트:
@@ -112,7 +113,7 @@ Yearly -> Monthly Grid -> Monthly List -> Daily -> 3 Days -> Yearly
 
 ## 오른쪽 사이드바 플래너
 
-Diary는 작업 공간이 준비되면 오른쪽 사이드바에 컴팩트 월간 플래너를 하나 만듭니다. **Open monthly planner in sidebar** 명령이나 월간 리본 아이콘으로 다시 표시할 수 있습니다.
+Diary는 작업 공간이 준비되면 오른쪽 사이드바에 컴팩트 월간 플래너를 하나 만듭니다. **Open monthly planner in sidebar** 명령으로 다시 표시할 수 있습니다.
 
 사이드 플래너는 보조 뷰로 동작합니다.
 

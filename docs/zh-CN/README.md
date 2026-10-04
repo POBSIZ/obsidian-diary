@@ -9,14 +9,15 @@ Diary 是一款 Obsidian 社区插件，可把仓库中的普通 Markdown 笔记
 | 项目 | 值 |
 | --- | --- |
 | 插件 ID | `diary` |
-| 当前版本 | `1.20.2` |
+| 当前版本 | `1.21.0` |
 | 最低 Obsidian 版本 | `1.7.2` |
 | 支持平台 | 桌面 / 移动端 (`isDesktopOnly: false`) |
 | 默认语言 | `en` |
 | 默认计划文件夹 | `Planner` |
 
-## 1.20.2 更新
+## 1.21.0 更新
 
+- `1.21.0`: 月度 ribbon 图标现在在主工作区打开月度网格计划器。侧边栏请使用 **Open monthly planner in sidebar** 命令。
 - `1.20.2`: 修复移动设备上侧边栏判断失败的问题。创建或打开笔记时，文件会在主工作区的新标签页中打开，侧边栏计划器保持不变。
 
 更早的变更请参阅 [Releases](https://github.com/POBSIZ/obsidian-diary/releases)。
@@ -73,7 +74,7 @@ Diary 是一款 Obsidian 社区插件，可把仓库中的普通 Markdown 笔记
 2. 将 `main.js`、`manifest.json`、`styles.css` 复制到 `Vault/.obsidian/plugins/diary/`。
 3. 在 Obsidian 中打开 **Settings → Community plugins**。
 4. 如果 Restricted mode 已开启，只在可信仓库中关闭它，然后启用 **Diary**。
-5. 从左侧 ribbon 图标或命令面板打开计划器。月度 ribbon 图标会打开右侧边栏计划器。
+5. 从左侧 ribbon 图标或命令面板打开计划器。所有计划器 ribbon 图标都会在主工作区打开计划器。
 
 ## 快速开始
 
@@ -90,7 +91,7 @@ Diary 是一款 Obsidian 社区插件，可把仓库中的普通 Markdown 笔记
 Ribbon 图标：
 
 - `calendar-range`：在主工作区打开年度计划器
-- `calendar-days`：在右侧边栏打开或显示月度计划器
+- `calendar-days`：在主工作区打开月度网格计划器
 - `list-ordered`：在主工作区打开月度列表
 
 命令面板：
@@ -112,7 +113,7 @@ Yearly -> Monthly Grid -> Monthly List -> Daily -> 3 Days -> Yearly
 
 ## 右侧边栏计划器
 
-当工作区准备好后，Diary 会在右侧边栏创建一个紧凑月度计划器。使用 **Open monthly planner in sidebar** 或月度 ribbon 图标可以再次显示它。
+当工作区准备好后，Diary 会在右侧边栏创建一个紧凑月度计划器。使用 **Open monthly planner in sidebar** 命令可以再次显示它。
 
 侧边栏计划器是辅助视图：
 

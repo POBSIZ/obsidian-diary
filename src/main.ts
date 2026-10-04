@@ -109,9 +109,9 @@ export default class DiaryObsidian extends Plugin {
 		);
 		this.addRibbonIcon(
 			"calendar-days",
-			t("command.openMonthlyPlannerInSidebar"),
+			t("command.openMonthlyPlanner"),
 			() => {
-				void this.activateMonthlyPlannerInSidebar();
+				void this.activateMonthlyPlanner();
 			},
 		);
 		this.addRibbonIcon(

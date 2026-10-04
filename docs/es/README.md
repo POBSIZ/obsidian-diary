@@ -9,14 +9,15 @@ Documentación completa: [English](https://github.com/POBSIZ/obsidian-diary/blob
 | Elemento | Valor |
 | --- | --- |
 | ID del plugin | `diary` |
-| Versión actual | `1.20.2` |
+| Versión actual | `1.21.0` |
 | Versión mínima de Obsidian | `1.7.2` |
 | Plataformas | Escritorio / móvil (`isDesktopOnly: false`) |
 | Idioma predeterminado | `en` |
 | Carpeta predeterminada del planificador | `Planner` |
 
-## Novedades de 1.20.2
+## Novedades de 1.21.0
 
+- `1.21.0`: El icono mensual abre la cuadrícula mensual en el área principal. Para la barra lateral, usa **Open monthly planner in sidebar**.
 - `1.20.2`: Corrige la detección del panel lateral en móvil para abrir las notas creadas o seleccionadas en una pestaña nueva del área principal y conservar el planificador lateral.
 
 Los cambios anteriores están disponibles en [Releases](https://github.com/POBSIZ/obsidian-diary/releases).
@@ -73,7 +74,7 @@ Las capturas usan una carpeta temporal con notas de todo el día, con hora, de r
 2. Copia `main.js`, `manifest.json` y `styles.css` en `Vault/.obsidian/plugins/diary/`.
 3. En Obsidian, abre **Settings → Community plugins**.
 4. Si Restricted mode está activo, desactívalo solo en vaults de confianza y activa **Diary**.
-5. Abre un planificador desde los iconos laterales o la paleta de comandos. El icono mensual abre el planificador en la barra lateral derecha.
+5. Abre un planificador desde los iconos laterales o la paleta de comandos. Todos los iconos de planificador abren los planificadores en el área principal.
 
 ## Inicio rápido
 
@@ -90,7 +91,7 @@ Las notas creadas son archivos Markdown normales y permanecen en el vault aunque
 Iconos laterales:
 
 - `calendar-range`: abre el planificador anual en el área principal
-- `calendar-days`: abre o muestra el planificador mensual en la barra lateral derecha
+- `calendar-days`: abre la cuadrícula mensual en el área principal
 - `list-ordered`: abre la lista mensual en el área principal
 
 Paleta de comandos:
@@ -112,7 +113,7 @@ Usa anterior/siguiente para moverte entre años o meses, y el icono de calendari
 
 ## Planificador lateral derecho
 
-Diary crea un planificador mensual compacto en la barra lateral derecha cuando el workspace está listo. Usa **Open monthly planner in sidebar** o el icono mensual para mostrarlo de nuevo.
+Diary crea un planificador mensual compacto en la barra lateral derecha cuando el workspace está listo. Usa **Open monthly planner in sidebar** para mostrarlo de nuevo.
 
 El planificador lateral está pensado como vista de apoyo:
 

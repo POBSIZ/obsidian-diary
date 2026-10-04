@@ -9,14 +9,15 @@ Documentation complète : [English](https://github.com/POBSIZ/obsidian-diary/blo
 | Élément | Valeur |
 | --- | --- |
 | ID du plugin | `diary` |
-| Version actuelle | `1.20.2` |
+| Version actuelle | `1.21.0` |
 | Version minimale d’Obsidian | `1.7.2` |
 | Plateformes | Bureau / mobile (`isDesktopOnly: false`) |
 | Langue par défaut | `en` |
 | Dossier de planning par défaut | `Planner` |
 
-## Nouveautés de la version 1.20.2
+## Nouveautés de la version 1.21.0
 
+- `1.21.0`: L’icône mensuelle ouvre la grille mensuelle dans l’espace principal. Pour la barre latérale, utilisez **Open monthly planner in sidebar**.
 - `1.20.2`: Corrige la détection du panneau latéral sur mobile pour ouvrir les notes créées ou sélectionnées dans un nouvel onglet principal et conserver le planificateur latéral.
 
 Les changements antérieurs sont disponibles sur la page [Releases](https://github.com/POBSIZ/obsidian-diary/releases).
@@ -73,7 +74,7 @@ Les captures utilisent un dossier temporaire contenant des notes de journée, de
 2. Copiez `main.js`, `manifest.json` et `styles.css` dans `Vault/.obsidian/plugins/diary/`.
 3. Dans Obsidian, ouvrez **Settings → Community plugins**.
 4. Si Restricted mode est activé, désactivez-le seulement dans les coffres de confiance, puis activez **Diary**.
-5. Ouvrez un planning depuis les icônes du ruban ou la palette de commandes. L’icône mensuelle ouvre le planificateur de droite.
+5. Ouvrez un planning depuis les icônes du ruban ou la palette de commandes. Toutes les icônes de planning du ruban ouvrent les plannings dans l’espace principal.
 
 ## Démarrage rapide
 
@@ -90,7 +91,7 @@ Les notes créées sont de simples fichiers Markdown. Elles restent dans votre c
 Icônes du ruban :
 
 - `calendar-range` : ouvrir le planificateur annuel dans l’espace principal
-- `calendar-days` : ouvrir ou révéler le planificateur mensuel dans la barre latérale droite
+- `calendar-days` : ouvrir la grille mensuelle dans l’espace principal
 - `list-ordered` : ouvrir la liste mensuelle dans l’espace principal
 
 Palette de commandes :
@@ -112,7 +113,7 @@ Utilisez précédent/suivant pour changer d’année ou de mois, et l’icône d
 
 ## Planificateur latéral droit
 
-Diary crée un planificateur mensuel compact dans la barre latérale droite lorsque l’espace de travail est prêt. Utilisez **Open monthly planner in sidebar** ou l’icône mensuelle pour le faire réapparaître.
+Diary crée un planificateur mensuel compact dans la barre latérale droite lorsque l’espace de travail est prêt. Utilisez **Open monthly planner in sidebar** pour le faire réapparaître.
 
 Cette vue sert d’accompagnement :
 

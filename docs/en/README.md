@@ -9,7 +9,7 @@ Full documentation: [English](https://github.com/POBSIZ/obsidian-diary/blob/main
 | Item | Value |
 | --- | --- |
 | Plugin ID | `diary` |
-| Current version | `1.20.2` |
+| Current version | `1.21.0` |
 | Minimum Obsidian version | `1.7.2` |
 | Supported platforms | Desktop / mobile (`isDesktopOnly: false`) |
 | Default language | `en` |
@@ -17,6 +17,7 @@ Full documentation: [English](https://github.com/POBSIZ/obsidian-diary/blob/main
 
 ## What's new
 
+- `1.21.0`: Opens the monthly grid from its ribbon icon in the main workspace. Use **Open monthly planner in sidebar** for the sidebar.
 - `1.20.2`: Fixes sidebar detection on mobile so creating or opening notes opens a new main workspace tab and preserves the sidebar planner.
 
 For earlier changes, see the [Releases page](https://github.com/POBSIZ/obsidian-diary/releases).
@@ -73,7 +74,7 @@ The screenshots use temporary demo notes for all-day, timed, range, todo, and pl
 2. Copy `main.js`, `manifest.json`, and `styles.css` into `Vault/.obsidian/plugins/diary/`.
 3. In Obsidian, open **Settings → Community plugins**.
 4. If Restricted mode is enabled, turn it off only for vaults you trust, then enable **Diary**.
-5. Open a planner from the left ribbon icons or the command palette. The monthly ribbon icon opens the right sidebar planner.
+5. Open a planner from the left ribbon icons or the command palette. All planner ribbon icons open planners in the main workspace.
 
 ## Quick start
 
@@ -90,7 +91,7 @@ Created notes are ordinary Markdown files. They remain in your vault even if the
 Ribbon icons:
 
 - `calendar-range`: open yearly planner in the main workspace
-- `calendar-days`: open or reveal the monthly planner in the right sidebar
+- `calendar-days`: open the monthly grid planner in the main workspace
 - `list-ordered`: open monthly list planner in the main workspace
 
 Command palette:
@@ -112,7 +113,7 @@ Use previous/next buttons to move through years or months, and the calendar icon
 
 ## Right sidebar planner
 
-Diary creates one compact monthly planner in the right sidebar when the workspace is ready. Use **Open monthly planner in sidebar** or the monthly ribbon icon to reveal it again.
+Diary creates one compact monthly planner in the right sidebar when the workspace is ready. Use **Open monthly planner in sidebar** to reveal it again.
 
 The sidebar works as a companion view:
 

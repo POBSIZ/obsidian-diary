@@ -11,13 +11,15 @@ Diary는 Obsidian 볼트의 일반 Markdown 노트를 연간·월간·일간·3�
 | Item | Value |
 | --- | --- |
 | Plugin ID | `diary` |
-| Version | `1.20.2` |
+| Version | `1.21.0` |
 | Minimum Obsidian version | `1.7.2` |
 | Platforms | Desktop and mobile (`isDesktopOnly: false`) |
 | Default language | `en` |
 | Default planner folder | `Planner` |
 
 ## What's new
+
+- `1.21.0`: opens the monthly grid from its ribbon icon in the main workspace, consistently with the yearly and monthly list icons. The sidebar remains available through its command. Updates the runtime Moment dependency to a patched version.
 
 - `1.20.2`: fixes mobile sidebar detection so creating or opening notes from the sidebar planner opens a new main workspace tab and preserves the planner.
 - `1.20.1`: removes the obsolete pnpm lockfile and declares npm as the package manager so community source reviews install the release dependencies consistently.
@@ -65,7 +67,7 @@ These screenshots use temporary demo notes for all-day, timed, range, todo, and 
 - Daily planner: a 24-hour timeline that separates timed plans from all-day and untimed notes. Collapse the all-day section to reclaim timeline space; its saved state and event count remain visible. Multi-day ranges render as continuous all-day bars or datetime slices, with cross-date time selection, interval dragging, and boundary resizing. Events shorter than 20 minutes use readable compact cards with time tooltips and collision-aware columns. Select an empty time slot to create a note with start and end times prefilled.
 - 3-day planner: compare three consecutive days in parallel columns on the same 24-hour timeline. Narrow screens keep readable column widths with horizontal scrolling.
 - Direct view selector: switch directly among yearly, monthly grid, monthly list, daily, and 3-day views. In narrow layouts it remains visible while secondary actions move into **More**.
-- Sidebar planner: a compact monthly planner opens in the right sidebar by default, can be revealed from the ribbon or command palette, and can cycle through yearly, monthly grid, and monthly list layouts in the same side leaf. On desktop and mobile, creating or opening a sidebar note uses a new main workspace tab and preserves the planner and existing tabs.
+- Sidebar planner: a compact monthly planner opens in the right sidebar by default, can be revealed from the command palette, and can cycle through yearly, monthly grid, and monthly list layouts in the same side leaf. On desktop and mobile, creating or opening a sidebar note uses a new main workspace tab and preserves the planner and existing tabs.
 - Date notes and range notes: recognized by `YYYY-MM-DD` and `YYYY-MM-DD--YYYY-MM-DD` filenames. By default Diary scans the entire vault, with an optional planner-folder-only scope. Title suffixes can keep visible spaces.
 - File options: switch an existing planner note between single-date and range modes, choose its folder, and edit the complete date-based filename. Diary moves the file and synchronizes `date_start` / `date_end` metadata.
 - Range title continuity: monthly range bars repeat their title at new week and month boundaries, while yearly cells repeat it at month and year boundaries.

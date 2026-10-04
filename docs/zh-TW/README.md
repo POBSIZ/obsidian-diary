@@ -9,14 +9,15 @@ Diary 是一款 Obsidian 社群外掛，可把儲存庫中的一般 Markdown 筆
 | 項目 | 值 |
 | --- | --- |
 | 外掛 ID | `diary` |
-| 目前版本 | `1.20.2` |
+| 目前版本 | `1.21.0` |
 | 最低 Obsidian 版本 | `1.7.2` |
 | 支援平台 | 桌面 / 行動裝置 (`isDesktopOnly: false`) |
 | 預設語言 | `en` |
 | 預設規劃資料夾 | `Planner` |
 
-## 1.20.2 更新
+## 1.21.0 更新
 
+- `1.21.0`: 月度 ribbon 圖示現在在主工作區開啟月度網格規劃器。側邊欄請使用 **Open monthly planner in sidebar** 命令。
 - `1.20.2`: 修正行動裝置上側邊欄判斷失敗的問題。建立或開啟筆記時，檔案會在主工作區的新分頁中開啟，側邊欄規劃器保持不變。
 
 較早的變更請參閱 [Releases](https://github.com/POBSIZ/obsidian-diary/releases)。
@@ -73,7 +74,7 @@ Diary 是一款 Obsidian 社群外掛，可把儲存庫中的一般 Markdown 筆
 2. 將 `main.js`、`manifest.json`、`styles.css` 複製到 `Vault/.obsidian/plugins/diary/`。
 3. 在 Obsidian 中開啟 **Settings → Community plugins**。
 4. 如果 Restricted mode 已開啟，只在可信任儲存庫中關閉它，然後啟用 **Diary**。
-5. 從左側 ribbon 圖示或命令面板開啟規劃器。月度 ribbon 圖示會開啟右側邊欄規劃器。
+5. 從左側 ribbon 圖示或命令面板開啟規劃器。所有規劃器 ribbon 圖示都會在主工作區開啟規劃器。
 
 ## 快速開始
 
@@ -90,7 +91,7 @@ Diary 是一款 Obsidian 社群外掛，可把儲存庫中的一般 Markdown 筆
 Ribbon 圖示：
 
 - `calendar-range`：在主工作區開啟年度規劃器
-- `calendar-days`：在右側邊欄開啟或顯示月度規劃器
+- `calendar-days`：在主工作區開啟月度網格規劃器
 - `list-ordered`：在主工作區開啟月度列表
 
 命令面板：
@@ -112,7 +113,7 @@ Yearly -> Monthly Grid -> Monthly List -> Daily -> 3 Days -> Yearly
 
 ## 右側邊欄規劃器
 
-當 workspace 準備好後，Diary 會在右側邊欄建立一個緊湊月度規劃器。使用 **Open monthly planner in sidebar** 或月度 ribbon 圖示可以再次顯示它。
+當 workspace 準備好後，Diary 會在右側邊欄建立一個緊湊月度規劃器。使用 **Open monthly planner in sidebar** 命令可以再次顯示它。
 
 側邊欄規劃器是輔助視圖：
 

@@ -9,14 +9,15 @@ Diary は、Obsidian の保管庫（vault）にある通常の Markdown ノー�
 | 項目 | 値 |
 | --- | --- |
 | プラグイン ID | `diary` |
-| 現在のバージョン | `1.20.2` |
+| 現在のバージョン | `1.21.0` |
 | 最小 Obsidian バージョン | `1.7.2` |
 | 対応プラットフォーム | デスクトップ / モバイル (`isDesktopOnly: false`) |
 | 既定の言語 | `en` |
 | 既定のプランナーフォルダ | `Planner` |
 
-## 1.20.2 の変更点
+## 1.21.0 の変更点
 
+- `1.21.0`: 月間リボンアイコンでメイン領域に月間グリッドプランナーを開きます。サイドバーには **Open monthly planner in sidebar** を使用します。
 - `1.20.2`: モバイルでサイドパネルの判定が失敗する問題を修正しました。ノートの作成・表示時にメイン領域の新しいタブを開き、サイドプランナーを維持します。
 
 過去の変更内容は [Releases](https://github.com/POBSIZ/obsidian-diary/releases) を参照してください。
@@ -73,7 +74,7 @@ Diary は、Obsidian の保管庫（vault）にある通常の Markdown ノー�
 2. `main.js`、`manifest.json`、`styles.css` を `Vault/.obsidian/plugins/diary/` にコピーします。
 3. Obsidian で **Settings → Community plugins** を開きます。
 4. Restricted mode が有効な場合は、信頼できる保管庫でのみ無効にして **Diary** を有効化します。
-5. 左リボンのアイコンまたはコマンドパレットからプランナーを開きます。月間アイコンは右サイドバーのプランナーを開きます。
+5. 左リボンのアイコンまたはコマンドパレットからプランナーを開きます。すべてのプランナーのリボンアイコンはメイン領域でプランナーを開きます。
 
 ## クイックスタート
 
@@ -90,7 +91,7 @@ Diary は、Obsidian の保管庫（vault）にある通常の Markdown ノー�
 リボンアイコン:
 
 - `calendar-range`: メイン領域で年間プランナーを開く
-- `calendar-days`: 右サイドバーで月間プランナーを開く、または表示する
+- `calendar-days`: メイン領域で月間グリッドプランナーを開く
 - `list-ordered`: メイン領域で月間リストを開く
 
 コマンドパレット:
@@ -112,7 +113,7 @@ Yearly -> Monthly Grid -> Monthly List -> Daily -> 3 Days -> Yearly
 
 ## 右サイドバープランナー
 
-Diary は workspace の準備ができると、右サイドバーにコンパクトな月間プランナーを 1 つ作ります。**Open monthly planner in sidebar** または月間リボンアイコンで再表示できます。
+Diary は workspace の準備ができると、右サイドバーにコンパクトな月間プランナーを 1 つ作ります。**Open monthly planner in sidebar** コマンドで再表示できます。
 
 サイドプランナーは補助ビューです。
 
