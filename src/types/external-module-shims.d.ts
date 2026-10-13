@@ -183,6 +183,8 @@ declare module "obsidian" {
 	export class Component {
 		load(): void;
 		unload(): void;
+		register(callback: () => unknown): void;
+		register(callback: () => void): void;
 		registerEvent(eventRef: EventRef): void;
 		registerInterval(id: number): number;
 		registerDomEvent<K extends keyof WindowEventMap>(
@@ -265,6 +267,7 @@ declare module "obsidian" {
 
 	export class Setting {
 		settingEl: HTMLElement;
+		controlEl: HTMLElement;
 		constructor(containerEl: HTMLElement);
 		setName(name: string | DocumentFragment): this;
 		setDesc(desc: string | DocumentFragment): this;
@@ -320,6 +323,13 @@ declare module "obsidian" {
 		close(): void;
 		onOpen(): void;
 		onClose(): void;
+	}
+
+	export abstract class SuggestModal<T> extends Modal {
+		setPlaceholder(placeholder: string): void;
+		abstract getSuggestions(query: string): T[] | Promise<T[]>;
+		abstract renderSuggestion(value: T, el: HTMLElement): void;
+		abstract onChooseSuggestion(value: T, event: MouseEvent | KeyboardEvent): void;
 	}
 
 	export class Notice {

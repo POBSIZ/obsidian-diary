@@ -1,6 +1,9 @@
-import { App, TFile, WorkspaceLeaf } from "obsidian";
+import { App, Notice, TFile, WorkspaceLeaf } from "obsidian";
 import { parseRangeBasename } from "../../utils/range";
 import { getFilePath, type PlannerTimeRange } from "./file-utils";
+import { formatPlannerBasename, getRepresentativeBasenames, isPlannerBasenameForDates, parsePlannerBasename, recognizePlannerBasename, type ParsedPlannerBasename } from "../../utils/date-formats";
+import { chooseRepresentativeNote } from "../../utils/representative-notes";
+import { t } from "../../i18n";
 import {
 	buildRecurrenceSourceFrontmatter,
 	serializeYamlFrontmatter,
@@ -68,7 +71,8 @@ export async function moveFileToDate(
 		const endMonth = endDate.getMonth() + 1;
 		const endDay = endDate.getDate();
 
-		const newBasename = `${targetDateStr}--${endYear}-${pad(endMonth)}-${pad(endDay)}${rangeParsed.suffix ? `-${rangeParsed.suffix}` : ""}.md`;
+		const newBasename = `${formatPlannerBasename(targetDateStr, rangeParsed.suffix, `${endYear}-${pad(endMonth)}-${pad(endDay)}`, rangeParsed.format)}.md`;
+		if (!isPlannerBasenameForDates(newBasename, targetDateStr, `${endYear}-${pad(endMonth)}-${pad(endDay)}`)) return null;
 		const fullNewPath = folder ? `${folder}/${newBasename}` : newBasename;
 
 		if (fullNewPath === file.path) return file;
@@ -90,7 +94,8 @@ export async function moveFileToDate(
 	const singleParsed = parseSingleDateBasename(file.basename.replace(/\.md$/i, ""));
 	if (!singleParsed) return null;
 
-	const newBasename = `${targetDateStr}${singleParsed.suffix ? `-${singleParsed.suffix}` : ""}.md`;
+	const newBasename = `${formatPlannerBasename(targetDateStr, singleParsed.suffix, undefined, singleParsed.format)}.md`;
+	if (!isPlannerBasenameForDates(newBasename, targetDateStr)) return null;
 	const fullNewPath = folder ? `${folder}/${newBasename}` : newBasename;
 
 	if (fullNewPath === file.path) return file;
@@ -123,7 +128,8 @@ export async function moveRangeFileToNewDates(
 	if (startStr > endStr) return null;
 
 	const folder = file.parent?.path ?? "";
-	const newBasename = `${startStr}--${endStr}${rangeParsed.suffix ? `-${rangeParsed.suffix}` : ""}.md`;
+	const newBasename = `${formatPlannerBasename(startStr, rangeParsed.suffix, endStr, rangeParsed.format)}.md`;
+	if (!isPlannerBasenameForDates(newBasename, startStr, endStr)) return null;
 	const fullNewPath = folder ? `${folder}/${newBasename}` : newBasename;
 
 	if (fullNewPath === file.path) return file;
@@ -155,7 +161,7 @@ export async function movePlannerFileToLocation(
 ): Promise<TFile> {
 	const folder = folderRaw.trim().replace(/^\/+|\/+$/g, "");
 	const cleanBasename = basenameRaw.trim().replace(/\.md$/i, "");
-	if (!cleanBasename || /[\\/]/.test(cleanBasename)) {
+	if (!cleanBasename || /[\\/]/.test(cleanBasename) || !parsePlannerBasename(cleanBasename)) {
 		const err = new Error("PLANNER_INVALID_FILENAME");
 		(err as Error & { code?: string }).code = "PLANNER_INVALID_FILENAME";
 		throw err;
@@ -212,11 +218,33 @@ export async function openDateNote(
 	day: number,
 ): Promise<void> {
 	const path = getFilePath(folder, year, month, day);
+	const expected = `${year}-${pad(month)}-${pad(day)}`;
+	const base = (folder || "Planner").trim().replace(/\/+$/g, "");
+	const existingNotes = getRepresentativeBasenames("daily", year, month, day)
+		.map((name) => app.vault.getAbstractFileByPath(base ? `${base}/${name}.md` : `${name}.md`))
+		.filter((candidate): candidate is TFile => candidate instanceof TFile);
+	if (existingNotes.some((candidate) => !isPlannerBasenameForDates(candidate.basename, expected))) {
+		new Notice(t("dateFormats.ambiguousFilename"));
+		chooseRepresentativeNote(app, existingNotes, (selected) => void leaf.openFile(selected));
+		return;
+	}
+	if (existingNotes.length > 1) {
+		chooseRepresentativeNote(app, existingNotes, (selected) => void leaf.openFile(selected));
+		return;
+	}
+	if (existingNotes[0]) {
+		await leaf.openFile(existingNotes[0]);
+		return;
+	}
 	const file = app.vault.getAbstractFileByPath(path);
 
 	if (file instanceof TFile) {
 		await leaf.openFile(file);
 	} else {
+		if (!isPlannerBasenameForDates(path.split("/").pop()!, expected)) {
+			new Notice(t("dateFormats.ambiguousFilename"));
+			return;
+		}
 		const dir = path.split("/").slice(0, -1).join("/");
 		if (dir && !app.vault.getAbstractFileByPath(dir)) {
 			await app.vault.createFolder(dir);
@@ -237,6 +265,7 @@ export async function createRangeFile(
 	notifyMinutes?: number | null,
 	timeRange?: PlannerTimeRange | null,
 	recurrence?: RecurrenceFormValue | null,
+	colorId?: string,
 ): Promise<TFile> {
 	const cleanBasename = basename.trim().replace(/\.md$/i, "");
 	const parsed = parseRangeBasename(cleanBasename);
@@ -268,6 +297,7 @@ export async function createRangeFile(
 		date_end: endStr,
 	};
 	if (color?.trim()) frontmatter.color = color.trim();
+	if (colorId?.trim()) frontmatter.diary_color_id = colorId.trim();
 	if (todo) {
 		frontmatter.todo = true;
 		frontmatter.completed = false;
@@ -287,10 +317,9 @@ export async function createRangeFile(
 /** Extract date and optional suffix from basename (e.g. "2026-02-12" or "2026-02-12-meeting"). */
 export function parseSingleDateBasename(
 	basename: string,
-): { date: string; suffix?: string } | null {
-	const m = basename.match(/^(\d{4}-\d{2}-\d{2})(?:-(.+))?$/);
-	if (!m) return null;
-	return { date: m[1] ?? "", suffix: m[2] ?? undefined };
+): (ParsedPlannerBasename & { date: string }) | null {
+	const parsed = parsePlannerBasename(basename);
+	return parsed?.kind === "single" ? { ...parsed, date: parsed.start } : null;
 }
 
 /** First calendar day for planner chips: range start, or single date. */
@@ -311,9 +340,13 @@ export async function createSingleDateFile(
 	notifyMinutes?: number | null,
 	timeRange?: PlannerTimeRange | null,
 	recurrence?: RecurrenceFormValue | null,
+	colorId?: string,
 ): Promise<TFile> {
 	const trimmed = (folder || "Planner").trim();
 	const cleanBasename = basename.trim().replace(/\.md$/i, "") || "untitled";
+	const parsed = parseSingleDateBasename(cleanBasename);
+	if (!parsed) throw new Error(recognizePlannerBasename(cleanBasename).status === "ambiguous"
+		? t("dateFormats.ambiguousFilename") : t("modal.invalidDateFileName"));
 	const filename = cleanBasename.endsWith(".md")
 		? cleanBasename
 		: `${cleanBasename}.md`;
@@ -326,7 +359,6 @@ export async function createSingleDateFile(
 	if (dir && !app.vault.getAbstractFileByPath(dir)) {
 		await app.vault.createFolder(dir);
 	}
-	const parsed = parseSingleDateBasename(cleanBasename);
 	const heading =
 		parsed?.suffix ?? parsed?.date ?? cleanBasename;
 	const hasNotify =
@@ -336,6 +368,7 @@ export async function createSingleDateFile(
 		notifyMinutes <= 1439;
 	const frontmatter: Record<string, unknown> = {};
 	if (color?.trim()) frontmatter.color = color.trim();
+	if (colorId?.trim()) frontmatter.diary_color_id = colorId.trim();
 	if (todo) {
 		frontmatter.todo = true;
 		frontmatter.completed = false;
@@ -355,10 +388,24 @@ export async function createSingleDateFile(
 	return app.vault.create(path, content);
 }
 
-/**
- * Update todo and completed status in a file's frontmatter.
- * When todo is false/undefined, removes both todo and completed.
- */
+/** Holiday drag creates an ordinary note using the current creation format. */
+export async function createHolidayPlannerFile(
+	app: App, folder: string, date: string, title: string, color?: string,
+): Promise<TFile> {
+	const base = (folder || "Planner").trim().replace(/^\/+|\/+$/g, "");
+	const suffix = sanitizePlannerBasenameSuffix(title) || "holiday";
+	for (let attempt = 1; attempt < 1000; attempt++) {
+		const numberedSuffix = attempt === 1 ? suffix : `${suffix}-${attempt}`;
+		const basename = formatPlannerBasename(date, numberedSuffix);
+		const path = base ? `${base}/${basename}.md` : `${basename}.md`;
+		if (!app.vault.getAbstractFileByPath(path)) {
+			return createSingleDateFile(app, base, basename, color);
+		}
+	}
+	throw new Error("Could not create a unique holiday note.");
+}
+
+/** Update todo status, removing both todo and completed when todo is off. */
 export async function updateFileTodoStatus(
 	app: App,
 	file: TFile,
@@ -388,6 +435,8 @@ export async function updateFileColor(
 	app: App,
 	file: TFile,
 	color: string | undefined,
+	colorId?: string,
+	inherit?: boolean,
 ): Promise<void> {
 	const trimmed = color?.trim();
 	await app.fileManager.processFrontMatter(
@@ -398,6 +447,9 @@ export async function updateFileColor(
 			} else {
 				delete frontmatter.color;
 			}
+			if (colorId?.trim()) frontmatter.diary_color_id = colorId.trim();
+			else delete frontmatter.diary_color_id;
+			if (inherit !== undefined) frontmatter.diary_color_inherit = inherit;
 		},
 	);
 }
@@ -477,9 +529,8 @@ export async function createExternalEventFile(
 	const endDate = getExternalEventEndDate(event);
 	const suffix = sanitizePlannerBasenameSuffix(event.title) || "external";
 	const isRange = event.allDay && startDate < endDate;
-	const baseName = isRange
-		? `${startDate}--${endDate}-${suffix}`
-		: `${startDate}-${suffix}`;
+	const baseName = formatPlannerBasename(startDate, suffix, isRange ? endDate : undefined);
+	if (!isPlannerBasenameForDates(baseName, startDate, isRange ? endDate : undefined)) throw new Error(t("dateFormats.ambiguousFilename"));
 	const path = await getAvailableExternalEventPath(app, trimmed, baseName);
 	const dir = path.split("/").slice(0, -1).join("/");
 	if (dir && !app.vault.getAbstractFileByPath(dir)) {
@@ -511,9 +562,13 @@ async function getAvailableExternalEventPath(
 	folder: string,
 	baseName: string,
 ): Promise<string> {
+	const expected = parsePlannerBasename(baseName);
+	if (!expected) throw new Error(t("dateFormats.ambiguousFilename"));
 	let candidate = folder ? `${folder}/${baseName}.md` : `${baseName}.md`;
 	let counter = 2;
-	while (app.vault.getAbstractFileByPath(candidate)) {
+	while (app.vault.getAbstractFileByPath(candidate) ||
+		!isPlannerBasenameForDates(candidate.split("/").pop()!, expected.start, expected.end)) {
+		if (counter >= 10000) throw new Error(t("dateFormats.ambiguousFilename"));
 		candidate = folder
 			? `${folder}/${baseName}-${counter}.md`
 			: `${baseName}-${counter}.md`;
@@ -559,17 +614,15 @@ export async function updateFileTitle(
 
 	if (rangeParsed) {
 		const suffix = newTitle ? sanitizePlannerBasenameSuffix(newTitle) : "";
-		const newBasename = `${rangeParsed.start}--${rangeParsed.end}${
-			suffix ? `-${suffix}` : ""
-		}.md`;
+		const newBasename = `${formatPlannerBasename(rangeParsed.start, suffix, rangeParsed.end, rangeParsed.format)}.md`;
+		if (!isPlannerBasenameForDates(newBasename, rangeParsed.start, rangeParsed.end)) throw new Error(t("dateFormats.ambiguousFilename"));
 		return await renamePlannerFileIfNeeded(app, file, newBasename);
 	}
 
 	if (singleParsed) {
 		const suffix = newTitle ? sanitizePlannerBasenameSuffix(newTitle) : "";
-		const newBasename = `${singleParsed.date}${
-			suffix ? `-${suffix}` : ""
-		}.md`;
+		const newBasename = `${formatPlannerBasename(singleParsed.date, suffix, undefined, singleParsed.format)}.md`;
+		if (!isPlannerBasenameForDates(newBasename, singleParsed.date)) throw new Error(t("dateFormats.ambiguousFilename"));
 		return await renamePlannerFileIfNeeded(app, file, newBasename);
 	}
 

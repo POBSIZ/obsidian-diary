@@ -3,6 +3,7 @@ import { Platform } from "obsidian";
 import { t } from "../i18n";
 import { DeleteConfirmModal } from "./yearly-planner/modals";
 import { parseRangeBasename } from "../utils/range";
+import { formatPlannerBasename, isPlannerBasenameForDates, parsePlannerBasename } from "../utils/date-formats";
 import {
 	getFilesForDate,
 	type PlannerFileScope,
@@ -188,30 +189,45 @@ export function rebasePlannerFileBasename(
 	if (rangeParsed) {
 		const span = daysInclusive(rangeParsed.start, rangeParsed.end);
 		const newEnd = addCalendarDays(targetDateStr, span - 1);
-		const suf = rangeParsed.suffix ? `-${rangeParsed.suffix}` : "";
-		return `${targetDateStr}--${newEnd}${suf}.md`;
+		const output = `${formatPlannerBasename(targetDateStr, rangeParsed.suffix, newEnd, rangeParsed.format)}.md`;
+		if (!isPlannerBasenameForDates(output, targetDateStr, newEnd)) throw new Error(t("dateFormats.ambiguousFilename"));
+		return output;
 	}
 	const singleParsed = parseSingleDateBasename(clean);
 	if (singleParsed) {
-		const suf = singleParsed.suffix ? `-${singleParsed.suffix}` : "";
-		return `${targetDateStr}${suf}.md`;
+		const output = `${formatPlannerBasename(targetDateStr, singleParsed.suffix, undefined, singleParsed.format)}.md`;
+		if (!isPlannerBasenameForDates(output, targetDateStr)) throw new Error(t("dateFormats.ambiguousFilename"));
+		return output;
 	}
-	return `${targetDateStr}.md`;
+	throw new Error("Unrecognized or ambiguous planner filename");
 }
 
 function uniqueVaultPath(app: App, path: string): string {
-	if (!app.vault.getAbstractFileByPath(path)) return path;
 	const lastSlash = path.lastIndexOf("/");
 	const dir = lastSlash >= 0 ? path.slice(0, lastSlash + 1) : "";
 	const file = lastSlash >= 0 ? path.slice(lastSlash + 1) : path;
+	const expected = parsePlannerBasename(file);
+	if (!expected) throw new Error(t("dateFormats.ambiguousFilename"));
+	if (!app.vault.getAbstractFileByPath(path)) return path;
 	const dot = file.lastIndexOf(".");
 	const stem = dot >= 0 ? file.slice(0, dot) : file;
 	const ext = dot >= 0 ? file.slice(dot) : "";
-	for (let i = 1; ; i++) {
+	for (let i = 1; i < 10000; i++) {
 		const suffix = i === 1 ? "-copy" : `-copy${i}`;
 		const candidate = `${dir}${stem}${suffix}${ext}`;
-		if (!app.vault.getAbstractFileByPath(candidate)) return candidate;
+		if (!app.vault.getAbstractFileByPath(candidate) &&
+			isPlannerBasenameForDates(`${stem}${suffix}${ext}`, expected.start, expected.end)) return candidate;
 	}
+	throw new Error(t("dateFormats.ambiguousFilename"));
+}
+
+async function createRebasedPlannerCopy(app: App, path: string, content: string): Promise<void> {
+	const file = await app.vault.create(path, content);
+	const range = parseRangeBasename(file.basename);
+	if (range) await app.fileManager.processFrontMatter(file, (frontmatter) => {
+		frontmatter.date_start = range.start;
+		frontmatter.date_end = range.end;
+	});
 }
 
 export type PastePlannerResult =
@@ -239,11 +255,11 @@ export async function pastePlannerClipboard(
 		const srcPath = items[0]!.path;
 		const content = items[0]!.content;
 		const createdPaths: string[] = [];
-		for (const dateStr of targetDates) {
-			const newBasename = rebasePlannerFileBasename(srcPath, dateStr);
+		const newBasenames = targetDates.map((dateStr) => rebasePlannerFileBasename(srcPath, dateStr));
+		for (const newBasename of newBasenames) {
 			let path = trimmed ? `${trimmed}/${newBasename}` : newBasename;
 			path = uniqueVaultPath(app, path);
-			await app.vault.create(path, content);
+			await createRebasedPlannerCopy(app, path, content);
 			createdPaths.push(path);
 		}
 		return {
@@ -256,11 +272,12 @@ export async function pastePlannerClipboard(
 	if (items.length > 1 && targetDates.length === 1) {
 		const dateStr = targetDates[0]!;
 		const createdPaths: string[] = [];
-		for (const it of items) {
-			const newBasename = rebasePlannerFileBasename(it.path, dateStr);
+		const rebasedItems = items.map((item) => ({ ...item, basename: rebasePlannerFileBasename(item.path, dateStr) }));
+		for (const it of rebasedItems) {
+			const newBasename = it.basename;
 			let path = trimmed ? `${trimmed}/${newBasename}` : newBasename;
 			path = uniqueVaultPath(app, path);
-			await app.vault.create(path, it.content);
+			await createRebasedPlannerCopy(app, path, it.content);
 			createdPaths.push(path);
 		}
 		return {

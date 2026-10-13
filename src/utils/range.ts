@@ -1,19 +1,17 @@
-const RANGE_BASENAME_REGEX =
-	/^(\d{4}-\d{2}-\d{2})--(\d{4}-\d{2}-\d{2})(?:-(.+))?$/;
+import { parsePlannerBasename } from "./date-formats";
 
 export interface ParsedRange {
 	start: string;
 	end: string;
 	suffix?: string;
+	format: string;
+	formatId: string;
 }
 
 export function parseRangeBasename(basename: string): ParsedRange | null {
-	const m = basename.match(RANGE_BASENAME_REGEX);
-	if (!m) return null;
-	const [, start, end, suffix] = m;
-	if (!start || !end) return null;
-	if (start > end) return null;
-	return { start, end, suffix: suffix ?? undefined };
+	const parsed = parsePlannerBasename(basename);
+	if (!parsed || parsed.kind !== "range" || !parsed.end) return null;
+	return { start: parsed.start, end: parsed.end, suffix: parsed.suffix, format: parsed.format, formatId: parsed.formatId };
 }
 
 export function isDateInRange(

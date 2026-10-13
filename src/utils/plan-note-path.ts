@@ -1,4 +1,5 @@
 import { App, TFile, TFolder } from "obsidian";
+import { formatDateForFilename, getRepresentativeBasenames, isRepresentativeBasenameForPeriod, tokenizeDateTemplate } from "./date-formats";
 
 export type PlanNoteKind = "yearly" | "monthly";
 
@@ -21,15 +22,28 @@ function getDateTokenParts(template: string): { year: boolean; month: boolean } 
 }
 
 /** Empty templates retain the original Planner/YYYY[-MM].md location. */
-export function isValidPlanNoteTemplate(template: string, kind: PlanNoteKind): boolean {
+export function isValidPlanNoteTemplate(template: string, kind: PlanNoteKind, grammarVersion: 1 | 2 = 2): boolean {
 	if (!template.trim()) return true;
+	if (grammarVersion === 2) {
+		const parts = tokenizeDateTemplate(template.trim());
+		if (!parts) return false;
+		const tokens = parts.flatMap((part) => "token" in part ? [part.token] : []);
+		if (!tokens.includes("YYYY") || tokens.includes("DD") ||
+			(kind === "monthly" ? !tokens.includes("MM") : tokens.includes("MM"))) return false;
+		const rendered = parts.map((part) => "literal" in part ? part.literal : part.token === "YYYY" ? "2026" : "10").join("");
+		return isSafePlanNotePath(rendered);
+	}
 	const tokens = getDateTokenParts(template);
 	if (!tokens.year || (kind === "monthly" && !tokens.month)) return false;
 	if (kind === "yearly" && tokens.month) return false;
 	if (UNSUPPORTED_DATE_TOKEN.test(template)) return false;
-	if (!template.endsWith(".md") || template.startsWith("/") || template.includes("\\")) return false;
-	if (/\{[^}]*\}/.test(template)) return false;
-	return template.split("/").every((part) => part !== "" && part !== "." && part !== "..");
+	return isSafePlanNotePath(template);
+}
+
+function isSafePlanNotePath(path: string): boolean {
+	if (!path.endsWith(".md") || path.startsWith("/") || /[\\\r\n]/.test(path)) return false;
+	if (/\{[^}]*\}/.test(path)) return false;
+	return path.split("/").every((part) => part !== "" && part !== "." && part !== "..");
 }
 
 export function getPlanNotePath(
@@ -38,21 +52,41 @@ export function getPlanNotePath(
 	template: string,
 	year: number,
 	month?: number,
+	grammarVersion: 1 | 2 = 1,
 ): string {
-	const filename = kind === "yearly"
-		? `${year}.md`
-		: `${year}-${String(month).padStart(2, "0")}.md`;
+	const filename = `${formatDateForFilename(kind, year, month ?? 1)}.md`;
 	const base = (folder || "Planner").trim().replace(/^\/+|\/+$/g, "");
 	const fallback = base ? `${base}/${filename}` : filename;
 	if (!template.trim()) return fallback;
-	if (!isValidPlanNoteTemplate(template, kind)) return fallback;
+	if (!isValidPlanNoteTemplate(template, kind, grammarVersion)) return fallback;
 	const paddedMonth = String(month).padStart(2, "0");
+	if (grammarVersion === 2) {
+		return tokenizeDateTemplate(template.trim())!.map((part) => "literal" in part ? part.literal :
+			part.token === "YYYY" ? String(year) : paddedMonth).join("");
+	}
 	return template.trim().replace(DATE_TOKEN, (token, index: number, source: string) => {
 		const before = source[index - 1] ?? "";
 		const after = source[index + token.length] ?? "";
 		if (/[A-Za-z]/.test(before) || /[A-Za-z]/.test(after)) return token;
 		return token.replace("YYYY", String(year)).replace("MM", paddedMonth);
 	});
+}
+
+/** Look up all configured exact filenames before allowing a new period note. */
+export function resolvePlanNote(
+	app: App, kind: PlanNoteKind, folder: string, template: string,
+	year: number, month?: number, grammarVersion: 1 | 2 = 1,
+): { path: string; candidates: TFile[]; ambiguous: boolean } {
+	const path = getPlanNotePath(kind, folder, template, year, month, grammarVersion);
+	const parent = path.slice(0, path.lastIndexOf("/") + 1);
+	const paths = new Set([path, ...getRepresentativeBasenames(kind, year, month ?? 1).map((name) => `${parent}${name}.md`)]);
+	const candidates = [...paths].map((candidate) => app.vault.getAbstractFileByPath(candidate))
+		.filter((candidate): candidate is TFile => candidate instanceof TFile);
+	const hasOverride = Boolean(template.trim()) && isValidPlanNoteTemplate(template, kind, grammarVersion);
+	const ambiguous = candidates.some((candidate) => !(hasOverride && candidate.path === path) &&
+		!isRepresentativeBasenameForPeriod(kind, candidate.basename, year, month ?? 1)) ||
+		(candidates.length === 0 && !hasOverride && !isRepresentativeBasenameForPeriod(kind, path.split("/").pop()!, year, month ?? 1));
+	return { path: candidates.length === 1 ? candidates[0]!.path : path, candidates, ambiguous };
 }
 
 export async function createPlanNoteFile(app: App, path: string, content: string): Promise<TFile> {

@@ -3,6 +3,9 @@ import { t } from "../i18n";
 import { createUiButton } from "../ui/components";
 
 export interface PlanNotePanelOptions {
+	/** Exact period note matches; multiple matches require an explicit choice. */
+	existingNotes?: TFile[];
+	ambiguousNotes?: boolean;
 	/** Human-readable label shown in the header (e.g. "2026" or "February 2026"). */
 	label: string;
 	/** Whether the panel body is expanded. Required when file exists. */
@@ -85,6 +88,14 @@ export async function renderPlanNotePanel(
 	opts: PlanNotePanelOptions,
 ): Promise<void> {
 	const panel = container.createDiv({ cls: "plan-note-panel" });
+	if (opts.ambiguousNotes || (opts.existingNotes && opts.existingNotes.length > 1)) {
+		panel.createEl("p", { text: t(opts.ambiguousNotes ? "dateFormats.ambiguousFilename" : "planNote.multipleExisting") });
+		for (const candidate of opts.existingNotes ?? []) {
+			const button = createUiButton(panel, { text: candidate.path });
+			button.addEventListener("click", () => opts.onOpen(candidate));
+		}
+		return;
+	}
 	const file = app.vault.getAbstractFileByPath(filePath);
 
 	if (file instanceof TFile) {

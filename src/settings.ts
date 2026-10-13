@@ -4,6 +4,7 @@ import {
 	Notice,
 	PluginSettingTab,
 	Setting,
+	TFile,
 } from "obsidian";
 import {
 	LOCALE_OPTIONS,
@@ -20,6 +21,15 @@ import {
 import type { CustomCalendarProfile } from "./utils/custom-calendars";
 import { renderCalendarOverlaySettings } from "./settings/custom-calendar-settings";
 import { configureFeedbackSetting } from "./settings/feedback-settings";
+import { renderDateFormatSettings } from "./settings/date-format-settings";
+import { renderPlannerColorSettings } from "./settings/planner-color-settings";
+import { DEFAULT_DATE_FORMATS, type DateFormatsConfiguration } from "./utils/date-formats";
+import {
+	DEFAULT_COLOR_PALETTE,
+	DEFAULT_HOLIDAY_COLOR,
+	type PlannerColorPreset,
+	type PlannerColorSelection,
+} from "./utils/planner-colors";
 import {
 	createExternalCalendarId,
 	DEFAULT_EXTERNAL_CALENDAR_REFRESH_MINUTES,
@@ -28,7 +38,7 @@ import {
 	type ExternalCalendarCache,
 	type ExternalCalendarSettings,
 } from "./utils/external-calendars";
-import { isValidPlanNoteTemplate } from "./utils/plan-note-path";
+import { getPlanNotePath, isValidPlanNoteTemplate } from "./utils/plan-note-path";
 import type { PlannerFileScope } from "./views/yearly-planner/file-utils";
 import {
 	createUiBadge,
@@ -47,6 +57,12 @@ export interface DiaryObsidianSettings {
 	weekStart: 0 | 1;
 	yearlyPlanNotePath: string;
 	monthlyPlanNotePath: string;
+	yearlyPlanNotePathGrammarVersion?: 1 | 2;
+	monthlyPlanNotePathGrammarVersion?: 1 | 2;
+	dateFormats: DateFormatsConfiguration;
+	colorPalette: PlannerColorPreset[];
+	holidayColor: PlannerColorSelection;
+	/** Legacy field: retained for migration; creation uses dateFormats defaults. */
 	dateFormat: string;
 	showHolidays: boolean;
 	holidayCountry: string;
@@ -80,6 +96,9 @@ export const DEFAULT_SETTINGS: DiaryObsidianSettings = {
 	weekStart: 0,
 	yearlyPlanNotePath: "",
 	monthlyPlanNotePath: "",
+	dateFormats: DEFAULT_DATE_FORMATS,
+	colorPalette: DEFAULT_COLOR_PALETTE.map((preset) => ({ ...preset })),
+	holidayColor: DEFAULT_HOLIDAY_COLOR,
 	dateFormat: "YYYY-MM-DD",
 	showHolidays: true,
 	holidayCountry: "KR",
@@ -125,6 +144,7 @@ const EXTERNAL_CALENDAR_REFRESH_OPTIONS: Array<{
 
 export class DiaryObsidianSettingTab extends PluginSettingTab {
 	plugin: DiaryObsidian;
+	private readonly planNotePathPreviewUpdaters = new Map<HTMLElement, () => void>();
 
 	constructor(app: App, plugin: DiaryObsidian) {
 		super(app, plugin);
@@ -184,13 +204,20 @@ export class DiaryObsidianSettingTab extends PluginSettingTab {
 					this.renderPlanNotePathSetting(setting, kind),
 			})),
 			{
-				name: t("settings.dateFormat"),
-				desc: t("settings.dateFormatDesc"),
-				control: {
-					type: "text",
-					key: "dateFormat",
-					defaultValue: "YYYY-MM-DD",
-					placeholder: "2000-01-15",
+				name: t("settings.dateFormats"),
+				desc: t("settings.dateFormatsDesc"),
+				render: (setting: Setting) => {
+					setting.settingEl.empty();
+					renderDateFormatSettings(setting.settingEl, this.plugin);
+				},
+			},
+			{
+				name: t("settings.colorPalette"),
+				desc: t("settings.colorPaletteDesc"),
+				aliases: [t("settings.holidayColor"), t("settings.linkExistingColors")],
+				render: (setting: Setting) => {
+					setting.settingEl.empty();
+					renderPlannerColorSettings(setting.settingEl, this.plugin);
 				},
 			},
 			{
@@ -285,6 +312,13 @@ export class DiaryObsidianSettingTab extends PluginSettingTab {
 		return this.plugin.settings[key as keyof DiaryObsidianSettings];
 	}
 
+	refreshPlanNotePathPreviews(): void {
+		for (const [element, update] of this.planNotePathPreviewUpdaters) {
+			if (!element.isConnected) this.planNotePathPreviewUpdaters.delete(element);
+			else update();
+		}
+	}
+
 	async setControlValue(key: string, value: unknown): Promise<void> {
 		switch (key) {
 			case "locale":
@@ -312,6 +346,7 @@ export class DiaryObsidianSettingTab extends PluginSettingTab {
 					return;
 				}
 				this.plugin.settings[key] = template;
+				this.plugin.settings[`${kind}PlanNotePathGrammarVersion`] = 2;
 				break;
 			}
 			case "dateFormat":
@@ -341,6 +376,17 @@ export class DiaryObsidianSettingTab extends PluginSettingTab {
 	): void {
 		const key = `${kind}PlanNotePath` as const;
 		const description = t(`settings.${kind}PlanNotePathDesc`);
+		const updateDescription = (template: string, grammarVersion: 1 | 2): boolean => {
+			const valid = isValidPlanNoteTemplate(template, kind, grammarVersion);
+			const now = new Date();
+			const path = getPlanNotePath(kind, this.plugin.settings.plannerFolder, template,
+				now.getFullYear(), now.getMonth() + 1, grammarVersion);
+			const existing = this.app.vault.getAbstractFileByPath(path);
+			setting.setDesc(valid ? `${description} ${t("settings.planNotePathPreview", { path })} ${t(existing instanceof TFile
+				? "settings.planNotePathExists" : existing ? "settings.planNotePathBlocked" : "settings.planNotePathNew")}`
+				: t(`settings.${kind}PlanNotePathError`));
+			return valid;
+		};
 		setting.settingEl.addClass("diary-plan-note-path-setting");
 		setting
 			.setName(t(`settings.${kind}PlanNotePath`))
@@ -350,22 +396,26 @@ export class DiaryObsidianSettingTab extends PluginSettingTab {
 				.setValue(this.plugin.settings[key] ?? "")
 				.onChange(async (value) => {
 					const template = value.trim();
-					const valid = isValidPlanNoteTemplate(template, kind);
+					const valid = updateDescription(template, 2);
 					setting.settingEl.toggleClass("is-invalid", !valid);
 					text.inputEl.setAttribute("aria-invalid", String(!valid));
-					setting.setDesc(valid
-						? description
-						: t(`settings.${kind}PlanNotePathError`));
 					if (!valid) return;
 					this.plugin.settings[key] = template;
+					this.plugin.settings[`${kind}PlanNotePathGrammarVersion`] = 2;
 					await this.plugin.saveSettings();
 				}));
+		updateDescription(this.plugin.settings[key] ?? "", this.plugin.settings[`${kind}PlanNotePathGrammarVersion`] ?? 1);
+		this.planNotePathPreviewUpdaters.set(setting.settingEl, () => {
+			if (setting.settingEl.querySelector<HTMLInputElement>("input")?.getAttribute("aria-invalid") === "true") return;
+			updateDescription(this.plugin.settings[key] ?? "", this.plugin.settings[`${kind}PlanNotePathGrammarVersion`] ?? 1);
+		});
 	}
 
 	display(): void {
 		const { containerEl } = this;
 
 		containerEl.empty();
+		this.planNotePathPreviewUpdaters.clear();
 
 		new Setting(containerEl)
 			.setName(t("settings.language"))
@@ -431,18 +481,8 @@ export class DiaryObsidianSettingTab extends PluginSettingTab {
 			this.renderPlanNotePathSetting(new Setting(containerEl), kind);
 		}
 
-		new Setting(containerEl)
-			.setName(t("settings.dateFormat"))
-			.setDesc(t("settings.dateFormatDesc"))
-			.addText((text) =>
-				text
-					.setPlaceholder("2000-01-15")
-					.setValue(this.plugin.settings.dateFormat)
-					.onChange(async (value) => {
-						this.plugin.settings.dateFormat = value || "YYYY-MM-DD";
-						await this.plugin.saveSettings();
-					}),
-			);
+		renderDateFormatSettings(containerEl, this.plugin);
+		renderPlannerColorSettings(containerEl, this.plugin);
 
 		new Setting(containerEl)
 			.setName(t("settings.showHolidays"))

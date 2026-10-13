@@ -9,7 +9,7 @@ Full documentation: [English](https://github.com/POBSIZ/obsidian-diary/blob/main
 | Item | Value |
 | --- | --- |
 | Plugin ID | `diary` |
-| Current version | `1.22.0` |
+| Current version | `1.23.0` |
 | Minimum Obsidian version | `1.7.2` |
 | Supported platforms | Desktop / mobile (`isDesktopOnly: false`) |
 | Default language | `en` |
@@ -17,11 +17,22 @@ Full documentation: [English](https://github.com/POBSIZ/obsidian-diary/blob/main
 
 ## What's new
 
+- `1.23.0`: Adds multiple recognized date formats with separate creation defaults, named linked colors and a configurable holiday color.
 - `1.22.0`: Shows a fixed six-week monthly grid with adjacent-month dates, notes, events and holidays. Date selection and note creation use the actual selected date, including across year boundaries.
 - `1.21.0`: Opens the monthly grid from its ribbon icon in the main workspace. Use **Open monthly planner in sidebar** for the sidebar.
 - `1.20.2`: Fixes sidebar detection on mobile so creating or opening notes opens a new main workspace tab and preserves the sidebar planner.
 
 For earlier changes, see the [Releases page](https://github.com/POBSIZ/obsidian-diary/releases).
+
+## Date formats and linked colors
+
+In **Date formats**, add recognition formats separately for daily, monthly and yearly notes, then choose one **Creation default** in each group. `YYYY-[M]MM-DD` creates `2026-M10-13.md`; `YYYY-[M]MM` creates `2026-M10.md`; `YYYY-[Year]` creates `2026-Year.md`. Supported tokens are `YYYY`, `MM` and `DD`, with literal text in brackets. Folder paths and `.md` belong in plan note path settings, not date formats.
+
+Changing a default does not rename existing notes. Moving a note preserves its original format. Diary opens an existing representative note in any recognized format before creating one; when several notes match, you choose which to open. Ambiguous names that resolve to different dates are excluded and listed in settings. After upgrading, daily creation stays `YYYY-MM-DD`; a valid former date-format setting is added only for recognition. Nonempty yearly/monthly path overrides take priority over their format defaults. Existing path templates keep their earlier interpretation until edited; new or edited templates accept `[literal text]`.
+
+In **Color palette**, name colors, change their values, or archive and restore entries. A note can use the theme color, an independent fixed color, or a linked palette entry. Linked notes follow palette color changes without rewriting every file. Archive hides an entry from new selections and retains existing links and the last color. **Link existing colors** previews matching planner notes and changes only those you select. **Manage linked notes** reassigns selected notes or disconnects them while keeping their current color.
+
+**Holiday color** supports theme, fixed and linked palette colors across planner views. Linked notes store `diary_color_id` and a fallback `color`; if the palette entry is unavailable, the fallback is used. `date_start` and `date_end` remain ISO dates.
 
 ## Screenshots
 
@@ -61,7 +72,7 @@ The screenshots use temporary demo notes for all-day, timed, range, todo, and pl
 - **Color, todo, and completion state**: Reflect `color`, `todo`, and `completed` frontmatter in chip styling and labels.
 - **Holiday overlays**: Show country-specific public holidays for the supported UI-language regions and select holiday badges to see their names.
 - **Alternate calendar label**: Show one secondary date label at a time. Available calendars include Korean lunar, Chinese lunar, Dangi, Hebrew, Islamic, Persian, Indian national, Buddhist, Japanese era, Minguo, Coptic, and Ethiopic.
-- **Custom calendar overlay**: Create local fantasy or campaign calendar profiles with custom months, weekdays, and simple leap rules. Diary shows the custom date as an overlay label while keeping normal `YYYY-MM-DD` note files.
+- **Custom calendar overlay**: Create local fantasy or campaign calendar profiles with custom months, weekdays, and simple leap rules. Diary shows the custom date as an overlay label. Note filenames follow the configured date formats; date values remain Gregorian.
 - **External calendar overlays**: Add `webcal://` or `https://` `.ics` feeds, refresh them manually or on an interval, and show events as read-only chips/ranges in yearly, monthly grid, monthly list, side planner, and day summary surfaces. Select an external event only when you want to create a normal Markdown note for it.
 - **Scoped styling**: Diary's CSS is limited to planner views, settings panels, and plugin modals so it does not restyle ordinary vault content.
 - **Local reminders**: Notes with `notify_minutes` show an Obsidian Notice on the event date while Obsidian is open.
@@ -151,7 +162,7 @@ Use **Settings → Diary → External calendars** to add a published `webcal://`
 
 Select a date cell or the add-file button, then use **Single date**.
 
-- The default filename is `YYYY-MM-DD.md`.
+- New filenames use the daily creation default, initially `YYYY-MM-DD.md`.
 - Add a suffix to use it as the chip title. Example: `2026-05-19-mobile-qa.md` -> `mobile-qa`
 - Set a color to display a chip border or mobile dot.
 - Enable **Todo file** to show todo state on the chip.
@@ -162,7 +173,7 @@ Select a date cell or the add-file button, then use **Single date**.
 
 On desktop, drag across date cells to prefill a **Range** modal. On mobile, select the add-file button, choose **Range**, and enter the start and end dates manually.
 
-- The filename format is `YYYY-MM-DD--YYYY-MM-DD.md`.
+- Range filenames use the daily creation format for both dates, joined by `--`. The initial default is `YYYY-MM-DD--YYYY-MM-DD.md`.
 - Add a suffix to use it as the range title. Example: `2026-05-21--2026-05-24-family-trip.md` -> `family-trip`
 - `date_start` and `date_end` frontmatter are saved automatically when the range note is created.
 - The yearly planner shows range notes with vertical bars and a start-date chip. The monthly grid and list show them as range bars.
@@ -246,7 +257,7 @@ Paste rules:
 | Yearly plan note path | Optional vault-relative template using `YYYY`. |
 | Monthly plan note path | Optional vault-relative template using `YYYY` and `MM`. |
 | Planner note scan scope | Controls whether Diary finds planner notes across the entire vault or only inside **Planner folder** and its subfolders. Default: `Entire vault`. |
-| Date format | Stored date format setting. Planner filenames currently use the `YYYY-MM-DD` rule. |
+| Date formats | Recognizes several formats and chooses one creation default for daily, monthly and yearly notes. |
 | Show holidays | Turns holiday rendering on or off. |
 | Holiday country | Holiday country. Supports `KR`, `US`, `JP`, `CN`, `GB`, `DE`, `ES`, `FR`, `AU`, `CA`, `TW`, and `None`. |
 | Calendar overlay | Selects one built-in alternate calendar or one custom calendar profile for yearly, monthly grid, monthly list, day summary, and sidebar planner views. Default: `None`. |
@@ -263,6 +274,8 @@ Diary also stores UI-only state in plugin data: plan note preview expansion, mob
 | Key | Description |
 | --- | --- |
 | `color` | Chip color. Any valid CSS color string can be used. Examples: `#22c55e`, `red`, `rgb(34, 197, 94)` |
+| `diary_color_id` | Palette entry ID. The current linked color takes priority over the fallback `color` value. |
+| `diary_color_inherit` | A recurring occurrence uses the source note color when true. Choosing its own theme, fixed or palette color removes inheritance. |
 | `todo` | Shows the note as a todo chip when `true`. |
 | `completed` | Shows completed state when `todo: true`. |
 | `start_time` | Optional chip start time in `HH:mm` format. For a range note, this is the time boundary on `date_start`; range notes require both times or neither. |
@@ -390,7 +403,7 @@ These links open public GitHub issues and require a GitHub account. Do not inclu
 - If the plugin is missing, make sure `main.js`, `manifest.json`, and `styles.css` are directly inside `Vault/.obsidian/plugins/diary/`.
 - If commands are missing, confirm that **Diary** is enabled in **Settings → Community plugins**.
 - If the sidebar planner is missing, run **Open monthly planner in sidebar** or reload Obsidian after enabling the plugin.
-- If chips do not appear, confirm that filenames follow `YYYY-MM-DD` or `YYYY-MM-DD--YYYY-MM-DD` rules.
+- If chips do not appear, confirm that the filename matches a recognized daily format and is not listed as ambiguous in Date formats settings.
 - If you want more space above the automatically cleared mobile navigation, increase **Mobile bottom padding**.
 - If a reminder does not appear, confirm that Obsidian is open, the event date is today, and `notify_minutes` is within `0-1439`.
 

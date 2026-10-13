@@ -9,7 +9,7 @@ Documentación completa: [English](https://github.com/POBSIZ/obsidian-diary/blob
 | Elemento | Valor |
 | --- | --- |
 | ID del plugin | `diary` |
-| Versión actual | `1.22.0` |
+| Versión actual | `1.23.0` |
 | Versión mínima de Obsidian | `1.7.2` |
 | Plataformas | Escritorio / móvil (`isDesktopOnly: false`) |
 | Idioma predeterminado | `en` |
@@ -17,11 +17,22 @@ Documentación completa: [English](https://github.com/POBSIZ/obsidian-diary/blob
 
 ## Novedades de 1.21.0
 
+- `1.23.0`: Añade varios formatos de fecha reconocidos con formatos de creación separados, colores vinculados con nombre y color de festivos configurable.
 - `1.22.0`: Muestra una cuadrícula mensual fija de seis semanas con fechas, notas, eventos y festivos de los meses adyacentes. La selección y creación de notas usan la fecha real, incluso entre años.
 - `1.21.0`: El icono mensual abre la cuadrícula mensual en el área principal. Para la barra lateral, usa **Open monthly planner in sidebar**.
 - `1.20.2`: Corrige la detección del panel lateral en móvil para abrir las notas creadas o seleccionadas en una pestaña nueva del área principal y conservar el planificador lateral.
 
 Los cambios anteriores están disponibles en [Releases](https://github.com/POBSIZ/obsidian-diary/releases).
+
+## Formatos de fecha y colores vinculados
+
+En **Formatos de fecha**, añade formatos de reconocimiento para notas diarias, mensuales y anuales, y elige un **Formato de creación** por grupo. `YYYY-[M]MM-DD` crea `2026-M10-13.md`; `YYYY-[M]MM` crea `2026-M10.md`; `YYYY-[Year]` crea `2026-Year.md`. Se admiten `YYYY`, `MM`, `DD` y texto literal entre corchetes. Las carpetas y `.md` se indican en las rutas de notas de planificación.
+
+Cambiar el formato predeterminado no renombra archivos existentes. Al mover una nota, se conserva su formato. Antes de crear una nota representativa, Diary busca una existente; si hay varias, eliges cuál abrir. Los nombres que corresponden a fechas distintas se excluyen y aparecen en los ajustes. Tras actualizar, la creación diaria sigue usando `YYYY-MM-DD`; un formato anterior válido se añade solo para reconocimiento. Las rutas anuales o mensuales no vacías tienen prioridad. Las plantillas existentes mantienen su interpretación hasta que se editen; las nuevas o editadas admiten `[texto literal]`.
+
+En **Paleta de colores**, asigna nombres, cambia colores y archiva o restaura entradas. Las notas pueden usar el color del tema, un color fijo independiente o una entrada vinculada. Cambiar la paleta actualiza las notas vinculadas sin reescribir todos los archivos. Archivar oculta la entrada para nuevas selecciones y conserva los vínculos y el último color. **Vincular colores existentes** muestra las notas del planificador coincidentes y modifica solo las seleccionadas. **Gestionar notas vinculadas** permite reasignarlas o desvincularlas conservando el color actual.
+
+**Color de festivos** admite tema, color fijo y paleta en los planificadores. Las notas vinculadas guardan `diary_color_id` y un `color` de respaldo para cuando falte la entrada. `date_start` y `date_end` siguen siendo fechas ISO.
 
 ## Capturas
 
@@ -61,7 +72,7 @@ Las capturas usan una carpeta temporal con notas de todo el día, con hora, de r
 - **Color, tarea y estado completado**: `color`, `todo` y `completed` en frontmatter se reflejan en el estilo y la etiqueta del chip.
 - **Festivos**: Muestra festivos públicos de las regiones cubiertas por los idiomas de la interfaz. Puedes seleccionar una insignia de festivo para ver su nombre.
 - **Etiqueta de calendario alternativo**: Muestra opcionalmente una etiqueta compacta, como calendario lunar coreano, lunar chino, Dangi, hebreo, islámico, persa, nacional indio, budista, era japonesa, Minguo, copto o etíope. Las opciones están localizadas en todos los idiomas de la interfaz.
-- **Calendario personalizado**: Crea perfiles locales para mundos de fantasía o campañas, con meses, días de la semana y reglas simples de año bisiesto. Diary muestra la fecha personalizada como etiqueta, pero conserva archivos `YYYY-MM-DD`.
+- **Calendario personalizado**: Crea perfiles locales para mundos de fantasía o campañas, con meses, días de la semana y reglas simples de año bisiesto. Diary muestra la fecha personalizada como etiqueta. Los nombres siguen los formatos de fecha configurados; las fechas siguen siendo gregorianas.
 - **Calendarios externos**: Añade feeds `.ics` por `webcal://` o `https://`, actualízalos manualmente o por intervalo y muéstralos como chips o rangos de solo lectura. Crea una nota Markdown solo cuando selecciones un evento externo.
 - **Estilos acotados**: El CSS de Diary se limita a vistas del planificador, paneles de ajustes y modales del plugin.
 - **Recordatorios locales**: Las notas con `notify_minutes` muestran un aviso de Obsidian en la fecha del evento mientras Obsidian está abierto.
@@ -151,7 +162,7 @@ Usa **Settings → Diary → Calendarios externos** para añadir una URL `webcal
 
 Selecciona una celda de fecha o el botón de añadir archivo y usa **Single date**.
 
-- El nombre predeterminado es `YYYY-MM-DD.md`.
+- Los nombres nuevos usan el formato diario de creación, inicialmente `YYYY-MM-DD.md`.
 - Añade un sufijo para usarlo como título del chip. Ejemplo: `2026-05-19-mobile-qa.md` -> `mobile-qa`
 - Define un color para mostrar borde de chip o punto móvil.
 - Activa **Todo file** para mostrar estado de tarea.
@@ -162,7 +173,7 @@ Selecciona una celda de fecha o el botón de añadir archivo y usa **Single date
 
 En escritorio, arrastra sobre celdas de fecha para rellenar un modal de **Rango**. En móvil, selecciona añadir archivo, elige **Rango** e introduce inicio y fin manualmente.
 
-- Formato de nombre: `YYYY-MM-DD--YYYY-MM-DD.md`
+- Los rangos usan el formato diario para ambas fechas, unidas por `--`. El formato inicial es `YYYY-MM-DD--YYYY-MM-DD.md`.
 - Añade un sufijo para usarlo como título del rango. Ejemplo: `2026-05-21--2026-05-24-family-trip.md` -> `family-trip`
 - `date_start` y `date_end` se guardan automáticamente al crear la nota.
 - El planificador anual muestra barras verticales y un chip en la fecha inicial. La cuadrícula y la lista mensual muestran barras de rango.
@@ -242,7 +253,7 @@ Reglas de pegado:
 | Idioma | Idioma de la interfaz. Predeterminado: `en`. Admite `en`, `de`, `es`, `fr`, `ja`, `zh-CN`, `zh-TW` y `ko`. |
 | Planner folder | Carpeta predeterminada para nuevas notas del planificador y notas de plan. También se usa cuando el escaneo se limita a la carpeta del planificador. Predeterminado: `Planner`. |
 | Planner note scan scope | Decide si Diary busca notas en todo el vault o solo en **Planner folder** y subcarpetas. Predeterminado: `Entire vault`. |
-| Date format | Ajuste de formato guardado. Los nombres de archivo del planificador usan `YYYY-MM-DD`. |
+| Date formats | Reconoce varios formatos y elige un formato de creación para notas diarias, mensuales y anuales. |
 | Show holidays | Activa o desactiva festivos. |
 | País de festivos | País para festivos. Admite `KR`, `US`, `JP`, `CN`, `GB`, `DE`, `ES`, `FR`, `AU`, `CA`, `TW` y `None`. |
 | Calendario mostrado | Selecciona un calendario alternativo integrado o un perfil personalizado para anual, cuadrícula mensual, lista mensual, resumen del día y planificador lateral. Predeterminado: `None`. |
@@ -259,6 +270,8 @@ Diary también guarda estado solo de interfaz: expansión del panel de plan, exp
 | Clave | Descripción |
 | --- | --- |
 | `color` | Color del chip. Puede ser cualquier color CSS válido, como `#22c55e`, `red` o `rgb(34, 197, 94)`. |
+| `diary_color_id` | ID de la entrada de la paleta. El color vinculado actual tiene prioridad sobre el `color` de respaldo. |
+| `diary_color_inherit` | Si es true, la ocurrencia recurrente usa el color de la nota de origen. Elegir tema, color fijo o paleta propios elimina la herencia. |
 | `todo` | Muestra la nota como chip de tarea cuando es `true`. |
 | `completed` | Muestra estado completado cuando `todo: true`. |
 | `start_time` | Hora de inicio opcional en formato `HH:mm`. En una nota de rango, es el límite de `date_start`; deben indicarse ambas horas o ninguna. |
@@ -386,7 +399,7 @@ Estos enlaces abren issues públicos de GitHub y requieren una cuenta de GitHub.
 - Si falta el plugin, comprueba que `main.js`, `manifest.json` y `styles.css` estén directamente en `Vault/.obsidian/plugins/diary/`.
 - Si faltan comandos, confirma que **Diary** esté activo en **Settings → Community plugins**.
 - Si falta el planificador lateral, ejecuta **Open monthly planner in sidebar** o recarga Obsidian tras activar el plugin.
-- Si no aparecen chips, comprueba que los nombres sigan `YYYY-MM-DD` o `YYYY-MM-DD--YYYY-MM-DD`.
+- Si no aparecen chips, comprueba que el nombre coincida con un formato diario reconocido y que no figure como ambiguo en los ajustes de formatos de fecha.
 - Si deseas más espacio sobre la navegación móvil reservada automáticamente, aumenta **Espacio inferior en móvil**.
 - Si no aparece un recordatorio, confirma que Obsidian esté abierto, que la fecha sea hoy y que `notify_minutes` esté entre `0` y `1439`.
 

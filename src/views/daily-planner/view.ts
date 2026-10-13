@@ -52,6 +52,7 @@ import {
 import {
 	createRangeFile as createRangeFileOp,
 	createSingleDateFile as createSingleDateFileOp,
+	createHolidayPlannerFile,
 	createExternalEventFile,
 	moveFileToDate,
 	moveRangeFileToNewDates,
@@ -299,6 +300,7 @@ export class DailyPlannerView extends ItemView {
 	}
 
 	render(): void {
+		applyHolidayColor(this.contentEl, this.app);
 		this.dragController.reset();
 		this.timeSelectionController.reset();
 		const previousScroll = this.contentEl.querySelector<HTMLElement>(
@@ -550,7 +552,7 @@ export class DailyPlannerView extends ItemView {
 				entries.push({
 					id: `holiday:${name}`,
 					title: name,
-					color: "var(--text-accent)",
+					color: getHolidayColor(this.app),
 					startMinutes: null,
 					endMinutes: null,
 					kind: "holiday",
@@ -1163,26 +1165,7 @@ export class DailyPlannerView extends ItemView {
 		const folder = (this.plugin.settings.plannerFolder || "Planner")
 			.trim()
 			.replace(/^\/+|\/+$/g, "");
-		const suffix =
-			item.entry.title
-				.replace(/[\\/:*?"<>|#\n\r\t]/g, "")
-				.trim() || "holiday";
-		let attempt = 1;
-		while (attempt < 1000) {
-			const numberedSuffix = attempt === 1 ? suffix : `${suffix}-${attempt}`;
-			const basename = `${item.sourceDate.dateString}-${numberedSuffix}`;
-			const path = folder ? `${folder}/${basename}.md` : `${basename}.md`;
-			if (!this.app.vault.getAbstractFileByPath(path)) {
-				return createSingleDateFileOp(
-					this.app,
-					folder,
-					basename,
-					item.entry.color ?? undefined,
-				);
-			}
-			attempt += 1;
-		}
-		throw new Error("Could not create a unique holiday note.");
+		return createHolidayPlannerFile(this.app, folder, item.sourceDate.dateString, item.entry.title, item.entry.color ?? undefined);
 	}
 
 	private getTodoTitle(file: TFile, includeTime: boolean): string {
@@ -1284,6 +1267,7 @@ export class DailyPlannerView extends ItemView {
 				notifyMinutes,
 				plannerTimeRange,
 				recurrence,
+				colorId,
 			) =>
 				createSingleDateFileOp(
 					this.app,
@@ -1294,6 +1278,7 @@ export class DailyPlannerView extends ItemView {
 					notifyMinutes,
 					plannerTimeRange,
 					recurrence,
+					colorId,
 				),
 			createRangeFile: (
 				folder,
@@ -1303,6 +1288,7 @@ export class DailyPlannerView extends ItemView {
 				notifyMinutes,
 				plannerTimeRange,
 				recurrence,
+				colorId,
 			) =>
 				createRangeFileOp(
 					this.app,
@@ -1313,6 +1299,7 @@ export class DailyPlannerView extends ItemView {
 					notifyMinutes,
 					plannerTimeRange,
 					recurrence,
+					colorId,
 				),
 			onCreated: () => this.render(),
 			openCreatedFile: (file) => this.plugin.openPlannerFile(this.leaf, file),
@@ -1415,3 +1402,4 @@ export class DailyPlannerView extends ItemView {
 		return this.contentEl.getBoundingClientRect().width || window.innerWidth;
 	}
 }
+import { applyHolidayColor, getHolidayColor } from "../../utils/planner-colors";

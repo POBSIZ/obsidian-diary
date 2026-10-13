@@ -8,6 +8,9 @@ import type {
 } from "./alternate-calendars";
 import type { ExternalCalendarEvent } from "./external-calendars";
 import { parseRangeBasename } from "./range";
+import { getFileColorSelection, getFileColorValues, getPlannerFileColor } from "./planner-colors";
+import { formatPlannerBasename, isPlannerBasenameForDates, parsePlannerBasename, recognizePlannerBasename } from "./date-formats";
+import { t } from "../i18n";
 
 export const RECURRENCE_GREGORIAN = "gregorian";
 
@@ -115,6 +118,7 @@ const RECURRENCE_SOURCE_KEYS = [
 ] as const;
 
 const RECURRENCE_OCCURRENCE_KEYS = [
+	"diary_color_inherit",
 	"recurrence_id",
 	"recurrence_role",
 	"recurrence_source_path",
@@ -225,6 +229,7 @@ export function getRecurrenceSourceDefinition(
 ): RecurrenceSourceDefinition | null {
 	const fm = app.metadataCache.getFileCache(file)?.frontmatter;
 	if (!fm || fm.recurrence_role !== "source") return null;
+	if (recognizePlannerBasename(file.basename).status === "ambiguous") return null;
 	const id = toStringValue(fm.recurrence_id);
 	const rule = toStringValue(fm.recurrence_rule);
 	const anchorDate =
@@ -339,10 +344,18 @@ export async function detachRecurrenceOccurrence(
 	app: App,
 	file: TFile,
 ): Promise<void> {
+	const selection = getFileColorSelection(app, file);
+	const currentColor = selection.mode === "inherit" ? getFileColorValues(app, file, selection) : null;
 	await app.fileManager.processFrontMatter(
 		file,
 		(frontmatter: Record<string, unknown>) => {
 			removeRecurrenceFrontmatter(frontmatter);
+			if (currentColor) {
+				if (currentColor.color) frontmatter.color = currentColor.color;
+				else delete frontmatter.color;
+				if (currentColor.colorId) frontmatter.diary_color_id = currentColor.colorId;
+				else delete frontmatter.diary_color_id;
+			}
 		},
 	);
 }
@@ -382,7 +395,7 @@ export function getRecurrenceVirtualEventsForRange(args: {
 		if (!source) continue;
 		const sourceFm = args.app.metadataCache.getFileCache(file)?.frontmatter ?? {};
 		const targetTemplate = materializeTargetPath(source, source.anchorDate);
-		const color = toStringValue(sourceFm.color) ?? undefined;
+		const color = getPlannerFileColor(args.app, file) ?? undefined;
 		const timeLabel = getPlannerTimeLabelFromFrontmatter(sourceFm);
 		for (const occurrenceDate of expandRecurrenceDates(source, args.range)) {
 			if (occurrenceDate === source.anchorDate) continue;
@@ -453,6 +466,9 @@ export async function createRecurrenceOccurrenceFile(args: {
 	if (existingOccurrence) return existingOccurrence;
 
 	const target = materializeTargetPath(source, args.occurrenceDate);
+	if (!isPlannerBasenameForDates(target.basename, args.occurrenceDate, target.rangeEnd)) {
+		throw new Error(t("dateFormats.ambiguousFilename"));
+	}
 	const existingTarget = args.app.vault.getAbstractFileByPath(target.path);
 	if (existingTarget instanceof TFile) {
 		throw new Error(`A different note already exists at ${target.path}.`);
@@ -524,9 +540,7 @@ function materializeTargetPath(
 	if (rangeParsed) {
 		const span = daysBetween(rangeParsed.start, rangeParsed.end);
 		const rangeEnd = addDays(occurrenceDate, Math.max(0, span - 1));
-		const basename = `${occurrenceDate}--${rangeEnd}${
-			suffix ? `-${suffix}` : ""
-		}.md`;
+		const basename = `${formatPlannerBasename(occurrenceDate, suffix, rangeEnd, rangeParsed.format)}.md`;
 		return {
 			path: folder ? `${folder}/${basename}` : basename,
 			basename,
@@ -535,7 +549,7 @@ function materializeTargetPath(
 		};
 	}
 
-	const basename = `${occurrenceDate}${suffix ? `-${suffix}` : ""}.md`;
+	const basename = `${formatPlannerBasename(occurrenceDate, suffix, undefined, singleParsed?.format)}.md`;
 	return {
 		path: folder ? `${folder}/${basename}` : basename,
 		basename,
@@ -561,20 +575,25 @@ async function materializeOccurrence(
 			source.id,
 			occurrenceDate,
 		);
-		if (sameOccurrence && sameOccurrence.path !== target.path) {
-			await app.vault.rename(sameOccurrence, target.path);
-			existing = app.vault.getAbstractFileByPath(target.path);
-		}
+		if (sameOccurrence) existing = sameOccurrence;
 	}
 
 	if (existing instanceof TFile) {
 		const fm = app.metadataCache.getFileCache(existing)?.frontmatter;
 		if (fm?.recurrence_id !== source.id) return "skipped";
 		if (fm.completed !== undefined) delete fields.completed;
+		// Older occurrences and explicit individual colors retain their own selection.
+		if (fm.diary_color_inherit !== true) {
+			delete fields.color;
+			delete fields.diary_color_id;
+			delete fields.diary_color_inherit;
+		}
 		if (frontmatterMatches(fm, fields)) return "skipped";
 		await app.fileManager.processFrontMatter(
 			existing,
 			(frontmatter: Record<string, unknown>) => {
+				if (fields.diary_color_inherit === true && fields.diary_color_id === undefined) delete frontmatter.diary_color_id;
+				if (fields.diary_color_inherit === true && fields.color === undefined) delete frontmatter.color;
 				for (const [key, value] of Object.entries(fields)) {
 					frontmatter[key] = value;
 				}
@@ -631,7 +650,10 @@ function buildOccurrenceFrontmatter(
 		recurrence_anchor_date: source.anchorDate,
 		title: target.title,
 	};
-	copyFrontmatterValue(sourceFm, fields, "color");
+	const resolvedColor = getPlannerFileColor(app, source.file);
+	if (resolvedColor) fields.color = resolvedColor;
+	copyFrontmatterValue(sourceFm, fields, "diary_color_id");
+	fields.diary_color_inherit = true;
 	copyFrontmatterValue(sourceFm, fields, "notify_minutes");
 	copyFrontmatterValue(sourceFm, fields, "start_time");
 	copyFrontmatterValue(sourceFm, fields, "end_time");
@@ -935,10 +957,9 @@ function sanitizePlannerBasenameSuffix(raw: string): string {
 
 function parseSingleDateBasename(
 	basename: string,
-): { date: string; suffix?: string } | null {
-	const m = basename.match(/^(\d{4}-\d{2}-\d{2})(?:-(.+))?$/);
-	if (!m) return null;
-	return { date: m[1] ?? "", suffix: m[2] ?? undefined };
+): { date: string; suffix?: string; format: string } | null {
+	const parsed = parsePlannerBasename(basename);
+	return parsed?.kind === "single" ? { date: parsed.start, suffix: parsed.suffix, format: parsed.format } : null;
 }
 
 function getPlannerDateFromBasename(basename: string): string | null {

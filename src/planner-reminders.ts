@@ -7,6 +7,7 @@ import {
 	type PlannerFileScope,
 } from "./views/yearly-planner/file-utils";
 import { getPlannerEventDateString } from "./views/yearly-planner/file-operations";
+import { onDateFormatsChanged } from "./utils/date-formats";
 
 const pad2 = (n: number) => String(n).padStart(2, "0");
 
@@ -69,6 +70,7 @@ export function registerPlannerReminders(
 	plugin.registerEvent(plugin.app.vault.on("create", debounced));
 	plugin.registerEvent(plugin.app.vault.on("delete", debounced));
 	plugin.registerEvent(plugin.app.vault.on("rename", debounced));
+	plugin.register(onDateFormatsChanged(debounced));
 
 	plugin.registerInterval(
 		win.setInterval(() => {

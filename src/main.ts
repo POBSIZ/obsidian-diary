@@ -38,6 +38,8 @@ import { registerPlannerReminders } from "./planner-reminders";
 import { DailyPlannerView } from "./views/daily-planner/view";
 import { ThreeDayPlannerView } from "./views/three-day-planner/view";
 import type { PlannerViewMode } from "./views/planner-layout";
+import { configureDateFormats, normalizeDateFormats } from "./utils/date-formats";
+import { configurePlannerColors, normalizeColorPalette, normalizePlannerColorSelection } from "./utils/planner-colors";
 
 const SIDEBAR_PLANNER_VIEW_TYPES = [
 	VIEW_TYPE_YEARLY_SIDEBAR_PLANNER,
@@ -444,11 +446,21 @@ export default class DiaryObsidian extends Plugin {
 	}
 
 	async loadSettings() {
+		const saved = (await this.loadData()) as Partial<DiaryObsidianSettings> | null;
 		this.settings = Object.assign(
 			{},
 			DEFAULT_SETTINGS,
-			(await this.loadData()) as Partial<DiaryObsidianSettings>,
+			saved,
 		);
+		this.settings.yearlyPlanNotePath = typeof saved?.yearlyPlanNotePath === "string" ? saved.yearlyPlanNotePath.trim() : "";
+		this.settings.monthlyPlanNotePath = typeof saved?.monthlyPlanNotePath === "string" ? saved.monthlyPlanNotePath.trim() : "";
+		this.settings.dateFormats = normalizeDateFormats(saved?.dateFormats, saved?.dateFormat);
+		this.settings.colorPalette = normalizeColorPalette(this.settings.colorPalette);
+		this.settings.holidayColor = normalizePlannerColorSelection(this.settings.holidayColor);
+		this.settings.yearlyPlanNotePathGrammarVersion = saved?.yearlyPlanNotePathGrammarVersion === 2 ? 2 : 1;
+		this.settings.monthlyPlanNotePathGrammarVersion = saved?.monthlyPlanNotePathGrammarVersion === 2 ? 2 : 1;
+		configureDateFormats(this.settings.dateFormats);
+		configurePlannerColors(this.app, this.settings);
 		this.settings.locale = normalizeLocale(this.settings.locale);
 		this.settings.weekStart = this.settings.weekStart === 1 ? 1 : 0;
 		const legacyEnabledAlternateCalendars =
@@ -507,6 +519,11 @@ export default class DiaryObsidian extends Plugin {
 	}
 
 	async saveSettings() {
+		this.settings.dateFormats = normalizeDateFormats(this.settings.dateFormats);
+		this.settings.colorPalette = normalizeColorPalette(this.settings.colorPalette);
+		this.settings.holidayColor = normalizePlannerColorSelection(this.settings.holidayColor);
+		configureDateFormats(this.settings.dateFormats);
+		configurePlannerColors(this.app, this.settings);
 		this.settings.locale = normalizeLocale(this.settings.locale);
 		setLocale(this.settings.locale ?? "en");
 		this.settings.customCalendarProfiles = normalizeCustomCalendarProfiles(
@@ -528,6 +545,7 @@ export default class DiaryObsidian extends Plugin {
 		this.refreshYearlyPlannerViews();
 		this.refreshMonthlyPlannerViews();
 		this.refreshMonthlyListPlannerViews();
+		this.refreshDailyPlannerViews();
 	}
 
 	async refreshExternalCalendar(calendarId: string): Promise<boolean> {

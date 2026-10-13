@@ -32,7 +32,6 @@ import {
 } from "../../utils/recurrence";
 import {
 	getAllFolderPaths,
-	getChipColor,
 	getNotifyMinutes,
 	getPlannerTimeRange,
 	isTodoCompleted,
@@ -49,77 +48,19 @@ import {
 	updateFileTodoStatus,
 } from "./file-operations";
 import { parseRangeBasename } from "../../utils/range";
+import { formatPlannerBasename, getDefaultDateFormat, parsePlannerBasename, recognizePlannerBasename } from "../../utils/date-formats";
 import type { SelectionBounds } from "./types";
 import {
 	createUiButton,
 	createUiButtonRow,
-	createUiColorPresetButton,
 	createUiError,
 	createUiFieldRow,
 	createUiModalActionBar,
 	configureUiModalSurface,
 	focusUiInputOnDesktop,
 } from "../../ui/components";
+import { PlannerColorField } from "../../ui/planner-color-field";
 
-/** Additional chip color presets (first preset is theme accent, computed at runtime). No duplicates. */
-const CHIP_COLOR_PRESETS_EXTRA: readonly { hex: string }[] = [
-	{ hex: "#22c55e" }, // green
-	{ hex: "#f59e0b" }, // yellow/orange
-	{ hex: "#ec4899" }, // pink
-	{ hex: "#6b7280" }, // gray
-];
-
-/** Resolves var(--interactive-accent) to 6-digit hex. Falls back to #7c3aed if unavailable. */
-function getThemeAccentHex(doc: Document = window.document): string {
-	const activeWindow = doc.defaultView ?? window;
-	const el = doc.body.createDiv();
-	el.setCssProps({ color: "var(--interactive-accent)" });
-	const computed = activeWindow.getComputedStyle(el).color;
-	el.remove();
-	const m = computed.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
-	if (m) {
-		const r = parseInt(m[1] ?? "0", 10);
-		const g = parseInt(m[2] ?? "0", 10);
-		const b = parseInt(m[3] ?? "0", 10);
-		return (
-			"#" +
-			[r, g, b]
-				.map((x) =>
-					Math.max(0, Math.min(255, x)).toString(16).padStart(2, "0"),
-				)
-				.join("")
-		);
-	}
-	const m2 = computed.match(/^rgba?\((\d+),\s*(\d+),\s*(\d+)/);
-	if (m2) {
-		const r = parseInt(m2[1] ?? "0", 10);
-		const g = parseInt(m2[2] ?? "0", 10);
-		const b = parseInt(m2[3] ?? "0", 10);
-		return (
-			"#" +
-			[r, g, b]
-				.map((x) =>
-					Math.max(0, Math.min(255, x)).toString(16).padStart(2, "0"),
-				)
-				.join("")
-		);
-	}
-	if (toHex6(computed)) return toHex6(computed)!;
-	return "#7c3aed";
-}
-
-/** Chip color presets: first = theme accent, rest = static. Deduplicates by normalized hex. */
-function getChipColorPresets(doc: Document = window.document): { hex: string }[] {
-	const themeHex = getThemeAccentHex(doc);
-	const all = [{ hex: themeHex }, ...CHIP_COLOR_PRESETS_EXTRA];
-	const seen = new Set<string>();
-	return all.filter((p) => {
-		const normalized = (toHex6(p.hex) ?? p.hex).toLowerCase();
-		if (seen.has(normalized)) return false;
-		seen.add(normalized);
-		return true;
-	});
-}
 
 /** Max lines to show in file preview. */
 const FILE_PREVIEW_MAX_LINES = 20;
@@ -127,62 +68,6 @@ const FILE_PREVIEW_MAX_LINES = 20;
 /** Max chars to show in file preview (fallback). */
 const FILE_PREVIEW_MAX_CHARS = 500;
 
-/** Convert 3-digit hex to 6-digit for color picker. */
-function toHex6(hex: string): string | null {
-	const m = hex.match(/^#([0-9a-fA-F]{3})$/);
-	if (m) {
-		const c = m[1] ?? "";
-		return `#${c[0]}${c[0]}${c[1]}${c[1]}${c[2]}${c[2]}`;
-	}
-	const m6 = hex.match(/^#([0-9a-fA-F]{6})$/);
-	return m6 ? hex : null;
-}
-
-/** Normalize any CSS color to 6-digit hex for comparison. Returns null if invalid. */
-function normalizeColorToHex(
-	cssColor: string,
-	doc: Document = window.document,
-): string | null {
-	const trimmed = cssColor.trim();
-	if (!trimmed) return null;
-	const hex = toHex6(trimmed);
-	if (hex) return hex.toLowerCase();
-	const activeWindow = doc.defaultView ?? window;
-	const div = doc.body.createDiv();
-	div.style.color = trimmed;
-	const computed = activeWindow.getComputedStyle(div).color;
-	div.remove();
-	if (!computed) return null;
-	const m = computed.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
-	if (m) {
-		const r = parseInt(m[1] ?? "0", 10);
-		const g = parseInt(m[2] ?? "0", 10);
-		const b = parseInt(m[3] ?? "0", 10);
-		return (
-			"#" +
-			[r, g, b]
-				.map((x) =>
-					Math.max(0, Math.min(255, x)).toString(16).padStart(2, "0"),
-				)
-				.join("")
-		);
-	}
-	const m2 = computed.match(/^rgba?\((\d+),\s*(\d+),\s*(\d+)/);
-	if (m2) {
-		const r = parseInt(m2[1] ?? "0", 10);
-		const g = parseInt(m2[2] ?? "0", 10);
-		const b = parseInt(m2[3] ?? "0", 10);
-		return (
-			"#" +
-			[r, g, b]
-				.map((x) =>
-					Math.max(0, Math.min(255, x)).toString(16).padStart(2, "0"),
-				)
-				.join("")
-		);
-	}
-	return toHex6(computed);
-}
 
 export type CreateSingleDateFileFn = (basename: string) => Promise<TFile>;
 
@@ -194,6 +79,7 @@ export type CreateSingleDateFileWithFolderFn = (
 	notifyMinutes?: number | null,
 	timeRange?: PlannerTimeRange | null,
 	recurrence?: RecurrenceFormValue | null,
+	colorId?: string,
 ) => Promise<TFile>;
 
 export type CreateRangeFileWithFolderFn = (
@@ -204,6 +90,7 @@ export type CreateRangeFileWithFolderFn = (
 	notifyMinutes?: number | null,
 	timeRange?: PlannerTimeRange | null,
 	recurrence?: RecurrenceFormValue | null,
+	colorId?: string,
 ) => Promise<TFile>;
 
 function formatHolidayDate(dateStr: string): string {
@@ -344,9 +231,15 @@ function formatOverlayPreview(
 }
 
 function getSingleDateFromFilename(filename: string): string | null {
-	const m = filename.match(/^(\d{4}-\d{2}-\d{2})(?:-.+)?$/);
-	if (!m) return null;
-	return m[1] ?? null;
+	const parsed = parsePlannerBasename(filename);
+	return parsed?.kind === "single" ? parsed.start : null;
+}
+
+/** Keep translated guidance while updating its filename examples to the creation format. */
+function dateFilenameHelp(key: string): string {
+	return key === "modal.fileNamePlaceholder"
+		? t(key).replace(/YYYY-MM-DD/g, () => getDefaultDateFormat("daily").format)
+		: t(key).replace(/\d{4}-\d{2}-\d{2}/g, (date) => formatPlannerBasename(date));
 }
 
 export interface CreateFileModalOptions {
@@ -372,10 +265,7 @@ export class CreateFileModal extends Modal {
 	private startDateInput!: HTMLInputElement;
 	private endDateInput!: HTMLInputElement;
 	private filenameInput!: HTMLInputElement;
-	private colorInput!: HTMLInputElement;
-	private colorPickerInput!: HTMLInputElement;
-	private colorPresetBtns: HTMLButtonElement[] = [];
-	private colorPresets: { hex: string }[] = [];
+	private colorField!: PlannerColorField;
 	private todoCheckbox!: HTMLInputElement;
 	private allDayCheckbox!: HTMLInputElement;
 	private startTimeInput!: HTMLInputElement;
@@ -555,9 +445,9 @@ export class CreateFileModal extends Modal {
 			type: "text",
 			cls: "yearly-planner-filename-input",
 		});
-		this.filenameInput.placeholder = t("modal.fileNamePlaceholder");
+		this.filenameInput.placeholder = dateFilenameHelp("modal.fileNamePlaceholder");
 		this.filenameInput.oninput = () => {
-			if (this.mode === "range") this.syncDatesFromFilename();
+			this.syncDatesFromFilename();
 			this.updateCreateState();
 		};
 		const filenameHint = filenameRow.createDiv({
@@ -565,47 +455,9 @@ export class CreateFileModal extends Modal {
 		});
 		filenameHint.appendText(t("modal.suffixAsTitle"));
 		filenameHint.appendText(" ");
-		filenameHint.appendText(t("modal.suffixExample"));
+		filenameHint.appendText(dateFilenameHelp("modal.suffixExample"));
 
-		this.colorPresets = getChipColorPresets(this.contentEl.ownerDocument);
-		const defaultColor = this.colorPresets[0]!.hex;
-		const colorRow = createUiFieldRow(form, "yearly-planner-create-file-row");
-		colorRow.createEl("label", { text: t("modal.color") });
-		const colorPresetsWrap = colorRow.createDiv({
-			cls: "yearly-planner-color-row",
-		});
-		const presetsEl = colorPresetsWrap.createDiv({
-			cls: "yearly-planner-color-presets",
-		});
-		this.colorPresets.forEach((preset) => {
-			const label = t("modal.colorPresetLabel", { color: preset.hex });
-			const btn = createUiColorPresetButton(presetsEl, {
-				classes: "yearly-planner-color-preset-btn",
-				color: preset.hex,
-				label,
-				onClick: () => this.setColorFromPreset(preset.hex),
-			});
-			this.colorPresetBtns.push(btn);
-		});
-		this.colorPickerInput = colorPresetsWrap.createEl("input", {
-			type: "color",
-			cls: "yearly-planner-color-picker",
-		});
-		this.colorPickerInput.value = defaultColor;
-		this.colorPickerInput.title = t("modal.pickColor");
-		this.colorPickerInput.oninput = () => {
-			this.colorInput.value = this.colorPickerInput.value;
-			this.updateColorPresetActive();
-		};
-		this.colorInput = colorRow.createEl("input", {
-			type: "text",
-			cls: "yearly-planner-filename-input",
-		});
-		this.colorInput.value = defaultColor;
-		this.colorInput.placeholder = defaultColor;
-		this.colorInput.title = t("modal.chipColorTitle");
-		this.colorInput.oninput = () => this.syncColorFromText();
-		this.updateColorPresetActive();
+		this.colorField = new PlannerColorField(form, this.app, undefined, () => this.updateCreateState());
 
 		const todoRow = createUiFieldRow(form, "yearly-planner-create-file-row");
 		this.todoCheckbox = todoRow.createEl("input", {
@@ -765,10 +617,13 @@ export class CreateFileModal extends Modal {
 	}
 
 	private getCreateValidationError(): string | null {
+		const colorError = this.colorField?.getValidationError();
+		if (colorError) return colorError;
 		const folder = this.getFolderValue();
 		const filename = this.filenameInput.value.trim().replace(/\.md$/i, "");
 		if (!folder) return t("modal.folderRequired");
 		if (!filename) return t("modal.fileNameRequired");
+		if (recognizePlannerBasename(filename).status === "ambiguous") return t("dateFormats.ambiguousFilename");
 		const timeError = this.getTimeRangeValidationError();
 		if (timeError) return timeError;
 		if (
@@ -787,13 +642,13 @@ export class CreateFileModal extends Modal {
 		if (this.mode === "single") {
 			const dateStr = getSingleDateFromFilename(filename);
 			if (!dateStr || !isValidDateStr(dateStr)) {
-				return t("modal.invalidDateFileName");
+				return dateFilenameHelp("modal.invalidDateFileName");
 			}
 			return null;
 		}
 		const range = parseRangeBasename(filename);
 		if (!range || !isValidDateStr(range.start) || !isValidDateStr(range.end)) {
-			return t("modal.invalidRangeFileName");
+			return dateFilenameHelp("modal.invalidRangeFileName");
 		}
 		return null;
 	}
@@ -973,31 +828,6 @@ export class CreateFileModal extends Modal {
 		};
 	}
 
-	private setColorFromPreset(hex: string): void {
-		this.colorInput.value = hex;
-		this.colorPickerInput.value = toHex6(hex) ?? hex;
-		this.updateColorPresetActive();
-	}
-
-	private syncColorFromText(): void {
-		const hex = toHex6(this.colorInput.value.trim());
-		if (hex) {
-			this.colorPickerInput.value = hex;
-		}
-		this.updateColorPresetActive();
-	}
-
-	private updateColorPresetActive(): void {
-		const val = this.colorInput.value.trim();
-		const normalizedVal =
-			normalizeColorToHex(val, this.contentEl.ownerDocument) ??
-			val.toLowerCase();
-		this.colorPresets.forEach((preset, i) => {
-			const btn = this.colorPresetBtns[i];
-			const presetHex = (toHex6(preset.hex) ?? preset.hex).toLowerCase();
-			btn?.toggleClass("is-active", normalizedVal === presetHex);
-		});
-	}
 
 	private getFolderValue(): string {
 		if (this.folderSelect.value === FOLDER_OTHER) {
@@ -1023,21 +853,17 @@ export class CreateFileModal extends Modal {
 	private syncFilename(): void {
 		const start = this.startDateInput.value;
 		const end = this.endDateInput.value;
-		if (this.mode === "single") {
-			this.filenameInput.value = start || "";
-		} else {
-			this.filenameInput.value = start && end ? `${start}--${end}` : "";
-		}
+		const original = parsePlannerBasename(this.filenameInput.value);
+		this.filenameInput.value = isValidDateStr(start) && (this.mode === "single" || isValidDateStr(end))
+			? formatPlannerBasename(start, original?.suffix, this.mode === "range" ? end : undefined, original?.format) : "";
 		this.filenameInput.readOnly = false;
 	}
 
 	private syncDatesFromFilename(): void {
-		const m = this.filenameInput.value.match(
-			/^(\d{4}-\d{2}-\d{2})--(\d{4}-\d{2}-\d{2})(?:-.+)?$/,
-		);
-		if (m) {
-			this.startDateInput.value = m[1] ?? "";
-			this.endDateInput.value = m[2] ?? "";
+		const parsed = parsePlannerBasename(this.filenameInput.value);
+		if (parsed) {
+			this.startDateInput.value = parsed.start;
+			this.endDateInput.value = parsed.end ?? parsed.start;
 			this.updateCalendarPreview();
 		}
 	}
@@ -1054,15 +880,7 @@ export class CreateFileModal extends Modal {
 
 		try {
 			if (this.mode === "single") {
-				const rawColor = this.colorInput.value.trim();
-				const themeHex = getThemeAccentHex(
-					this.contentEl.ownerDocument,
-				).toLowerCase();
-				const color =
-					rawColor &&
-					(toHex6(rawColor) ?? rawColor).toLowerCase() !== themeHex
-						? rawColor
-						: undefined;
+				const { color, colorId } = this.colorField.getValues();
 				const todo = this.todoCheckbox.checked;
 				const notifyMinutes = parseTimeValueToNotifyMinutes(
 					this.notifyTimeInput.value,
@@ -1075,21 +893,14 @@ export class CreateFileModal extends Modal {
 					notifyMinutes,
 					this.getTimeRangeValue(),
 					this.getRecurrenceValue(),
+					colorId,
 				);
 				this.options.onCreated();
 				this.close();
 				await this.openCreatedFile(file);
 			} else {
 				if (!filename) return;
-				const rawColor = this.colorInput.value.trim();
-				const themeHex = getThemeAccentHex(
-					this.contentEl.ownerDocument,
-				).toLowerCase();
-				const color =
-					rawColor &&
-					(toHex6(rawColor) ?? rawColor).toLowerCase() !== themeHex
-						? rawColor
-						: undefined;
+				const { color, colorId } = this.colorField.getValues();
 				const todo = this.todoCheckbox.checked;
 				const notifyMinutes = parseTimeValueToNotifyMinutes(
 					this.notifyTimeInput.value,
@@ -1102,6 +913,7 @@ export class CreateFileModal extends Modal {
 					notifyMinutes,
 					this.getTimeRangeValue(),
 					this.getRecurrenceValue(),
+					colorId,
 				);
 				this.options.onCreated();
 				this.close();
@@ -1170,10 +982,7 @@ export class FileOptionsModal extends Modal {
 	private rangeRow!: HTMLElement;
 	private singleModeBtn!: HTMLButtonElement;
 	private rangeModeBtn!: HTMLButtonElement;
-	private colorInput!: HTMLInputElement;
-	private colorPickerInput!: HTMLInputElement;
-	private colorPresetBtns: HTMLButtonElement[] = [];
-	private colorPresets: { hex: string }[] = [];
+	private colorField!: PlannerColorField;
 	private todoCheckbox!: HTMLInputElement;
 	private allDayCheckbox!: HTMLInputElement;
 	private startTimeInput!: HTMLInputElement;
@@ -1327,7 +1136,7 @@ export class FileOptionsModal extends Modal {
 			cls: "yearly-planner-filename-input",
 		});
 		this.filenameInput.value = this.file.basename;
-		this.filenameInput.placeholder = t("modal.fileNamePlaceholder");
+		this.filenameInput.placeholder = dateFilenameHelp("modal.fileNamePlaceholder");
 		this.filenameInput.addEventListener("input", () => {
 			this.syncFileOptionsDatesFromFilename();
 			this.updateFileOptionsState();
@@ -1340,47 +1149,7 @@ export class FileOptionsModal extends Modal {
 		filenameHint.appendText(t("modal.suffixExample"));
 		this.updateFileOptionsModeUI();
 
-		this.colorPresets = getChipColorPresets(this.contentEl.ownerDocument);
-		const defaultColor = this.colorPresets[0]!.hex;
-		const colorRow = createUiFieldRow(form, "yearly-planner-create-file-row");
-		colorRow.createEl("label", { text: t("modal.color") });
-		const colorPresetsWrap = colorRow.createDiv({
-			cls: "yearly-planner-color-row",
-		});
-		const presetsEl = colorPresetsWrap.createDiv({
-			cls: "yearly-planner-color-presets",
-		});
-		const currentColor = getChipColor(this.app, this.file) ?? defaultColor;
-		this.colorPresets.forEach((preset) => {
-			const label = t("modal.colorPresetLabel", { color: preset.hex });
-			const btn = createUiColorPresetButton(presetsEl, {
-				classes: "yearly-planner-color-preset-btn",
-				color: preset.hex,
-				label,
-				onClick: () => this.setColorFromPreset(preset.hex),
-			});
-			this.colorPresetBtns.push(btn);
-		});
-		this.colorPickerInput = colorPresetsWrap.createEl("input", {
-			type: "color",
-			cls: "yearly-planner-color-picker",
-		});
-		this.colorPickerInput.value =
-			toHex6(currentColor) ?? currentColor ?? defaultColor;
-		this.colorPickerInput.title = t("modal.pickColor");
-		this.colorPickerInput.oninput = () => {
-			this.colorInput.value = this.colorPickerInput.value;
-			this.updateColorPresetActive();
-		};
-		this.colorInput = colorRow.createEl("input", {
-			type: "text",
-			cls: "yearly-planner-filename-input",
-		});
-		this.colorInput.value = currentColor;
-		this.colorInput.placeholder = defaultColor;
-		this.colorInput.title = t("modal.chipColorTitle");
-		this.colorInput.oninput = () => this.syncColorFromText();
-		this.updateColorPresetActive();
+		this.colorField = new PlannerColorField(form, this.app, this.file, () => this.updateFileOptionsState());
 
 		const todoRow = createUiFieldRow(form, "yearly-planner-create-file-row");
 		this.todoCheckbox = todoRow.createEl("input", {
@@ -1586,16 +1355,10 @@ export class FileOptionsModal extends Modal {
 		if (!this.startDateInput) return;
 		const start = this.startDateInput.value;
 		const end = this.endDateInput?.value ?? "";
+		const original = parsePlannerBasename(this.filenameInput.value) ?? parsePlannerBasename(this.file.basename);
 		const suffix = this.getFileOptionsFilenameSuffix();
-		const suffixText = suffix ? `-${suffix}` : "";
-		this.filenameInput.value =
-			this.mode === "range"
-				? start && end
-					? `${start}--${end}${suffixText}`
-					: ""
-				: start
-					? `${start}${suffixText}`
-					: "";
+		this.filenameInput.value = isValidDateStr(start) && (this.mode === "single" || isValidDateStr(end))
+			? formatPlannerBasename(start, suffix, this.mode === "range" ? end : undefined, original?.format) : "";
 	}
 
 	private syncFileOptionsDatesFromFilename(): void {
@@ -1649,31 +1412,6 @@ export class FileOptionsModal extends Modal {
 		await this.leaf.openFile(this.file);
 	}
 
-	private setColorFromPreset(hex: string): void {
-		this.colorInput.value = hex;
-		this.colorPickerInput.value = toHex6(hex) ?? hex;
-		this.updateColorPresetActive();
-	}
-
-	private syncColorFromText(): void {
-		const hex = toHex6(this.colorInput.value.trim());
-		if (hex) {
-			this.colorPickerInput.value = hex;
-		}
-		this.updateColorPresetActive();
-	}
-
-	private updateColorPresetActive(): void {
-		const val = this.colorInput.value.trim();
-		const normalizedVal =
-			normalizeColorToHex(val, this.contentEl.ownerDocument) ??
-			val.toLowerCase();
-		this.colorPresets.forEach((preset, i) => {
-			const btn = this.colorPresetBtns[i];
-			const presetHex = (toHex6(preset.hex) ?? preset.hex).toLowerCase();
-			btn?.toggleClass("is-active", normalizedVal === presetHex);
-		});
-	}
 
 	private updateCompletedRowVisibility(): void {
 		this.completedRow.toggleClass("is-hidden", !this.todoCheckbox.checked);
@@ -1881,6 +1619,8 @@ export class FileOptionsModal extends Modal {
 	}
 
 	private getFileOptionsValidationError(): string | null {
+		const colorError = this.colorField?.getValidationError();
+		if (colorError) return colorError;
 		if (
 			this.folderSelect.value === FOLDER_OTHER &&
 			!this.folderCustomInput.value.trim()
@@ -1889,11 +1629,12 @@ export class FileOptionsModal extends Modal {
 		}
 		const filename = this.filenameInput.value.trim().replace(/\.md$/i, "");
 		if (!filename) return t("modal.fileNameRequired");
+		if (recognizePlannerBasename(filename).status === "ambiguous") return t("dateFormats.ambiguousFilename");
 		if (/[\\/]/.test(filename)) return t("modal.fileNameNoPathSeparators");
 		if (this.mode === "single") {
 			const dateStr = getSingleDateFromFilename(filename);
 			if (!dateStr || !isValidDateStr(dateStr)) {
-				return t("modal.invalidDateFileName");
+				return dateFilenameHelp("modal.invalidDateFileName");
 			}
 		} else {
 			const range = parseRangeBasename(filename);
@@ -1902,7 +1643,7 @@ export class FileOptionsModal extends Modal {
 				!isValidDateStr(range.start) ||
 				!isValidDateStr(range.end)
 			) {
-				return t("modal.invalidRangeFileName");
+				return dateFilenameHelp("modal.invalidRangeFileName");
 			}
 			if (range.start > range.end) return t("modal.invalidDateRange");
 		}
@@ -1971,18 +1712,10 @@ export class FileOptionsModal extends Modal {
 				this.filenameInput.value,
 			);
 			this.file = fileToUpdate;
-			const rawColor = this.colorInput.value.trim();
-			const themeHex = getThemeAccentHex(
-				this.contentEl.ownerDocument,
-			).toLowerCase();
-			const color =
-				rawColor &&
-				(toHex6(rawColor) ?? rawColor).toLowerCase() !== themeHex
-					? rawColor
-					: undefined;
+			const { color, colorId, inherit } = this.colorField.getValues();
 			const todo = this.todoCheckbox.checked;
 			const completed = this.completedCheckbox.checked;
-			await updateFileColor(this.app, fileToUpdate, color);
+			await updateFileColor(this.app, fileToUpdate, color, colorId, inherit);
 			await updateFileTodoStatus(this.app, fileToUpdate, todo, completed);
 			await updateFileNotifyMinutes(
 				this.app,

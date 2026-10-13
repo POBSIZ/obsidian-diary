@@ -2,11 +2,42 @@ import { App, TFile, TFolder } from "obsidian";
 import { getDaysInMonth } from "../../utils/date";
 import { parseRangeBasename, isDateInRange } from "../../utils/range";
 import { getRecurrenceRole } from "../../utils/recurrence";
+import { formatDateForFilename, formatPlannerBasename, getDateFormatsRevision, parsePlannerBasename, parsePlannerFile } from "../../utils/date-formats";
 import type { RangeRunPosition } from "./types";
+import { getPlannerFileColor } from "../../utils/planner-colors";
 
 const pad = (n: number) => String(n).padStart(2, "0");
 
 export type PlannerFileScope = "vault" | "plannerFolder";
+
+interface PlannerFileIndex {
+	revision: number;
+	singles: Map<string, TFile[]>;
+	ranges: RangeForYear[];
+}
+const plannerFileIndexes = new WeakMap<TFile[], PlannerFileIndex>();
+
+/** Renderers pass a fresh, immutable file snapshot to all date cells in one render. */
+function getPlannerFileIndex(files: TFile[]): PlannerFileIndex {
+	const revision = getDateFormatsRevision();
+	const cached = plannerFileIndexes.get(files);
+	if (cached?.revision === revision) return cached;
+	const singles = new Map<string, TFile[]>();
+	const ranges: RangeForYear[] = [];
+	for (const file of files) {
+		const parsed = parsePlannerFile(file);
+		if (!parsed) continue;
+		if (parsed.kind === "range" && parsed.end) ranges.push({ file, start: parsed.start, end: parsed.end });
+		else {
+			const matches = singles.get(parsed.start) ?? [];
+			matches.push(file);
+			singles.set(parsed.start, matches);
+		}
+	}
+	const index = { revision, singles, ranges };
+	plannerFileIndexes.set(files, index);
+	return index;
+}
 
 function normalizePlannerFolder(folder: string): string {
 	return (folder || "Planner").trim().replace(/^\/+|\/+$/g, "");
@@ -80,13 +111,13 @@ export function getFilePath(
 	day: number,
 ): string {
 	const trimmed = (folder || "Planner").trim();
-	const filename = `${year}-${pad(month)}-${pad(day)}.md`;
+	const filename = `${formatDateForFilename("daily", year, month, day)}.md`;
 	return trimmed ? `${trimmed}/${filename}` : filename;
 }
 
 export function getYearNoteFilePath(folder: string, year: number): string {
 	const trimmed = (folder || "Planner").trim();
-	const filename = `${year}.md`;
+	const filename = `${formatDateForFilename("yearly", year)}.md`;
 	return trimmed ? `${trimmed}/${filename}` : filename;
 }
 
@@ -96,7 +127,7 @@ export function getMonthNoteFilePath(
 	month: number,
 ): string {
 	const trimmed = (folder || "Planner").trim();
-	const filename = `${year}-${pad(month)}.md`;
+	const filename = `${formatDateForFilename("monthly", year, month)}.md`;
 	return trimmed ? `${trimmed}/${filename}` : filename;
 }
 
@@ -117,15 +148,9 @@ export function getRangesForYear(
 	const yearStart = `${year}-01-01`;
 	const yearEnd = `${year}-12-31`;
 	const ranges: RangeForYear[] = [];
-	for (const file of plannerFiles) {
-		const parsed = parseRangeBasename(file.basename);
-		if (!parsed) continue;
-		if (parsed.end < yearStart || parsed.start > yearEnd) continue;
-		ranges.push({
-			file,
-			start: parsed.start,
-			end: parsed.end,
-		});
+	for (const range of getPlannerFileIndex(plannerFiles).ranges) {
+		if (range.end < yearStart || range.start > yearEnd) continue;
+		ranges.push(range);
 	}
 	ranges.sort((a, b) => a.start.localeCompare(b.start));
 	return ranges;
@@ -163,7 +188,7 @@ export function getRangeFilePath(
 	const trimmed = (folder || "Planner").trim();
 	const startStr = `${startYear}-${pad(startMonth)}-${pad(startDay)}`;
 	const endStr = `${endYear}-${pad(endMonth)}-${pad(endDay)}`;
-	const filename = `${startStr}--${endStr}.md`;
+	const filename = `${formatPlannerBasename(startStr, undefined, endStr)}.md`;
 	return trimmed ? `${trimmed}/${filename}` : filename;
 }
 
@@ -185,13 +210,8 @@ export function getFilesForDate(
 } {
 	const dateStr = `${year}-${pad(month)}-${pad(day)}`;
 
-	const singleFiles = plannerFiles.filter((file) => {
-		return (
-			file.basename === dateStr ||
-			(file.basename.startsWith(`${dateStr}-`) &&
-				!parseRangeBasename(file.basename))
-		);
-	});
+	const index = getPlannerFileIndex(plannerFiles);
+	const singleFiles = [...(index.singles.get(dateStr) ?? [])];
 	singleFiles.sort((a, b) => {
 		const aStart = getPlannerTimeRange(app, a).startTime;
 		const bStart = getPlannerTimeRange(app, b).startTime;
@@ -208,9 +228,8 @@ export function getFilesForDate(
 		runPos: RangeRunPosition;
 		isFirst: boolean;
 	}> = [];
-	for (const file of plannerFiles) {
-		const parsed = parseRangeBasename(file.basename);
-		if (!parsed || !isDateInRange(dateStr, parsed.start, parsed.end))
+	for (const parsed of index.ranges) {
+		if (!isDateInRange(dateStr, parsed.start, parsed.end))
 			continue;
 		const runPos = getRangeRunPosition(
 			year,
@@ -220,7 +239,7 @@ export function getFilesForDate(
 			parsed.end,
 		);
 		rangeFiles.push({
-			file,
+			file: parsed.file,
 			runPos,
 			isFirst: dateStr === parsed.start,
 		});
@@ -277,8 +296,8 @@ export function getSuffixFromBasename(basename: string): string | null {
 	const clean = basename.replace(/\.md$/i, "");
 	const rangeParsed = parseRangeBasename(clean);
 	if (rangeParsed?.suffix) return rangeParsed.suffix;
-	const singleMatch = clean.match(/^(\d{4}-\d{2}-\d{2})(?:-(.+))?$/);
-	return singleMatch?.[2] ?? null;
+	const single = parsePlannerBasename(clean);
+	return single?.kind === "single" ? single.suffix ?? null : null;
 }
 
 export function getFileTitle(app: App, file: TFile): string {
@@ -392,19 +411,5 @@ export function getPlannerChipTitle(app: App, file: TFile): string {
 
 /** Returns chip color from frontmatter if valid; otherwise null (use default). */
 export function getChipColor(app: App, file: TFile): string | null {
-	const cache = app.metadataCache.getFileCache(file);
-	const rawColor: unknown = cache?.frontmatter?.color;
-	const colorStr = rawColor != null ? toStringSafe(rawColor) : null;
-	if (!colorStr || colorStr.trim() === "") return null;
-	const trimmed = colorStr.trim();
-	if (!isValidCssColor(trimmed)) return null;
-	return trimmed;
-}
-
-function isValidCssColor(value: string): boolean {
-	const div = window.document.body.createDiv();
-	div.style.color = value;
-	const isValid = div.style.color !== "";
-	div.remove();
-	return isValid;
+	return getPlannerFileColor(app, file);
 }

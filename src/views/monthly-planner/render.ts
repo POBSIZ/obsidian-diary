@@ -608,7 +608,7 @@ function createMobileHolidaySummary(inner: HTMLElement, holidayNames: string[]):
 		cls: "monthly-planner-mobile-single-dot",
 	});
 	dotEl.setCssProps({
-		"--monthly-mobile-dot-color": "var(--text-accent)",
+		"--monthly-mobile-dot-color": "var(--diary-holiday-color, var(--text-accent))",
 	});
 	groupEl.title = holidayNames.join(", ");
 	if (holidayNames.length > 1) {

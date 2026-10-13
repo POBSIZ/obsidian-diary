@@ -1,7 +1,7 @@
 /*
 This CSS file is included with your plugin, and
 available in the app when your plugin is enabled.
-Diary release version: 1.22.0
+Diary release version: 1.23.0
 */
 
 :where(
@@ -768,6 +768,7 @@ body.-is-mobile .planner-container-compact .planner-view-switcher-popover {
 
 .yearly-planner-color-presets {
 	display: flex;
+	flex-wrap: wrap;
 	gap: 0.25rem;
 	align-items: center;
 }
@@ -793,6 +794,36 @@ body.-is-mobile .planner-container-compact .planner-view-switcher-popover {
 .yearly-planner-color-preset-btn.is-active {
 	border-color: var(--interactive-accent);
 	box-shadow: 0 0 0 1px var(--interactive-accent);
+}
+
+.yearly-planner-color-preset-btn.is-active::after {
+	content: "✓";
+	color: var(--text-normal);
+	background: var(--background-primary);
+	border-radius: 50%;
+	font-size: 0.7rem;
+	line-height: 1;
+	padding: 0.1rem;
+}
+
+.diary-color-selection {
+	width: 100%;
+	min-width: 0;
+	min-height: 2.25rem;
+	padding: 0 0.5rem;
+	font-size: 1rem;
+	border: var(--planner-border-width-thin) solid var(--background-modifier-border);
+	border-radius: var(--planner-radius-sm);
+	background: var(--background-modifier-form-field);
+	color: var(--text-normal);
+}
+
+body.is-mobile .diary-color-selection,
+body.-is-mobile .diary-color-selection,
+body.is-mobile .yearly-planner-create-file-modal .diary-color-value.yearly-planner-filename-input,
+body.-is-mobile .yearly-planner-create-file-modal .diary-color-value.yearly-planner-filename-input {
+	min-height: var(--planner-touch-target-min);
+	height: var(--planner-touch-target-min);
 }
 
 .yearly-planner-color-picker {
@@ -1188,7 +1219,7 @@ button.yearly-planner-month-width-btn:focus-visible {
 
 /* Holiday indicator: left border accent */
 .yearly-planner-table tbody td.yearly-planner-cell-holiday {
-	border-left: 3px solid var(--text-accent);
+	border-left: 3px solid var(--diary-holiday-color, var(--text-accent));
 }
 
 .yearly-planner-table
@@ -1217,11 +1248,11 @@ button.yearly-planner-month-width-btn:focus-visible {
 	width: 100%;
 	background: color-mix(
 		in srgb,
-		var(--text-accent) 12%,
+		var(--diary-holiday-color, var(--text-accent)) 12%,
 		var(--background-primary)
 	);
-	border-left: var(--planner-border-width-accent) solid var(--text-accent);
-	color: var(--text-accent);
+	border-left: var(--planner-border-width-accent) solid var(--diary-holiday-color, var(--text-accent));
+	color: var(--diary-holiday-text-color, var(--text-accent));
 	font-size: var(--planner-chip-font-size-sm);
 	white-space: nowrap;
 	overflow: hidden;
@@ -1237,10 +1268,10 @@ button.yearly-planner-month-width-btn:focus-visible {
 .yearly-planner-cell-holiday-badge:hover {
 	background: color-mix(
 		in srgb,
-		var(--text-accent) 20%,
+		var(--diary-holiday-color, var(--text-accent)) 20%,
 		var(--background-modifier-hover)
 	);
-	color: var(--text-accent);
+	color: var(--diary-holiday-text-color, var(--text-accent));
 }
 
 .yearly-planner-holiday-label {
@@ -3125,7 +3156,7 @@ body.-is-mobile .yearly-planner-file-preview {
 }
 
 .monthly-planner-table tbody td.monthly-planner-cell-holiday {
-	border-left: 3px solid var(--text-accent);
+	border-left: 3px solid var(--diary-holiday-color, var(--text-accent));
 }
 
 .monthly-planner-table tbody td.monthly-planner-cell-selected {
@@ -3270,7 +3301,7 @@ body.-is-mobile .yearly-planner-file-preview {
 }
 
 .monthly-planner-mobile-single-group-holiday .monthly-planner-mobile-single-plus {
-	color: var(--text-accent);
+	color: var(--diary-holiday-text-color, var(--text-accent));
 }
 
 /* Range bar: chip-like layer with distinct color per bar, gap between stacked bars */
@@ -3476,8 +3507,8 @@ body.-is-mobile .yearly-planner-file-preview {
 }
 
 .monthly-planner-day-summary-item-holiday.monthly-planner-cell-file {
-	color: var(--text-accent);
-	background: color-mix(in srgb, var(--text-accent) 12%, var(--background-primary));
+	color: var(--diary-holiday-text-color, var(--text-accent));
+	background: color-mix(in srgb, var(--diary-holiday-color, var(--text-accent)) 12%, var(--background-primary));
 }
 
 .monthly-planner-day-summary-empty {
@@ -3514,11 +3545,11 @@ body.-is-mobile .yearly-planner-file-preview {
 	width: 100%;
 	background: color-mix(
 		in srgb,
-		var(--text-accent) 12%,
+		var(--diary-holiday-color, var(--text-accent)) 12%,
 		var(--background-primary)
 	);
-	border-left: var(--planner-border-width-accent) solid var(--text-accent);
-	color: var(--text-accent);
+	border-left: var(--planner-border-width-accent) solid var(--diary-holiday-color, var(--text-accent));
+	color: var(--diary-holiday-text-color, var(--text-accent));
 	font-size: 0.7em;
 	white-space: nowrap;
 	overflow: hidden;
@@ -3534,7 +3565,7 @@ body.-is-mobile .yearly-planner-file-preview {
 .monthly-planner-cell-holiday-badge:hover {
 	background: color-mix(
 		in srgb,
-		var(--text-accent) 20%,
+		var(--diary-holiday-color, var(--text-accent)) 20%,
 		var(--background-modifier-hover)
 	);
 }
@@ -3812,7 +3843,7 @@ body.-is-mobile .monthly-planner-weekend-label {
 }
 
 .daily-planner-holiday-chip {
-	color: var(--text-accent);
+	color: var(--diary-holiday-text-color, var(--text-accent));
 	cursor: default;
 }
 
@@ -4925,7 +4956,7 @@ body.-is-mobile .daily-planner-timeline-scroll {
 }
 
 .monthly-list-planner-day-holiday {
-	border-left: 3px solid var(--text-accent);
+	border-left: 3px solid var(--diary-holiday-color, var(--text-accent));
 }
 
 .monthly-list-planner-day-sat:not(.monthly-list-planner-day-holiday) {
@@ -5477,9 +5508,9 @@ button.planner-chip.planner-recurrence-source {
 	min-width: 0;
 	padding: var(--planner-chip-padding);
 	border-radius: var(--planner-radius-xs);
-	border-left: var(--planner-border-width-accent) solid var(--text-accent);
-	background: color-mix(in srgb, var(--text-accent) 12%, var(--background-primary));
-	color: var(--text-accent);
+	border-left: var(--planner-border-width-accent) solid var(--diary-holiday-color, var(--text-accent));
+	background: color-mix(in srgb, var(--diary-holiday-color, var(--text-accent)) 12%, var(--background-primary));
+	color: var(--diary-holiday-text-color, var(--text-accent));
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
@@ -5488,10 +5519,10 @@ button.planner-chip.planner-recurrence-source {
 :where(.planner-holiday-badge):hover {
 	background: color-mix(
 		in srgb,
-		var(--text-accent) 20%,
+		var(--diary-holiday-color, var(--text-accent)) 20%,
 		var(--background-modifier-hover)
 	);
-	color: var(--text-accent);
+	color: var(--diary-holiday-text-color, var(--text-accent));
 }
 
 :where(.planner-alt-calendar-label) {
@@ -6381,4 +6412,109 @@ body:is(.is-mobile, .-is-mobile)
 
 .diary-plan-note-path-setting.is-invalid .setting-item-description {
 	color: var(--text-error);
+}
+
+/* Date format and linked color settings share the planner settings surface. */
+.diary-settings-panel {
+	margin-block: var(--size-4-4);
+	border: 1px solid var(--background-modifier-border);
+	border-radius: var(--radius-m);
+}
+
+.diary-settings-panel > summary {
+	padding: var(--size-4-3);
+	font-weight: var(--font-semibold);
+	cursor: pointer;
+}
+
+.diary-settings-panel-body {
+	padding: 0 var(--size-4-3) var(--size-4-3);
+}
+
+.diary-settings-format-group + .diary-settings-format-group,
+.diary-settings-palette-card {
+	margin-block-start: var(--size-4-3);
+	padding-block: var(--size-4-2);
+	border-top: 1px solid var(--background-modifier-border);
+}
+
+.diary-settings-panel .setting-item {
+	flex-wrap: wrap;
+	gap: var(--size-4-2);
+}
+
+.diary-settings-panel .setting-item-control {
+	flex-wrap: wrap;
+	min-width: 0;
+}
+
+.diary-settings-panel input[type="text"],
+.diary-settings-panel select {
+	max-width: 100%;
+}
+
+.diary-settings-panel input[type="color"] {
+	width: 3rem;
+	min-width: 3rem;
+	height: 2rem;
+	padding: 2px;
+}
+
+.diary-settings-panel .is-invalid input,
+.diary-settings-panel input[aria-invalid="true"] {
+	border-color: var(--text-error);
+}
+
+.diary-settings-palette-card > .diary-ui-button,
+.diary-settings-color-selection-actions > .diary-ui-button {
+	margin-inline-end: var(--size-4-2);
+	margin-block: var(--size-4-1);
+}
+
+.diary-settings-color-candidates {
+	max-height: 40vh;
+	overflow-y: auto;
+	margin-block: var(--size-4-3);
+	padding: var(--size-4-1);
+}
+
+.diary-settings-color-candidate {
+	display: flex;
+	align-items: center;
+	gap: var(--size-4-2);
+	min-height: 44px;
+	padding-block: var(--size-4-1);
+	cursor: pointer;
+}
+
+.diary-settings-color-candidate span,
+.diary-settings-format-conflicts li,
+.diary-settings-color-candidates li {
+	overflow-wrap: anywhere;
+}
+
+.diary-settings-format-ambiguity {
+	color: var(--text-warning);
+}
+
+@media (max-width: 600px) {
+	.diary-settings-panel .setting-item-info {
+		flex-basis: 100%;
+	}
+
+	.diary-settings-panel .setting-item-control {
+		justify-content: flex-start;
+		width: 100%;
+	}
+
+	.diary-settings-panel input[type="text"],
+	.diary-settings-panel select {
+		min-width: 0;
+		flex: 1 1 10rem;
+	}
+
+	.diary-settings-panel .diary-ui-button,
+	.diary-settings-panel .setting-item-control button {
+		min-height: 44px;
+	}
 }

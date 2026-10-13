@@ -1,6 +1,6 @@
 {
 	"name": "diary-obsidian",
-	"version": "1.22.0",
+	"version": "1.23.0",
 	"description": "This is a diary obsidian plugin for Obsidian (https://obsidian.md)",
 	"main": "main.js",
 	"type": "module",
@@ -11,7 +11,7 @@
 		"lint": "npm run lint:patterns && eslint . --max-warnings 0",
 		"lint:patterns": "node scripts/check-source-warnings.mjs",
 		"design:lint": "npx --yes -p @google/design.md@0.3.0 designmd lint design.md",
-		"test": "echo \"No tests configured\""
+		"test": "node scripts/test-date-formats.mjs && node scripts/test-planner-colors.mjs && node scripts/check-locales.mjs"
 	},
 	"keywords": [],
 	"license": "0-BSD",

@@ -11,7 +11,7 @@ Diary는 Obsidian 볼트의 일반 Markdown 노트를 연간·월간·일간·3�
 | Item | Value |
 | --- | --- |
 | Plugin ID | `diary` |
-| Version | `1.22.0` |
+| Version | `1.23.0` |
 | Minimum Obsidian version | `1.7.2` |
 | Platforms | Desktop and mobile (`isDesktopOnly: false`) |
 | Default language | `en` |
@@ -19,6 +19,7 @@ Diary는 Obsidian 볼트의 일반 Markdown 노트를 연간·월간·일간·3�
 
 ## What's new
 
+- `1.23.0`: Recognizes multiple date formats with one creation default for each note type. Adds named linked palette colors, selective linking of existing notes, and theme/fixed/palette holiday colors.
 - `1.22.0`: Shows a fixed six-week monthly grid with adjacent-month dates, notes, events and holidays. Date selection and note creation use the actual selected date, including across year boundaries.
 - `1.21.0`: opens the monthly grid from its ribbon icon in the main workspace, consistently with the yearly and monthly list icons. The sidebar remains available through its command. Updates the runtime Moment dependency to a patched version.
 
@@ -70,14 +71,15 @@ These screenshots use temporary demo notes for all-day, timed, range, todo, and 
 - Direct view selector: switch directly among yearly, monthly grid, monthly list, daily, and 3-day views. In narrow layouts it remains visible while secondary actions move into **More**.
 - Monthly grid: always shows six weeks (42 dates), including adjacent-month notes, events and holidays. Muted backgrounds and month labels distinguish adjacent dates; actions use the selected date.
 - Sidebar planner: a compact monthly planner opens in the right sidebar by default, can be revealed from the command palette, and can cycle through yearly, monthly grid, and monthly list layouts in the same side leaf. On desktop and mobile, creating or opening a sidebar note uses a new main workspace tab and preserves the planner and existing tabs.
-- Date notes and range notes: recognized by `YYYY-MM-DD` and `YYYY-MM-DD--YYYY-MM-DD` filenames. By default Diary scans the entire vault, with an optional planner-folder-only scope. Title suffixes can keep visible spaces.
+- Date notes and range notes: recognize several configured filename formats and use one creation default; ISO filenames remain the initial defaults. By default Diary scans the entire vault, with an optional planner-folder-only scope. Title suffixes can keep visible spaces.
 - File options: switch an existing planner note between single-date and range modes, choose its folder, and edit the complete date-based filename. Diary moves the file and synchronizes `date_start` / `date_end` metadata.
 - Range title continuity: monthly range bars repeat their title at new week and month boundaries, while yearly cells repeat it at month and year boundaries.
-- Plan notes: yearly `{plannerFolder}/{year}.md` and monthly `{plannerFolder}/{year}-{month}.md` notes by default. Set vault-relative path templates separately using `YYYY` and `MM` to match other periodic note folders and filenames. Preview state persists on desktop and separately on mobile.
+- Plan notes: yearly `{plannerFolder}/{year}.md` and monthly `{plannerFolder}/{year}-{month}.md` notes by default. Choose separate monthly/yearly recognition and creation formats, or set vault-relative path overrides with `YYYY`, `MM`, and `[literal text]`. Existing path templates retain their old interpretation until edited. Preview state persists on desktop and separately on mobile.
 - Remembered yearly cell width: expanded month-cell widths are saved across reloads.
-- Chip metadata: `color`, `todo`, `completed`, `start_time`, `end_time`, `notify_minutes`, `title`, `date_start`, `date_end`, and recurrence frontmatter. For range files, `date_start` + `start_time` and `date_end` + `end_time` define one continuous datetime interval; times remain independent from reminders.
+- Linked colors: name and edit palette entries, connect selected existing planner notes, and archive or restore entries. Linked notes follow color changes; independent fixed colors remain available. Holiday colors support theme, fixed, or palette selection.
+- Chip metadata: `diary_color_id`, `color`, `todo`, `completed`, `start_time`, `end_time`, `notify_minutes`, `title`, `date_start`, `date_end`, and recurrence frontmatter. For range files, `date_start` + `start_time` and `date_end` + `end_time` define one continuous datetime interval; times remain independent from reminders.
 - Recurring events: repeat every N days, weeks, months, or years with a Gregorian or alternate-calendar basis. Occurrences stay virtual until you explicitly create Markdown notes from them.
-- Custom calendar overlays: create local fantasy/campaign calendar profiles and show one custom label in planner cells while keeping normal `YYYY-MM-DD` files.
+- Custom calendar overlays: create local fantasy/campaign calendar profiles and show one custom label in planner cells. Filenames follow the configured date formats while date values remain Gregorian.
 - External calendar overlays: add opt-in `webcal://` or `https://` `.ics` feeds, refresh them manually or on an interval, and show events as read-only chips/ranges. Select an external event only when you want to create a normal Markdown note for it.
 - Scoped styling: Diary's CSS is limited to planner views, settings panels, and plugin modals so it does not restyle ordinary vault content.
 - Desktop workflows: right-sidebar companion planner, drag range selection, chip drag-to-move, keyboard activation, internal planner copy/paste/delete/undo.
@@ -141,7 +143,8 @@ npm test
 ## Repository layout
 
 - `src/main.ts`: plugin lifecycle, view registration, sidebar planner setup, commands, refresh wiring.
-- `src/settings.ts`: settings schema/defaults and settings tab UI.
+- `src/settings.ts`, `src/settings/*`: settings schema/defaults and shared settings UI.
+- `src/utils/date-formats.ts`, `src/utils/planner-colors.ts`: filename parsing/creation and linked color resolution.
 - `src/views/yearly-planner/*`: yearly calendar UI, interactions, modals, file operations.
 - `src/views/monthly-planner/*`: monthly grid UI, sidebar compact layout, mobile pinch zoom, interactions.
 - `src/views/monthly-list-planner/*`: monthly list UI, filters, and interactions.

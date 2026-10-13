@@ -1,4 +1,4 @@
-import { createPlanNoteFile, getPlanNotePath } from "../../utils/plan-note-path";
+import { createPlanNoteFile, resolvePlanNote } from "../../utils/plan-note-path";
 import { ItemView, Platform, TFile, WorkspaceLeaf } from "obsidian";
 import { t } from "../../i18n";
 import DiaryObsidian from "../../main";
@@ -399,6 +399,7 @@ export class MonthlyListPlannerView extends ItemView {
 	}
 
 	render(): void {
+		applyHolidayColor(this.contentEl, this.app);
 		const { contentEl } = this;
 		this.compactLayout = this.shouldUseCompactLayout();
 		const shouldScrollToToday = this.pendingScrollToToday;
@@ -412,14 +413,16 @@ export class MonthlyListPlannerView extends ItemView {
 			? 0
 			: (scrollEl?.scrollTop ?? 0);
 
-		const planNotePath = getPlanNotePath(
+		const { path: planNotePath, candidates: planNoteCandidates, ambiguous: planNoteAmbiguous } = resolvePlanNote(
+			this.app,
 			"monthly",
 			this.plugin.settings.plannerFolder || "Planner",
 			this.plugin.settings.monthlyPlanNotePath ?? "",
 			this.year,
 			this.month,
+			this.plugin.settings.monthlyPlanNotePathGrammarVersion ?? 1,
 		);
-		const planNoteRevision = getPlanNoteFileRevision(this.app, planNotePath);
+		const planNoteRevision = JSON.stringify([getPlanNoteFileRevision(this.app, planNotePath), planNoteCandidates.map((file) => file.path), planNoteAmbiguous]);
 		const planNoteWrapper = detachReusablePlanNotePanel(contentEl, {
 			path: planNotePath,
 			revision: planNoteRevision,
@@ -479,13 +482,16 @@ export class MonthlyListPlannerView extends ItemView {
 
 	private async renderMonthNotePanel(container: HTMLElement): Promise<void> {
 		const folder = this.plugin.settings.plannerFolder || "Planner";
-		const filePath = getPlanNotePath(
-			"monthly", folder, this.plugin.settings.monthlyPlanNotePath ?? "", this.year, this.month,
+		const { path: filePath, candidates, ambiguous } = resolvePlanNote(
+			this.app, "monthly", folder, this.plugin.settings.monthlyPlanNotePath ?? "", this.year, this.month,
+			this.plugin.settings.monthlyPlanNotePathGrammarVersion ?? 1,
 		);
 		const locale = this.plugin.settings.locale ?? "en";
 		const monthLabel = getMonthLabel(locale, this.month);
 		const label = `${monthLabel} ${this.year}`;
 		await renderPlanNotePanel(container, this.app, filePath, this, {
+			existingNotes: candidates,
+			ambiguousNotes: ambiguous,
 			label,
 			expanded: this.plugin.isPlanNotePanelExpanded(),
 			onToggle: () => void this.plugin.togglePlanNotePanelExpanded(),
@@ -607,6 +613,7 @@ export class MonthlyListPlannerView extends ItemView {
 				notifyMinutes,
 				timeRange,
 				recurrence,
+				colorId,
 			) =>
 				createSingleDateFileOp(
 					this.app,
@@ -617,6 +624,7 @@ export class MonthlyListPlannerView extends ItemView {
 					notifyMinutes,
 					timeRange,
 					recurrence,
+					colorId,
 				),
 			createRangeFile: (
 				folder,
@@ -626,6 +634,7 @@ export class MonthlyListPlannerView extends ItemView {
 				notifyMinutes,
 				timeRange,
 				recurrence,
+				colorId,
 			) =>
 				createRangeFileOp(
 					this.app,
@@ -636,6 +645,7 @@ export class MonthlyListPlannerView extends ItemView {
 					notifyMinutes,
 					timeRange,
 					recurrence,
+					colorId,
 				),
 			onCreated: () => this.render(),
 			openCreatedFile: (file) =>
@@ -895,3 +905,4 @@ function createExternalEventLookup(
 ): Map<string, ExternalCalendarEvent> {
 	return new Map(events.map((event) => [event.id, event]));
 }
+import { applyHolidayColor } from "../../utils/planner-colors";

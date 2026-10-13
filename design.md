@@ -1,6 +1,6 @@
 ---
 version: "alpha"
-lastReviewedPluginVersion: "1.15.1"
+lastReviewedPluginVersion: "1.23.0"
 name: "Diary Planner UI"
 description: "Obsidian-native planner visuals for yearly, monthly, monthly list, daily, 3-day, recurrence, calendar overlays, external calendar overlays, and compact sidebar views."
 colors:
@@ -67,7 +67,7 @@ Diary의 화면은 Obsidian 테마 안에서 이질감 없이 보여야 한다. 
 Obsidian CSS 변수(`--background-*`, `--text-*`, `--interactive-*`)를 따르고,
 모양과 간격은 플러그인의 공통 토큰으로 맞춘다.
 
-이 문서는 `1.15.1`의 연간·월간·목록·일별·3일 플래너와 오른쪽 사이드바,
+이 문서는 `1.23.0`의 연간·월간·목록·일별·3일 플래너와 오른쪽 사이드바,
 공통 헤더, 기간 이동, 반복 일정, 기본 제공·사용자 지정 캘린더, 외부 캘린더,
 파일 옵션 모달, 다국어 UI, 키보드 접근성에 적용되는 기준을 정리한다.
 
@@ -97,6 +97,21 @@ frontmatter의 `colors`는 디자인 도구가 참조할 기준 팔레트다. �
 
 - 토요일: `--planner-weekend-saturday`
 - 일요일: `--planner-weekend-sunday`
+
+일정 색상은 테마 기본색, 독립된 개별 색상, ID로 연결한 이름 있는 팔레트 항목을
+구분한다. 팔레트 색상 변경은 연결된 노트 전체에 렌더링 시 반영하고, 보관한 항목은
+새 선택 목록에서 제외하되 기존 참조와 마지막 색상을 유지한다. 색상값이 테마 강조색과
+같아도 개별 색상으로 선택한 값은 유지한다. 공휴일 색상 역시 테마·개별·팔레트를
+지원하며 배지, 점, 옅은 배경에 같은 색을 사용한다. 글자는 테마의 읽기 쉬운 텍스트색을
+유지하고 선택 상태는 색 외에 표시와 접근성 상태로도 전달한다.
+
+날짜 형식과 팔레트 설정은 기존 설정 탭과 Obsidian 1.13+에서 같은 렌더러를 사용한다.
+일간·월간·연간 인식 목록에는 생성 기본 형식이 각각 하나 있다. 입력 오류가 있으면
+마지막 유효 설정을 유지하고 파일명 예시를 보여준다. 서로 다른 날짜로 해석되는 파일은
+목록과 개수로 안내한다. 월간·연간 경로는 실제 결과 경로와 기존 노트 유무를 표시한다.
+기존 색상 일괄 연결과 형식 삭제의 영향은 파일 경로 목록으로 검토할 수 있게 한다.
+일괄 연결 후보는 처음에 선택하지 않으며 선택한 노트에만 적용한다. 좁은 화면에서는
+설정의 입력과 작업 버튼이 줄바꿈되고 독립 버튼은 44px 이상의 터치 높이를 유지한다.
 
 ## Typography
 
@@ -205,7 +220,7 @@ frontmatter의 `colors`는 디자인 도구가 참조할 기준 팔레트다. �
 - `planner-segmented-control`: 월간 목록 필터처럼 단일 선택 상태를 `tablist`/`tab` 의미와 함께 제공하는 공통 컨트롤
 - `planner-holiday-badge`: 휴일 표시 뱃지
 - `planner-range-bar`: 범위 파일 바
-- `yearly-planner-color-preset-btn`: 노트 생성/수정 모달의 색상 프리셋 버튼. 첫 프리셋은 현재 Obsidian 강조색을 런타임에 해석하며, 각 버튼은 현지화된 `aria-label`과 `title`을 가진다.
+- `yearly-planner-color-preset-btn`: 노트 생성/수정 모달의 색상 프리셋 버튼. 테마 기본색과 연결 팔레트 항목을 구분하고, 각 버튼은 현지화된 `aria-label`과 `title`, 선택 상태를 가진다.
 - `planner-recurrence-occurrence`: 반복 발생분 표시. 칩/범위 바의 기본 border 규칙을 유지한 채 dashed border만 더한다.
 - `planner-external-event-chip`: 외부 캘린더의 단일 일정. 칩의 위치와 높이는 따르되 반투명 배경과 외곽선으로 읽기 전용 오버레이임을 구분한다.
 - `planner-external-event-range`: 외부 캘린더 기간 일정 표시. range bar의 stacking 규칙은 따르되 낮은 opacity와 dashed/striped 처리를 사용한다.
