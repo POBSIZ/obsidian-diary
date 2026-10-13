@@ -11,7 +11,7 @@ Diary는 Obsidian 볼트의 일반 Markdown 노트를 연간·월간·일간·3�
 | Item | Value |
 | --- | --- |
 | Plugin ID | `diary` |
-| Version | `1.23.0` |
+| Version | `1.23.1` |
 | Minimum Obsidian version | `1.7.2` |
 | Platforms | Desktop and mobile (`isDesktopOnly: false`) |
 | Default language | `en` |
@@ -19,6 +19,7 @@ Diary는 Obsidian 볼트의 일반 Markdown 노트를 연간·월간·일간·3�
 
 ## What's new
 
+- `1.23.1`: Preserves the first entry of legacy `color` lists for display and palette linking.
 - `1.23.0`: Recognizes multiple date formats with one creation default for each note type. Adds named linked palette colors, selective linking of existing notes, and theme/fixed/palette holiday colors.
 - `1.22.0`: Shows a fixed six-week monthly grid with adjacent-month dates, notes, events and holidays. Date selection and note creation use the actual selected date, including across year boundaries.
 - `1.21.0`: opens the monthly grid from its ribbon icon in the main workspace, consistently with the yearly and monthly list icons. The sidebar remains available through its command. Updates the runtime Moment dependency to a patched version.

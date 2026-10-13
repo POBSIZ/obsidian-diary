@@ -9,7 +9,7 @@ Full documentation: [English](https://github.com/POBSIZ/obsidian-diary/blob/main
 | Item | Value |
 | --- | --- |
 | Plugin ID | `diary` |
-| Current version | `1.23.0` |
+| Current version | `1.23.1` |
 | Minimum Obsidian version | `1.7.2` |
 | Supported platforms | Desktop / mobile (`isDesktopOnly: false`) |
 | Default language | `en` |
@@ -17,6 +17,7 @@ Full documentation: [English](https://github.com/POBSIZ/obsidian-diary/blob/main
 
 ## What's new
 
+- `1.23.1`: Preserves the first entry of legacy `color` lists for display and palette linking.
 - `1.23.0`: Adds multiple recognized date formats with separate creation defaults, named linked colors and a configurable holiday color.
 - `1.22.0`: Shows a fixed six-week monthly grid with adjacent-month dates, notes, events and holidays. Date selection and note creation use the actual selected date, including across year boundaries.
 - `1.21.0`: Opens the monthly grid from its ribbon icon in the main workspace. Use **Open monthly planner in sidebar** for the sidebar.

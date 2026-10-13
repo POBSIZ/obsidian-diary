@@ -9,14 +9,15 @@ Documentación completa: [English](https://github.com/POBSIZ/obsidian-diary/blob
 | Elemento | Valor |
 | --- | --- |
 | ID del plugin | `diary` |
-| Versión actual | `1.23.0` |
+| Versión actual | `1.23.1` |
 | Versión mínima de Obsidian | `1.7.2` |
 | Plataformas | Escritorio / móvil (`isDesktopOnly: false`) |
 | Idioma predeterminado | `en` |
 | Carpeta predeterminada del planificador | `Planner` |
 
-## Novedades de 1.21.0
+## Novedades
 
+- `1.23.1`: Conserva el primer color de las listas `color` existentes para mostrarlo y vincularlo a la paleta.
 - `1.23.0`: Añade varios formatos de fecha reconocidos con formatos de creación separados, colores vinculados con nombre y color de festivos configurable.
 - `1.22.0`: Muestra una cuadrícula mensual fija de seis semanas con fechas, notas, eventos y festivos de los meses adyacentes. La selección y creación de notas usan la fecha real, incluso entre años.
 - `1.21.0`: El icono mensual abre la cuadrícula mensual en el área principal. Para la barra lateral, usa **Open monthly planner in sidebar**.

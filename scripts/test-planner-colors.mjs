@@ -106,6 +106,12 @@ assert.deepEqual(colors.normalizeColorPalette([{ id: "same", name: " A ", color:
 const linked = add("Planner/2026-10-13-hospital.md", { diary_color_id: "hospital", color: "#3b82f6" });
 const fixed = add("Planner/2026-10-13-school.md", { color: "#3b82f6" });
 const plain = add("Planner/2026-10-13.md", {});
+const legacyList = add("Planner/2026-10-13-legacy-list.md", { color: ["#3b82f6", "#f59e0b"] });
+assert.equal(colors.getPlannerFileColor(app, legacyList), "#3b82f6", "legacy color lists retain their first entry");
+assert.ok(colors.findMatchingColorFiles(app, "hospital").includes(legacyList), "legacy color lists can be linked to palette entries");
+const invalidList = add("Planner/2026-10-13-invalid-list.md", { color: ["invalid", "#3b82f6"] });
+assert.equal(colors.getPlannerFileColor(app, invalidList), null, "only the first legacy list entry determines its color");
+assert.ok(!colors.findMatchingColorFiles(app, "hospital").includes(invalidList));
 const legacyNamed = add("Planner/2026-10-13-legacy.md", { color: "red" });
 assert.equal(colors.getPlannerFileColor(app, linked), "#3b82f6");
 const changedPalette = [{ ...palette[0], name: "Renamed", color: "#e11d48" }, palette[1]];

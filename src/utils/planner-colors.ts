@@ -150,7 +150,8 @@ function getFrontmatter(app: App, file: TFile): Record<string, unknown> {
 
 function rawFileSelection(app: App, file: TFile): PlannerColorSelection {
 	const fm = getFrontmatter(app, file);
-	const color = isValidPlannerColor(fm.color) ? fm.color.trim() : "";
+	const raw: unknown = Array.isArray(fm.color) ? fm.color[0] : fm.color;
+	const color = isValidPlannerColor(raw) ? raw.trim() : "";
 	const id = typeof fm.diary_color_id === "string" ? fm.diary_color_id.trim() : "";
 	if (id) return { mode: "palette", id, color };
 	return color ? { mode: "fixed", color } : { mode: "theme" };
@@ -264,8 +265,8 @@ export function findMatchingColorFiles(app: App, id: string, files: readonly TFi
 	const preset = getPlannerColorPalette(app).find((entry) => entry.id === id);
 	if (!preset) return [];
 	return files.filter((file) => {
-		const fm = getFrontmatter(app, file);
-		return parsePlannerBasename(file.basename) !== null && !fm.diary_color_id && typeof fm.color === "string" && normalizeCssColor(fm.color) === preset.color;
+		const selection = rawFileSelection(app, file);
+		return parsePlannerBasename(file.basename) !== null && selection.mode === "fixed" && normalizeCssColor(selection.color) === preset.color;
 	});
 }
 

@@ -9,14 +9,15 @@ Vollständige Dokumentation: [English](https://github.com/POBSIZ/obsidian-diary/
 | Eintrag | Wert |
 | --- | --- |
 | Plugin-ID | `diary` |
-| Aktuelle Version | `1.23.0` |
+| Aktuelle Version | `1.23.1` |
 | Minimale Obsidian-Version | `1.7.2` |
 | Plattformen | Desktop / Mobil (`isDesktopOnly: false`) |
 | Standardsprache | `en` |
 | Standardordner für Planer | `Planner` |
 
-## Neu in 1.21.0
+## Änderungen
 
+- `1.23.1`: Behält bei vorhandenen `color`-Listen den ersten Farbwert für die Anzeige und die Verknüpfung mit der Palette bei.
 - `1.23.0`: Mehrere erkannte Datumsformate mit getrennten Erstellungsformaten, benannte verknüpfte Farben und eine einstellbare Feiertagsfarbe.
 - `1.22.0`: Zeigt ein festes Monatsraster mit sechs Wochen und den Daten, Notizen, Terminen und Feiertagen angrenzender Monate. Auswahl und Notizerstellung verwenden auch über Jahresgrenzen hinweg das tatsächliche Datum.
 - `1.21.0`: Das Monats-Ribbon-Icon öffnet das Monatsraster im Hauptbereich. Für die Seitenleiste verwende **Open monthly planner in sidebar**.
@@ -30,9 +31,9 @@ Unter **Datumsformate** fügst du Erkennungsformate für Tages-, Monats- und Jah
 
 Ein neues Standardformat benennt bestehende Dateien nicht um. Beim Verschieben bleibt das ursprüngliche Format erhalten. Vor dem Erstellen öffnet Diary eine passende bestehende Notiz; bei mehreren Treffern wählst du die Notiz. Mehrdeutige Dateinamen werden ausgeblendet und in den Einstellungen aufgelistet. Nach dem Update bleibt `YYYY-MM-DD` das Tagesformat für neue Notizen; ein gültiges bisheriges Format dient zusätzlich zur Erkennung. Nicht leere Jahres-/Monatspfade haben Vorrang. Bestehende Pfadvorlagen behalten bis zur Bearbeitung ihre bisherige Bedeutung; neue und bearbeitete Vorlagen unterstützen `[Text]`.
 
-In der **Farbpalette** kannst du Farben benennen, ändern, archivieren und wiederherstellen. Notizen verwenden die Themafarbe, eine unabhängige feste Farbe oder einen verknüpften Eintrag. Palettenänderungen gelten für alle verknüpften Notizen, ohne jede Datei neu zu schreiben. Archivieren verbirgt den Eintrag für neue Auswahlen und erhält bestehende Verknüpfungen und die letzte Farbe. **Bestehende Farben verknüpfen** zeigt passende Planernotizen und ändert nur deine Auswahl. Unter **Verknüpfte Notizen verwalten** ordnest du ausgewählte Notizen neu zu oder löst ihre Verbindung und behältst die aktuelle Farbe.
+In der **Farbpalette** kannst du Farben benennen, ändern, archivieren und wiederherstellen. Notizen verwenden die Theme-Farbe, eine unabhängige feste Farbe oder einen verknüpften Eintrag. Palettenänderungen gelten für alle verknüpften Notizen, ohne jede Datei neu zu schreiben. Archivieren verbirgt den Eintrag für neue Auswahlen und erhält bestehende Verknüpfungen und die letzte Farbe. **Bestehende Farben verknüpfen** zeigt passende Planernotizen und ändert nur deine Auswahl. Unter **Verknüpfte Notizen verwalten** ordnest du ausgewählte Notizen neu zu oder löst ihre Verbindung und behältst die aktuelle Farbe.
 
-Die **Feiertagsfarbe** kann der Themafarbe, einer festen Farbe oder einem Paletteneintrag folgen. Verknüpfte Notizen speichern `diary_color_id` und `color` als Ersatzwert, falls der Eintrag fehlt. `date_start` und `date_end` bleiben ISO-Daten.
+Die **Feiertagsfarbe** kann der Theme-Farbe, einer festen Farbe oder einem Paletteneintrag folgen. Verknüpfte Notizen speichern `diary_color_id` und `color` als Ersatzwert, falls der Eintrag fehlt. `date_start` und `date_end` bleiben ISO-Daten.
 
 ## Screenshots
 
@@ -271,7 +272,7 @@ Diary speichert außerdem reine UI-Zustände in Plugin-Daten: Plan-Notiz-Vorscha
 | --- | --- |
 | `color` | Chip-Farbe. Jede gültige CSS-Farbe ist möglich, z. B. `#22c55e`, `red`, `rgb(34, 197, 94)`. |
 | `diary_color_id` | ID des Paletteneintrags. Die verknüpfte Farbe hat Vorrang vor dem Ersatzwert `color`. |
-| `diary_color_inherit` | Bei true übernimmt ein Serientermin die Quellfarbe. Eine eigene Themafarbe, feste Farbe oder Palette hebt die Vererbung auf. |
+| `diary_color_inherit` | Bei true übernimmt ein Serientermin die Quellfarbe. Eine eigene Theme-Farbe, feste Farbe oder Palette hebt die Vererbung auf. |
 | `todo` | Zeigt die Notiz als Todo-Chip, wenn `true`. |
 | `completed` | Zeigt Erledigt-Status, wenn `todo: true`. |
 | `start_time` | Optionale Startzeit im Format `HH:mm`. Bei Zeitraum-Notizen ist dies die Grenze am `date_start`; beide Zeiten müssen gesetzt oder leer sein. |
