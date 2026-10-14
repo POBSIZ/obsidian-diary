@@ -23,15 +23,15 @@ Documentation complète : [English](https://github.com/POBSIZ/obsidian-diary/blo
 - `1.21.0`: L’icône mensuelle ouvre la grille mensuelle dans l’espace principal. Pour la barre latérale, utilisez **Open monthly planner in sidebar**.
 - `1.20.2`: Corrige la détection du panneau latéral sur mobile pour ouvrir les notes créées ou sélectionnées dans un nouvel onglet principal et conserver le planificateur latéral.
 
-Les changements antérieurs sont disponibles sur la page [Releases](https://github.com/POBSIZ/obsidian-diary/releases).
+Les changements antérieurs sont disponibles sur la page [Releases](https://github.com/POBSIZ/obsidian-diary/releases). Le [compte rendu de la version 1.23.1 (en anglais)](../releases/1.23.1.md) décrit la migration, les vérifications et la clôture des issues #4 et #5.
 
 ## Formats de date et couleurs liées
 
-Dans **Formats de date**, ajoutez des formats reconnus pour les notes quotidiennes, mensuelles et annuelles, puis choisissez un **Format de création** par groupe. `YYYY-[M]MM-DD` crée `2026-M10-13.md`, `YYYY-[M]MM` crée `2026-M10.md` et `YYYY-[Year]` crée `2026-Year.md`. Les jetons disponibles sont `YYYY`, `MM` et `DD`, avec du texte entre crochets. Les dossiers et `.md` se définissent dans les chemins des notes de planification.
+Dans **Formats de date**, ajoutez des formats reconnus pour les notes quotidiennes, mensuelles et annuelles, puis choisissez un **Format de création** par groupe. `YYYY-[M]MM-DD` crée `2026-M10-13.md`, `YYYY-[M]MM` crée `2026-M10.md` et `YYYY-[Year]` crée `2026-Year.md`. Les jetons disponibles sont `YYYY`, `MM` et `DD`, avec du texte entre crochets. Saisissez des modèles de nom sans chemin de dossier ni extension `.md`.
 
-Changer le format par défaut ne renomme aucun fichier existant. Déplacer une note conserve son format initial. Avant une création, Diary cherche une note représentative existante ; s’il y en a plusieurs, vous choisissez celle à ouvrir. Les noms donnant des dates différentes sont exclus et signalés dans les paramètres. Après la mise à jour, les nouvelles notes quotidiennes restent au format `YYYY-MM-DD` ; un ancien format valide est ajouté uniquement pour la reconnaissance. Les chemins annuels ou mensuels non vides ont priorité. Les modèles existants conservent leur interprétation jusqu’à leur modification ; les nouveaux modèles et ceux modifiés acceptent `[texte littéral]`.
+Changer le format par défaut ne renomme aucun fichier existant. Déplacer une note conserve son format initial. Avant de créer une note représentative, Diary cherche les noms exacts reconnus dans le dossier choisi ; pour les notes mensuelles et annuelles, il utilise le dossier du chemin de planification résolu. S’il y en a plusieurs, vous choisissez celle à ouvrir. Les noms présentant des interprétations de date ou des dispositions de jetons contradictoires ne s’affichent pas comme pastilles et sont signalés dans les paramètres. Après la mise à jour, les nouvelles notes quotidiennes restent au format `YYYY-MM-DD` ; un ancien format valide est ajouté uniquement pour la reconnaissance. Les chemins annuels ou mensuels non vides ont priorité. Les modèles existants conservent leur interprétation jusqu’à leur modification ; les nouveaux modèles et ceux modifiés acceptent `[texte littéral]`.
 
-Dans **Palette de couleurs**, nommez les couleurs, modifiez-les, archivez ou restaurez les entrées. Une note utilise la couleur du thème, une couleur fixe indépendante ou une entrée liée. Modifier la palette actualise les notes liées sans réécrire chaque fichier. Archiver masque l’entrée pour les nouvelles sélections tout en conservant les liens et la dernière couleur. **Lier les couleurs existantes** affiche les notes du planificateur correspondantes et modifie uniquement votre sélection. **Gérer les notes liées** permet de les réaffecter ou de les délier en conservant leur couleur actuelle.
+Dans **Palette de couleurs**, nommez les couleurs, modifiez-les, archivez ou restaurez les entrées. Une note utilise la couleur du thème, une couleur fixe indépendante ou une entrée liée. Modifier la palette actualise les notes liées sans réécrire chaque fichier. Archiver masque l’entrée pour les nouvelles sélections tout en conservant les liens et la dernière couleur. **Lier les couleurs existantes** affiche les notes correspondantes dans le périmètre de recherche configuré et modifie uniquement votre sélection. **Gérer les notes liées** permet de les réaffecter ou de les délier en conservant leur couleur actuelle.
 
 La **Couleur des jours fériés** accepte le thème, une couleur fixe ou une palette dans les planificateurs. Les notes liées stockent `diary_color_id` et un `color` de secours utilisé si l’entrée manque. `date_start` et `date_end` restent des dates ISO.
 
@@ -67,10 +67,10 @@ Les captures utilisent un dossier temporaire contenant des notes de journée, de
 - **Planning sur 3 jours** : comparez trois jours consécutifs en colonnes parallèles. Les petits écrans conservent des colonnes lisibles grâce au défilement horizontal.
 - **Sélecteur direct de vue** : passez directement entre année, grille mensuelle, liste mensuelle, jour et 3 jours.
 - **Planificateur latéral droit** : gardez un planning mensuel compact dans la barre latérale droite pendant que les notes s’ouvrent dans l’espace principal.
-- **Panneau de notes de plan** : crée et prévisualise les notes annuelles (`YYYY.md`) et mensuelles (`YYYY-MM.md`) au-dessus du planning. L’état ouvert ou fermé est enregistré, avec un état mobile séparé qui commence fermé.
+- **Panneau de notes de plan** : crée et prévisualise les notes annuelles et mensuelles au-dessus du planning, initialement nommées `YYYY.md` et `YYYY-MM.md`. L’état ouvert ou fermé est enregistré, avec un état mobile séparé qui commence fermé.
 - **Notes datées et notes de période** : les fichiers correspondant aux noms de date ou de période apparaissent sous forme de pastilles. Diary scanne tout le coffre par défaut, ou seulement le dossier de planning si vous le configurez.
 - **Événements récurrents** : répétez tous les N jours, semaines, mois ou années sur base grégorienne ou calendrier alternatif. Les occurrences restent virtuelles jusqu’à leur conversion.
-- **Couleur, tâche et état terminé** : `color`, `todo` et `completed` dans le frontmatter influencent le style et le libellé de la pastille.
+- **Couleur, tâche et état terminé** : `diary_color_id`, `color`, `todo` et `completed` dans le frontmatter influencent le style et le libellé de la pastille.
 - **Jours fériés** : affiche les jours fériés des régions couvertes par les langues de l’interface. Sélectionnez un badge pour voir son nom.
 - **Étiquette de calendrier alternatif** : affichez une étiquette compacte, par exemple calendrier lunaire coréen, lunaire chinois, Dangi, hébraïque, islamique, persan, national indien, bouddhique, ères japonaises, Minguo, copte ou éthiopien. Les options sont localisées dans toutes les langues prises en charge.
 - **Calendrier personnalisé** : créez des profils locaux pour univers de fiction ou campagnes, avec mois, jours de semaine et règles simples de bissextile. Diary affiche la date personnalisée comme étiquette. Les noms suivent les formats de date configurés ; les valeurs de date restent grégoriennes.
@@ -185,8 +185,9 @@ Sur ordinateur, faites glisser sur les cellules de date pour préremplir une mod
 
 Utilisez le panneau de plan au-dessus de chaque planificateur pour créer des plans annuels ou mensuels.
 
-- Plan annuel : `{plannerFolder}/{year}.md`
-- Plan mensuel : `{plannerFolder}/{year}-{month}.md`
+- Chemin annuel initial : `{plannerFolder}/{year}.md`
+- Chemin mensuel initial : `{plannerFolder}/{year}-{month}.md`
+- Laissez le chemin de planification vide pour utiliser le format mensuel ou annuel de création dans **Planner folder**. Un **Chemin de la note annuelle** ou **Chemin de la note mensuelle** non vide a priorité, par exemple `Notes/Yearly/YYYY-[Year].md` ou `Notes/Monthly/YYYY-[M]MM.md`. `YYYY` représente l’année sur quatre chiffres ; les chemins mensuels utilisent aussi le mois sur deux chiffres `MM`. Les modèles nouveaux ou modifiés acceptent `[texte littéral]` ; les modèles existants gardent leur interprétation jusqu’à leur modification. Les paramètres affichent le chemin résolu et les sous-dossiers sont créés au besoin.
 - Le panneau peut être replié ou déplié, et cet état est conservé.
 - Bureau et mobile ont des états séparés : bureau déplié par défaut, mobile replié.
 - Si la note existe déjà, Diary affiche un aperçu et un bouton d’ouverture.
@@ -253,8 +254,12 @@ Règles de collage :
 | --- | --- |
 | Langue | Langue de l’interface du plugin. Par défaut : `en`. Prend en charge `en`, `de`, `es`, `fr`, `ja`, `zh-CN`, `zh-TW` et `ko`. |
 | Planner folder | Dossier par défaut des nouvelles notes de planning et de plan. Sert aussi lorsque le scan est limité au dossier de planning. Par défaut : `Planner`. |
+| Chemin de la note annuelle | Modèle `.md` facultatif relatif au coffre avec `YYYY` et `[texte littéral]`. A priorité sur le format annuel de création ; vide, utilise ce format dans **Planner folder**. |
+| Chemin de la note mensuelle | Modèle `.md` facultatif relatif au coffre avec `YYYY`, `MM` et `[texte littéral]`. A priorité sur le format mensuel de création ; vide, utilise ce format dans **Planner folder**. |
 | Planner note scan scope | Détermine si Diary cherche dans tout le coffre ou seulement dans **Planner folder** et ses sous-dossiers. Par défaut : `Entire vault`. |
-| Date formats | Reconnaît plusieurs formats et choisit un format de création par type de note. |
+| Date formats | Reconnaît plusieurs formats de nom et choisit un format de création pour chaque groupe : notes quotidiennes, mensuelles et annuelles. |
+| Palette de couleurs | Nomme et modifie les couleurs liées, archive ou restaure les entrées et lie, réaffecte ou délie les notes sélectionnées. |
+| Couleur des jours fériés | Utilise la couleur du thème, une couleur fixe indépendante ou une entrée de palette dans les vues du planificateur. |
 | Show holidays | Active ou désactive l’affichage des jours fériés. |
 | Pays des jours fériés | Pays utilisé pour les jours fériés. Prend en charge `KR`, `US`, `JP`, `CN`, `GB`, `DE`, `ES`, `FR`, `AU`, `CA`, `TW` et `None`. |
 | Calendrier affiché | Sélectionne un calendrier alternatif intégré ou un profil personnalisé pour les vues annuelle, grille mensuelle, liste mensuelle, résumé du jour et barre latérale. Par défaut : `None`. |
@@ -270,7 +275,7 @@ Diary enregistre aussi des états uniquement UI : expansion du panneau de plan, 
 
 | Clé | Description |
 | --- | --- |
-| `color` | Couleur de la pastille. Toute couleur CSS valide est acceptée, par exemple `#22c55e`, `red`, `rgb(34, 197, 94)`. |
+| `color` | Couleur fixe de la pastille ou valeur de secours d’une couleur liée. Accepte les couleurs CSS valides, comme `#22c55e`, `red` ou `rgb(34, 197, 94)`. Les anciennes listes utilisent la première entrée. |
 | `diary_color_id` | ID de l’entrée de palette. La couleur liée actuelle a priorité sur le `color` de secours. |
 | `diary_color_inherit` | Si true, une occurrence récurrente suit la couleur de la source. Choisir sa propre couleur de thème, fixe ou de palette supprime cet héritage. |
 | `todo` | Affiche la note comme tâche lorsque `true`. |
@@ -303,7 +308,7 @@ Les occurrences sont virtuelles par défaut. Lors de la création d’une note, 
 
 ## Règles de nom de fichier
 
-Diary scanne par défaut les fichiers Markdown du coffre entier et affiche ceux dont le nom suit ces règles. Dans les réglages, vous pouvez limiter le scan à **Planner folder** et ses sous-dossiers. Les nouvelles notes sont créées par défaut dans **Planner folder**.
+Diary scanne par défaut les fichiers Markdown du coffre entier et affiche ceux dont le nom correspond à un format quotidien reconnu. Les exemples ci-dessous utilisent les formats ISO initiaux ; les notes de plan mensuelles et annuelles utilisent leurs propres groupes de formats. Dans les réglages, vous pouvez limiter le scan à **Planner folder** et ses sous-dossiers. Les nouvelles notes sont créées par défaut dans **Planner folder**.
 
 Date unique :
 
@@ -364,7 +369,7 @@ Validation du document de design :
 npm run design:lint
 ```
 
-Test :
+Tests de régression et de cohérence des traductions :
 
 ```bash
 npm test

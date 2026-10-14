@@ -23,15 +23,15 @@ Vollständige Dokumentation: [English](https://github.com/POBSIZ/obsidian-diary/
 - `1.21.0`: Das Monats-Ribbon-Icon öffnet das Monatsraster im Hauptbereich. Für die Seitenleiste verwende **Open monthly planner in sidebar**.
 - `1.20.2`: Behebt die Erkennung des Seitenplaners auf Mobilgeräten, damit neue oder ausgewählte Notizen in einem neuen Haupt-Tab geöffnet werden und der Seitenplaner erhalten bleibt.
 
-Ältere Änderungen stehen auf der [Releases-Seite](https://github.com/POBSIZ/obsidian-diary/releases).
+Ältere Änderungen stehen auf der [Releases-Seite](https://github.com/POBSIZ/obsidian-diary/releases). Der [Release-Bericht zu 1.23.1 (Englisch)](../releases/1.23.1.md) beschreibt die Migration, die Prüfung und den Abschluss der Issues #4 und #5.
 
 ## Datumsformate und verknüpfte Farben
 
-Unter **Datumsformate** fügst du Erkennungsformate für Tages-, Monats- und Jahresnotizen hinzu und wählst pro Gruppe ein Format für neue Notizen. `YYYY-[M]MM-DD` ergibt `2026-M10-13.md`, `YYYY-[M]MM` ergibt `2026-M10.md` und `YYYY-[Year]` ergibt `2026-Year.md`. Unterstützt werden `YYYY`, `MM` und `DD` sowie Text in eckigen Klammern. Ordner und `.md` gehören in die Plan-Notiz-Pfade.
+Unter **Datumsformate** fügst du Erkennungsformate für Tages-, Monats- und Jahresnotizen hinzu und wählst pro Gruppe ein Format für neue Notizen. `YYYY-[M]MM-DD` ergibt `2026-M10-13.md`, `YYYY-[M]MM` ergibt `2026-M10.md` und `YYYY-[Year]` ergibt `2026-Year.md`. Unterstützt werden `YYYY`, `MM` und `DD` sowie Text in eckigen Klammern. Gib Dateinamensmuster ohne Ordnerpfad oder `.md`-Endung ein.
 
-Ein neues Standardformat benennt bestehende Dateien nicht um. Beim Verschieben bleibt das ursprüngliche Format erhalten. Vor dem Erstellen öffnet Diary eine passende bestehende Notiz; bei mehreren Treffern wählst du die Notiz. Mehrdeutige Dateinamen werden ausgeblendet und in den Einstellungen aufgelistet. Nach dem Update bleibt `YYYY-MM-DD` das Tagesformat für neue Notizen; ein gültiges bisheriges Format dient zusätzlich zur Erkennung. Nicht leere Jahres-/Monatspfade haben Vorrang. Bestehende Pfadvorlagen behalten bis zur Bearbeitung ihre bisherige Bedeutung; neue und bearbeitete Vorlagen unterstützen `[Text]`.
+Ein neues Standardformat benennt bestehende Dateien nicht um. Beim Verschieben bleibt das ursprüngliche Format erhalten. Vor dem Erstellen prüft Diary die exakten erkannten Dateinamen im gewählten Ordner; für Monats- und Jahresnotizen gilt der Ordner des aufgelösten Plan-Notiz-Pfads. Bei mehreren Treffern wählst du die Notiz. Dateinamen mit widersprüchlichen Datumsdeutungen oder Token-Anordnungen erscheinen nicht als Planer-Chips und werden in den Einstellungen aufgelistet. Nach dem Update bleibt `YYYY-MM-DD` das Tagesformat für neue Notizen; ein gültiges bisheriges Format dient zusätzlich zur Erkennung. Nicht leere Jahres-/Monatspfade haben Vorrang. Bestehende Pfadvorlagen behalten bis zur Bearbeitung ihre bisherige Bedeutung; neue und bearbeitete Vorlagen unterstützen `[Text]`.
 
-In der **Farbpalette** kannst du Farben benennen, ändern, archivieren und wiederherstellen. Notizen verwenden die Theme-Farbe, eine unabhängige feste Farbe oder einen verknüpften Eintrag. Palettenänderungen gelten für alle verknüpften Notizen, ohne jede Datei neu zu schreiben. Archivieren verbirgt den Eintrag für neue Auswahlen und erhält bestehende Verknüpfungen und die letzte Farbe. **Bestehende Farben verknüpfen** zeigt passende Planernotizen und ändert nur deine Auswahl. Unter **Verknüpfte Notizen verwalten** ordnest du ausgewählte Notizen neu zu oder löst ihre Verbindung und behältst die aktuelle Farbe.
+In der **Farbpalette** kannst du Farben benennen, ändern, archivieren und wiederherstellen. Notizen verwenden die Theme-Farbe, eine unabhängige feste Farbe oder einen verknüpften Eintrag. Palettenänderungen gelten für alle verknüpften Notizen, ohne jede Datei neu zu schreiben. Archivieren verbirgt den Eintrag für neue Auswahlen und erhält bestehende Verknüpfungen und die letzte Farbe. **Bestehende Farben verknüpfen** zeigt passende Planernotizen im eingestellten Scanbereich und ändert nur deine Auswahl. Unter **Verknüpfte Notizen verwalten** ordnest du ausgewählte Notizen neu zu oder löst ihre Verbindung und behältst die aktuelle Farbe.
 
 Die **Feiertagsfarbe** kann der Theme-Farbe, einer festen Farbe oder einem Paletteneintrag folgen. Verknüpfte Notizen speichern `diary_color_id` und `color` als Ersatzwert, falls der Eintrag fehlt. `date_start` und `date_end` bleiben ISO-Daten.
 
@@ -67,10 +67,10 @@ Für die Screenshots wurde ein temporärer Demo-Ordner mit ganztägigen, zeitgeb
 - **3-Tage-Planer**: Vergleiche drei aufeinanderfolgende Tage in parallelen Spalten. Auf schmalen Bildschirmen bleiben die Spalten per horizontalem Scrollen lesbar.
 - **Direkte Ansichtsauswahl**: Wechsle direkt zwischen Jahr, Monatsraster, Monatsliste, Tag und 3 Tagen.
 - **Rechter Seitenplaner**: Ein kompakter Monatsplaner bleibt in der rechten Seitenleiste geöffnet, während Notizen im Hauptbereich geöffnet werden.
-- **Plan-Notiz-Panel**: Erstellt und zeigt Jahresnotizen (`YYYY.md`) und Monatsnotizen (`YYYY-MM.md`) oberhalb des Planers. Eingeklappter Zustand wird gespeichert; mobil gibt es einen eigenen Zustand, der zunächst eingeklappt ist.
+- **Plan-Notiz-Panel**: Erstellt und zeigt Jahres- und Monatsnotizen oberhalb des Planers. Die anfänglichen Dateinamen sind `YYYY.md` und `YYYY-MM.md`. Eingeklappter Zustand wird gespeichert; mobil gibt es einen eigenen Zustand, der zunächst eingeklappt ist.
 - **Tages- und Zeitraum-Notizen**: Diary zeigt Notizen als Planer-Chips an, wenn Dateinamen Einzeltermine oder Zeiträume beschreiben. Standardmäßig wird der gesamte Vault gescannt; optional nur der Planerordner.
 - **Wiederkehrende Ereignisse**: Wiederhole alle N Tage, Wochen, Monate oder Jahre mit gregorianischer oder alternativer Kalenderbasis. Vorkommen bleiben bis zur Auswahl virtuell.
-- **Farbe, Todo und Erledigt-Status**: `color`, `todo` und `completed` aus dem Frontmatter beeinflussen Chip-Stil und Beschriftung.
+- **Farbe, Todo und Erledigt-Status**: `diary_color_id`, `color`, `todo` und `completed` aus dem Frontmatter beeinflussen Chip-Stil und Beschriftung.
 - **Feiertage**: Zeigt landesspezifische Feiertage für die unterstützten UI-Sprachregionen. Feiertags-Badges lassen sich auswählen, um Namen zu sehen.
 - **Alternative Kalenderbeschriftung**: Zeigt optional eine kompakte Zusatzbeschriftung, etwa koreanischen Mondkalender, chinesischen Mondkalender, Dangi, hebräischen, islamischen, persischen, indischen Nationalkalender, buddhistischen Kalender, japanische Ära, Minguo, koptischen oder äthiopischen Kalender. Die Optionsnamen sind in allen unterstützten UI-Sprachen lokalisiert.
 - **Eigenes Kalender-Overlay**: Erstelle lokale Fantasy- oder Kampagnenkalender mit eigenen Monaten, Wochentagen und einfachen Schaltregeln. Diary zeigt das eigene Datum als Overlay. Dateinamen folgen den eingestellten Datumsformaten; Datumswerte bleiben gregorianisch.
@@ -185,8 +185,9 @@ Auf dem Desktop kannst du über Datumszellen ziehen, um ein **Zeitraum**-Modal v
 
 Nutze das Plan-Notiz-Panel oberhalb jedes Planers, um Jahres- oder Monatspläne zu erstellen.
 
-- Jahresplan: `{plannerFolder}/{year}.md`
-- Monatsplan: `{plannerFolder}/{year}-{month}.md`
+- Anfänglicher Jahresplan-Pfad: `{plannerFolder}/{year}.md`
+- Anfänglicher Monatsplan-Pfad: `{plannerFolder}/{year}-{month}.md`
+- Ein leerer Plan-Notiz-Pfad verwendet das gewählte Monats- oder Jahresformat für neue Notizen in **Planner folder**. Ein ausgefüllter **Pfad der Jahresplan-Notiz** oder **Pfad der Monatsplan-Notiz** hat Vorrang, etwa `Notes/Yearly/YYYY-[Year].md` oder `Notes/Monthly/YYYY-[M]MM.md`. `YYYY` steht für das vierstellige Jahr; Monatspfade verwenden zusätzlich den zweistelligen Monat `MM`. Neue oder bearbeitete Vorlagen unterstützen `[Text]`; bestehende Vorlagen behalten bis zur Bearbeitung ihre bisherige Bedeutung. Die Einstellungen zeigen den aufgelösten Pfad. Unterordner werden bei Bedarf erstellt.
 - Das Panel kann ein- und ausgeklappt werden; der Zustand wird in Plugin-Daten gespeichert.
 - Desktop und Mobil haben getrennte Zustände: Desktop startet ausgeklappt, Mobil eingeklappt.
 - Wenn die Plan-Notiz existiert, zeigt Diary eine Vorschau und eine Öffnen-Schaltfläche.
@@ -253,8 +254,12 @@ Einfügeregeln:
 | --- | --- |
 | Sprache | Sprache der Plugin-Oberfläche. Standard: `en`. Unterstützt `en`, `de`, `es`, `fr`, `ja`, `zh-CN`, `zh-TW` und `ko`. |
 | Planner folder | Standardordner für neue Planernotizen und Plan-Notizen. Wird auch genutzt, wenn der Scan auf den Planerordner begrenzt ist. Standard: `Planner`. |
+| Pfad der Jahresplan-Notiz | Optionaler relativer `.md`-Pfad im Vault mit `YYYY` und `[Text]`. Hat Vorrang vor dem Jahresformat für neue Notizen; leer verwendet dieses Format in **Planner folder**. |
+| Pfad der Monatsplan-Notiz | Optionaler relativer `.md`-Pfad im Vault mit `YYYY`, `MM` und `[Text]`. Hat Vorrang vor dem Monatsformat für neue Notizen; leer verwendet dieses Format in **Planner folder**. |
 | Planner note scan scope | Legt fest, ob Diary im gesamten Vault oder nur in **Planner folder** und Unterordnern sucht. Standard: `Entire vault`. |
-| Date formats | Erkennt mehrere Formate und wählt je ein Erstellungsformat für Tages-, Monats- und Jahresnotizen. |
+| Date formats | Erkennt mehrere Dateinamensformate und wählt je ein Erstellungsformat für Tages-, Monats- und Jahresnotizen. |
+| Farbpalette | Benennt und bearbeitet verknüpfte Farben, archiviert oder stellt Einträge wieder her, verknüpft ausgewählte Notizen, ordnet sie neu zu oder löst ihre Verknüpfungen. |
+| Feiertagsfarbe | Verwendet die Theme-Farbe, eine unabhängige feste Farbe oder einen Paletteneintrag in den Planeransichten. |
 | Show holidays | Schaltet Feiertagsanzeige ein oder aus. |
 | Feiertagsland | Feiertagsland. Unterstützt `KR`, `US`, `JP`, `CN`, `GB`, `DE`, `ES`, `FR`, `AU`, `CA`, `TW` und `None`. |
 | Angezeigter Kalender | Wählt einen eingebauten alternativen Kalender oder ein eigenes Kalenderprofil für Jahresplaner, Monatsraster, Monatsliste, Tagesübersicht und Seitenplaner. Standard: `None`. |
@@ -270,7 +275,7 @@ Diary speichert außerdem reine UI-Zustände in Plugin-Daten: Plan-Notiz-Vorscha
 
 | Schlüssel | Beschreibung |
 | --- | --- |
-| `color` | Chip-Farbe. Jede gültige CSS-Farbe ist möglich, z. B. `#22c55e`, `red`, `rgb(34, 197, 94)`. |
+| `color` | Feste Chip-Farbe oder Ersatzwert einer verknüpften Farbe. Gültige CSS-Farben sind möglich, z. B. `#22c55e`, `red` oder `rgb(34, 197, 94)`. Bei vorhandenen Listen gilt der erste Eintrag. |
 | `diary_color_id` | ID des Paletteneintrags. Die verknüpfte Farbe hat Vorrang vor dem Ersatzwert `color`. |
 | `diary_color_inherit` | Bei true übernimmt ein Serientermin die Quellfarbe. Eine eigene Theme-Farbe, feste Farbe oder Palette hebt die Vererbung auf. |
 | `todo` | Zeigt die Notiz als Todo-Chip, wenn `true`. |
@@ -303,7 +308,7 @@ Wiederkehrende Vorkommen sind standardmäßig virtuell. Beim Erstellen einer Not
 
 ## Dateinamenregeln
 
-Diary scannt standardmäßig Markdown-Dateien im gesamten Vault und zeigt Notizen an, deren Dateinamen diesen Regeln entsprechen. In den Einstellungen kannst du den Scan auf **Planner folder** und Unterordner begrenzen. Neue Notizen landen standardmäßig im konfigurierten **Planner folder**.
+Diary scannt standardmäßig Markdown-Dateien im gesamten Vault und zeigt Notizen an, deren Dateinamen einem eingestellten Tagesformat entsprechen. Die folgenden Beispiele verwenden die anfänglichen ISO-Formate; Monats- und Jahrespläne verwenden ihre eigenen Formatgruppen. In den Einstellungen kannst du den Scan auf **Planner folder** und Unterordner begrenzen. Neue Notizen landen standardmäßig im konfigurierten **Planner folder**.
 
 Einzelnes Datum:
 
@@ -364,7 +369,7 @@ Design-Dokument prüfen:
 npm run design:lint
 ```
 
-Test:
+Regressionstests und Prüfung der Übersetzungen:
 
 ```bash
 npm test

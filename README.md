@@ -41,7 +41,7 @@ Diary는 Obsidian 볼트의 일반 Markdown 노트를 연간·월간·일간·3�
 - `1.17.1`: fixes scrolling and overlapping items in the all-day section of the daily and 3-day planners on mobile, and keeps button icons readable in narrow layouts.
 - `1.17.0`: adds a collapsible all-day section with event counts to the daily and 3-day planners, and improves sub-20-minute events with readable compact cards, time tooltips, and collision-aware layout.
 
-Older changes are listed on the [Releases page](https://github.com/POBSIZ/obsidian-diary/releases).
+Older changes are listed on the [Releases page](https://github.com/POBSIZ/obsidian-diary/releases). The [1.23.1 release record](docs/releases/1.23.1.md) covers migration, verification, and the follow-up for issues #4 and #5.
 
 ## Screenshots
 
@@ -75,16 +75,18 @@ These screenshots use temporary demo notes for all-day, timed, range, todo, and 
 - Date notes and range notes: recognize several configured filename formats and use one creation default; ISO filenames remain the initial defaults. By default Diary scans the entire vault, with an optional planner-folder-only scope. Title suffixes can keep visible spaces.
 - File options: switch an existing planner note between single-date and range modes, choose its folder, and edit the complete date-based filename. Diary moves the file and synchronizes `date_start` / `date_end` metadata.
 - Range title continuity: monthly range bars repeat their title at new week and month boundaries, while yearly cells repeat it at month and year boundaries.
-- Plan notes: yearly `{plannerFolder}/{year}.md` and monthly `{plannerFolder}/{year}-{month}.md` notes by default. Choose separate monthly/yearly recognition and creation formats, or set vault-relative path overrides with `YYYY`, `MM`, and `[literal text]`. Existing path templates retain their old interpretation until edited. Preview state persists on desktop and separately on mobile.
+- Plan notes: the initial paths are yearly `{plannerFolder}/{year}.md` and monthly `{plannerFolder}/{year}-{month}.md`. With empty path overrides, new notes use the monthly or yearly creation default in the planner folder. Nonempty vault-relative path overrides take priority; yearly paths support `YYYY` and `[literal text]`, while monthly paths also support `MM`. Existing path templates retain their old interpretation until edited. Preview state persists on desktop and separately on mobile.
 - Remembered yearly cell width: expanded month-cell widths are saved across reloads.
 - Linked colors: name and edit palette entries, connect selected existing planner notes, and archive or restore entries. Linked notes follow color changes; independent fixed colors remain available. Holiday colors support theme, fixed, or palette selection.
-- Chip metadata: `diary_color_id`, `color`, `todo`, `completed`, `start_time`, `end_time`, `notify_minutes`, `title`, `date_start`, `date_end`, and recurrence frontmatter. For range files, `date_start` + `start_time` and `date_end` + `end_time` define one continuous datetime interval; times remain independent from reminders.
+- Chip metadata: `diary_color_id`, `diary_color_inherit`, `color`, `todo`, `completed`, `start_time`, `end_time`, `notify_minutes`, `title`, `date_start`, `date_end`, and recurrence frontmatter. For range files, `date_start` + `start_time` and `date_end` + `end_time` define one continuous datetime interval; times remain independent from reminders.
 - Recurring events: repeat every N days, weeks, months, or years with a Gregorian or alternate-calendar basis. Occurrences stay virtual until you explicitly create Markdown notes from them.
 - Custom calendar overlays: create local fantasy/campaign calendar profiles and show one custom label in planner cells. Filenames follow the configured date formats while date values remain Gregorian.
 - External calendar overlays: add opt-in `webcal://` or `https://` `.ics` feeds, refresh them manually or on an interval, and show events as read-only chips/ranges. Select an external event only when you want to create a normal Markdown note for it.
 - Scoped styling: Diary's CSS is limited to planner views, settings panels, and plugin modals so it does not restyle ordinary vault content.
 - Desktop workflows: right-sidebar companion planner, drag range selection, chip drag-to-move, keyboard activation, internal planner copy/paste/delete/undo.
 - Mobile workflows: use 44/48 px standalone controls, responsive modal action layouts, safe-area-aware modal sizing, keyboard-safe form scrolling, day summary sheets, monthly-grid pinch zoom, and automatic clearance above standard or floating Obsidian navigation.
+
+Use **Settings → Diary → Date formats** to add recognition formats and choose one creation default separately for daily, monthly, and yearly notes. For example, `YYYY-[M]MM-DD` creates `2026-M10-13.md`. Changing a default keeps existing filenames; moving a note preserves its recognized format. **Color palette** and **Holiday color** configure linked note colors and holiday styling. Existing-color linking previews notes in the configured scan scope and changes only your selection.
 
 ## Quick start
 
@@ -112,6 +114,8 @@ After updating, reload Obsidian to load the installed build. If notes still open
 
 ## Development
 
+See the [development guide](docs/development.md) for date-format, color, testing, and release rules.
+
 ```bash
 npm install
 npm run dev
@@ -135,7 +139,7 @@ Design document lint:
 npm run design:lint
 ```
 
-Test:
+Regression and locale consistency checks:
 
 ```bash
 npm test

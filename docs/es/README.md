@@ -23,15 +23,15 @@ Documentación completa: [English](https://github.com/POBSIZ/obsidian-diary/blob
 - `1.21.0`: El icono mensual abre la cuadrícula mensual en el área principal. Para la barra lateral, usa **Open monthly planner in sidebar**.
 - `1.20.2`: Corrige la detección del panel lateral en móvil para abrir las notas creadas o seleccionadas en una pestaña nueva del área principal y conservar el planificador lateral.
 
-Los cambios anteriores están disponibles en [Releases](https://github.com/POBSIZ/obsidian-diary/releases).
+Los cambios anteriores están disponibles en [Releases](https://github.com/POBSIZ/obsidian-diary/releases). El [registro de la versión 1.23.1 (en inglés)](../releases/1.23.1.md) recoge la migración, la verificación y el cierre de las issues #4 y #5.
 
 ## Formatos de fecha y colores vinculados
 
-En **Formatos de fecha**, añade formatos de reconocimiento para notas diarias, mensuales y anuales, y elige un **Formato de creación** por grupo. `YYYY-[M]MM-DD` crea `2026-M10-13.md`; `YYYY-[M]MM` crea `2026-M10.md`; `YYYY-[Year]` crea `2026-Year.md`. Se admiten `YYYY`, `MM`, `DD` y texto literal entre corchetes. Las carpetas y `.md` se indican en las rutas de notas de planificación.
+En **Formatos de fecha**, añade formatos de reconocimiento para notas diarias, mensuales y anuales, y elige un **Formato de creación** por grupo. `YYYY-[M]MM-DD` crea `2026-M10-13.md`; `YYYY-[M]MM` crea `2026-M10.md`; `YYYY-[Year]` crea `2026-Year.md`. Se admiten `YYYY`, `MM`, `DD` y texto literal entre corchetes. Introduce patrones de nombre sin ruta de carpeta ni extensión `.md`.
 
-Cambiar el formato predeterminado no renombra archivos existentes. Al mover una nota, se conserva su formato. Antes de crear una nota representativa, Diary busca una existente; si hay varias, eliges cuál abrir. Los nombres que corresponden a fechas distintas se excluyen y aparecen en los ajustes. Tras actualizar, la creación diaria sigue usando `YYYY-MM-DD`; un formato anterior válido se añade solo para reconocimiento. Las rutas anuales o mensuales no vacías tienen prioridad. Las plantillas existentes mantienen su interpretación hasta que se editen; las nuevas o editadas admiten `[texto literal]`.
+Cambiar el formato predeterminado no renombra archivos existentes. Al mover una nota, se conserva su formato. Antes de crear una nota representativa, Diary busca nombres exactos reconocidos en la carpeta elegida; para notas mensuales y anuales usa la carpeta de la ruta de planificación resuelta. Si hay varias, eliges cuál abrir. Los nombres con interpretaciones de fecha o disposiciones de tokens contradictorias no aparecen como chips y se indican en los ajustes. Tras actualizar, la creación diaria sigue usando `YYYY-MM-DD`; un formato anterior válido se añade solo para reconocimiento. Las rutas anuales o mensuales no vacías tienen prioridad. Las plantillas existentes mantienen su interpretación hasta que se editen; las nuevas o editadas admiten `[texto literal]`.
 
-En **Paleta de colores**, asigna nombres, cambia colores y archiva o restaura entradas. Las notas pueden usar el color del tema, un color fijo independiente o una entrada vinculada. Cambiar la paleta actualiza las notas vinculadas sin reescribir todos los archivos. Archivar oculta la entrada para nuevas selecciones y conserva los vínculos y el último color. **Vincular colores existentes** muestra las notas del planificador coincidentes y modifica solo las seleccionadas. **Gestionar notas vinculadas** permite reasignarlas o desvincularlas conservando el color actual.
+En **Paleta de colores**, asigna nombres, cambia colores y archiva o restaura entradas. Las notas pueden usar el color del tema, un color fijo independiente o una entrada vinculada. Cambiar la paleta actualiza las notas vinculadas sin reescribir todos los archivos. Archivar oculta la entrada para nuevas selecciones y conserva los vínculos y el último color. **Vincular colores existentes** muestra las notas coincidentes dentro del ámbito de escaneo configurado y modifica solo las seleccionadas. **Gestionar notas vinculadas** permite reasignarlas o desvincularlas conservando el color actual.
 
 **Color de festivos** admite tema, color fijo y paleta en los planificadores. Las notas vinculadas guardan `diary_color_id` y un `color` de respaldo para cuando falte la entrada. `date_start` y `date_end` siguen siendo fechas ISO.
 
@@ -67,10 +67,10 @@ Las capturas usan una carpeta temporal con notas de todo el día, con hora, de r
 - **Planificador de 3 días**: Compara tres días consecutivos en columnas paralelas. En pantallas estrechas conserva columnas legibles mediante desplazamiento horizontal.
 - **Selector directo de vista**: Cambia directamente entre año, cuadrícula mensual, lista mensual, día y 3 días.
 - **Planificador lateral derecho**: Mantén un planificador mensual compacto en la barra lateral derecha mientras las notas se abren en el área principal.
-- **Panel de notas de plan**: Crea y previsualiza notas anuales (`YYYY.md`) y mensuales (`YYYY-MM.md`) encima del planificador. El estado expandido o contraído se guarda; en móvil se guarda por separado y empieza contraído.
+- **Panel de notas de plan**: Crea y previsualiza notas anuales y mensuales encima del planificador, inicialmente llamadas `YYYY.md` y `YYYY-MM.md`. El estado expandido o contraído se guarda; en móvil se guarda por separado y empieza contraído.
 - **Notas de fecha y rango**: Muestra notas como chips según nombres de archivo de fecha única o rango. Diary escanea todo el vault de forma predeterminada o solo la carpeta del planificador si lo configuras.
 - **Eventos recurrentes**: Repite cada N días, semanas, meses o años con base gregoriana o de calendario alternativo. Las apariciones permanecen virtuales hasta seleccionarlas.
-- **Color, tarea y estado completado**: `color`, `todo` y `completed` en frontmatter se reflejan en el estilo y la etiqueta del chip.
+- **Color, tarea y estado completado**: `diary_color_id`, `color`, `todo` y `completed` en frontmatter se reflejan en el estilo y la etiqueta del chip.
 - **Festivos**: Muestra festivos públicos de las regiones cubiertas por los idiomas de la interfaz. Puedes seleccionar una insignia de festivo para ver su nombre.
 - **Etiqueta de calendario alternativo**: Muestra opcionalmente una etiqueta compacta, como calendario lunar coreano, lunar chino, Dangi, hebreo, islámico, persa, nacional indio, budista, era japonesa, Minguo, copto o etíope. Las opciones están localizadas en todos los idiomas de la interfaz.
 - **Calendario personalizado**: Crea perfiles locales para mundos de fantasía o campañas, con meses, días de la semana y reglas simples de año bisiesto. Diary muestra la fecha personalizada como etiqueta. Los nombres siguen los formatos de fecha configurados; las fechas siguen siendo gregorianas.
@@ -185,8 +185,9 @@ En escritorio, arrastra sobre celdas de fecha para rellenar un modal de **Rango*
 
 Usa el panel de notas de plan encima de cada planificador para crear planes anuales o mensuales.
 
-- Plan anual: `{plannerFolder}/{year}.md`
-- Plan mensual: `{plannerFolder}/{year}-{month}.md`
+- Ruta anual inicial: `{plannerFolder}/{year}.md`
+- Ruta mensual inicial: `{plannerFolder}/{year}-{month}.md`
+- Deja una ruta de planificación vacía para usar el formato mensual o anual de creación en **Planner folder**. Una **Ruta de la nota anual** o **Ruta de la nota mensual** no vacía tiene prioridad, por ejemplo `Notes/Yearly/YYYY-[Year].md` o `Notes/Monthly/YYYY-[M]MM.md`. `YYYY` representa el año de cuatro cifras; las rutas mensuales también usan el mes de dos cifras `MM`. Las plantillas nuevas o editadas admiten `[texto literal]`; las existentes conservan su interpretación hasta que se editen. Los ajustes muestran la ruta resuelta y las subcarpetas se crean cuando hacen falta.
 - El panel puede contraerse o expandirse, y el estado se guarda en datos del plugin.
 - Escritorio y móvil mantienen estados separados: escritorio empieza expandido, móvil contraído.
 - Si la nota ya existe, Diary muestra una vista previa y un botón para abrirla.
@@ -253,8 +254,12 @@ Reglas de pegado:
 | --- | --- |
 | Idioma | Idioma de la interfaz. Predeterminado: `en`. Admite `en`, `de`, `es`, `fr`, `ja`, `zh-CN`, `zh-TW` y `ko`. |
 | Planner folder | Carpeta predeterminada para nuevas notas del planificador y notas de plan. También se usa cuando el escaneo se limita a la carpeta del planificador. Predeterminado: `Planner`. |
+| Ruta de la nota anual | Plantilla `.md` opcional relativa al vault con `YYYY` y `[texto literal]`. Tiene prioridad sobre el formato anual de creación; vacía usa ese formato en **Planner folder**. |
+| Ruta de la nota mensual | Plantilla `.md` opcional relativa al vault con `YYYY`, `MM` y `[texto literal]`. Tiene prioridad sobre el formato mensual de creación; vacía usa ese formato en **Planner folder**. |
 | Planner note scan scope | Decide si Diary busca notas en todo el vault o solo en **Planner folder** y subcarpetas. Predeterminado: `Entire vault`. |
-| Date formats | Reconoce varios formatos y elige un formato de creación para notas diarias, mensuales y anuales. |
+| Date formats | Reconoce varios formatos de nombre y elige un formato de creación para cada grupo: notas diarias, mensuales y anuales. |
+| Paleta de colores | Nombra y edita colores vinculados, archiva o restaura entradas y vincula, reasigna o desvincula notas seleccionadas. |
+| Color de festivos | Usa el color del tema, un color fijo independiente o una entrada de la paleta en las vistas del planificador. |
 | Show holidays | Activa o desactiva festivos. |
 | País de festivos | País para festivos. Admite `KR`, `US`, `JP`, `CN`, `GB`, `DE`, `ES`, `FR`, `AU`, `CA`, `TW` y `None`. |
 | Calendario mostrado | Selecciona un calendario alternativo integrado o un perfil personalizado para anual, cuadrícula mensual, lista mensual, resumen del día y planificador lateral. Predeterminado: `None`. |
@@ -270,7 +275,7 @@ Diary también guarda estado solo de interfaz: expansión del panel de plan, exp
 
 | Clave | Descripción |
 | --- | --- |
-| `color` | Color del chip. Puede ser cualquier color CSS válido, como `#22c55e`, `red` o `rgb(34, 197, 94)`. |
+| `color` | Color fijo del chip o respaldo de un color vinculado. Admite colores CSS válidos, como `#22c55e`, `red` o `rgb(34, 197, 94)`. En las listas existentes se usa la primera entrada. |
 | `diary_color_id` | ID de la entrada de la paleta. El color vinculado actual tiene prioridad sobre el `color` de respaldo. |
 | `diary_color_inherit` | Si es true, la ocurrencia recurrente usa el color de la nota de origen. Elegir tema, color fijo o paleta propios elimina la herencia. |
 | `todo` | Muestra la nota como chip de tarea cuando es `true`. |
@@ -303,7 +308,7 @@ Las apariciones son virtuales por defecto. Al crear una nota, Diary reutiliza un
 
 ## Reglas de nombres de archivo
 
-Diary escanea Markdown en todo el vault por defecto y muestra notas cuyos nombres cumplen estas reglas. En ajustes puedes limitar el escaneo a **Planner folder** y subcarpetas. Las notas nuevas se crean por defecto en **Planner folder**.
+Diary escanea Markdown en todo el vault por defecto y muestra notas cuyos nombres coinciden con un formato diario reconocido. Los ejemplos siguientes usan los formatos ISO iniciales; las notas de plan mensuales y anuales usan sus grupos de formato propios. En ajustes puedes limitar el escaneo a **Planner folder** y subcarpetas. Las notas nuevas se crean por defecto en **Planner folder**.
 
 Fecha única:
 
@@ -364,7 +369,7 @@ Validación del documento de diseño:
 npm run design:lint
 ```
 
-Test:
+Pruebas de regresión y coherencia de las traducciones:
 
 ```bash
 npm test

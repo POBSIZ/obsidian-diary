@@ -23,15 +23,15 @@ Full documentation: [English](https://github.com/POBSIZ/obsidian-diary/blob/main
 - `1.21.0`: Opens the monthly grid from its ribbon icon in the main workspace. Use **Open monthly planner in sidebar** for the sidebar.
 - `1.20.2`: Fixes sidebar detection on mobile so creating or opening notes opens a new main workspace tab and preserves the sidebar planner.
 
-For earlier changes, see the [Releases page](https://github.com/POBSIZ/obsidian-diary/releases).
+For earlier changes, see the [Releases page](https://github.com/POBSIZ/obsidian-diary/releases). The [1.23.1 release record](../releases/1.23.1.md) covers migration, verification, and the follow-up for issues #4 and #5.
 
 ## Date formats and linked colors
 
-In **Date formats**, add recognition formats separately for daily, monthly and yearly notes, then choose one **Creation default** in each group. `YYYY-[M]MM-DD` creates `2026-M10-13.md`; `YYYY-[M]MM` creates `2026-M10.md`; `YYYY-[Year]` creates `2026-Year.md`. Supported tokens are `YYYY`, `MM` and `DD`, with literal text in brackets. Folder paths and `.md` belong in plan note path settings, not date formats.
+In **Date formats**, add recognition formats separately for daily, monthly and yearly notes, then choose one **Creation default** in each group. `YYYY-[M]MM-DD` creates `2026-M10-13.md`; `YYYY-[M]MM` creates `2026-M10.md`; `YYYY-[Year]` creates `2026-Year.md`. Supported tokens are `YYYY`, `MM` and `DD`, with literal text in brackets. Enter filename patterns without a folder path or `.md` extension.
 
-Changing a default does not rename existing notes. Moving a note preserves its original format. Diary opens an existing representative note in any recognized format before creating one; when several notes match, you choose which to open. Ambiguous names that resolve to different dates are excluded and listed in settings. After upgrading, daily creation stays `YYYY-MM-DD`; a valid former date-format setting is added only for recognition. Nonempty yearly/monthly path overrides take priority over their format defaults. Existing path templates keep their earlier interpretation until edited; new or edited templates accept `[literal text]`.
+Changing a default does not rename existing notes. Moving a note preserves its original format. Before creating a representative note, Diary checks recognized exact filenames in the selected folder; monthly and yearly notes use the folder resolved by their plan note path. When several notes match, you choose which to open. Names with conflicting date interpretations or token layouts are excluded from planner chips and listed in settings. After upgrading, daily creation stays `YYYY-MM-DD`; a valid former date-format setting is added only for recognition. Nonempty yearly/monthly path overrides take priority over their format defaults. Existing path templates keep their earlier interpretation until edited; new or edited templates accept `[literal text]`.
 
-In **Color palette**, name colors, change their values, or archive and restore entries. A note can use the theme color, an independent fixed color, or a linked palette entry. Linked notes follow palette color changes without rewriting every file. Archive hides an entry from new selections and retains existing links and the last color. **Link existing colors** previews matching planner notes and changes only those you select. **Manage linked notes** reassigns selected notes or disconnects them while keeping their current color.
+In **Color palette**, name colors, change their values, or archive and restore entries. A note can use the theme color, an independent fixed color, or a linked palette entry. Linked notes follow palette color changes without rewriting every file. Archive hides an entry from new selections and retains existing links and the last color. **Link existing colors** previews matching planner notes in the configured scan scope and changes only those you select. **Manage linked notes** reassigns selected notes or disconnects them while keeping their current color.
 
 **Holiday color** supports theme, fixed and linked palette colors across planner views. Linked notes store `diary_color_id` and a fallback `color`; if the palette entry is unavailable, the fallback is used. `date_start` and `date_end` remain ISO dates.
 
@@ -67,10 +67,10 @@ The screenshots use temporary demo notes for all-day, timed, range, todo, and pl
 - **3-day planner**: Compare three consecutive days in parallel columns on one 24-hour timeline. Narrow screens use horizontal scrolling instead of compressing the day columns.
 - **Direct view selector**: Switch directly among yearly, monthly grid, monthly list, daily, and 3-day views. On narrow screens it stays visible while secondary actions move into **More**.
 - **Right sidebar planner**: Keep a compact monthly planner open in the right sidebar while notes remain open in the main workspace.
-- **Plan note panel**: Create and preview yearly notes (`YYYY.md`) and monthly notes (`YYYY-MM.md`) above the planner. Preview expanded/collapsed state is saved, with a separate mobile state that starts collapsed.
+- **Plan note panel**: Create and preview yearly and monthly notes above the planner, initially named `YYYY.md` and `YYYY-MM.md`. Preview expanded/collapsed state is saved, with a separate mobile state that starts collapsed.
 - **Date and range notes**: Display notes as planner chips based on single-date and date-range filenames. Diary scans the whole vault by default, or only the planner folder when configured.
 - **Recurring events**: Repeat every N days, weeks, months, or years using a Gregorian or alternate-calendar basis. Occurrences remain virtual until selected and converted to Markdown notes.
-- **Color, todo, and completion state**: Reflect `color`, `todo`, and `completed` frontmatter in chip styling and labels.
+- **Color, todo, and completion state**: Reflect `diary_color_id`, `color`, `todo`, and `completed` frontmatter in chip styling and labels.
 - **Holiday overlays**: Show country-specific public holidays for the supported UI-language regions and select holiday badges to see their names.
 - **Alternate calendar label**: Show one secondary date label at a time. Available calendars include Korean lunar, Chinese lunar, Dangi, Hebrew, Islamic, Persian, Indian national, Buddhist, Japanese era, Minguo, Coptic, and Ethiopic.
 - **Custom calendar overlay**: Create local fantasy or campaign calendar profiles with custom months, weekdays, and simple leap rules. Diary shows the custom date as an overlay label. Note filenames follow the configured date formats; date values remain Gregorian.
@@ -185,9 +185,9 @@ On desktop, drag across date cells to prefill a **Range** modal. On mobile, sele
 
 Use the plan note panel above each planner to create yearly or monthly planning notes.
 
-- Yearly plan note: `{plannerFolder}/{year}.md`
-- Monthly plan note: `{plannerFolder}/{year}-{month}.md`
-- In Diary settings, set **Yearly plan note path** or **Monthly plan note path** to a vault-relative template such as `Notes/Yearly/YYYY.md` or `Notes/Monthly/YYYY-MM.md`. `YYYY` is the four-digit year and `MM` is the two-digit month. Leave either setting empty to keep its default path. Nested folders are created when you create a note.
+- Initial yearly plan note path: `{plannerFolder}/{year}.md`
+- Initial monthly plan note path: `{plannerFolder}/{year}-{month}.md`
+- Leave a plan note path empty to use the corresponding monthly or yearly creation default in **Planner folder**. A nonempty **Yearly plan note path** or **Monthly plan note path** overrides that default with a vault-relative template, such as `Notes/Yearly/YYYY-[Year].md` or `Notes/Monthly/YYYY-[M]MM.md`. `YYYY` is the four-digit year; monthly paths also use the two-digit month `MM`. New or edited templates support `[literal text]`; existing templates retain their old interpretation until edited. The settings show the resolved path, and Diary creates nested folders when needed.
 - The panel can be collapsed or expanded, and that state is saved in plugin data.
 - Desktop and mobile keep separate panel state: desktop defaults expanded, while mobile defaults collapsed until you expand it.
 - If the plan note already exists, Diary shows a preview and an open button.
@@ -255,10 +255,12 @@ Paste rules:
 | Language | Plugin UI language. Default: `en`. Supports `en`, `de`, `es`, `fr`, `ja`, `zh-CN`, `zh-TW`, and `ko`. |
 | Planner folder | Default folder for new planner notes and plan notes unless a plan note path is set. Also used when scan scope is set to planner folder only. Default: `Planner`. |
 | Week starts on | Sunday or Monday for the monthly grid. Default: Sunday. |
-| Yearly plan note path | Optional vault-relative template using `YYYY`. |
-| Monthly plan note path | Optional vault-relative template using `YYYY` and `MM`. |
+| Yearly plan note path | Optional vault-relative `.md` template with `YYYY` and `[literal text]`. Overrides the yearly creation default; empty uses that default in **Planner folder**. |
+| Monthly plan note path | Optional vault-relative `.md` template with `YYYY`, `MM`, and `[literal text]`. Overrides the monthly creation default; empty uses that default in **Planner folder**. |
 | Planner note scan scope | Controls whether Diary finds planner notes across the entire vault or only inside **Planner folder** and its subfolders. Default: `Entire vault`. |
-| Date formats | Recognizes several formats and chooses one creation default for daily, monthly and yearly notes. |
+| Date formats | Recognizes several filename formats and chooses one creation default separately for daily, monthly and yearly notes. |
+| Color palette | Names and edits linked colors, archives or restores entries, and selectively links, reassigns or disconnects existing notes. |
+| Holiday color | Uses the theme color, an independent fixed color or a linked palette entry across planner views. |
 | Show holidays | Turns holiday rendering on or off. |
 | Holiday country | Holiday country. Supports `KR`, `US`, `JP`, `CN`, `GB`, `DE`, `ES`, `FR`, `AU`, `CA`, `TW`, and `None`. |
 | Calendar overlay | Selects one built-in alternate calendar or one custom calendar profile for yearly, monthly grid, monthly list, day summary, and sidebar planner views. Default: `None`. |
@@ -274,7 +276,7 @@ Diary also stores UI-only state in plugin data: plan note preview expansion, mob
 
 | Key | Description |
 | --- | --- |
-| `color` | Chip color. Any valid CSS color string can be used. Examples: `#22c55e`, `red`, `rgb(34, 197, 94)` |
+| `color` | Fixed chip color or fallback for a linked color. Accepts valid CSS colors, such as `#22c55e`, `red`, or `rgb(34, 197, 94)`. Legacy lists use the first entry. |
 | `diary_color_id` | Palette entry ID. The current linked color takes priority over the fallback `color` value. |
 | `diary_color_inherit` | A recurring occurrence uses the source note color when true. Choosing its own theme, fixed or palette color removes inheritance. |
 | `todo` | Shows the note as a todo chip when `true`. |
@@ -307,7 +309,7 @@ Recurring occurrences are virtual by default. Creating one from its planner moda
 
 ## Filename rules
 
-Diary scans Markdown files across the vault by default and displays notes whose filenames match these rules. In settings, you can limit scanning to the configured **Planner folder** and its subfolders. Newly created notes go into the configured **Planner folder** by default.
+Diary scans Markdown files across the vault by default and displays notes whose filenames match a configured daily recognition format. The examples below use the initial ISO formats; monthly and yearly plan notes use their separate format groups. In settings, you can limit scanning to the configured **Planner folder** and its subfolders. Newly created notes go into the configured **Planner folder** by default.
 
 Single date:
 
@@ -343,7 +345,7 @@ When you create or edit planner note titles, spaces in the visible title are pre
 
 ## Development
 
-Use npm for this repository. The CI build matrix currently validates Node.js `20.x` and `22.x`; local development also works on the current LTS release.
+Use npm for this repository. The CI build matrix currently validates Node.js `20.x` and `22.x`; local development also works on the current LTS release. See the [development guide](../development.md) for date-format, color, testing, and release rules.
 
 ```bash
 npm install
@@ -368,7 +370,7 @@ Design document lint:
 npm run design:lint
 ```
 
-Test:
+Regression and locale consistency checks:
 
 ```bash
 npm test
