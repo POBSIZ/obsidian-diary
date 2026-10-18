@@ -83,7 +83,8 @@ Obsidian CSS 변수(`--background-*`, `--text-*`, `--interactive-*`)를 따르�
 런타임 UI의 기준은 `styles.css`의 Obsidian 연동 변수와 플래너 토큰,
 `src/ui/components.ts` 및 `src/views/planner-components.ts`의 공통 구성 요소다.
 토큰이나 구성 요소의 동작을 바꿀 때는 이 문서도 같은 변경에서 갱신한다.
-배포와 검증 결과는 [1.23.1 작업 기록](docs/releases/1.23.1.md)에 정리한다.
+날짜 형식·색상 변경의 배포와 검증 결과는 [1.23.1 작업 기록](docs/releases/1.23.1.md),
+다국어 문구·좁은 화면 개선의 결과는 [1.24.0 작업 기록](docs/releases/1.24.0.md)에 정리한다.
 
 ## Colors
 

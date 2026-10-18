@@ -44,6 +44,8 @@ Diary는 Obsidian 볼트의 일반 Markdown 노트를 연간·월간·일간·3�
 
 Older changes are listed on the [Releases page](https://github.com/POBSIZ/obsidian-diary/releases). The [1.23.1 release record](docs/releases/1.23.1.md) covers migration, verification, and the follow-up for issues #4 and #5.
 
+The [1.24.0 release record](docs/releases/1.24.0.md) covers multilingual copy, screen checks, and Community distribution verification.
+
 ## Screenshots
 
 These screenshots use temporary demo notes for all-day, timed, range, todo, and plan entries. The demo folder was removed after capture.
