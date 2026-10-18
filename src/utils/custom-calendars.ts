@@ -239,19 +239,19 @@ export function validateCustomCalendarProfile(
 	profile: CustomCalendarProfile,
 ): ValidationResult {
 	const errors: string[] = [];
-	if (!profile.name.trim()) errors.push("Name is required.");
+	if (!profile.name.trim()) errors.push("settings.customCalendarError.nameRequired");
 	if (!isValidDateString(profile.epoch.gregorianDate)) {
-		errors.push("Epoch Gregorian date must use YYYY-MM-DD.");
+		errors.push("settings.customCalendarError.epochDateInvalid");
 	}
 	if (!Number.isInteger(profile.epoch.year) || profile.epoch.year === 0) {
-		errors.push("Epoch year must be a non-zero integer.");
+		errors.push("settings.customCalendarError.epochYearInvalid");
 	}
 	if (
 		!Number.isInteger(profile.epoch.month) ||
 		profile.epoch.month < 1 ||
 		profile.epoch.month > profile.months.length
 	) {
-		errors.push("Epoch month is outside the month list.");
+		errors.push("settings.customCalendarError.epochMonthInvalid");
 	}
 	const epochMonth = profile.months[profile.epoch.month - 1];
 	if (
@@ -260,42 +260,42 @@ export function validateCustomCalendarProfile(
 		profile.epoch.day < 1 ||
 		profile.epoch.day > getMonthLength(profile, profile.epoch.year, profile.epoch.month)
 	) {
-		errors.push("Epoch day is outside the selected month.");
+		errors.push("settings.customCalendarError.epochDayInvalid");
 	}
 	if (
 		!Number.isInteger(profile.epoch.weekday) ||
 		profile.epoch.weekday < 1 ||
 		profile.epoch.weekday > profile.weekdays.length
 	) {
-		errors.push("Epoch weekday is outside the weekday list.");
+		errors.push("settings.customCalendarError.epochWeekdayInvalid");
 	}
 	if (profile.months.length < 1 || profile.months.length > 24) {
-		errors.push("Use 1-24 months.");
+		errors.push("settings.customCalendarError.monthCountInvalid");
 	}
 	for (const month of profile.months) {
-		if (!month.name.trim()) errors.push("Each month needs a name.");
+		if (!month.name.trim()) errors.push("settings.customCalendarError.monthNameRequired");
 		if (!Number.isInteger(month.days) || month.days < 1 || month.days > 99) {
-			errors.push("Each month length must be 1-99 days.");
+			errors.push("settings.customCalendarError.monthDaysInvalid");
 		}
 	}
 	if (profile.weekdays.length < 1 || profile.weekdays.length > 14) {
-		errors.push("Use 1-14 weekdays.");
+		errors.push("settings.customCalendarError.weekdayCountInvalid");
 	}
 	for (const weekday of profile.weekdays) {
-		if (!weekday.name.trim()) errors.push("Each weekday needs a name.");
+		if (!weekday.name.trim()) errors.push("settings.customCalendarError.weekdayNameRequired");
 	}
 	if (profile.leapRule.type === "every-n-years") {
 		if (profile.leapRule.interval < 2 || profile.leapRule.interval > 100) {
-			errors.push("Leap interval must be 2-100.");
+			errors.push("settings.customCalendarError.leapIntervalInvalid");
 		}
 		if (profile.leapRule.addDays < 1 || profile.leapRule.addDays > 30) {
-			errors.push("Leap days must be 1-30.");
+			errors.push("settings.customCalendarError.leapDaysInvalid");
 		}
 		if (
 			profile.leapRule.month < 1 ||
 			profile.leapRule.month > profile.months.length
 		) {
-			errors.push("Leap month is outside the month list.");
+			errors.push("settings.customCalendarError.leapMonthInvalid");
 		}
 	}
 	return { ok: errors.length === 0, errors };

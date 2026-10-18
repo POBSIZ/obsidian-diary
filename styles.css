@@ -1,7 +1,7 @@
 /*
 This CSS file is included with your plugin, and
 available in the app when your plugin is enabled.
-Diary release version: 1.23.1
+Diary release version: 1.24.0
 */
 
 :where(
@@ -1654,6 +1654,7 @@ button.yearly-planner-month-width-btn:focus-visible {
 .diary-external-calendar-feed-state {
 	display: inline-flex;
 	align-items: center;
+	max-width: 100%;
 	min-height: 1.45rem;
 	padding: 0.15rem 0.45rem;
 	border: 1px solid var(--background-modifier-border);
@@ -1662,7 +1663,8 @@ button.yearly-planner-month-width-btn:focus-visible {
 	color: var(--text-muted);
 	font-size: var(--font-ui-smaller);
 	line-height: 1.2;
-	white-space: nowrap;
+	white-space: normal;
+	overflow-wrap: anywhere;
 }
 
 .diary-calendar-settings-pill.is-active {
@@ -2073,6 +2075,18 @@ button.yearly-planner-month-width-btn:focus-visible {
 .diary-external-calendar-feed-controls .setting-item-control {
 	flex-wrap: wrap;
 	gap: 0.35rem;
+}
+
+.diary-feedback-setting .setting-item-control {
+	min-width: 0;
+	flex-wrap: wrap;
+}
+
+.diary-feedback-setting .setting-item-control button {
+	max-width: 100%;
+	height: auto;
+	white-space: normal;
+	overflow-wrap: anywhere;
 }
 
 @media (max-width: 600px) {
@@ -6078,6 +6092,11 @@ body.-is-mobile .diary-feedback-setting {
 	align-items: stretch;
 	flex-direction: column;
 	gap: 0.55rem;
+}
+
+body.is-mobile :is(.diary-calendar-settings-body, .diary-external-calendar-settings-body) > .setting-item,
+body.-is-mobile :is(.diary-calendar-settings-body, .diary-external-calendar-settings-body) > .setting-item {
+	padding-inline: 0;
 }
 
 body.is-mobile .diary-feedback-setting .setting-item-control,

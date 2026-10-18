@@ -329,7 +329,7 @@ export class MonthlyPlannerView
 		);
 		const locale = this.plugin.settings.locale ?? "en";
 		const monthLabel = getMonthLabel(locale, this.month);
-		const label = `${monthLabel} ${this.year}`;
+		const label = t("view.monthlyDisplayText", { year: this.year, month: monthLabel });
 		await renderPlanNotePanel(container, this.app, filePath, this, {
 			existingNotes: candidates,
 			ambiguousNotes: ambiguous,

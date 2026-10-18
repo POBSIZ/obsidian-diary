@@ -1,6 +1,6 @@
 ---
 version: "alpha"
-lastReviewedPluginVersion: "1.23.1"
+lastReviewedPluginVersion: "1.24.0"
 name: "Diary Planner UI"
 description: "Obsidian-native planner visuals for yearly, monthly, monthly list, daily, 3-day, recurrence, calendar overlays, external calendar overlays, and compact sidebar views."
 colors:
@@ -67,7 +67,7 @@ Diary의 화면은 Obsidian 테마 안에서 이질감 없이 보여야 한다. 
 Obsidian CSS 변수(`--background-*`, `--text-*`, `--interactive-*`)를 따르고,
 모양과 간격은 플러그인의 공통 토큰으로 맞춘다.
 
-이 문서는 `1.23.1`의 연간·월간·목록·일별·3일 플래너와 오른쪽 사이드바,
+이 문서는 `1.24.0`의 연간·월간·목록·일별·3일 플래너와 오른쪽 사이드바,
 공통 헤더, 기간 이동, 반복 일정, 기본 제공·사용자 지정 캘린더, 외부 캘린더,
 파일 옵션 모달, 다국어 UI, 키보드 접근성에 적용되는 기준을 정리한다.
 
@@ -161,6 +161,11 @@ frontmatter의 `colors`는 디자인 도구가 참조할 기준 팔레트다. �
 내비게이션 높이, 내비게이션 막대 오프셋, 안전 영역을 합산한 여유 공간 위에 둔다.
 **Mobile bottom padding**은 이 자동 계산을 끄는 설정이 아니라 사용자가 원하는
 최소 여백이다. 실제 여백에는 자동 계산값과 설정값 중 큰 값을 쓴다.
+
+설정의 달력 상태 배지와 피드백 버튼은 긴 번역도 줄바꿈해 표시한다. 좁은
+설정 창에서도 라벨이 잘리거나 가로 스크롤이 생기지 않도록 한다.
+모바일 달력 설정은 카드와 항목의 가로 여백이 중복되지 않게 한다. 월간 화면의
+기간과 계획 노트 제목은 해당 언어의 월·연도 표시 형식을 따른다.
 
 오른쪽 사이드바 플래너는 데스크톱에서도 컴팩트 레이아웃을 사용한다. 폭이 좁은
 사이드 리프에서는 일자 요약 시트를 중심으로 월간 그리드를 탐색한다. 노트는 메인

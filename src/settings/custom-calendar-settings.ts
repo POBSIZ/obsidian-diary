@@ -716,7 +716,7 @@ class CustomCalendarProfileModal extends Modal {
 		const profile = this.readProfile();
 		const result = profile
 			? validateCustomCalendarProfile(profile)
-			: { ok: false, errors: [t("settings.customCalendarInvalid")] };
+			: { ok: false, errors: ["settings.customCalendarInvalid"] };
 		const showLeap = this.leapTypeSelect.value === "every-n-years";
 		this.leapMonthInput.max = String(
 			Math.max(1, profile?.months.length ?? this.working.months.length),
@@ -725,7 +725,7 @@ class CustomCalendarProfileModal extends Modal {
 		this.leapAddDaysRow.toggleClass("is-hidden", !showLeap);
 		this.leapMonthRow.toggleClass("is-hidden", !showLeap);
 		this.saveBtn.disabled = !result.ok;
-		this.errorEl.setText(result.errors.join("\n"));
+		this.errorEl.setText(result.errors.map((key) => t(key)).join("\n"));
 		this.errorEl.toggleClass("is-hidden", result.ok);
 		this.renderPreview(profile, result.ok);
 	}

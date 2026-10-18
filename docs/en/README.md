@@ -9,7 +9,7 @@ Full documentation: [English](https://github.com/POBSIZ/obsidian-diary/blob/main
 | Item | Value |
 | --- | --- |
 | Plugin ID | `diary` |
-| Current version | `1.23.1` |
+| Current version | `1.24.0` |
 | Minimum Obsidian version | `1.7.2` |
 | Supported platforms | Desktop / mobile (`isDesktopOnly: false`) |
 | Default language | `en` |
@@ -17,6 +17,7 @@ Full documentation: [English](https://github.com/POBSIZ/obsidian-diary/blob/main
 
 ## What's new
 
+- `1.24.0`: Improves UI wording in all eight languages, translates custom calendar validation errors, fixes clipped settings labels on narrow screens, and localizes month–year headings.
 - `1.23.1`: Preserves the first entry of legacy `color` lists for display and palette linking.
 - `1.23.0`: Adds multiple recognized date formats with separate creation defaults, named linked colors and a configurable holiday color.
 - `1.22.0`: Shows a fixed six-week monthly grid with adjacent-month dates, notes, events and holidays. Date selection and note creation use the actual selected date, including across year boundaries.
@@ -27,7 +28,7 @@ For earlier changes, see the [Releases page](https://github.com/POBSIZ/obsidian-
 
 ## Date formats and linked colors
 
-In **Date formats**, add recognition formats separately for daily, monthly and yearly notes, then choose one **Creation default** in each group. `YYYY-[M]MM-DD` creates `2026-M10-13.md`; `YYYY-[M]MM` creates `2026-M10.md`; `YYYY-[Year]` creates `2026-Year.md`. Supported tokens are `YYYY`, `MM` and `DD`, with literal text in brackets. Enter filename patterns without a folder path or `.md` extension.
+In **Date formats**, add recognition formats separately for daily, monthly and yearly notes, then choose one **New note format** in each group. `YYYY-[M]MM-DD` creates `2026-M10-13.md`; `YYYY-[M]MM` creates `2026-M10.md`; `YYYY-[Year]` creates `2026-Year.md`. Supported tokens are `YYYY`, `MM` and `DD`, with literal text in brackets. Enter filename patterns without a folder path or `.md` extension.
 
 Changing a default does not rename existing notes. Moving a note preserves its original format. Before creating a representative note, Diary checks recognized exact filenames in the selected folder; monthly and yearly notes use the folder resolved by their plan note path. When several notes match, you choose which to open. Names with conflicting date interpretations or token layouts are excluded from planner chips and listed in settings. After upgrading, daily creation stays `YYYY-MM-DD`; a valid former date-format setting is added only for recognition. Nonempty yearly/monthly path overrides take priority over their format defaults. Existing path templates keep their earlier interpretation until edited; new or edited templates accept `[literal text]`.
 
@@ -166,7 +167,7 @@ Select a date cell or the add-file button, then use **Single date**.
 - New filenames use the daily creation default, initially `YYYY-MM-DD.md`.
 - Add a suffix to use it as the chip title. Example: `2026-05-19-mobile-qa.md` -> `mobile-qa`
 - Set a color to display a chip border or mobile dot.
-- Enable **Todo file** to show todo state on the chip.
+- Enable **To-do file** to show todo state on the chip.
 - Set **Reminder time** to save `notify_minutes` frontmatter.
 - Enable **Repeat**, choose **Daily**, **Weekly**, **Monthly**, or **Yearly**, enter an interval from 1 to 999, then choose a calendar basis and optional inclusive end date. This supports every N days, weeks, months, or years. Future occurrences appear as virtual planner items without creating files.
 

@@ -9,7 +9,7 @@ Documentación completa: [English](https://github.com/POBSIZ/obsidian-diary/blob
 | Elemento | Valor |
 | --- | --- |
 | ID del plugin | `diary` |
-| Versión actual | `1.23.1` |
+| Versión actual | `1.24.0` |
 | Versión mínima de Obsidian | `1.7.2` |
 | Plataformas | Escritorio / móvil (`isDesktopOnly: false`) |
 | Idioma predeterminado | `en` |
@@ -17,6 +17,7 @@ Documentación completa: [English](https://github.com/POBSIZ/obsidian-diary/blob
 
 ## Novedades
 
+- `1.24.0`: Mejora los textos de la interfaz en los ocho idiomas, traduce los errores de los calendarios personalizados, evita que las etiquetas de ajustes se corten en pantallas estrechas y adapta los encabezados de mes y año al idioma.
 - `1.23.1`: Conserva el primer color de las listas `color` existentes para mostrarlo y vincularlo a la paleta.
 - `1.23.0`: Añade varios formatos de fecha reconocidos con formatos de creación separados, colores vinculados con nombre y color de festivos configurable.
 - `1.22.0`: Muestra una cuadrícula mensual fija de seis semanas con fechas, notas, eventos y festivos de los meses adyacentes. La selección y creación de notas usan la fecha real, incluso entre años.
@@ -93,7 +94,7 @@ Las capturas usan una carpeta temporal con notas de todo el día, con hora, de r
 
 1. Ejecuta **Open monthly planner in sidebar** para el planificador lateral o **Open monthly planner** para una pestaña completa.
 2. Selecciona el botón de añadir archivo en el encabezado o una celda de fecha.
-3. Elige **Single date** o **Rango**.
+3. Elige **Single date** o **Período**.
 4. Introduce carpeta, fechas, nombre de archivo, color, estado de tarea, hora de recordatorio y repetición opcional.
 5. Selecciona **Crear**. Diary crea una nota Markdown y la muestra como chip o barra de rango.
 
@@ -172,7 +173,7 @@ Selecciona una celda de fecha o el botón de añadir archivo y usa **Single date
 
 ### Notas de rango
 
-En escritorio, arrastra sobre celdas de fecha para rellenar un modal de **Rango**. En móvil, selecciona añadir archivo, elige **Rango** e introduce inicio y fin manualmente.
+En escritorio, arrastra sobre celdas de fecha para rellenar un modal de **Período**. En móvil, selecciona añadir archivo, elige **Período** e introduce inicio y fin manualmente.
 
 - Los rangos usan el formato diario para ambas fechas, unidas por `--`. El formato inicial es `YYYY-MM-DD--YYYY-MM-DD.md`.
 - Añade un sufijo para usarlo como título del rango. Ejemplo: `2026-05-21--2026-05-24-family-trip.md` -> `family-trip`

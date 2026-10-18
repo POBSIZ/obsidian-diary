@@ -9,7 +9,7 @@ Vollständige Dokumentation: [English](https://github.com/POBSIZ/obsidian-diary/
 | Eintrag | Wert |
 | --- | --- |
 | Plugin-ID | `diary` |
-| Aktuelle Version | `1.23.1` |
+| Aktuelle Version | `1.24.0` |
 | Minimale Obsidian-Version | `1.7.2` |
 | Plattformen | Desktop / Mobil (`isDesktopOnly: false`) |
 | Standardsprache | `en` |
@@ -17,6 +17,7 @@ Vollständige Dokumentation: [English](https://github.com/POBSIZ/obsidian-diary/
 
 ## Änderungen
 
+- `1.24.0`: Überarbeitet die Oberflächentexte in allen acht Sprachen, übersetzt Fehlermeldungen für eigene Kalender, behebt abgeschnittene Einstellungsbeschriftungen bei schmalen Fenstern und passt Monats- und Jahresüberschriften an die gewählte Sprache an.
 - `1.23.1`: Behält bei vorhandenen `color`-Listen den ersten Farbwert für die Anzeige und die Verknüpfung mit der Palette bei.
 - `1.23.0`: Mehrere erkannte Datumsformate mit getrennten Erstellungsformaten, benannte verknüpfte Farben und eine einstellbare Feiertagsfarbe.
 - `1.22.0`: Zeigt ein festes Monatsraster mit sechs Wochen und den Daten, Notizen, Terminen und Feiertagen angrenzender Monate. Auswahl und Notizerstellung verwenden auch über Jahresgrenzen hinweg das tatsächliche Datum.

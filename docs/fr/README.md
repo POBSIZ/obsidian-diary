@@ -9,7 +9,7 @@ Documentation complète : [English](https://github.com/POBSIZ/obsidian-diary/blo
 | Élément | Valeur |
 | --- | --- |
 | ID du plugin | `diary` |
-| Version actuelle | `1.23.1` |
+| Version actuelle | `1.24.0` |
 | Version minimale d’Obsidian | `1.7.2` |
 | Plateformes | Bureau / mobile (`isDesktopOnly: false`) |
 | Langue par défaut | `en` |
@@ -17,6 +17,7 @@ Documentation complète : [English](https://github.com/POBSIZ/obsidian-diary/blo
 
 ## Nouveautés
 
+- `1.24.0`: Améliore les textes de l’interface dans les huit langues, traduit les erreurs des calendriers personnalisés, corrige les libellés tronqués dans les fenêtres étroites et adapte les titres de mois et d’année à la langue choisie.
 - `1.23.1`: Conserve la première couleur des anciennes listes `color` pour l’affichage et la liaison à la palette.
 - `1.23.0`: Ajoute plusieurs formats de date reconnus avec des formats de création distincts, des couleurs liées nommées et une couleur réglable pour les jours fériés.
 - `1.22.0`: Affiche une grille mensuelle fixe de six semaines avec les dates, notes, événements et jours fériés des mois voisins. La sélection et la création de notes utilisent la date réelle, même entre deux années.

@@ -130,7 +130,7 @@ export function renderMonthlyPlannerHeader(
 			onClick: callbacks.onNext,
 		},
 		period: {
-			text: `${ctx.monthLabel} ${ctx.year}`,
+			text: t("view.monthlyDisplayText", { year: ctx.year, month: ctx.monthLabel }),
 			label: t("header.clickToEnterMonthYear"),
 			title: t("header.clickToEnterMonthYear"),
 			onClick: openMonthYearModal,
