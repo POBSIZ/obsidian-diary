@@ -1,5 +1,7 @@
 # Diary
 
+[![Sponsor on GitHub](https://img.shields.io/badge/Sponsor-GitHub-ea4aaa?style=for-the-badge&logo=githubsponsors&logoColor=white)](https://github.com/sponsors/POBSIZ)
+
 Diary turns ordinary Markdown notes into yearly, monthly, daily, and 3-day planner views in Obsidian.
 
 Diary는 Obsidian 볼트의 일반 Markdown 노트를 연간·월간·일간·3일 플래너로 보여주는 커뮤니티 플러그인입니다.
