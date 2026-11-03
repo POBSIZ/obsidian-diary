@@ -377,6 +377,8 @@
 	"externalEvent.copySuccess": "Copied event details.",
 	"externalEvent.createSuccess": "Created Markdown note from external event.",
 	"externalEvent.createFailed": "Could not create note: {message}",
+	"settings.sidebarDefaultView": "Sidebar default view",
+	"settings.sidebarDefaultViewDesc": "Choose the view for a new sidebar planner. Changing this setting also switches the current sidebar. On restart, the last view is restored.",
 	"settings.weekStart": "Week starts on",
 	"settings.weekStartDesc": "Choose the first day in the monthly calendar.",
 	"settings.sunday": "Sunday",

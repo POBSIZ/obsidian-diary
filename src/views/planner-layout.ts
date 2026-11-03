@@ -12,7 +12,7 @@ export type PlannerViewMode =
 	| "daily"
 	| "threeDay";
 
-const VIEW_OPTIONS: readonly {
+export const PLANNER_VIEW_OPTIONS: readonly {
 	mode: PlannerViewMode;
 	icon: string;
 	labelKey: string;
@@ -260,8 +260,8 @@ export function renderPlannerViewSwitcher(
 	onSelect: (mode: PlannerViewMode) => void,
 ): HTMLDetailsElement {
 	const current =
-		VIEW_OPTIONS.find((option) => option.mode === currentMode) ??
-		VIEW_OPTIONS[0]!;
+		PLANNER_VIEW_OPTIONS.find((option) => option.mode === currentMode) ??
+		PLANNER_VIEW_OPTIONS[0]!;
 	const details = parent.createEl("details", {
 		cls: "planner-view-switcher",
 	});
@@ -294,7 +294,7 @@ export function renderPlannerViewSwitcher(
 		cls: "planner-view-switcher-heading",
 		text: t("viewSwitcher.title"),
 	});
-	for (const option of VIEW_OPTIONS) {
+	for (const option of PLANNER_VIEW_OPTIONS) {
 		const item = createUiButton(popover, {
 			classes: [
 				"planner-view-switcher-item",

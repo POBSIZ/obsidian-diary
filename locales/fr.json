@@ -376,6 +376,8 @@
 	"externalEvent.copySuccess": "Détails de l’événement copiés.",
 	"externalEvent.createSuccess": "Note Markdown créée à partir de l’événement externe.",
 	"externalEvent.createFailed": "Impossible de créer la note : {message}",
+	"settings.sidebarDefaultView": "Vue par défaut du panneau latéral",
+	"settings.sidebarDefaultViewDesc": "Choisissez la vue d’un nouveau planning latéral. Ce réglage change aussi la vue du panneau actuel. Au redémarrage, la dernière vue est restaurée.",
 	"settings.weekStart": "Début de la semaine",
 	"settings.weekStartDesc": "Premier jour dans la grille mensuelle.",
 	"settings.sunday": "Dimanche",

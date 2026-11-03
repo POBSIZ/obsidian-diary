@@ -376,6 +376,8 @@
 	"externalEvent.copySuccess": "已複製事件詳細資料。",
 	"externalEvent.createSuccess": "已從外部事件建立 Markdown 筆記。",
 	"externalEvent.createFailed": "無法建立筆記：{message}",
+	"settings.sidebarDefaultView": "側邊欄預設檢視",
+	"settings.sidebarDefaultViewDesc": "選擇新建側邊欄規劃器時使用的檢視。變更此設定也會切換目前側邊欄的檢視。重新啟動時還原上次的檢視。",
 	"settings.weekStart": "每週起始日",
 	"settings.weekStartDesc": "選擇月度網格每週從星期幾開始。",
 	"settings.sunday": "星期日",

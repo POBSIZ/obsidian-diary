@@ -377,6 +377,8 @@
 	"externalEvent.copySuccess": "일정 정보를 복사했습니다.",
 	"externalEvent.createSuccess": "외부 일정으로 Markdown 노트를 만들었습니다.",
 	"externalEvent.createFailed": "노트를 만들지 못했습니다: {message}",
+	"settings.sidebarDefaultView": "사이드바 기본 화면",
+	"settings.sidebarDefaultViewDesc": "새 사이드바 플래너의 화면을 선택합니다. 설정을 바꾸면 현재 사이드바도 전환됩니다. 재시작 시에는 마지막 화면을 복원합니다.",
 	"settings.weekStart": "한 주의 시작 요일",
 	"settings.weekStartDesc": "월간 달력의 첫 요일을 선택합니다.",
 	"settings.sunday": "일요일",

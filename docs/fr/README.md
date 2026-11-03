@@ -9,7 +9,7 @@ Documentation complète : [English](https://github.com/POBSIZ/obsidian-diary/blo
 | Élément | Valeur |
 | --- | --- |
 | ID du plugin | `diary` |
-| Version actuelle | `1.24.0` |
+| Version actuelle | `1.25.0` |
 | Version minimale d’Obsidian | `1.7.2` |
 | Plateformes | Bureau / mobile (`isDesktopOnly: false`) |
 | Langue par défaut | `en` |
@@ -17,6 +17,7 @@ Documentation complète : [English](https://github.com/POBSIZ/obsidian-diary/blo
 
 ## Nouveautés
 
+- `1.25.0`: Ajoute une vue par défaut du panneau latéral : année, calendrier mensuel, liste mensuelle, jour ou 3 jours. Les nouveaux panneaux utilisent le calendrier mensuel ; les panneaux restaurés gardent leur dernière vue.
 - `1.24.0`: Améliore les textes de l’interface dans les huit langues, traduit les erreurs des calendriers personnalisés, corrige les libellés tronqués dans les fenêtres étroites et adapte les titres de mois et d’année à la langue choisie.
 - `1.23.1`: Conserve la première couleur des anciennes listes `color` pour l’affichage et la liaison à la palette.
 - `1.23.0`: Ajoute plusieurs formats de date reconnus avec des formats de création distincts, des couleurs liées nommées et une couleur réglable pour les jours fériés.
@@ -128,6 +129,8 @@ Utilisez précédent/suivant pour changer d’année ou de mois, et l’icône d
 ## Planificateur latéral droit
 
 Diary crée un planificateur mensuel compact dans la barre latérale droite lorsque l’espace de travail est prêt. Utilisez **Open monthly planner in sidebar** pour le faire réapparaître.
+
+Dans **Paramètres → Diary → Vue par défaut du panneau latéral**, choisissez année, calendrier mensuel, liste mensuelle, jour ou 3 jours. Le calendrier mensuel est sélectionné par défaut. Ce choix s’applique aux nouveaux plannings latéraux ; sa modification change aussi le panneau actuel. Au redémarrage, la dernière vue est restaurée. Les boutons du ruban gardent leur fonction.
 
 Cette vue sert d’accompagnement :
 

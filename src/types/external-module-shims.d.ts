@@ -227,6 +227,7 @@ declare module "obsidian" {
 	export interface WorkspaceLeaf {
 		view: View;
 		getRoot(): unknown;
+		getViewState(): ViewState;
 		setViewState(state: ViewState): Promise<void>;
 		openFile(file: TFile): Promise<void>;
 		detach(): void;

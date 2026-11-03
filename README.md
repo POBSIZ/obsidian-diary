@@ -11,7 +11,7 @@ Diary는 Obsidian 볼트의 일반 Markdown 노트를 연간·월간·일간·3�
 | Item | Value |
 | --- | --- |
 | Plugin ID | `diary` |
-| Version | `1.24.0` |
+| Version | `1.25.0` |
 | Minimum Obsidian version | `1.7.2` |
 | Platforms | Desktop and mobile (`isDesktopOnly: false`) |
 | Default language | `en` |
@@ -19,6 +19,7 @@ Diary는 Obsidian 볼트의 일반 Markdown 노트를 연간·월간·일간·3�
 
 ## What's new
 
+- `1.25.0`: Adds a sidebar default view setting with yearly, monthly calendar, monthly list, daily and 3-day options. New sidebars use monthly calendar by default; restored sidebars keep their last view.
 - `1.24.0`: Improves UI wording in all eight languages, translates custom calendar validation errors, fixes clipped settings labels on narrow screens, and localizes month–year headings.
 - `1.23.1`: Preserves the first entry of legacy `color` lists for display and palette linking.
 - `1.23.0`: Recognizes multiple date formats with one creation default for each note type. Adds named linked palette colors, selective linking of existing notes, and theme/fixed/palette holiday colors.
@@ -74,7 +75,7 @@ These screenshots use temporary demo notes for all-day, timed, range, todo, and 
 - 3-day planner: compare three consecutive days in parallel columns on the same 24-hour timeline. Narrow screens keep readable column widths with horizontal scrolling.
 - Direct view selector: switch directly among yearly, monthly grid, monthly list, daily, and 3-day views. In narrow layouts it remains visible while secondary actions move into **More**.
 - Monthly grid: always shows six weeks (42 dates), including adjacent-month notes, events and holidays. Muted backgrounds and month labels distinguish adjacent dates; actions use the selected date.
-- Sidebar planner: a compact monthly planner opens in the right sidebar by default, can be revealed from the command palette, and can cycle through yearly, monthly grid, and monthly list layouts in the same side leaf. On desktop and mobile, creating or opening a sidebar note uses a new main workspace tab and preserves the planner and existing tabs.
+- Sidebar planner: choose its default view in **Settings → Diary → Sidebar default view** (monthly calendar by default). Yearly, monthly calendar, monthly list, daily, and 3 days are supported. Changing the setting switches the current sidebar; restarting restores the last view. Existing ribbon buttons keep their behavior. On desktop and mobile, creating or opening a sidebar note uses a new main workspace tab and preserves the planner and existing tabs.
 - Date notes and range notes: recognize several configured filename formats and use one creation default; ISO filenames remain the initial defaults. By default Diary scans the entire vault, with an optional planner-folder-only scope. Title suffixes can keep visible spaces.
 - File options: switch an existing planner note between single-date and range modes, choose its folder, and edit the complete date-based filename. Diary moves the file and synchronizes `date_start` / `date_end` metadata.
 - Range title continuity: monthly range bars repeat their title at new week and month boundaries, while yearly cells repeat it at month and year boundaries.

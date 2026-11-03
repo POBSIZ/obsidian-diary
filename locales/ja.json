@@ -376,6 +376,8 @@
 	"externalEvent.copySuccess": "イベント詳細をコピーしました。",
 	"externalEvent.createSuccess": "外部イベントから Markdown ノートを作成しました。",
 	"externalEvent.createFailed": "ノートを作成できませんでした: {message}",
+	"settings.sidebarDefaultView": "サイドバーの既定の表示",
+	"settings.sidebarDefaultViewDesc": "新しいサイドバープランナーの表示を選びます。設定を変更すると現在のサイドバーも切り替わります。再起動時は最後の表示を復元します。",
 	"settings.weekStart": "週の開始日",
 	"settings.weekStartDesc": "月間グリッドの最初の曜日。",
 	"settings.sunday": "日曜日",

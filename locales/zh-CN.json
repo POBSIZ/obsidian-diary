@@ -376,6 +376,8 @@
 	"externalEvent.copySuccess": "已复制事件详情。",
 	"externalEvent.createSuccess": "已从外部事件创建 Markdown 笔记。",
 	"externalEvent.createFailed": "无法创建笔记：{message}",
+	"settings.sidebarDefaultView": "侧边栏默认视图",
+	"settings.sidebarDefaultViewDesc": "选择新建侧边栏计划器时使用的视图。更改此设置也会切换当前侧边栏的视图。重启时恢复上次的视图。",
 	"settings.weekStart": "每周起始日",
 	"settings.weekStartDesc": "选择月度网格每周从星期几开始。",
 	"settings.sunday": "星期日",

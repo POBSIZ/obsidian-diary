@@ -376,6 +376,8 @@
 	"externalEvent.copySuccess": "Ereignisdetails kopiert.",
 	"externalEvent.createSuccess": "Markdown-Notiz aus externem Ereignis erstellt.",
 	"externalEvent.createFailed": "Notiz konnte nicht erstellt werden: {message}",
+	"settings.sidebarDefaultView": "Standardansicht der Seitenleiste",
+	"settings.sidebarDefaultViewDesc": "Wähle die Ansicht für einen neuen Seitenleistenplaner. Eine Änderung wechselt auch die aktuelle Seitenleiste. Beim Neustart wird die letzte Ansicht wiederhergestellt.",
 	"settings.weekStart": "Wochenbeginn",
 	"settings.weekStartDesc": "Erster Wochentag im Monatsraster.",
 	"settings.sunday": "Sonntag",

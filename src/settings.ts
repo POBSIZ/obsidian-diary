@@ -40,6 +40,7 @@ import {
 } from "./utils/external-calendars";
 import { getPlanNotePath, isValidPlanNoteTemplate } from "./utils/plan-note-path";
 import type { PlannerFileScope } from "./views/yearly-planner/file-utils";
+import { PLANNER_VIEW_OPTIONS, type PlannerViewMode } from "./views/planner-layout";
 import {
 	createUiBadge,
 	createUiButton,
@@ -55,6 +56,7 @@ export interface DiaryObsidianSettings {
 	plannerFolder: string;
 	plannerFileScope: PlannerFileScope;
 	weekStart: 0 | 1;
+	sidebarDefaultView: PlannerViewMode;
 	yearlyPlanNotePath: string;
 	monthlyPlanNotePath: string;
 	yearlyPlanNotePathGrammarVersion?: 1 | 2;
@@ -94,6 +96,7 @@ export const DEFAULT_SETTINGS: DiaryObsidianSettings = {
 	plannerFolder: "Planner",
 	plannerFileScope: "vault",
 	weekStart: 0,
+	sidebarDefaultView: "monthly",
 	yearlyPlanNotePath: "",
 	monthlyPlanNotePath: "",
 	dateFormats: DEFAULT_DATE_FORMATS,
@@ -195,6 +198,16 @@ export class DiaryObsidianSettingTab extends PluginSettingTab {
 					type: "dropdown",
 					key: "weekStart",
 					options: { "0": t("settings.sunday"), "1": t("settings.monday") },
+				},
+			},
+			{
+				name: t("settings.sidebarDefaultView"),
+				desc: t("settings.sidebarDefaultViewDesc"),
+				control: {
+					type: "dropdown",
+					key: "sidebarDefaultView",
+					defaultValue: "monthly",
+					options: Object.fromEntries(PLANNER_VIEW_OPTIONS.map((option) => [option.mode, t(option.labelKey)])),
 				},
 			},
 			...(["yearly", "monthly"] as const).map((kind) => ({
@@ -337,6 +350,9 @@ export class DiaryObsidianSettingTab extends PluginSettingTab {
 			case "weekStart":
 				this.plugin.settings.weekStart = Number(value) === 1 ? 1 : 0;
 				break;
+			case "sidebarDefaultView":
+				await this.plugin.setSidebarDefaultView(value);
+				return;
 			case "yearlyPlanNotePath":
 			case "monthlyPlanNotePath": {
 				const kind = key === "yearlyPlanNotePath" ? "yearly" : "monthly";
@@ -476,6 +492,15 @@ export class DiaryObsidianSettingTab extends PluginSettingTab {
 					this.plugin.settings.weekStart = value === "1" ? 1 : 0;
 					await this.plugin.saveSettings();
 				}));
+
+		new Setting(containerEl)
+			.setName(t("settings.sidebarDefaultView"))
+			.setDesc(t("settings.sidebarDefaultViewDesc"))
+			.addDropdown((dropdown) => {
+				for (const option of PLANNER_VIEW_OPTIONS) dropdown.addOption(option.mode, t(option.labelKey));
+				return dropdown.setValue(this.plugin.settings.sidebarDefaultView)
+					.onChange(async (value) => { await this.setControlValue("sidebarDefaultView", value); });
+			});
 
 		for (const kind of ["yearly", "monthly"] as const) {
 			this.renderPlanNotePathSetting(new Setting(containerEl), kind);

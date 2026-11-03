@@ -9,7 +9,7 @@ Documentación completa: [English](https://github.com/POBSIZ/obsidian-diary/blob
 | Elemento | Valor |
 | --- | --- |
 | ID del plugin | `diary` |
-| Versión actual | `1.24.0` |
+| Versión actual | `1.25.0` |
 | Versión mínima de Obsidian | `1.7.2` |
 | Plataformas | Escritorio / móvil (`isDesktopOnly: false`) |
 | Idioma predeterminado | `en` |
@@ -17,6 +17,7 @@ Documentación completa: [English](https://github.com/POBSIZ/obsidian-diary/blob
 
 ## Novedades
 
+- `1.25.0`: Añade una vista predeterminada para la barra lateral: año, calendario mensual, lista mensual, día o 3 días. Las nuevas barras usan el calendario mensual; las restauradas conservan su última vista.
 - `1.24.0`: Mejora los textos de la interfaz en los ocho idiomas, traduce los errores de los calendarios personalizados, evita que las etiquetas de ajustes se corten en pantallas estrechas y adapta los encabezados de mes y año al idioma.
 - `1.23.1`: Conserva el primer color de las listas `color` existentes para mostrarlo y vincularlo a la paleta.
 - `1.23.0`: Añade varios formatos de fecha reconocidos con formatos de creación separados, colores vinculados con nombre y color de festivos configurable.
@@ -128,6 +129,8 @@ Usa anterior/siguiente para moverte entre años o meses, y el icono de calendari
 ## Planificador lateral derecho
 
 Diary crea un planificador mensual compacto en la barra lateral derecha cuando el workspace está listo. Usa **Open monthly planner in sidebar** para mostrarlo de nuevo.
+
+En **Ajustes → Diary → Vista predeterminada de la barra lateral**, elige año, calendario mensual, lista mensual, día o 3 días. La opción predeterminada es el calendario mensual. Se aplica a los nuevos planificadores laterales; cambiarla también cambia el actual. Al reiniciar se restaura la última vista. Los botones de la cinta mantienen su función.
 
 El planificador lateral está pensado como vista de apoyo:
 

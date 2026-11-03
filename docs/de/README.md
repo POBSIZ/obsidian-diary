@@ -9,7 +9,7 @@ Vollständige Dokumentation: [English](https://github.com/POBSIZ/obsidian-diary/
 | Eintrag | Wert |
 | --- | --- |
 | Plugin-ID | `diary` |
-| Aktuelle Version | `1.24.0` |
+| Aktuelle Version | `1.25.0` |
 | Minimale Obsidian-Version | `1.7.2` |
 | Plattformen | Desktop / Mobil (`isDesktopOnly: false`) |
 | Standardsprache | `en` |
@@ -17,6 +17,7 @@ Vollständige Dokumentation: [English](https://github.com/POBSIZ/obsidian-diary/
 
 ## Änderungen
 
+- `1.25.0`: Neue Einstellung für die Standardansicht der Seitenleiste: Jahr, Monatskalender, Monatsliste, Tag oder 3 Tage. Neue Seitenleisten verwenden standardmäßig den Monatskalender; wiederhergestellte behalten die letzte Ansicht.
 - `1.24.0`: Überarbeitet die Oberflächentexte in allen acht Sprachen, übersetzt Fehlermeldungen für eigene Kalender, behebt abgeschnittene Einstellungsbeschriftungen bei schmalen Fenstern und passt Monats- und Jahresüberschriften an die gewählte Sprache an.
 - `1.23.1`: Behält bei vorhandenen `color`-Listen den ersten Farbwert für die Anzeige und die Verknüpfung mit der Palette bei.
 - `1.23.0`: Mehrere erkannte Datumsformate mit getrennten Erstellungsformaten, benannte verknüpfte Farben und eine einstellbare Feiertagsfarbe.
@@ -128,6 +129,8 @@ Mit Zurück/Vorwärts wechselst du Jahre oder Monate. Das Kalender-Icon springt 
 ## Rechter Seitenplaner
 
 Diary erstellt einen kompakten Monatsplaner in der rechten Seitenleiste, sobald der Workspace bereit ist. Mit dem Befehl **Open monthly planner in sidebar** kannst du ihn wieder anzeigen.
+
+Unter **Einstellungen → Diary → Standardansicht der Seitenleiste** kannst du Jahr, Monatskalender, Monatsliste, Tag oder 3 Tage wählen. Standard ist der Monatskalender. Die Auswahl gilt für neue Seitenleistenplaner; Änderungen wechseln auch die aktuelle Seitenleiste. Beim Neustart wird die letzte Ansicht wiederhergestellt. Die Ribbon-Schaltflächen behalten ihre Funktion.
 
 Der Seitenplaner ist als Begleitansicht gedacht:
 

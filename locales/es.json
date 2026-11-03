@@ -376,6 +376,8 @@
 	"externalEvent.copySuccess": "Detalles del evento copiados.",
 	"externalEvent.createSuccess": "Nota Markdown creada desde el evento externo.",
 	"externalEvent.createFailed": "No se pudo crear la nota: {message}",
+	"settings.sidebarDefaultView": "Vista predeterminada de la barra lateral",
+	"settings.sidebarDefaultViewDesc": "Elige la vista para un nuevo planificador lateral. Al cambiar este ajuste también cambia la barra lateral actual. Al reiniciar se restaura la última vista.",
 	"settings.weekStart": "Inicio de la semana",
 	"settings.weekStartDesc": "Primer día en la cuadrícula mensual.",
 	"settings.sunday": "Domingo",

@@ -38,6 +38,7 @@ import { registerPlannerReminders } from "./planner-reminders";
 import { DailyPlannerView } from "./views/daily-planner/view";
 import { ThreeDayPlannerView } from "./views/three-day-planner/view";
 import type { PlannerViewMode } from "./views/planner-layout";
+import { getSidebarPlannerViewState, normalizeSidebarDefaultView } from "./utils/sidebar-planner";
 import { configureDateFormats, normalizeDateFormats } from "./utils/date-formats";
 import { configurePlannerColors, normalizeColorPalette, normalizePlannerColorSelection } from "./utils/planner-colors";
 
@@ -45,6 +46,8 @@ const SIDEBAR_PLANNER_VIEW_TYPES = [
 	VIEW_TYPE_YEARLY_SIDEBAR_PLANNER,
 	VIEW_TYPE_MONTHLY_SIDEBAR_PLANNER,
 	VIEW_TYPE_MONTHLY_LIST_SIDEBAR_PLANNER,
+	VIEW_TYPE_DAILY_PLANNER,
+	VIEW_TYPE_THREE_DAY_PLANNER,
 ] as const;
 
 function normalizeYearlyPlannerExpandedMonths(months: unknown): number[] {
@@ -463,6 +466,7 @@ export default class DiaryObsidian extends Plugin {
 		configurePlannerColors(this.app, this.settings);
 		this.settings.locale = normalizeLocale(this.settings.locale);
 		this.settings.weekStart = this.settings.weekStart === 1 ? 1 : 0;
+		this.settings.sidebarDefaultView = normalizeSidebarDefaultView(this.settings.sidebarDefaultView);
 		const legacyEnabledAlternateCalendars =
 			this.settings.enabledAlternateCalendars;
 		const legacyShowLunarDates = this.settings.showLunarDates;
@@ -519,6 +523,7 @@ export default class DiaryObsidian extends Plugin {
 	}
 
 	async saveSettings() {
+		this.settings.sidebarDefaultView = normalizeSidebarDefaultView(this.settings.sidebarDefaultView);
 		this.settings.dateFormats = normalizeDateFormats(this.settings.dateFormats);
 		this.settings.colorPalette = normalizeColorPalette(this.settings.colorPalette);
 		this.settings.holidayColor = normalizePlannerColorSelection(this.settings.holidayColor);
@@ -746,6 +751,18 @@ export default class DiaryObsidian extends Plugin {
 		}
 	}
 
+	async setSidebarDefaultView(value: unknown): Promise<void> {
+		this.settings.sidebarDefaultView = normalizeSidebarDefaultView(value);
+		await this.saveSettings();
+		const leaf = this.findPlannerSidebarLeaf();
+		if (leaf) {
+			await leaf.setViewState({
+				...getSidebarPlannerViewState(this.settings.sidebarDefaultView, leaf.getViewState().state),
+				active: false,
+			});
+		}
+	}
+
 	private async ensureMonthlyPlannerSidebarLeaf(options: {
 		year?: number;
 		month?: number;
@@ -782,22 +799,24 @@ export default class DiaryObsidian extends Plugin {
 			return existingLeaf;
 		}
 
+		const initialView = getSidebarPlannerViewState(
+			hasExplicitDate ? "monthly" : normalizeSidebarDefaultView(this.settings.sidebarDefaultView),
+			state,
+		);
 		const sideLeafOptions: {
 			active: boolean;
 			reveal: boolean;
 			split: boolean;
-			state?: { year: number; month: number };
+			state: { year: number; month?: number; day?: number };
 		} = {
 			active: options.active,
 			reveal: options.reveal,
 			split: false,
+			state: initialView.state,
 		};
-		if (state) {
-			sideLeafOptions.state = state;
-		}
 
 		const leaf = await this.app.workspace.ensureSideLeaf(
-			VIEW_TYPE_MONTHLY_SIDEBAR_PLANNER,
+			initialView.type,
 			"right",
 			sideLeafOptions,
 		);
@@ -807,15 +826,14 @@ export default class DiaryObsidian extends Plugin {
 	}
 
 	private findPlannerSidebarLeaf(): WorkspaceLeaf | null {
-		const leaves = SIDEBAR_PLANNER_VIEW_TYPES.flatMap((type) =>
-			this.app.workspace.getLeavesOfType(type),
-		);
-		for (const leaf of leaves) {
-			if (leaf.view.containerEl.closest(".mod-right-split")) {
-				return leaf;
-			}
-		}
-		return leaves[0] ?? null;
+		return this.getRightSidebarPlannerLeaves()[0] ?? null;
+	}
+
+	private getRightSidebarPlannerLeaves(): WorkspaceLeaf[] {
+		const { workspace } = this.app;
+		return SIDEBAR_PLANNER_VIEW_TYPES.flatMap((type) =>
+			workspace.getLeavesOfType(type),
+		).filter((leaf) => leaf.getRoot() === workspace.rightSplit);
 	}
 
 	private findMonthlyPlannerLeafInRightSidebar(): WorkspaceLeaf | null {
@@ -825,7 +843,7 @@ export default class DiaryObsidian extends Plugin {
 		for (const leaf of leaves) {
 			if (
 				leaf.view instanceof MonthlyPlannerView &&
-				leaf.view.containerEl.closest(".mod-right-split")
+				leaf.getRoot() === this.app.workspace.rightSplit
 			) {
 				return leaf;
 			}
@@ -845,7 +863,7 @@ export default class DiaryObsidian extends Plugin {
 			VIEW_TYPE_MONTHLY_PLANNER,
 		);
 		for (const leaf of leaves) {
-			if (leaf.view.containerEl.closest(".mod-right-split")) {
+			if (leaf.getRoot() === this.app.workspace.rightSplit) {
 				leaf.detach();
 			}
 		}
@@ -854,9 +872,7 @@ export default class DiaryObsidian extends Plugin {
 	private detachDuplicateMonthlySidebarPlannerLeaves(
 		keepLeaf: WorkspaceLeaf,
 	): void {
-		const leaves = SIDEBAR_PLANNER_VIEW_TYPES.flatMap((type) =>
-			this.app.workspace.getLeavesOfType(type),
-		);
+		const leaves = this.getRightSidebarPlannerLeaves();
 		for (const leaf of leaves) {
 			if (leaf !== keepLeaf) {
 				leaf.detach();

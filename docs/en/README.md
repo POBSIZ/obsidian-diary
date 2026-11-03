@@ -9,7 +9,7 @@ Full documentation: [English](https://github.com/POBSIZ/obsidian-diary/blob/main
 | Item | Value |
 | --- | --- |
 | Plugin ID | `diary` |
-| Current version | `1.24.0` |
+| Current version | `1.25.0` |
 | Minimum Obsidian version | `1.7.2` |
 | Supported platforms | Desktop / mobile (`isDesktopOnly: false`) |
 | Default language | `en` |
@@ -17,6 +17,7 @@ Full documentation: [English](https://github.com/POBSIZ/obsidian-diary/blob/main
 
 ## What's new
 
+- `1.25.0`: Adds a sidebar default view setting with yearly, monthly calendar, monthly list, daily and 3-day options. New sidebars use monthly calendar by default; restored sidebars keep their last view.
 - `1.24.0`: Improves UI wording in all eight languages, translates custom calendar validation errors, fixes clipped settings labels on narrow screens, and localizes month–year headings.
 - `1.23.1`: Preserves the first entry of legacy `color` lists for display and palette linking.
 - `1.23.0`: Adds multiple recognized date formats with separate creation defaults, named linked colors and a configurable holiday color.
@@ -128,6 +129,8 @@ Use previous/next buttons to move through years or months, and the calendar icon
 ## Right sidebar planner
 
 Diary creates one compact monthly planner in the right sidebar when the workspace is ready. Use **Open monthly planner in sidebar** to reveal it again.
+
+In **Settings → Diary → Sidebar default view**, choose yearly, monthly calendar, monthly list, daily, or 3 days. The default is monthly calendar. The choice applies to new sidebar planners and immediately switches an existing sidebar when changed. Restarting restores the last view; ribbon buttons keep their existing behavior.
 
 The sidebar works as a companion view:
 
