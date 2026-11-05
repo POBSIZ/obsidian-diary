@@ -189,7 +189,16 @@ These links open public GitHub issues and require a GitHub account. Do not inclu
 
 Thank you to everyone who supports Diary's development and maintenance.
 
-- [@anomic321-bit](https://github.com/anomic321-bit)
+<table>
+  <tr>
+    <td align="center">
+      <a href="https://github.com/anomic321-bit">
+        <img src="https://avatars.githubusercontent.com/u/352123200?v=4&amp;s=128" width="64" height="64" alt="anomic321-bit's GitHub avatar"><br>
+        <sub>@anomic321-bit</sub>
+      </a>
+    </td>
+  </tr>
+</table>
 
 [Support Diary on GitHub Sponsors](https://github.com/sponsors/POBSIZ).
 
