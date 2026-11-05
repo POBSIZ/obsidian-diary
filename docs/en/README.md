@@ -414,6 +414,12 @@ These links open public GitHub issues and require a GitHub account. Do not inclu
 - If you want more space above the automatically cleared mobile navigation, increase **Mobile bottom padding**.
 - If a reminder does not appear, confirm that Obsidian is open, the event date is today, and `notify_minutes` is within `0-1439`.
 
+## Sponsors
+
+Thank you to everyone who supports Diary's development and maintenance. [Meet our sponsors](../../README.md#sponsors) or [support Diary on GitHub Sponsors](https://github.com/sponsors/POBSIZ).
+
+Recognition is optional. We list public GitHub sponsors by name or username with a profile link, regardless of amount or whether support is one-time or recurring. Credits remain after sponsorship ends unless you ask for removal. Private sponsors are not named, and anonymous support is equally appreciated. To change your display name or have your credit removed, [send feedback](https://github.com/POBSIZ/obsidian-diary/issues/new?template=feedback.yml).
+
 ## License
 
 See `LICENSE`.

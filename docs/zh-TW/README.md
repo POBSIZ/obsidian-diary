@@ -416,6 +416,12 @@ npm test
 - 若要在自動避開的行動導覽上方保留更多空間，請增加 **行動裝置底部間距**。
 - 如果提醒沒有出現，請確認 Obsidian 已開啟、筆記日期是今天，且 `notify_minutes` 在 `0` 到 `1439` 之間。
 
+## 贊助者
+
+感謝所有支持 Diary 開發與維護的朋友。你可以查看[贊助者名單](../../README.md#sponsors)，或[透過 GitHub Sponsors 支持 Diary](https://github.com/sponsors/POBSIZ)。
+
+是否列入名單由你選擇。對於公開的 GitHub 贊助者，我們會列出姓名或使用者名稱及個人檔案連結，不限金額，也不區分單次或定期贊助。除非你要求移除，贊助結束後仍會保留致謝。我們不會公布非公開贊助者的姓名，也同樣感謝匿名支持。如果你希望變更顯示名稱或從名單中移除，請[傳送回饋](https://github.com/POBSIZ/obsidian-diary/issues/new?template=feedback.yml)。
+
 ## 授權
 
 參見 `LICENSE`。

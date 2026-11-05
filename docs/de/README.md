@@ -413,6 +413,12 @@ Diese Links öffnen öffentliche GitHub-Issues und erfordern ein GitHub-Konto. F
 - Wenn mehr Platz über der automatisch freigehaltenen mobilen Navigation gewünscht ist, erhöhe **Unterer Abstand mobil**.
 - Wenn eine Erinnerung nicht erscheint, prüfe, ob Obsidian geöffnet ist, das Ereignis heute liegt und `notify_minutes` zwischen `0` und `1439` liegt.
 
+## Unterstützer
+
+Vielen Dank an alle, die die Entwicklung und Pflege von Diary unterstützen. Hier findest du [unsere Unterstützer](../../README.md#sponsors) und kannst [Diary über GitHub Sponsors unterstützen](https://github.com/sponsors/POBSIZ).
+
+Die Nennung ist freiwillig. Öffentliche GitHub-Unterstützer führen wir mit Namen oder Benutzernamen und einem Profillink auf, unabhängig vom Betrag und davon, ob die Unterstützung einmalig oder regelmäßig erfolgt. Der Eintrag bleibt nach dem Ende der Unterstützung bestehen, sofern du nicht um Entfernung bittest. Private Unterstützer werden nicht genannt; für anonyme Unterstützung sind wir ebenso dankbar. Um deinen Anzeigenamen zu ändern oder deinen Eintrag entfernen zu lassen, [sende uns Feedback](https://github.com/POBSIZ/obsidian-diary/issues/new?template=feedback.yml).
+
 ## Lizenz
 
 Siehe `LICENSE`.

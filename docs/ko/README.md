@@ -416,6 +416,12 @@ npm test
 - 자동으로 확보된 모바일 내비게이션 여백보다 더 넓은 공간이 필요하면 **Mobile bottom padding** 값을 키웁니다.
 - 알림이 오지 않으면 Obsidian이 열려 있는지, 노트의 이벤트 날짜가 오늘인지, `notify_minutes` 값이 `0-1439` 범위인지 확인합니다.
 
+## 후원자
+
+Diary의 개발과 유지보수를 후원해 주시는 모든 분께 감사드립니다. [후원자 명단](../../README.md#sponsors)을 확인하거나 [GitHub Sponsors에서 Diary를 후원](https://github.com/sponsors/POBSIZ)할 수 있습니다.
+
+명단 게재는 선택 사항입니다. 공개 GitHub 후원자는 금액이나 일회성·정기 후원 여부에 관계없이 이름 또는 아이디와 프로필 링크로 소개합니다. 삭제 요청이 없으면 후원이 종료된 뒤에도 감사 명단에 남습니다. 비공개 후원자의 이름은 공개하지 않으며, 익명 후원에도 똑같이 감사드립니다. 표시명 변경이나 명단 삭제를 원하시면 [피드백 보내기](https://github.com/POBSIZ/obsidian-diary/issues/new?template=feedback.yml)를 이용해 주세요.
+
 ## 라이선스
 
 `LICENSE` 파일을 참고하세요.

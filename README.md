@@ -185,6 +185,18 @@ npm test
 
 These links open public GitHub issues and require a GitHub account. Do not include private vault content, calendar URLs, access tokens, or other sensitive information.
 
+## Sponsors
+
+Thank you to everyone who supports Diary's development and maintenance.
+
+- [@anomic321-bit](https://github.com/anomic321-bit)
+
+[Support Diary on GitHub Sponsors](https://github.com/sponsors/POBSIZ).
+
+Recognition is optional. We list public GitHub sponsors by name or username with a profile link, regardless of amount or whether support is one-time or recurring. Credits remain after sponsorship ends unless you ask for removal. Private sponsors are not named, and anonymous support is equally appreciated. To change your display name or have your credit removed, [send feedback](https://github.com/POBSIZ/obsidian-diary/issues/new?template=feedback.yml).
+
+<!-- Keep the sponsor list here so all translated documentation links to one list. Add only public sponsors or supporters who explicitly agree to be named. -->
+
 ## License
 
 See `LICENSE`.

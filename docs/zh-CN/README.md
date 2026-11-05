@@ -416,6 +416,12 @@ npm test
 - 如果希望在自动避开的移动导航上方留出更多空间，请增加 **移动端底部间距**。
 - 如果提醒没有出现，请确认 Obsidian 已打开、笔记日期是今天，且 `notify_minutes` 在 `0` 到 `1439` 之间。
 
+## 赞助者
+
+感谢所有支持 Diary 开发和维护的朋友。你可以查看[赞助者名单](../../README.md#sponsors)，或[通过 GitHub Sponsors 支持 Diary](https://github.com/sponsors/POBSIZ)。
+
+是否列入名单由你选择。对于公开的 GitHub 赞助者，我们会列出姓名或用户名及个人资料链接，不限金额，也不区分一次性或定期赞助。除非你要求移除，赞助结束后仍会保留致谢。我们不会公布非公开赞助者的姓名，也同样感谢匿名支持。如果你希望更改显示名称或从名单中移除，请[发送反馈](https://github.com/POBSIZ/obsidian-diary/issues/new?template=feedback.yml)。
+
 ## 许可证
 
 参见 `LICENSE`。

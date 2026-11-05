@@ -413,6 +413,12 @@ Estos enlaces abren issues públicos de GitHub y requieren una cuenta de GitHub.
 - Si deseas más espacio sobre la navegación móvil reservada automáticamente, aumenta **Espacio inferior en móvil**.
 - Si no aparece un recordatorio, confirma que Obsidian esté abierto, que la fecha sea hoy y que `notify_minutes` esté entre `0` y `1439`.
 
+## Patrocinadores
+
+Gracias a quienes apoyan el desarrollo y mantenimiento de Diary. Consulta [la lista de patrocinadores](../../README.md#sponsors) o [apoya Diary en GitHub Sponsors](https://github.com/sponsors/POBSIZ).
+
+La mención es opcional. Incluimos a los patrocinadores públicos de GitHub con su nombre o nombre de usuario y un enlace a su perfil, sin importar el importe ni si el apoyo es puntual o recurrente. La mención se conserva cuando termina el patrocinio, salvo que solicites su retirada. No nombramos a los patrocinadores privados y agradecemos por igual el apoyo anónimo. Para cambiar el nombre mostrado o retirar tu mención, [envía tus comentarios](https://github.com/POBSIZ/obsidian-diary/issues/new?template=feedback.yml).
+
 ## Licencia
 
 Consulta `LICENSE`.
