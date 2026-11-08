@@ -21,7 +21,7 @@ Diary는 Obsidian 볼트의 일반 Markdown 노트를 연간·월간·일간·3�
 
 ## What's new
 
-- `1.26.0`: Adds a display time zone for external calendars, defaulting to the device time zone. Dates, details and timelines use the same zone, fixing early-morning events appearing on the previous UTC date.
+- `1.26.0`: Adds a display time zone for external calendars, defaulting to the device time zone. Dates, details and timelines use the same zone, fixing early-morning events appearing on the previous UTC date. [Release verification](docs/releases/1.26.0.md).
 - `1.25.0`: Adds a sidebar default view setting with yearly, monthly calendar, monthly list, daily and 3-day options. New sidebars use monthly calendar by default; restored sidebars keep their last view.
 - `1.24.0`: Improves UI wording in all eight languages, translates custom calendar validation errors, fixes clipped settings labels on narrow screens, and localizes month–year headings.
 - `1.23.1`: Preserves the first entry of legacy `color` lists for display and palette linking.

@@ -4,6 +4,8 @@ Use npm with the committed `package-lock.json`. Keep generated `main.js` and `no
 
 The [1.24.0 release record](releases/1.24.0.md) covers multilingual copy, narrow-screen layout checks and Community distribution.
 
+The [1.26.0 release record](releases/1.26.0.md) covers external-calendar time zones, regression and desktop verification, published asset hashes and completed Community distribution.
+
 ## Date filenames
 
 Use [date-formats.ts](../src/utils/date-formats.ts) for filename parsing and generation across creation, movement, clipboard, recurrence, holiday drag and external-event note creation. Each note type has multiple recognized formats and one creation default. Operations on recognized notes preserve the detected format. Keep internal dates and range `date_start` / `date_end` values in Gregorian ISO form.
@@ -52,8 +54,10 @@ If pre-existing untracked backup files interfere with lint, preserve them. A cle
 
 The holiday parser’s `deepmerge` dependency is overridden with the pinned npm alias `npm:@stackline/deepmerge@1.1.0`. The original 4.3.1 package is affected by [CVE-2026-93753](https://github.com/advisories/GHSA-gcqx-w48m-w2h4), with no patched upstream release at verification on 2026-11-03. The [replacement’s compatibility contract](https://github.com/alexandroit/stackline-deepmerge/blob/main/docs/COMPATIBILITY.md) retains the `merge.all()` API used by the parser and blocks prototype poisoning.
 
-The 1.25.0 release checks compared complete serialized holiday results before and after the override for KR, US, GB, DE, ES, FR, JP, CN and TW across 2024, 2026, 2027, 2028 and 2030; all 45 combinations matched. The permanent regression suite checks the prototype-poisoning case, merge behavior and nine country calendars. Runtime audit reports no vulnerabilities. The full audit retains 23 moderate development-only findings rooted in fast-uri, minimatch and the development Moment dependency; they are outside the shipped runtime bundle.
+The 1.25.0 release checks compared complete serialized holiday results before and after the override for KR, US, GB, DE, ES, FR, JP, CN and TW across 2024, 2026, 2027, 2028 and 2030; all 45 combinations matched. The permanent regression suite checks the prototype-poisoning case, merge behavior and nine country calendars. At that release's verification, the full audit reported 23 moderate development-only findings. The [1.26.0 closeout](releases/1.26.0.md#remaining-maintenance-and-closeout) reviewed 14 moderate affected development-dependency entries rooted in fast-uri, minimatch and the development Moment dependency. Runtime audit and Community dependency review passed with no vulnerable dependencies; tooling remediation remains separate maintenance.
 
 ## External calendar display time zone
 
 `externalCalendarTimeZone` defaults to `device`; saved IANA zones are validated with `Intl.DateTimeFormat` and invalid or missing values fall back to the device. The display preference is attached only to rendered external event copies, never to source timestamps or instance IDs. Date grouping, range filtering, details, note creation and daily/3-day timeline placement share the same conversion. All-day dates, floating times and existing Planner notes retain their original values. IANA zone offsets follow daylight saving rules. Recurrence expansion retains its source date basis so exception dates and linked event identities stay stable.
+
+When changing these paths, use [the shared time-zone conversion](../src/utils/external-calendar-timezone.ts) and [external-event date/time helpers](../src/utils/external-calendars.ts). Do not derive a timed event's display date by slicing a UTC timestamp. Run the external-calendar, settings persistence and note-creation regressions, then verify that a device/fixed-zone switch changes date grouping and time placement together. Source timestamps and recurrence identity must remain stable.
