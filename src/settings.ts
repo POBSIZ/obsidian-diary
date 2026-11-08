@@ -23,6 +23,7 @@ import { renderCalendarOverlaySettings } from "./settings/custom-calendar-settin
 import { configureFeedbackSetting } from "./settings/feedback-settings";
 import { renderDateFormatSettings } from "./settings/date-format-settings";
 import { renderPlannerColorSettings } from "./settings/planner-color-settings";
+import { renderExternalCalendarTimeZoneSetting } from "./settings/external-calendar-timezone-settings";
 import { DEFAULT_DATE_FORMATS, type DateFormatsConfiguration } from "./utils/date-formats";
 import {
 	DEFAULT_COLOR_PALETTE,
@@ -72,6 +73,7 @@ export interface DiaryObsidianSettings {
 	customCalendarProfiles: CustomCalendarProfile[];
 	selectedCustomCalendarId: string;
 	externalCalendars: ExternalCalendarSettings[];
+	externalCalendarTimeZone: string;
 	externalCalendarCaches: ExternalCalendarCache[];
 	externalCalendarAutoRefreshMigrated: boolean;
 	externalCalendarYearlyVisibilityMigrated: boolean;
@@ -109,6 +111,7 @@ export const DEFAULT_SETTINGS: DiaryObsidianSettings = {
 	customCalendarProfiles: [],
 	selectedCustomCalendarId: "",
 	externalCalendars: [],
+	externalCalendarTimeZone: "device",
 	externalCalendarCaches: [],
 	externalCalendarAutoRefreshMigrated: false,
 	externalCalendarYearlyVisibilityMigrated: false,
@@ -283,6 +286,11 @@ export class DiaryObsidianSettingTab extends PluginSettingTab {
 					setting.settingEl.empty();
 					this.renderExternalCalendars(setting.settingEl);
 				},
+			},
+			{
+				name: t("settings.externalCalendarTimeZone"),
+				desc: t("settings.externalCalendarTimeZoneDesc"),
+				render: (setting: Setting) => renderExternalCalendarTimeZoneSetting(setting, this.plugin),
 			},
 			{
 				name: t("settings.mobileBottomPadding"),
@@ -547,6 +555,7 @@ export class DiaryObsidianSettingTab extends PluginSettingTab {
 
 		renderCalendarOverlaySettings(containerEl, this.plugin);
 		this.renderExternalCalendars(containerEl);
+		renderExternalCalendarTimeZoneSetting(new Setting(containerEl), this.plugin);
 
 		new Setting(containerEl)
 			.setName(t("settings.mobileBottomPadding"))

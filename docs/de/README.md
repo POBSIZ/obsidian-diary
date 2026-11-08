@@ -9,7 +9,7 @@ Vollständige Dokumentation: [English](https://github.com/POBSIZ/obsidian-diary/
 | Eintrag | Wert |
 | --- | --- |
 | Plugin-ID | `diary` |
-| Aktuelle Version | `1.25.0` |
+| Aktuelle Version | `1.26.0` |
 | Minimale Obsidian-Version | `1.7.2` |
 | Plattformen | Desktop / Mobil (`isDesktopOnly: false`) |
 | Standardsprache | `en` |
@@ -17,6 +17,7 @@ Vollständige Dokumentation: [English](https://github.com/POBSIZ/obsidian-diary/
 
 ## Änderungen
 
+- `1.26.0`: Neue Anzeigezeitzone für externe Kalender, standardmäßig die Gerätezeitzone. Datum, Details und Zeitachsen verwenden dieselbe Zone; frühe Termine erscheinen dadurch nicht mehr am vorherigen UTC-Tag.
 - `1.25.0`: Neue Einstellung für die Standardansicht der Seitenleiste: Jahr, Monatskalender, Monatsliste, Tag oder 3 Tage. Neue Seitenleisten verwenden standardmäßig den Monatskalender; wiederhergestellte behalten die letzte Ansicht.
 - `1.24.0`: Überarbeitet die Oberflächentexte in allen acht Sprachen, übersetzt Fehlermeldungen für eigene Kalender, behebt abgeschnittene Einstellungsbeschriftungen bei schmalen Fenstern und passt Monats- und Jahresüberschriften an die gewählte Sprache an.
 - `1.23.1`: Behält bei vorhandenen `color`-Listen den ersten Farbwert für die Anzeige und die Verknüpfung mit der Palette bei.
@@ -269,6 +270,7 @@ Einfügeregeln:
 | Angezeigter Kalender | Wählt einen eingebauten alternativen Kalender oder ein eigenes Kalenderprofil für Jahresplaner, Monatsraster, Monatsliste, Tagesübersicht und Seitenplaner. Standard: `None`. |
 | Eigene Kalender | Lokale Fantasy- oder Kampagnenkalenderprofile mit Monatslängen, Wochentagen, Epoche, Beschriftungsformat und einfacher Schaltregel. |
 | Externe Kalender | Optionale `webcal://`- oder `https://`-`.ics`-Feeds als schreibgeschützte Overlays. Jeder Feed hat Aktivierung, Farbe, Aktualisierungsintervall, Beschreibung und Sichtbarkeit pro Ansicht. |
+| Zeitzone externer Kalender | Datum und Uhrzeit externer Termine in der Gerätezeitzone oder einer festen Zeitzone anzeigen. Ganztägige Termine und Zeiten ohne Zeitzone behalten ihre Werte; Planner-Notizen bleiben unverändert. |
 | Unterer Abstand mobil | Mindestabstand für alle mobilen Planer. Automatischer Navbar- und Safe-Area-Abstand bleibt auch bei einem kleineren Wert aktiv. |
 | Mobile Zellbreite | Breite der Monatszellen im mobilen Jahresplaner. `0` nutzt den Standardwert. |
 | Feedback und Support | Öffnet öffentliche GitHub-Formulare für Feedback, Fehlermeldungen und Funktionsvorschläge. |

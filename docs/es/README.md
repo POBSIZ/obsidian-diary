@@ -9,7 +9,7 @@ Documentación completa: [English](https://github.com/POBSIZ/obsidian-diary/blob
 | Elemento | Valor |
 | --- | --- |
 | ID del plugin | `diary` |
-| Versión actual | `1.25.0` |
+| Versión actual | `1.26.0` |
 | Versión mínima de Obsidian | `1.7.2` |
 | Plataformas | Escritorio / móvil (`isDesktopOnly: false`) |
 | Idioma predeterminado | `en` |
@@ -17,6 +17,7 @@ Documentación completa: [English](https://github.com/POBSIZ/obsidian-diary/blob
 
 ## Novedades
 
+- `1.26.0`: Añade una zona horaria de visualización para calendarios externos, con la zona del dispositivo como predeterminada. Las fechas, los detalles y las líneas de tiempo usan la misma zona, evitando que eventos de madrugada aparezcan en el día UTC anterior.
 - `1.25.0`: Añade una vista predeterminada para la barra lateral: año, calendario mensual, lista mensual, día o 3 días. Las nuevas barras usan el calendario mensual; las restauradas conservan su última vista.
 - `1.24.0`: Mejora los textos de la interfaz en los ocho idiomas, traduce los errores de los calendarios personalizados, evita que las etiquetas de ajustes se corten en pantallas estrechas y adapta los encabezados de mes y año al idioma.
 - `1.23.1`: Conserva el primer color de las listas `color` existentes para mostrarlo y vincularlo a la paleta.
@@ -269,6 +270,7 @@ Reglas de pegado:
 | Calendario mostrado | Selecciona un calendario alternativo integrado o un perfil personalizado para anual, cuadrícula mensual, lista mensual, resumen del día y planificador lateral. Predeterminado: `None`. |
 | Calendarios personalizados | Perfiles locales de fantasía o campaña con longitudes de mes, días de la semana, época, formato de etiqueta y regla simple de año bisiesto. |
 | Calendarios externos | Feeds `.ics` opcionales por `webcal://` o `https://` como superposiciones de solo lectura. Cada feed tiene estado, color, intervalo, descripciones y visibilidad por vista. |
+| Zona horaria de calendarios externos | Muestra las fechas y horas de eventos externos en la zona del dispositivo o en una zona fija. Los eventos de todo el día y las horas sin zona conservan sus valores; las notas de Planner no cambian. |
 | Espacio inferior en móvil | Espacio inferior mínimo para todos los planificadores móviles. La separación automática de navbar y safe area sigue activa con valores menores. |
 | Ancho de celda en móvil | Ancho de celdas de mes en el planificador anual móvil. `0` usa el valor predeterminado. |
 | Comentarios y soporte | Abre formularios públicos de GitHub para comentarios, errores y sugerencias de funciones. |

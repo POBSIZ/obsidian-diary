@@ -459,5 +459,8 @@
 	"settings.customCalendarError.weekdayNameRequired": "Gib für jeden Wochentag einen Namen ein.",
 	"settings.customCalendarError.leapIntervalInvalid": "Das Schaltintervall muss zwischen 2 und 100 liegen.",
 	"settings.customCalendarError.leapDaysInvalid": "Die Zahl der zusätzlichen Schalttage muss zwischen 1 und 30 liegen.",
-	"settings.customCalendarError.leapMonthInvalid": "Wähle für die zusätzlichen Schalttage eine Monatsnummer aus der definierten Monatsliste."
+	"settings.customCalendarError.leapMonthInvalid": "Wähle für die zusätzlichen Schalttage eine Monatsnummer aus der definierten Monatsliste.",
+	"settings.externalCalendarTimeZone": "Zeitzone externer Kalender",
+	"settings.externalCalendarTimeZoneDesc": "Datum und Uhrzeit externer Termine in der Gerätezeitzone oder einer festen Zeitzone anzeigen. Ganztägige Termine und Zeiten ohne Zeitzone behalten ihre Werte; Planner-Notizen bleiben unverändert.",
+	"settings.timeZoneDevice": "Gerätezeitzone ({zone})"
 }

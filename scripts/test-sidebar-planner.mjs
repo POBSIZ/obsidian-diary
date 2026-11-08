@@ -147,6 +147,23 @@ for (const [index, mode] of modes.entries()) {
 	assert.equal(created.type, types.VIEW_TYPE_DAILY_PLANNER);
 }
 assert.equal(types.DEFAULT_SETTINGS.sidebarDefaultView, "monthly");
+assert.equal(types.DEFAULT_SETTINGS.externalCalendarTimeZone, "device");
+for (const value of [undefined, null, "invalid", "device", "UTC", "Asia/Seoul", "America/New_York"]) {
+	const { plugin } = fixture();
+	plugin.loadData = async () => ({ externalCalendarTimeZone:value });
+	await plugin.loadSettings();
+	const expected = ["UTC", "Asia/Seoul", "America/New_York"].includes(value) ? value : "device";
+	assert.equal(plugin.settings.externalCalendarTimeZone, expected);
+	let saved;
+	plugin.saveData = async (data) => { saved = structuredClone(data); };
+	const refreshed = [];
+	for (const method of ["refreshYearlyPlannerViews", "refreshMonthlyPlannerViews", "refreshMonthlyListPlannerViews", "refreshDailyPlannerViews"]) plugin[method] = () => refreshed.push(method);
+	await plugin.saveSettings();
+	assert.equal(refreshed.length, 4, "time zone changes must refresh every planner surface");
+	plugin.loadData = async () => saved;
+	await plugin.loadSettings();
+	assert.equal(plugin.settings.externalCalendarTimeZone, expected);
+}
 for (const value of [...modes, undefined, "invalid"]) {
 	const { plugin } = fixture();
 	plugin.loadData = async () => ({ sidebarDefaultView: value });

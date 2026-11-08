@@ -459,5 +459,8 @@
 	"settings.customCalendarError.weekdayNameRequired": "请填写每个星期名称。",
 	"settings.customCalendarError.leapIntervalInvalid": "闰日间隔必须在 2 到 100 年之间。",
 	"settings.customCalendarError.leapDaysInvalid": "增加的闰日天数必须在 1 到 30 天之间。",
-	"settings.customCalendarError.leapMonthInvalid": "请输入已定义月份列表中的编号作为闰日月份。"
+	"settings.customCalendarError.leapMonthInvalid": "请输入已定义月份列表中的编号作为闰日月份。",
+	"settings.externalCalendarTimeZone": "外部日历显示时区",
+	"settings.externalCalendarTimeZoneDesc": "使用设备时区或固定时区显示外部事件的日期和时间。全天事件及无时区信息的时间保留原值，Planner 笔记不会更改。",
+	"settings.timeZoneDevice": "设备时区（{zone}）"
 }

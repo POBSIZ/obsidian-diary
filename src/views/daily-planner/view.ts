@@ -16,6 +16,7 @@ import { getCalendarOverlayConfig, getCalendarOverlayLabel } from "../../utils/c
 import {
 	getExternalCalendarName,
 	getExternalEventEndDate,
+	getExternalEventMinutes,
 	getExternalEventStartDate,
 	getExternalEventsForDate,
 	getExternalEventsForRange,
@@ -145,28 +146,6 @@ function minutesToTime(minutes: number): string {
 
 function minutesToDisplayTime(minutes: number): string {
 	return minutes >= MINUTES_PER_DAY ? "24:00" : minutesToTime(minutes);
-}
-
-function getExternalEventMinutes(
-	event: ExternalCalendarEvent,
-	dateString: string,
-): { start: number; end: number } | null {
-	if (event.allDay) return null;
-	const start = new Date(event.start);
-	if (Number.isNaN(start.getTime())) return null;
-	const startDate = `${start.getFullYear()}-${pad(start.getMonth() + 1)}-${pad(start.getDate())}`;
-	let startMinutes = startDate < dateString ? 0 : start.getHours() * 60 + start.getMinutes();
-	let endMinutes = startMinutes + DEFAULT_DURATION_MINUTES;
-	if (event.end) {
-		const end = new Date(event.end);
-		if (!Number.isNaN(end.getTime())) {
-			const endDate = `${end.getFullYear()}-${pad(end.getMonth() + 1)}-${pad(end.getDate())}`;
-			endMinutes = endDate > dateString ? MINUTES_PER_DAY : end.getHours() * 60 + end.getMinutes();
-		}
-	}
-	startMinutes = Math.max(0, Math.min(MINUTES_PER_DAY - 1, startMinutes));
-	endMinutes = Math.max(startMinutes + 15, Math.min(MINUTES_PER_DAY, endMinutes));
-	return { start: startMinutes, end: endMinutes };
 }
 
 export class DailyPlannerView extends ItemView {

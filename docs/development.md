@@ -42,7 +42,7 @@ npm audit --omit=dev
 git diff --check
 ```
 
-`npm test` runs date-format, linked-color, sidebar default-view and holiday dependency regressions, and checks locale message keys and placeholders. `npm run design:lint` validates [design.md](../design.md) with the pinned published CLI. Public documentation and UI strings must preserve the same behavior and conditions across the eight supported locales.
+`npm test` runs date-format, external-calendar time zone, linked-color, sidebar default-view and holiday dependency regressions, and checks locale message keys and placeholders. `npm run design:lint` validates [design.md](../design.md) with the pinned published CLI. Public documentation and UI strings must preserve the same behavior and conditions across the eight supported locales.
 
 For behavior changes, verify the affected workflows in the running Obsidian plugin and record the loaded version. Record the emulation engine and viewport, and distinguish emulation from physical iOS/Android testing. Restore the original workspace and settings, and remove only owned test notes and tabs. For a release, check the published assets, completed Community review and public version, then install the downloaded assets and compare their hashes. Documentation-only follow-ups retain the existing plugin version and release tag; check the changed documents and links without rerunning unchanged code gates solely for prose edits.
 
@@ -53,3 +53,7 @@ If pre-existing untracked backup files interfere with lint, preserve them. A cle
 The holiday parser’s `deepmerge` dependency is overridden with the pinned npm alias `npm:@stackline/deepmerge@1.1.0`. The original 4.3.1 package is affected by [CVE-2026-93753](https://github.com/advisories/GHSA-gcqx-w48m-w2h4), with no patched upstream release at verification on 2026-11-03. The [replacement’s compatibility contract](https://github.com/alexandroit/stackline-deepmerge/blob/main/docs/COMPATIBILITY.md) retains the `merge.all()` API used by the parser and blocks prototype poisoning.
 
 The 1.25.0 release checks compared complete serialized holiday results before and after the override for KR, US, GB, DE, ES, FR, JP, CN and TW across 2024, 2026, 2027, 2028 and 2030; all 45 combinations matched. The permanent regression suite checks the prototype-poisoning case, merge behavior and nine country calendars. Runtime audit reports no vulnerabilities. The full audit retains 23 moderate development-only findings rooted in fast-uri, minimatch and the development Moment dependency; they are outside the shipped runtime bundle.
+
+## External calendar display time zone
+
+`externalCalendarTimeZone` defaults to `device`; saved IANA zones are validated with `Intl.DateTimeFormat` and invalid or missing values fall back to the device. The display preference is attached only to rendered external event copies, never to source timestamps or instance IDs. Date grouping, range filtering, details, note creation and daily/3-day timeline placement share the same conversion. All-day dates, floating times and existing Planner notes retain their original values. IANA zone offsets follow daylight saving rules. Recurrence expansion retains its source date basis so exception dates and linked event identities stay stable.

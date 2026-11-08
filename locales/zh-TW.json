@@ -459,5 +459,8 @@
 	"settings.customCalendarError.weekdayNameRequired": "請填寫每個星期名稱。",
 	"settings.customCalendarError.leapIntervalInvalid": "閏日間隔必須介於 2 到 100 年。",
 	"settings.customCalendarError.leapDaysInvalid": "增加的閏日天數必須介於 1 到 30 天。",
-	"settings.customCalendarError.leapMonthInvalid": "請輸入已定義月份清單中的編號作為閏日月份。"
+	"settings.customCalendarError.leapMonthInvalid": "請輸入已定義月份清單中的編號作為閏日月份。",
+	"settings.externalCalendarTimeZone": "外部日曆顯示時區",
+	"settings.externalCalendarTimeZoneDesc": "使用裝置時區或固定時區顯示外部事件的日期與時間。全天事件及無時區資訊的時間保留原值，Planner 筆記不會變更。",
+	"settings.timeZoneDevice": "裝置時區（{zone}）"
 }

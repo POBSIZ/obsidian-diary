@@ -460,5 +460,8 @@
 	"settings.customCalendarError.weekdayNameRequired": "Enter a name for every weekday.",
 	"settings.customCalendarError.leapIntervalInvalid": "Enter a whole number from 2 to 100 for the leap interval.",
 	"settings.customCalendarError.leapDaysInvalid": "Enter a whole number from 1 to 30 for the days to add.",
-	"settings.customCalendarError.leapMonthInvalid": "Choose a month number from the month list for adding leap days."
+	"settings.customCalendarError.leapMonthInvalid": "Choose a month number from the month list for adding leap days.",
+	"settings.externalCalendarTimeZone": "External calendar time zone",
+	"settings.externalCalendarTimeZoneDesc": "Use the device time zone or a fixed zone for external event dates and times. All-day and floating times keep their original values; Planner notes are unchanged.",
+	"settings.timeZoneDevice": "Device time zone ({zone})"
 }

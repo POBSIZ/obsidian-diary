@@ -41,6 +41,7 @@ import type { PlannerViewMode } from "./views/planner-layout";
 import { getSidebarPlannerViewState, normalizeSidebarDefaultView } from "./utils/sidebar-planner";
 import { configureDateFormats, normalizeDateFormats } from "./utils/date-formats";
 import { configurePlannerColors, normalizeColorPalette, normalizePlannerColorSelection } from "./utils/planner-colors";
+import { normalizeExternalCalendarTimeZone } from "./utils/external-calendar-timezone";
 
 const SIDEBAR_PLANNER_VIEW_TYPES = [
 	VIEW_TYPE_YEARLY_SIDEBAR_PLANNER,
@@ -467,6 +468,7 @@ export default class DiaryObsidian extends Plugin {
 		this.settings.locale = normalizeLocale(this.settings.locale);
 		this.settings.weekStart = this.settings.weekStart === 1 ? 1 : 0;
 		this.settings.sidebarDefaultView = normalizeSidebarDefaultView(this.settings.sidebarDefaultView);
+		this.settings.externalCalendarTimeZone = normalizeExternalCalendarTimeZone(this.settings.externalCalendarTimeZone);
 		const legacyEnabledAlternateCalendars =
 			this.settings.enabledAlternateCalendars;
 		const legacyShowLunarDates = this.settings.showLunarDates;
@@ -523,6 +525,7 @@ export default class DiaryObsidian extends Plugin {
 	}
 
 	async saveSettings() {
+		this.settings.externalCalendarTimeZone = normalizeExternalCalendarTimeZone(this.settings.externalCalendarTimeZone);
 		this.settings.sidebarDefaultView = normalizeSidebarDefaultView(this.settings.sidebarDefaultView);
 		this.settings.dateFormats = normalizeDateFormats(this.settings.dateFormats);
 		this.settings.colorPalette = normalizeColorPalette(this.settings.colorPalette);

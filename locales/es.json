@@ -459,5 +459,8 @@
 	"settings.customCalendarError.weekdayNameRequired": "Introduce un nombre para cada día de la semana.",
 	"settings.customCalendarError.leapIntervalInvalid": "El intervalo bisiesto debe estar entre 2 y 100.",
 	"settings.customCalendarError.leapDaysInvalid": "El número de días bisiestos añadidos debe estar entre 1 y 30.",
-	"settings.customCalendarError.leapMonthInvalid": "El número del mes al que se añaden los días bisiestos debe corresponder a un mes de la lista definida."
+	"settings.customCalendarError.leapMonthInvalid": "El número del mes al que se añaden los días bisiestos debe corresponder a un mes de la lista definida.",
+	"settings.externalCalendarTimeZone": "Zona horaria de calendarios externos",
+	"settings.externalCalendarTimeZoneDesc": "Muestra las fechas y horas de eventos externos en la zona del dispositivo o en una zona fija. Los eventos de todo el día y las horas sin zona conservan sus valores; las notas de Planner no cambian.",
+	"settings.timeZoneDevice": "Zona del dispositivo ({zone})"
 }

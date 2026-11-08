@@ -459,5 +459,8 @@
 	"settings.customCalendarError.weekdayNameRequired": "すべての曜日に名前を入力してください。",
 	"settings.customCalendarError.leapIntervalInvalid": "閏日を追加する間隔は2〜100年にしてください。",
 	"settings.customCalendarError.leapDaysInvalid": "閏年に追加する日数は1〜30日にしてください。",
-	"settings.customCalendarError.leapMonthInvalid": "閏日を入れる月には、設定した月リスト内の番号を入力してください。"
+	"settings.customCalendarError.leapMonthInvalid": "閏日を入れる月には、設定した月リスト内の番号を入力してください。",
+	"settings.externalCalendarTimeZone": "外部カレンダーの表示タイムゾーン",
+	"settings.externalCalendarTimeZoneDesc": "外部予定の日時を端末のタイムゾーンまたは固定のタイムゾーンで表示します。終日の予定とタイムゾーン情報のない時刻は元の値を保持し、Plannerノートは変更しません。",
+	"settings.timeZoneDevice": "端末のタイムゾーン（{zone}）"
 }

@@ -460,5 +460,8 @@
 	"settings.customCalendarError.weekdayNameRequired": "모든 요일에 이름을 입력하세요.",
 	"settings.customCalendarError.leapIntervalInvalid": "윤일 주기는 2~100 사이의 정수로 입력하세요.",
 	"settings.customCalendarError.leapDaysInvalid": "추가 일수는 1~30 사이의 정수로 입력하세요.",
-	"settings.customCalendarError.leapMonthInvalid": "월 목록에 있는 월 번호를 윤일을 추가할 월로 입력하세요."
+	"settings.customCalendarError.leapMonthInvalid": "월 목록에 있는 월 번호를 윤일을 추가할 월로 입력하세요.",
+	"settings.externalCalendarTimeZone": "외부 캘린더 표시 시간대",
+	"settings.externalCalendarTimeZoneDesc": "외부 일정의 날짜와 시간을 기기 시간대 또는 고정 시간대로 표시합니다. 종일 일정과 시간대 정보가 없는 일정은 원래 날짜·시간을 유지하며 Planner 노트는 바꾸지 않습니다.",
+	"settings.timeZoneDevice": "기기 시간대 ({zone})"
 }

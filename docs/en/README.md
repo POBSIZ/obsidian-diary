@@ -9,7 +9,7 @@ Full documentation: [English](https://github.com/POBSIZ/obsidian-diary/blob/main
 | Item | Value |
 | --- | --- |
 | Plugin ID | `diary` |
-| Current version | `1.25.0` |
+| Current version | `1.26.0` |
 | Minimum Obsidian version | `1.7.2` |
 | Supported platforms | Desktop / mobile (`isDesktopOnly: false`) |
 | Default language | `en` |
@@ -17,6 +17,7 @@ Full documentation: [English](https://github.com/POBSIZ/obsidian-diary/blob/main
 
 ## What's new
 
+- `1.26.0`: Adds a display time zone for external calendars, defaulting to the device time zone. Dates, details and timelines use the same zone, fixing early-morning events appearing on the previous UTC date.
 - `1.25.0`: Adds a sidebar default view setting with yearly, monthly calendar, monthly list, daily and 3-day options. New sidebars use monthly calendar by default; restored sidebars keep their last view.
 - `1.24.0`: Improves UI wording in all eight languages, translates custom calendar validation errors, fixes clipped settings labels on narrow screens, and localizes month–year headings.
 - `1.23.1`: Preserves the first entry of legacy `color` lists for display and palette linking.
@@ -270,6 +271,7 @@ Paste rules:
 | Calendar overlay | Selects one built-in alternate calendar or one custom calendar profile for yearly, monthly grid, monthly list, day summary, and sidebar planner views. Default: `None`. |
 | Custom calendars | Local fantasy/campaign calendar profiles. Each profile can define month lengths, weekday names, an epoch mapping, a label format, and a simple leap rule. |
 | External calendars | Opt-in `webcal://` or `https://` `.ics` feeds shown as read-only overlays. Each feed has an enabled state, color, refresh interval, description toggle, and per-view visibility settings. |
+| External calendar time zone | Use the device time zone or a fixed zone for external event dates and times. All-day and floating times keep their original values; Planner notes are unchanged. |
 | Mobile bottom padding | Minimum bottom padding for every mobile planner. Automatic navbar and safe-area clearance still applies when this value is smaller. |
 | Mobile cell width | Month cell width for the mobile yearly planner. `0` uses the default. |
 | Feedback and support | Opens public GitHub forms for feedback, bug reports, and feature suggestions. |

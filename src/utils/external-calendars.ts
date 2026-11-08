@@ -1,5 +1,6 @@
 import { App, requestUrl, TFile } from "obsidian";
 import type { DiaryObsidianSettings } from "../settings";
+import { getExternalCalendarDateTime, getExternalCalendarTimeZone } from "./external-calendar-timezone";
 
 export interface ExternalCalendarSettings {
 	id: string;
@@ -37,6 +38,8 @@ export interface ExternalCalendarEvent {
 	start: string;
 	end?: string;
 	allDay: boolean;
+	/** View-only preference. Source timestamps and cached identities remain unchanged. */
+	displayTimeZone?: string;
 	location?: string;
 	descriptionText?: string;
 	status?: "confirmed" | "tentative" | "cancelled";
@@ -263,7 +266,7 @@ export function getExternalEventsForRange(
 		}
 		for (const event of cache.events) {
 			if (event.status === "cancelled") continue;
-			for (const instance of expandExternalEvent(event, range)) {
+			for (const instance of expandExternalEvent({ ...event, displayTimeZone: settings.externalCalendarTimeZone }, range)) {
 				if (linkedKeys.has(getExternalEventLinkKey(instance))) continue;
 				events.push({
 					...instance,
@@ -310,11 +313,32 @@ export function getExternalEventsForDate(
 }
 
 export function getExternalEventStartDate(event: ExternalCalendarEvent): string {
-	return event.start.slice(0, 10);
+	return getExternalEventDisplayDate(event.start, event);
 }
 
 export function getExternalEventEndDate(event: ExternalCalendarEvent): string {
-	return (event.end ?? event.start).slice(0, 10);
+	return getExternalEventDisplayDate(event.end ?? event.start, event);
+}
+
+function getExternalEventDisplayDate(value: string, event: ExternalCalendarEvent): string {
+	if (event.allDay) return value.slice(0, 10);
+	return getExternalCalendarDateTime(value, event.displayTimeZone)?.date ?? value.slice(0, 10);
+}
+
+export function getExternalEventMinutes(
+	event: ExternalCalendarEvent,
+	dateString: string,
+): { start: number; end: number } | null {
+	if (event.allDay) return null;
+	const start = getExternalCalendarDateTime(event.start, event.displayTimeZone);
+	if (!start) return null;
+	let startMinutes = start.date < dateString ? 0 : start.hour * 60 + start.minute;
+	let endMinutes = startMinutes + 60;
+	const end = event.end ? getExternalCalendarDateTime(event.end, event.displayTimeZone) : null;
+	if (end) endMinutes = end.date > dateString ? 1440 : end.hour * 60 + end.minute;
+	startMinutes = Math.max(0, Math.min(1439, startMinutes));
+	endMinutes = Math.max(startMinutes + 15, Math.min(1440, endMinutes));
+	return { start: startMinutes, end: endMinutes };
 }
 
 export function isExternalRangeEvent(event: ExternalCalendarEvent): boolean {
@@ -332,6 +356,7 @@ export function getExternalEventTimeLabel(event: ExternalCalendarEvent, locale: 
 	const formatter = new Intl.DateTimeFormat(locale === "ko" ? "ko-KR" : "en-US", {
 		hour: "2-digit",
 		minute: "2-digit",
+		timeZone: getExternalCalendarTimeZone(event.start, event.displayTimeZone),
 	});
 	return formatter.format(start);
 }
@@ -640,13 +665,16 @@ function expandExternalEvent(
 		return eventIntersectsRange(event, range) ? [event] : [];
 	}
 	const instances: ExternalCalendarEvent[] = [];
+	// Expand in the source date basis so UTC instance IDs and recurrence exceptions stay stable.
 	const durationDays =
-		daysBetween(getExternalEventStartDate(event), getExternalEventEndDate(event));
-	let occurrenceDate = getExternalEventStartDate(event);
+		daysBetween(event.start.slice(0, 10), (event.end ?? event.start).slice(0, 10));
+	let occurrenceDate = event.start.slice(0, 10);
+	// A UTC occurrence on the next date can still fall on the final visible local date.
+	const expansionEnd = addDaysToDate(range.end, 1);
 	const excluded = new Set(event.recurrence.exDates);
 	let generated = 0;
 	let guard = 0;
-	while (occurrenceDate <= range.end && guard < 10000) {
+	while (occurrenceDate <= expansionEnd && guard < 10000) {
 		guard++;
 		generated++;
 		if (event.recurrence.count && generated > event.recurrence.count) break;

@@ -459,5 +459,8 @@
 	"settings.customCalendarError.weekdayNameRequired": "Saisissez un nom pour chaque jour de la semaine.",
 	"settings.customCalendarError.leapIntervalInvalid": "L’intervalle bissextile doit être compris entre 2 et 100.",
 	"settings.customCalendarError.leapDaysInvalid": "Le nombre de jours bissextiles ajoutés doit être compris entre 1 et 30.",
-	"settings.customCalendarError.leapMonthInvalid": "Le numéro du mois auquel ajouter les jours bissextiles doit correspondre à un mois de la liste définie."
+	"settings.customCalendarError.leapMonthInvalid": "Le numéro du mois auquel ajouter les jours bissextiles doit correspondre à un mois de la liste définie.",
+	"settings.externalCalendarTimeZone": "Fuseau horaire des calendriers externes",
+	"settings.externalCalendarTimeZoneDesc": "Affiche les dates et heures des événements externes dans le fuseau de l’appareil ou un fuseau fixe. Les événements sur une journée et les heures sans fuseau conservent leurs valeurs ; les notes Planner restent inchangées.",
+	"settings.timeZoneDevice": "Fuseau de l’appareil ({zone})"
 }

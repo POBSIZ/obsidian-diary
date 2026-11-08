@@ -221,6 +221,10 @@ api.configureDateFormats(config("iso", [{id:"event-counter-pattern",format:"YYYY
 await copies.app.vault.create("Planner/2026-10-13-Visit.md", "# Existing event");
 const external = await api.createExternalEventFile(copies.app, "Planner", {id:"external",calendarId:"test",uid:"uid",instanceId:"instance",title:"Visit",start:"2026-10-13",allDay:true,categories:[]}, "Test", "en");
 assert.equal(external.path, "Planner/2026-10-13-Visit-3.md", "external note counter suffixes also skip ambiguous final filenames");
+const zonedExternal = await api.createExternalEventFile(copies.app, "Planner", {id:"flight",calendarId:"test",uid:"flight",instanceId:"2026-11-10T23:40:00.000Z",title:"Flight",start:"2026-11-10T23:40:00.000Z",end:"2026-11-11T01:10:00.000Z",displayTimeZone:"Asia/Seoul",allDay:false,categories:[]}, "Test", "en");
+assert.equal(zonedExternal.path, "Planner/2026-11-11-Flight.md", "external note creation uses the chosen display date");
+assert.match(copies.contents.get(zonedExternal.path), /08:40/);
+assert.match(copies.contents.get(zonedExternal.path), /2026-11-10T23:40:00.000Z/, "source identity stays in UTC for linked-overlay suppression");
 api.configureDateFormats(config());
 
 let basenameReads = 0;
