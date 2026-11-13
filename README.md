@@ -13,7 +13,7 @@ Diary는 Obsidian 볼트의 일반 Markdown 노트를 연간·월간·일간·3�
 | Item | Value |
 | --- | --- |
 | Plugin ID | `diary` |
-| Version | `1.26.1` |
+| Version | `1.26.2` |
 | Minimum Obsidian version | `1.7.2` |
 | Platforms | Desktop and mobile (`isDesktopOnly: false`) |
 | Default language | `en` |
@@ -21,6 +21,7 @@ Diary는 Obsidian 볼트의 일반 Markdown 노트를 연간·월간·일간·3�
 
 ## What's new
 
+- `1.26.2`: Removes an unnecessary TypeScript assertion reported by Community source review; runtime behavior is unchanged.
 - `1.26.1`: Speeds up planner rendering, reminders and recurring-event calculations, and reduces unnecessary work when saving settings. [Measurements and verification](docs/releases/1.26.1.md).
 - `1.26.0`: Adds a display time zone for external calendars, defaulting to the device time zone. Dates, details and timelines use the same zone, fixing early-morning events appearing on the previous UTC date. [Release verification](docs/releases/1.26.0.md).
 - `1.25.0`: Adds a sidebar default view setting with yearly, monthly calendar, monthly list, daily and 3-day options. New sidebars use monthly calendar by default; restored sidebars keep their last view.

@@ -9,7 +9,7 @@ Documentación completa: [English](https://github.com/POBSIZ/obsidian-diary/blob
 | Elemento | Valor |
 | --- | --- |
 | ID del plugin | `diary` |
-| Versión actual | `1.26.1` |
+| Versión actual | `1.26.2` |
 | Versión mínima de Obsidian | `1.7.2` |
 | Plataformas | Escritorio / móvil (`isDesktopOnly: false`) |
 | Idioma predeterminado | `en` |
@@ -17,6 +17,7 @@ Documentación completa: [English](https://github.com/POBSIZ/obsidian-diary/blob
 
 ## Novedades
 
+- `1.26.2`: Elimina una aserción de TypeScript innecesaria detectada en la revisión de código de Community; el comportamiento en ejecución no cambia.
 - `1.26.1`: Optimiza las vistas del planificador, los recordatorios y el cálculo de eventos recurrentes, y reduce el procesamiento innecesario al guardar ajustes.
 - `1.26.0`: Añade una zona horaria de visualización para calendarios externos, con la zona del dispositivo como predeterminada. Las fechas, los detalles y las líneas de tiempo usan la misma zona, evitando que eventos de madrugada aparezcan en el día UTC anterior.
 - `1.25.0`: Añade una vista predeterminada para la barra lateral: año, calendario mensual, lista mensual, día o 3 días. Las nuevas barras usan el calendario mensual; las restauradas conservan su última vista.

@@ -352,7 +352,7 @@ export class DiaryObsidianSettingTab extends PluginSettingTab {
 			default:
 				return;
 		}
-		const changedKeys: (keyof DiaryObsidianSettings)[] = [key as keyof DiaryObsidianSettings];
+		const changedKeys: (keyof DiaryObsidianSettings)[] = [key];
 		if (key === "yearlyPlanNotePath") changedKeys.push("yearlyPlanNotePathGrammarVersion");
 		if (key === "monthlyPlanNotePath") changedKeys.push("monthlyPlanNotePathGrammarVersion");
 		await this.plugin.saveSettings(changedKeys);

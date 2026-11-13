@@ -9,7 +9,7 @@ Full documentation: [English](https://github.com/POBSIZ/obsidian-diary/blob/main
 | Item | Value |
 | --- | --- |
 | Plugin ID | `diary` |
-| Current version | `1.26.1` |
+| Current version | `1.26.2` |
 | Minimum Obsidian version | `1.7.2` |
 | Supported platforms | Desktop / mobile (`isDesktopOnly: false`) |
 | Default language | `en` |
@@ -17,6 +17,7 @@ Full documentation: [English](https://github.com/POBSIZ/obsidian-diary/blob/main
 
 ## What's new
 
+- `1.26.2`: Removes an unnecessary TypeScript assertion reported by Community source review; runtime behavior is unchanged.
 - `1.26.1`: Speeds up planner rendering, reminders and recurring-event calculations, and reduces unnecessary work when saving settings.
 - `1.26.0`: Adds a display time zone for external calendars, defaulting to the device time zone. Dates, details and timelines use the same zone, fixing early-morning events appearing on the previous UTC date.
 - `1.25.0`: Adds a sidebar default view setting with yearly, monthly calendar, monthly list, daily and 3-day options. New sidebars use monthly calendar by default; restored sidebars keep their last view.
