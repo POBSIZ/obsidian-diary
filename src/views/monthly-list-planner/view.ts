@@ -34,17 +34,14 @@ import {
 } from "./render-list";
 import { getDaysInMonth } from "../../utils/date";
 import {
-	createRecurrenceOccurrenceFile,
 	getRecurrenceVirtualEventsForRange,
-	isRecurrenceVirtualEvent,
 } from "../../utils/recurrence";
 import { getCalendarOverlayConfig } from "../../utils/calendar-overlays";
 import {
-	getExternalCalendarName,
 	getExternalEventsForRange,
 	type ExternalCalendarEvent,
 } from "../../utils/external-calendars";
-import { ExternalEventModal } from "../external-event-modal";
+import { openPlannerEventModal } from "../planner-event-actions";
 import {
 	PLANNER_COMPACT_LAYOUT_MAX_WIDTH,
 	renderPlannerSegmentedControl,
@@ -677,48 +674,7 @@ export class MonthlyListPlannerView extends ItemView {
 			this.visibleExternalEventsById.get(eventId) ??
 			this.getVisibleExternalEvents().find((item) => item.id === eventId);
 		if (!event) return;
-		const recurrenceEvent = isRecurrenceVirtualEvent(event) ? event : null;
-		const plannerFiles = recurrenceEvent
-			? getPlannerMarkdownFiles(
-					this.app,
-					this.plugin.settings.plannerFolder || "Planner",
-					this.plugin.settings.plannerFileScope ?? "vault",
-				)
-			: [];
-		new ExternalEventModal(this.app, {
-			event,
-			calendarName: recurrenceEvent
-				? t("recurrence.virtualSource")
-				: getExternalCalendarName(this.plugin.settings, event.calendarId),
-			folder: this.plugin.settings.plannerFolder || "Planner",
-			locale: this.plugin.settings.locale ?? "en",
-			onCreated: async (file) => {
-				await this.plugin.openPlannerFile(this.leaf, file);
-				this.render();
-			},
-			createFile: recurrenceEvent
-				? () =>
-						createRecurrenceOccurrenceFile({
-							app: this.app,
-							sourcePath: recurrenceEvent.recurrenceSourcePath,
-							occurrenceDate: recurrenceEvent.recurrenceOccurrenceDate,
-							plannerFiles,
-						})
-				: undefined,
-			readOnlyHint: recurrenceEvent
-				? t("recurrence.virtualHint")
-				: undefined,
-			createSuccessMessage: recurrenceEvent
-				? t("recurrence.createSuccess")
-				: undefined,
-			onRefresh: recurrenceEvent
-				? undefined
-				: async () => {
-						const ok = await this.plugin.refreshExternalCalendar(event.calendarId);
-						this.render();
-						return ok;
-					},
-		}).open();
+		openPlannerEventModal(this.app, this.plugin, this.leaf, event, () => this.render());
 	}
 
 	private renderList(contentEl: HTMLElement): void {

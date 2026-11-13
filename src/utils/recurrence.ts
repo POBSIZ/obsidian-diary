@@ -1,7 +1,4 @@
 import { App, TFile } from "obsidian";
-import KoreanLunarCalendar from "korean-lunar-calendar";
-import { CalendarChinese, CalendarKorean } from "date-chinese";
-import { CalendarDate, createCalendar, toCalendar } from "@internationalized/date";
 import type {
 	AlternateCalendarId,
 	AlternateCalendarSelection,
@@ -11,6 +8,11 @@ import { parseRangeBasename } from "./range";
 import { getFileColorSelection, getFileColorValues, getPlannerFileColor } from "./planner-colors";
 import { formatPlannerBasename, isPlannerBasenameForDates, parsePlannerBasename, recognizePlannerBasename } from "./date-formats";
 import { t } from "../i18n";
+import { getCalendarDateParts, createCalendarDatePartsLookup } from "./recurrence/calendar";
+import { expandSimpleRecurrenceDates } from "./recurrence/calculation";
+import { addDays, daysBetween, isValidDateString } from "./recurrence/date";
+
+export { getCalendarDateParts } from "./recurrence/calendar";
 
 export const RECURRENCE_GREGORIAN = "gregorian";
 
@@ -62,45 +64,12 @@ export interface RecurrenceVirtualEvent extends ExternalCalendarEvent {
 	recurrenceOccurrenceDate: string;
 }
 
-const pad = (n: number): string => String(n).padStart(2, "0");
-const DAY_MS = 86_400_000;
 const SIMPLE_RECURRENCE_FREQUENCIES: readonly SimpleRecurrenceFrequency[] = [
 	"DAILY",
 	"WEEKLY",
 	"MONTHLY",
 	"YEARLY",
 ];
-
-const INTL_CALENDAR_IDS = new Set<AlternateCalendarId>([
-	"buddhist",
-	"hebrew",
-	"islamic",
-	"islamic-civil",
-	"islamic-umalqura",
-	"persian",
-	"indian",
-	"japanese",
-	"roc",
-	"coptic",
-	"ethiopic",
-]);
-
-type InternationalizedCalendarId = Parameters<typeof createCalendar>[0];
-
-const INTERNATIONALIZED_DATE_IDS: Partial<
-	Record<AlternateCalendarId, InternationalizedCalendarId>
-> = {
-	buddhist: "buddhist",
-	hebrew: "hebrew",
-	"islamic-civil": "islamic-civil",
-	"islamic-umalqura": "islamic-umalqura",
-	persian: "persian",
-	indian: "indian",
-	japanese: "japanese",
-	roc: "roc",
-	coptic: "coptic",
-	ethiopic: "ethiopic",
-};
 
 const RECURRENCE_SOURCE_KEYS = [
 	"recurrence_id",
@@ -292,7 +261,7 @@ export function buildRecurrenceSourceFrontmatter(
 	const calendar = normalizeRecurrenceCalendar(value.calendar);
 	const anchorParts =
 		getCalendarDateParts(anchorDate, calendar) ??
-		getGregorianDateParts(anchorDate) ?? { year: 0, month: 1, day: 1 };
+		getCalendarDateParts(anchorDate, RECURRENCE_GREGORIAN) ?? { year: 0, month: 1, day: 1 };
 	const fields: Record<string, unknown> = {
 		recurrence_id: existingId || createRecurrenceId(),
 		recurrence_role: "source",
@@ -390,6 +359,7 @@ export function getRecurrenceVirtualEventsForRange(args: {
 	}
 
 	const events: RecurrenceVirtualEvent[] = [];
+	const getParts = createCalendarDatePartsLookup();
 	for (const file of args.plannerFiles) {
 		const source = getRecurrenceSourceDefinition(args.app, file);
 		if (!source) continue;
@@ -397,7 +367,7 @@ export function getRecurrenceVirtualEventsForRange(args: {
 		const targetTemplate = materializeTargetPath(source, source.anchorDate);
 		const color = getPlannerFileColor(args.app, file) ?? undefined;
 		const timeLabel = getPlannerTimeLabelFromFrontmatter(sourceFm);
-		for (const occurrenceDate of expandRecurrenceDates(source, args.range)) {
+		for (const occurrenceDate of expandRecurrenceDates(source, args.range, getParts)) {
 			if (occurrenceDate === source.anchorDate) continue;
 			if (existingOccurrenceKeys.has(`${source.id}|${occurrenceDate}`)) continue;
 			const target = materializeTargetPath(source, occurrenceDate);
@@ -484,38 +454,6 @@ export async function createRecurrenceOccurrenceFile(args: {
 		throw new Error("Failed to create the repeat occurrence note.");
 	}
 	return created;
-}
-
-export function getCalendarDateParts(
-	dateStr: string,
-	calendar: RecurrenceCalendarId,
-): CalendarDateParts | null {
-	const gregorian = getGregorianDateParts(dateStr);
-	if (!gregorian) return null;
-	if (calendar === RECURRENCE_GREGORIAN) return gregorian;
-	if (calendar === "korean-lunar") return getKoreanLunarParts(gregorian);
-	if (calendar === "chinese") return getChineseParts(gregorian, false);
-	if (calendar === "dangi") return getChineseParts(gregorian, true);
-
-	const intlDateId = INTERNATIONALIZED_DATE_IDS[calendar];
-	if (intlDateId) {
-		try {
-			const converted = toCalendar(
-				new CalendarDate(gregorian.year, gregorian.month, gregorian.day),
-				createCalendar(intlDateId),
-			);
-			return {
-				year: converted.year,
-				month: converted.month,
-				day: converted.day,
-				era: converted.era,
-			};
-		} catch {
-			return getIntlCalendarParts(gregorian, calendar);
-		}
-	}
-
-	return getIntlCalendarParts(gregorian, calendar);
 }
 
 function materializeTargetPath(
@@ -671,164 +609,15 @@ function buildOccurrenceFrontmatter(
 function expandRecurrenceDates(
 	source: RecurrenceSourceDefinition,
 	range: RecurrenceMaterializeRange,
+	getParts: typeof getCalendarDateParts = getCalendarDateParts,
 ): string[] {
-	return expandSimpleRecurrenceDates(source, range);
-}
-
-function expandSimpleRecurrenceDates(
-	source: RecurrenceSourceDefinition,
-	range: RecurrenceMaterializeRange,
-): string[] {
-	if (range.end < source.anchorDate) return [];
-	const frequency = getSimpleRecurrenceFrequency(source.rule);
-	const interval = getRecurrenceInterval(source.rule);
-	const start = range.start > source.anchorDate ? range.start : source.anchorDate;
-	const end =
-		source.untilDate && source.untilDate < range.end
-			? source.untilDate
-			: range.end;
-	if (end < start) return [];
-
-	const matches: string[] = [];
-	let cursor = start;
-	while (cursor <= end) {
-		if (
-			!source.exdates.includes(cursor) &&
-			matchesSimpleRecurrenceDate(source, frequency, interval, cursor)
-		) {
-			matches.push(cursor);
-		}
-		cursor = addDays(cursor, 1);
-	}
-
-	return matches;
-}
-
-function matchesSimpleRecurrenceDate(
-	source: RecurrenceSourceDefinition,
-	frequency: SimpleRecurrenceFrequency,
-	interval: number,
-	dateStr: string,
-): boolean {
-	const elapsedDays = daysBetween(source.anchorDate, dateStr);
-	if (elapsedDays < 0) return false;
-	if (frequency === "DAILY") {
-		return elapsedDays % interval === 0;
-	}
-	if (frequency === "WEEKLY") {
-		return elapsedDays % (7 * interval) === 0;
-	}
-	const parts = getCalendarDateParts(dateStr, source.calendar);
-	if (!parts) return false;
-	if (
-		source.anchorParts.isLeapMonth !== undefined &&
-		parts.isLeapMonth !== source.anchorParts.isLeapMonth
-	) {
-		return false;
-	}
-	if (frequency === "MONTHLY") {
-		const months = monthsBetween(source.anchorParts, parts);
-		return (
-			months >= 0 &&
-			months % interval === 0 &&
-			parts.day === source.anchorParts.day
-		);
-	}
-	if (frequency === "YEARLY") {
-		const years = parts.year - source.anchorParts.year;
-		return (
-			years >= 0 &&
-			years % interval === 0 &&
-			parts.month === source.anchorParts.month &&
-			parts.day === source.anchorParts.day
-		);
-	}
-	return false;
-}
-
-function getGregorianDateParts(dateStr: string): CalendarDateParts | null {
-	const parsed = parseDateString(dateStr);
-	if (!parsed) return null;
-	return parsed;
-}
-
-function getKoreanLunarParts(
-	gregorian: CalendarDateParts,
-): CalendarDateParts | null {
-	const calendar = new KoreanLunarCalendar();
-	if (!calendar.setSolarDate(gregorian.year, gregorian.month, gregorian.day)) {
-		return null;
-	}
-	const lunar = calendar.getLunarCalendar();
-	return {
-		year: lunar.year,
-		month: lunar.month,
-		day: lunar.day,
-		isLeapMonth: lunar.intercalation === true,
-	};
-}
-
-function getChineseParts(
-	gregorian: CalendarDateParts,
-	useKoreanMeridian: boolean,
-): CalendarDateParts | null {
-	try {
-		const calendar = useKoreanMeridian
-			? new CalendarKorean()
-			: new CalendarChinese();
-		calendar.fromGregorian(gregorian.year, gregorian.month, gregorian.day);
-		const values = calendar.get();
-		const month = Number(values[2]);
-		const leap = Boolean(values[3]);
-		const day = Number(values[4]);
-		return {
-			year: calendar.yearFromEpochCycle(),
-			month,
-			day,
-			isLeapMonth: leap,
-		};
-	} catch {
-		return getIntlCalendarParts(
-			gregorian,
-			useKoreanMeridian ? "dangi" : "chinese",
-		);
-	}
-}
-
-function getIntlCalendarParts(
-	gregorian: CalendarDateParts,
-	calendar: AlternateCalendarId,
-): CalendarDateParts | null {
-	if (!INTL_CALENDAR_IDS.has(calendar) && calendar !== "chinese" && calendar !== "dangi") {
-		return null;
-	}
-	try {
-		const formatter = new Intl.DateTimeFormat(
-			`en-US-u-ca-${calendar}-nu-latn`,
-			{
-				year: "numeric",
-				month: "numeric",
-				day: "numeric",
-			},
-		);
-		if (formatter.resolvedOptions().calendar !== calendar) return null;
-		const parts = formatter.formatToParts(
-			new Date(gregorian.year, gregorian.month - 1, gregorian.day),
-		);
-		const year =
-			getNumberPart(parts, "relatedYear") ?? getNumberPart(parts, "year");
-		const month = getNumberPart(parts, "month");
-		const day = getNumberPart(parts, "day");
-		if (!year || !month || !day) return null;
-		return {
-			year,
-			month,
-			day,
-			era: getStringPart(parts, "era") ?? undefined,
-		};
-	} catch {
-		return null;
-	}
+	return expandSimpleRecurrenceDates(
+		source,
+		range,
+		getSimpleRecurrenceFrequency(source.rule),
+		getRecurrenceInterval(source.rule),
+		getParts,
+	);
 }
 
 function getStoredAnchorParts(
@@ -970,60 +759,6 @@ function getPlannerDateFromBasename(basename: string): string | null {
 	return single?.date ?? null;
 }
 
-function parseDateString(
-	dateStr: string,
-): { year: number; month: number; day: number } | null {
-	const m = dateStr.match(/^(\d{4})-(\d{2})-(\d{2})$/);
-	if (!m) return null;
-	const year = Number(m[1]);
-	const month = Number(m[2]);
-	const day = Number(m[3]);
-	if (!Number.isInteger(year) || !Number.isInteger(month) || !Number.isInteger(day)) {
-		return null;
-	}
-	return { year, month, day };
-}
-
-function isValidDateString(dateStr: string): boolean {
-	const parsed = parseDateString(dateStr);
-	if (!parsed) return false;
-	const date = new Date(parsed.year, parsed.month - 1, parsed.day);
-	return (
-		date.getFullYear() === parsed.year &&
-		date.getMonth() === parsed.month - 1 &&
-		date.getDate() === parsed.day
-	);
-}
-
-function dateStringToUtcDate(dateStr: string): Date {
-	const parsed = parseDateString(dateStr);
-	if (!parsed) return new Date(Date.UTC(1970, 0, 1));
-	return new Date(Date.UTC(parsed.year, parsed.month - 1, parsed.day));
-}
-
-function utcDateToDateString(date: Date): string {
-	return `${date.getUTCFullYear()}-${pad(date.getUTCMonth() + 1)}-${pad(
-		date.getUTCDate(),
-	)}`;
-}
-
-function addDays(dateStr: string, days: number): string {
-	const date = dateStringToUtcDate(dateStr);
-	date.setUTCDate(date.getUTCDate() + days);
-	return utcDateToDateString(date);
-}
-
-function daysBetween(start: string, end: string): number {
-	return Math.round(
-		(dateStringToUtcDate(end).getTime() - dateStringToUtcDate(start).getTime()) /
-			DAY_MS,
-	);
-}
-
-function monthsBetween(start: CalendarDateParts, end: CalendarDateParts): number {
-	return (end.year - start.year) * 12 + (end.month - start.month);
-}
-
 function toStringValue(value: unknown): string | null {
 	if (typeof value === "string") return value.trim() || null;
 	if (typeof value === "number" || typeof value === "boolean") {
@@ -1039,23 +774,6 @@ function toNumberValue(value: unknown): number | null {
 		if (Number.isFinite(n)) return n;
 	}
 	return null;
-}
-
-function getNumberPart(
-	parts: Intl.DateTimeFormatPart[],
-	type: string,
-): number | null {
-	const part = parts.find((p) => p.type === type);
-	if (!part) return null;
-	const n = Number(part.value.replace(/[^\d-]/g, ""));
-	return Number.isFinite(n) ? n : null;
-}
-
-function getStringPart(
-	parts: Intl.DateTimeFormatPart[],
-	type: string,
-): string | null {
-	return parts.find((p) => p.type === type)?.value ?? null;
 }
 
 function isAlternateCalendarId(value: string): value is AlternateCalendarId {

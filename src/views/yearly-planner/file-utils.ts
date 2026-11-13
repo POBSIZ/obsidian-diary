@@ -5,6 +5,7 @@ import { getRecurrenceRole } from "../../utils/recurrence";
 import { formatDateForFilename, formatPlannerBasename, getDateFormatsRevision, parsePlannerBasename, parsePlannerFile } from "../../utils/date-formats";
 import type { RangeRunPosition } from "./types";
 import { getPlannerFileColor } from "../../utils/planner-colors";
+import { DateIntervalIndex } from "../../utils/date-interval-index";
 
 const pad = (n: number) => String(n).padStart(2, "0");
 
@@ -13,7 +14,7 @@ export type PlannerFileScope = "vault" | "plannerFolder";
 interface PlannerFileIndex {
 	revision: number;
 	singles: Map<string, TFile[]>;
-	ranges: RangeForYear[];
+	ranges: DateIntervalIndex<RangeForYear>;
 }
 const plannerFileIndexes = new WeakMap<TFile[], PlannerFileIndex>();
 
@@ -34,7 +35,7 @@ function getPlannerFileIndex(files: TFile[]): PlannerFileIndex {
 			singles.set(parsed.start, matches);
 		}
 	}
-	const index = { revision, singles, ranges };
+	const index = { revision, singles, ranges: new DateIntervalIndex(ranges, (range) => range) };
 	plannerFileIndexes.set(files, index);
 	return index;
 }
@@ -147,14 +148,15 @@ export function getRangesForYear(
 ): RangeForYear[] {
 	const yearStart = `${year}-01-01`;
 	const yearEnd = `${year}-12-31`;
-	const ranges: RangeForYear[] = [];
-	for (const range of getPlannerFileIndex(plannerFiles).ranges) {
-		if (range.end < yearStart || range.start > yearEnd) continue;
-		ranges.push(range);
-	}
-	ranges.sort((a, b) => a.start.localeCompare(b.start));
-	return ranges;
+	return getPlannerFileIndex(plannerFiles).ranges.query(yearStart, yearEnd);
 }
+
+/** Reuse the same parsed snapshot for monthly range lanes and per-day lookups. */
+export function getPlannerRangesForPeriod(files: TFile[], range: { start: string; end: string }): RangeForYear[] {
+	return getPlannerFileIndex(files).ranges.query(range.start, range.end);
+}
+
+const basenameCollator = new Intl.Collator(undefined, { numeric: true });
 
 /** Returns a map from range basename to lane index (0-based). Overlapping ranges get different lanes. */
 export function getRangeLaneMap(ranges: RangeForYear[]): Map<string, number> {
@@ -211,26 +213,25 @@ export function getFilesForDate(
 	const dateStr = `${year}-${pad(month)}-${pad(day)}`;
 
 	const index = getPlannerFileIndex(plannerFiles);
-	const singleFiles = [...(index.singles.get(dateStr) ?? [])];
-	singleFiles.sort((a, b) => {
-		const aStart = getPlannerTimeRange(app, a).startTime;
-		const bStart = getPlannerTimeRange(app, b).startTime;
+	const singles = (index.singles.get(dateStr) ?? []).map((file) => ({ file, start: getPlannerTimeRange(app, file).startTime }));
+	singles.sort((a, b) => {
+		const aStart = a.start;
+		const bStart = b.start;
 		if (aStart && bStart && aStart !== bStart) {
 			return aStart.localeCompare(bStart);
 		}
 		if (aStart && !bStart) return -1;
 		if (!aStart && bStart) return 1;
-		return a.basename.localeCompare(b.basename, undefined, { numeric: true });
+		return basenameCollator.compare(a.file.basename, b.file.basename);
 	});
+	const singleFiles = singles.map(({ file }) => file);
 
 	const rangeFiles: Array<{
 		file: TFile;
 		runPos: RangeRunPosition;
 		isFirst: boolean;
 	}> = [];
-	for (const parsed of index.ranges) {
-		if (!isDateInRange(dateStr, parsed.start, parsed.end))
-			continue;
+	for (const parsed of index.ranges.query(dateStr)) {
 		const runPos = getRangeRunPosition(
 			year,
 			month,
@@ -244,13 +245,6 @@ export function getFilesForDate(
 			isFirst: dateStr === parsed.start,
 		});
 	}
-
-	/* Sort by start date ascending so later ranges render last (on top via z-index). */
-	rangeFiles.sort((a, b) => {
-		const aStart = parseRangeBasename(a.file.basename)?.start ?? "";
-		const bStart = parseRangeBasename(b.file.basename)?.start ?? "";
-		return aStart.localeCompare(bStart);
-	});
 
 	return { singleFiles, rangeFiles };
 }

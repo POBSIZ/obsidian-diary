@@ -18,8 +18,8 @@ import {
 	getExternalEventEndDate,
 	getExternalEventMinutes,
 	getExternalEventStartDate,
-	getExternalEventsForDate,
 	getExternalEventsForRange,
+	createExternalEventDateLookup,
 	isExternalRangeEvent,
 	type ExternalCalendarEvent,
 } from "../../utils/external-calendars";
@@ -30,7 +30,7 @@ import {
 	getRecurrenceVirtualEventsForRange,
 	isRecurrenceVirtualEvent,
 } from "../../utils/recurrence";
-import { ExternalEventModal } from "../external-event-modal";
+import { openPlannerEventModal } from "../planner-event-actions";
 import { PlannerPeriodModal } from "../planner-period-modal";
 import {
 	PLANNER_COMPACT_LAYOUT_MAX_WIDTH,
@@ -377,13 +377,22 @@ export class DailyPlannerView extends ItemView {
 		const folder = this.plugin.settings.plannerFolder || "Planner";
 		const scope = this.plugin.settings.plannerFileScope ?? "vault";
 		const plannerFiles = getPlannerMarkdownFiles(this.app, folder, scope);
+		const last = addDaysToParts(this.year, this.month, this.day, this.getVisibleDayCount() - 1);
+		const range = {
+			start: toDateString(this.year, this.month, this.day),
+			end: toDateString(last.year, last.month, last.day),
+		};
+		const externalEventsForDate = createExternalEventDateLookup([
+			...getExternalEventsForRange(this.app, this.plugin.settings, range, "monthly", plannerFiles),
+			...getRecurrenceVirtualEventsForRange({ app: this.app, plannerFiles, range }),
+		]);
 		for (let offset = 0; offset < this.getVisibleDayCount(); offset++) {
 			const date = addDaysToParts(this.year, this.month, this.day, offset);
 			days.push({
 				...date,
 				dateString: toDateString(date.year, date.month, date.day),
 				label: this.formatDayColumnDate(date),
-				entries: this.getEntries(date, folder, scope, plannerFiles),
+				entries: this.getEntries(date, folder, scope, plannerFiles, externalEventsForDate),
 			});
 		}
 		return days;
@@ -394,6 +403,7 @@ export class DailyPlannerView extends ItemView {
 		folder: string,
 		scope: PlannerFileScope,
 		plannerFiles: TFile[],
+		externalEventsForDate: ReturnType<typeof createExternalEventDateLookup>,
 	): DailyPlannerEntry[] {
 		const dateString = toDateString(date.year, date.month, date.day);
 		const { singleFiles, rangeFiles } = getFilesForDate(
@@ -468,23 +478,9 @@ export class DailyPlannerView extends ItemView {
 			});
 		}
 
-		const externalEvents = getExternalEventsForRange(
-			this.app,
-			this.plugin.settings,
-			{ start: dateString, end: dateString },
-			"monthly",
-			plannerFiles,
-		);
-		const recurrenceEvents = getRecurrenceVirtualEventsForRange({
-			app: this.app,
-			plannerFiles,
-			range: { start: dateString, end: dateString },
-		});
-		const overlayEvents = [...externalEvents, ...recurrenceEvents];
-		for (const event of getExternalEventsForDate(
-			overlayEvents,
-			dateString,
-		).summaryEvents) {
+		for (const event of externalEventsForDate(dateString).summaryEvents) {
+			// Daily virtual occurrences retain their original occurrence-date placement.
+			if (isRecurrenceVirtualEvent(event) && event.recurrenceOccurrenceDate !== dateString) continue;
 			let minutes = getExternalEventMinutes(event, dateString);
 			if (isRecurrenceVirtualEvent(event)) {
 				const source = this.app.vault.getAbstractFileByPath(
@@ -1176,46 +1172,7 @@ export class DailyPlannerView extends ItemView {
 	}
 
 	private openExternalEventModal(event: ExternalCalendarEvent): void {
-		const recurrenceEvent = isRecurrenceVirtualEvent(event) ? event : null;
-		const plannerFiles = recurrenceEvent
-			? getPlannerMarkdownFiles(
-					this.app,
-					this.plugin.settings.plannerFolder || "Planner",
-					this.plugin.settings.plannerFileScope ?? "vault",
-				)
-			: [];
-		new ExternalEventModal(this.app, {
-			event,
-			calendarName: recurrenceEvent
-				? t("recurrence.virtualSource")
-				: getExternalCalendarName(this.plugin.settings, event.calendarId),
-			folder: this.plugin.settings.plannerFolder || "Planner",
-			locale: this.plugin.settings.locale ?? "en",
-			onCreated: async (file) => {
-				await this.plugin.openPlannerFile(this.leaf, file);
-				this.render();
-			},
-			createFile: recurrenceEvent
-				? () =>
-						createRecurrenceOccurrenceFile({
-							app: this.app,
-							sourcePath: recurrenceEvent.recurrenceSourcePath,
-							occurrenceDate: recurrenceEvent.recurrenceOccurrenceDate,
-							plannerFiles,
-						})
-				: undefined,
-			readOnlyHint: recurrenceEvent ? t("recurrence.virtualHint") : undefined,
-			createSuccessMessage: recurrenceEvent
-				? t("recurrence.createSuccess")
-				: undefined,
-			onRefresh: recurrenceEvent
-				? undefined
-				: async () => {
-						const ok = await this.plugin.refreshExternalCalendar(event.calendarId);
-						this.render();
-						return ok;
-					},
-		}).open();
+		openPlannerEventModal(this.app, this.plugin, this.leaf, event, () => this.render());
 	}
 
 	private openCreateFileModal(

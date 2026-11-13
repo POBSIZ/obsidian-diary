@@ -28,7 +28,7 @@ export function renderPlannerColorSettings(parent: HTMLElement, plugin: DiaryObs
 					id: `color-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
 					name: t("settings.colorPaletteNew"), color: "#3b82f6",
 				});
-				await plugin.saveSettings();
+				await plugin.saveSettings(["colorPalette"]);
 				render();
 			},
 		});
@@ -47,7 +47,7 @@ function renderPreset(parent: HTMLElement, plugin: DiaryObsidian,
 			.onClick(async () => {
 				const current = getCurrentPreset(plugin, preset.id);
 				if (current) current.archived = false;
-				await plugin.saveSettings();
+				await plugin.saveSettings(["colorPalette"]);
 				rerender();
 			}));
 	} else {
@@ -57,19 +57,19 @@ function renderPreset(parent: HTMLElement, plugin: DiaryObsidian,
 				if (!current) return;
 				current.name = name.trim();
 				setting.setName(getPlannerColorPresetLabel(current));
-				await plugin.saveSettings();
+				await plugin.saveSettings(["colorPalette"]);
 			}));
 		renderHexColor(card, preset.color, async (color) => {
 			const current = getCurrentPreset(plugin, preset.id);
 			if (!current) return;
 			current.color = color;
-			await plugin.saveSettings();
+			await plugin.saveSettings(["colorPalette"]);
 		});
 		setting.addButton((button) => button.setButtonText(t("settings.colorPaletteArchive"))
 			.onClick(async () => {
 				const current = getCurrentPreset(plugin, preset.id);
 				if (current) current.archived = true;
-				await plugin.saveSettings();
+				await plugin.saveSettings(["colorPalette"]);
 				rerender();
 			}));
 		createUiButton(card, {
@@ -104,13 +104,13 @@ function renderHolidayColor(parent: HTMLElement, plugin: DiaryObsidian, rerender
 					if (!preset || preset.archived) return;
 					plugin.settings.holidayColor = { mode: "palette", id: preset.id, color: preset.color };
 				}
-				await plugin.saveSettings();
+				await plugin.saveSettings(["holidayColor"]);
 				rerender();
 			});
 		});
 	if (selection.mode === "fixed") renderHexColor(parent, selection.color, async (color) => {
 		plugin.settings.holidayColor = { mode: "fixed", color };
-		await plugin.saveSettings();
+		await plugin.saveSettings(["holidayColor"]);
 	});
 }
 

@@ -14,7 +14,7 @@ export function renderExternalCalendarTimeZoneSetting(setting: Setting, plugin: 
 			}
 			dropdown.setValue(plugin.settings.externalCalendarTimeZone).onChange(async (value) => {
 				plugin.settings.externalCalendarTimeZone = value;
-				await plugin.saveSettings();
+				await plugin.saveSettings(["externalCalendarTimeZone"]);
 			});
 		});
 }

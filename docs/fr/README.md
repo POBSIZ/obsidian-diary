@@ -9,7 +9,7 @@ Documentation complète : [English](https://github.com/POBSIZ/obsidian-diary/blo
 | Élément | Valeur |
 | --- | --- |
 | ID du plugin | `diary` |
-| Version actuelle | `1.26.0` |
+| Version actuelle | `1.26.1` |
 | Version minimale d’Obsidian | `1.7.2` |
 | Plateformes | Bureau / mobile (`isDesktopOnly: false`) |
 | Langue par défaut | `en` |
@@ -17,6 +17,7 @@ Documentation complète : [English](https://github.com/POBSIZ/obsidian-diary/blo
 
 ## Nouveautés
 
+- `1.26.1`: Optimise les vues du planificateur, les rappels et le calcul des événements récurrents, et réduit les traitements inutiles lors de l’enregistrement des paramètres.
 - `1.26.0`: Ajoute un fuseau d’affichage pour les calendriers externes, celui de l’appareil par défaut. Les dates, les détails et les horaires utilisent le même fuseau, pour que les événements matinaux ne soient plus affichés la veille en UTC.
 - `1.25.0`: Ajoute une vue par défaut du panneau latéral : année, calendrier mensuel, liste mensuelle, jour ou 3 jours. Les nouveaux panneaux utilisent le calendrier mensuel ; les panneaux restaurés gardent leur dernière vue.
 - `1.24.0`: Améliore les textes de l’interface dans les huit langues, traduit les erreurs des calendriers personnalisés, corrige les libellés tronqués dans les fenêtres étroites et adapte les titres de mois et d’année à la langue choisie.

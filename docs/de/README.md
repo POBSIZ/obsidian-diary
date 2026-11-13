@@ -9,7 +9,7 @@ Vollständige Dokumentation: [English](https://github.com/POBSIZ/obsidian-diary/
 | Eintrag | Wert |
 | --- | --- |
 | Plugin-ID | `diary` |
-| Aktuelle Version | `1.26.0` |
+| Aktuelle Version | `1.26.1` |
 | Minimale Obsidian-Version | `1.7.2` |
 | Plattformen | Desktop / Mobil (`isDesktopOnly: false`) |
 | Standardsprache | `en` |
@@ -17,6 +17,7 @@ Vollständige Dokumentation: [English](https://github.com/POBSIZ/obsidian-diary/
 
 ## Änderungen
 
+- `1.26.1`: Optimiert die Planeransichten, Erinnerungen und die Berechnung wiederkehrender Termine und reduziert unnötige Verarbeitung beim Speichern von Einstellungen.
 - `1.26.0`: Neue Anzeigezeitzone für externe Kalender, standardmäßig die Gerätezeitzone. Datum, Details und Zeitachsen verwenden dieselbe Zone; frühe Termine erscheinen dadurch nicht mehr am vorherigen UTC-Tag.
 - `1.25.0`: Neue Einstellung für die Standardansicht der Seitenleiste: Jahr, Monatskalender, Monatsliste, Tag oder 3 Tage. Neue Seitenleisten verwenden standardmäßig den Monatskalender; wiederhergestellte behalten die letzte Ansicht.
 - `1.24.0`: Überarbeitet die Oberflächentexte in allen acht Sprachen, übersetzt Fehlermeldungen für eigene Kalender, behebt abgeschnittene Einstellungsbeschriftungen bei schmalen Fenstern und passt Monats- und Jahresüberschriften an die gewählte Sprache an.

@@ -28,7 +28,7 @@ import type { CalendarCell } from "../../utils/date";
 import { PlannerPeriodModal } from "../planner-period-modal";
 import type { MonthlyPlannerSelectedDate } from "./types";
 import {
-	getExternalEventsForDate,
+	type ExternalCalendarDateEvents,
 	type ExternalCalendarEvent,
 } from "../../utils/external-calendars";
 import { isRecurrenceVirtualEvent } from "../../utils/recurrence";
@@ -152,6 +152,7 @@ export interface CreateMonthlyCellContext {
 	holidaysData: HolidayData | null;
 	calendarOverlay: CalendarOverlayConfig;
 	externalEvents: ExternalCalendarEvent[];
+	externalEventsForDate: (date: string) => ExternalCalendarDateEvents;
 	rangeLaneMap: Map<string, number>;
 	selectedDate: MonthlyPlannerSelectedDate | null;
 	isCompactLayout: boolean;
@@ -248,10 +249,7 @@ export function createMonthlyCell(
 		ctx.plannerFileScope,
 		ctx.plannerFiles,
 	);
-	const externalDateEvents = getExternalEventsForDate(
-		ctx.externalEvents,
-		dateKey,
-	);
+	const externalDateEvents = ctx.externalEventsForDate(dateKey);
 	const isCompactLayout = ctx.isCompactLayout;
 	const holidayNames =
 		isHoliday && ctx.holidaysData?.names.has(dateKey)

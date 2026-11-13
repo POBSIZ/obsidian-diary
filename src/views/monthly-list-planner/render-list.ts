@@ -8,7 +8,7 @@ import {
 	type CalendarOverlayConfig,
 } from "../../utils/calendar-overlays";
 import {
-	getExternalEventsForDate,
+	createExternalEventDateLookup,
 	type ExternalCalendarEvent,
 } from "../../utils/external-calendars";
 import {
@@ -66,6 +66,7 @@ export function renderMonthlyListBody(
 		filter,
 		clipboardSelection,
 	} = ctx;
+	const externalEventsForDate = createExternalEventDateLookup(externalEvents);
 	const daysInMonth = getDaysInMonth(year, month);
 	const weekdayShort = getWeekdayLabels(locale);
 	const weekendL = getWeekendLabels(locale);
@@ -99,7 +100,7 @@ export function renderMonthlyListBody(
 			plannerFileScope,
 			plannerFiles,
 		);
-		const externalDateEvents = getExternalEventsForDate(externalEvents, dateKey);
+		const externalDateEvents = externalEventsForDate(dateKey);
 		const hasEntries =
 			singleFiles.length > 0 ||
 			rangeFiles.length > 0 ||

@@ -1,0 +1,213 @@
+{
+  "recordedDate": "2026-11-14",
+  "timeZone": "Asia/Seoul",
+  "status": "verified uncommitted development source; published runtime restored",
+  "sourceDigest": {
+    "sha256": "583995186bf26d5b023fd42e3479dda3aae2d1e54af0c6f79dd4aae101b3125d",
+    "method": "sorted relative paths and bytes separated by NUL",
+    "files": 84
+  },
+  "synthetic": {
+    "environment": {
+      "node": "v22.22.3",
+      "platform": "darwin",
+      "arch": "arm64",
+      "cpu": "Apple M4",
+      "timeZone": "Asia/Seoul",
+      "samples": 9
+    },
+    "fixture": {
+      "notes": 10000,
+      "ranges": 2000,
+      "timedExternalEvents": 600,
+      "monthCells": 42,
+      "yearDays": 365,
+      "holidayCountry": "KR"
+    },
+    "baselineRef": "dac408378729a23d477a9cc791c31627cd4f5286",
+    "baseline": {
+      "holidayThreeDays": {
+        "medianMs": 12.705499999999972,
+        "p95Ms": 14.277749999999969,
+        "checksum": 36,
+        "firstLookupMs": 13.839917000000014
+      },
+      "externalMonth42Days": {
+        "medianMs": 114.87225000000012,
+        "p95Ms": 117.36745799999994,
+        "checksum": 42
+      },
+      "externalYear365Days": {
+        "medianMs": 1005.7460410000003,
+        "p95Ms": 1017.2648330000002,
+        "checksum": 600
+      },
+      "notesYear10000Files": {
+        "medianMs": 23.867416999999477,
+        "p95Ms": 27.63079199999993,
+        "checksum": 16000
+      },
+      "externalTimeLabels600": {
+        "medianMs": 14.088541999999507,
+        "p95Ms": 14.166291999999885,
+        "checksum": 4800
+      }
+    },
+    "current": {
+      "holidayThreeDays": {
+        "medianMs": 0.00483400000121037,
+        "p95Ms": 0.041332999999212916,
+        "checksum": 36,
+        "firstLookupMs": 11.22595899999942,
+        "reductionPercent": 99.96195348470181
+      },
+      "externalMonth42Days": {
+        "medianMs": 3.0177499999990687,
+        "p95Ms": 3.275541000000885,
+        "checksum": 42,
+        "reductionPercent": 97.37295125672296
+      },
+      "externalYear365Days": {
+        "medianMs": 2.9437920000000304,
+        "p95Ms": 3.025375000001077,
+        "checksum": 600,
+        "reductionPercent": 99.70730265096812
+      },
+      "notesYear10000Files": {
+        "medianMs": 4.51575000000048,
+        "p95Ms": 5.917916000000332,
+        "checksum": 16000,
+        "reductionPercent": 81.07985459842354
+      },
+      "externalTimeLabels600": {
+        "medianMs": 0.41683300000113377,
+        "p95Ms": 0.4611249999998108,
+        "checksum": 4800,
+        "reductionPercent": 97.04133330474404
+      }
+    }
+  },
+  "obsidian": {
+    "measurement": "synchronous render() duration; 31 samples after a warm render and 250 ms for asynchronous plan-note content; existing NOTE views and settings",
+    "baseline": {
+      "version": "1.26.0",
+      "mainHash": "8aee17c1e0e7c873c43c3ba79c0d89395ff53cc25c2433eda747611e4522d46c",
+      "loadedRefreshHash": "c9872dab6ae500aefcfe64722ac9cad6468522437fe615409e719f9d62443b79",
+      "results": [
+        {
+          "type": "monthly-planner-view",
+          "samples": 31,
+          "medianMs": 8.900000095367432,
+          "p95Ms": 10.899999618530273,
+          "elements": 1413,
+          "chips": 161,
+          "contentHash": "fd78c8f9bff1e20c3de25c52be8030773ca53ae71534f2a211f6e79f773f3e1f"
+        },
+        {
+          "type": "monthly-sidebar-planner-view",
+          "samples": 31,
+          "medianMs": 8.699999809265137,
+          "p95Ms": 11.200000286102295,
+          "elements": 1534,
+          "chips": 0,
+          "contentHash": "3083c3cdf299e6627bf4ba45f9c75835a77d8fea523f21aa0766948f9aba2fb2"
+        },
+        {
+          "type": "three-day-planner-view",
+          "samples": 31,
+          "medianMs": 16.199999809265137,
+          "p95Ms": 17,
+          "elements": 289,
+          "chips": 21,
+          "contentHash": "66e230997ac2e50e46e6aac5ca74bdeb1d447f25dcab86dd390f33cece070caa"
+        }
+      ]
+    },
+    "candidate": {
+      "version": "1.26.0",
+      "mainHash": "84662b1f2a4a8aea78bda4923431b0d95e6f6e4f19febbd9cf5026752d870952",
+      "loadedRefreshHash": "e13ac12dec31c653b7b7d1f61b036fcd1b37d9eb6e8645e3aab8a569e77c5646",
+      "results": [
+        {
+          "type": "monthly-planner-view",
+          "samples": 31,
+          "medianMs": 4.699999809265137,
+          "p95Ms": 10.599999904632568,
+          "elements": 1413,
+          "chips": 161,
+          "contentHash": "fd78c8f9bff1e20c3de25c52be8030773ca53ae71534f2a211f6e79f773f3e1f",
+          "reductionPercent": 47.191013944915014
+        },
+        {
+          "type": "monthly-sidebar-planner-view",
+          "samples": 31,
+          "medianMs": 4.399999618530273,
+          "p95Ms": 6.900000095367432,
+          "elements": 1534,
+          "chips": 0,
+          "contentHash": "3083c3cdf299e6627bf4ba45f9c75835a77d8fea523f21aa0766948f9aba2fb2",
+          "reductionPercent": 49.425290632254296
+        },
+        {
+          "type": "three-day-planner-view",
+          "samples": 31,
+          "medianMs": 2.5999999046325684,
+          "p95Ms": 6.899999618530273,
+          "elements": 289,
+          "chips": 21,
+          "contentHash": "66e230997ac2e50e46e6aac5ca74bdeb1d447f25dcab86dd390f33cece070caa",
+          "reductionPercent": 83.95061768367694
+        }
+      ]
+    },
+    "matchingContentAndCounts": true,
+    "runtimeRestored": true
+  },
+  "structure": {
+    "mainTsLinesBefore": 902,
+    "mainTsLinesAfter": 728,
+    "extractedModules": [
+      "src/planner-views.ts",
+      "src/planner-refresh.ts",
+      "src/utils/external-event-dates.ts"
+    ],
+    "sharedUtilities": [
+      "src/utils/date-interval-index.ts",
+      "src/utils/lru-cache.ts"
+    ]
+  },
+  "productionBundle": {
+    "beforeBytes": 2174664,
+    "afterBytes": 2175808,
+    "generatedArtifactCommitted": false,
+    "baselineRebuildMatchesInstalledRelease": true
+  },
+  "validation": {
+    "node": "22.22.3",
+    "cleanSourceCopy": true,
+    "npmCi": "passed",
+    "npmRunLint": "passed with zero warnings",
+    "npmRunBuild": "passed",
+    "npmTest": "passed including new performance regressions and eight locales",
+    "runtimeDependencyAudit": "0 vulnerabilities",
+    "developmentDependencyAudit": "14 pre-existing moderate findings; dependencies unchanged",
+    "deployedBuildMatchesCleanBuild": true,
+    "obsidianCapturedErrors": "none",
+    "enabledPluginListByteIdentical": true,
+    "originalMainTabsAndActiveLeafPreserved": true
+  },
+  "preservation": {
+    "preExistingGitignoreChange": "preserved",
+    "runtimeAssets": "original main.js, manifest.json and styles.css restored and reloaded",
+    "notes": "no note creation or edit actions performed",
+    "dataJson": "not byte-identical after reload; existing external-calendar startup refresh updated the persisted cache",
+    "workspaceJson": "autosaved after plugin reload; original six main leaf IDs, active leaf and sidebar state verified"
+  },
+  "limits": [
+    "Synthetic timings measure computation with generated data, not vault I/O or paint time.",
+    "Holiday repeated-lookup timings use a warm cache; first lookup timings are single observations.",
+    "Desktop render timings are not input-to-paint, frame rate, memory or startup measurements.",
+    "Physical iOS/Android and mobile emulation were not tested; CSS and note routing were unchanged.",
+    "No release, commit or push was performed."
+  ]
+}

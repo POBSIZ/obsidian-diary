@@ -1,5 +1,5 @@
 import { Platform, Plugin, TFile, WorkspaceLeaf } from "obsidian";
-import { normalizeLocale, setLocale, t } from "./i18n";
+import { normalizeLocale, setLocale } from "./i18n";
 import {
 	DEFAULT_SETTINGS,
 	DiaryObsidianSettings,
@@ -7,7 +7,6 @@ import {
 } from "./settings";
 import { normalizeAlternateCalendarId } from "./utils/alternate-calendars";
 import {
-	clearCustomCalendarCaches,
 	normalizeCustomCalendarProfiles,
 } from "./utils/custom-calendars";
 import {
@@ -34,14 +33,17 @@ import { MonthlyPlannerView } from "./views/monthly-planner/view";
 import { MonthlySidebarPlannerView } from "./views/monthly-planner/sidebar-view";
 import { MonthlyListPlannerView } from "./views/monthly-list-planner/view";
 import { MonthlyListSidebarPlannerView } from "./views/monthly-list-planner/sidebar-view";
-import { registerPlannerReminders } from "./planner-reminders";
 import { DailyPlannerView } from "./views/daily-planner/view";
 import { ThreeDayPlannerView } from "./views/three-day-planner/view";
+import { registerPlannerViews, refreshPlannerViewGroup, syncPlannerPlanNotePanels } from "./planner-views";
+import { registerPlannerRefresh, refreshAllPlannerViews } from "./planner-refresh";
+import { registerPlannerReminders, type PlannerReminderController } from "./planner-reminders";
 import type { PlannerViewMode } from "./views/planner-layout";
 import { getSidebarPlannerViewState, normalizeSidebarDefaultView } from "./utils/sidebar-planner";
 import { configureDateFormats, normalizeDateFormats } from "./utils/date-formats";
 import { configurePlannerColors, normalizeColorPalette, normalizePlannerColorSelection } from "./utils/planner-colors";
 import { normalizeExternalCalendarTimeZone } from "./utils/external-calendar-timezone";
+import { prepareSettingsSave, normalizeYearlyPlannerExpandedMonths, type SettingsKey } from "./settings/persistence";
 
 const SIDEBAR_PLANNER_VIEW_TYPES = [
 	VIEW_TYPE_YEARLY_SIDEBAR_PLANNER,
@@ -51,113 +53,19 @@ const SIDEBAR_PLANNER_VIEW_TYPES = [
 	VIEW_TYPE_THREE_DAY_PLANNER,
 ] as const;
 
-function normalizeYearlyPlannerExpandedMonths(months: unknown): number[] {
-	if (!Array.isArray(months)) return [];
-	const normalized = new Set<number>();
-	for (const value of months) {
-		const month = Number(value);
-		if (Number.isInteger(month) && month >= 1 && month <= 12) {
-			normalized.add(month);
-		}
-	}
-	return Array.from(normalized).sort((a, b) => a - b);
-}
 
 export default class DiaryObsidian extends Plugin {
 	settings: DiaryObsidianSettings;
 	settingTab?: DiaryObsidianSettingTab;
 	private readonly externalCalendarRefreshInFlight = new Set<string>();
 	private didRefreshExternalCalendarsOnStartup = false;
+	private plannerReminders?: PlannerReminderController;
 
 	async onload() {
 		await this.loadSettings();
 		setLocale(this.settings.locale ?? "en");
 
-		this.registerView(
-			VIEW_TYPE_YEARLY_PLANNER,
-			(leaf) => new YearlyPlannerView(leaf, this),
-		);
-		this.registerView(
-			VIEW_TYPE_DAILY_PLANNER,
-			(leaf) => new DailyPlannerView(leaf, this),
-		);
-		this.registerView(
-			VIEW_TYPE_THREE_DAY_PLANNER,
-			(leaf) => new ThreeDayPlannerView(leaf, this),
-		);
-		this.registerView(
-			VIEW_TYPE_YEARLY_SIDEBAR_PLANNER,
-			(leaf) => new YearlySidebarPlannerView(leaf, this),
-		);
-		this.registerView(
-			VIEW_TYPE_MONTHLY_PLANNER,
-			(leaf) => new MonthlyPlannerView(leaf, this),
-		);
-		this.registerView(
-			VIEW_TYPE_MONTHLY_SIDEBAR_PLANNER,
-			(leaf) => new MonthlySidebarPlannerView(leaf, this),
-		);
-		this.registerView(
-			VIEW_TYPE_MONTHLY_LIST_PLANNER,
-			(leaf) => new MonthlyListPlannerView(leaf, this),
-		);
-		this.registerView(
-			VIEW_TYPE_MONTHLY_LIST_SIDEBAR_PLANNER,
-			(leaf) => new MonthlyListSidebarPlannerView(leaf, this),
-		);
-
-		this.addRibbonIcon(
-			"calendar-range",
-			t("ribbon.openYearlyPlanner"),
-			() => {
-				void this.activateYearlyPlanner();
-			},
-		);
-		this.addRibbonIcon(
-			"calendar-days",
-			t("command.openMonthlyPlanner"),
-			() => {
-				void this.activateMonthlyPlanner();
-			},
-		);
-		this.addRibbonIcon(
-			"list-ordered",
-			t("ribbon.openMonthlyListPlanner"),
-			() => {
-				void this.activateMonthlyListPlanner();
-			},
-		);
-
-		this.addCommand({
-			id: "open-yearly-planner",
-			name: t("command.openYearlyPlanner"),
-			callback: () => void this.activateYearlyPlanner(),
-		});
-		this.addCommand({
-			id: "open-daily-planner",
-			name: t("command.openDailyPlanner"),
-			callback: () => void this.activateDailyPlanner(),
-		});
-		this.addCommand({
-			id: "open-three-day-planner",
-			name: t("command.openThreeDayPlanner"),
-			callback: () => void this.activateThreeDayPlanner(),
-		});
-		this.addCommand({
-			id: "open-monthly-planner",
-			name: t("command.openMonthlyPlanner"),
-			callback: () => void this.activateMonthlyPlanner(),
-		});
-		this.addCommand({
-			id: "open-monthly-planner-in-sidebar",
-			name: t("command.openMonthlyPlannerInSidebar"),
-			callback: () => void this.activateMonthlyPlannerInSidebar(),
-		});
-		this.addCommand({
-			id: "open-monthly-list-planner",
-			name: t("command.openMonthlyListPlanner"),
-			callback: () => void this.activateMonthlyListPlanner(),
-		});
+		registerPlannerViews(this);
 
 		this.app.workspace.onLayoutReady(() => {
 			void this.ensureMonthlyPlannerSidebarLeaf({
@@ -170,49 +78,16 @@ export default class DiaryObsidian extends Plugin {
 		this.settingTab = new DiaryObsidianSettingTab(this.app, this);
 		this.addSettingTab(this.settingTab);
 
-		registerPlannerReminders(this);
+		this.plannerReminders = registerPlannerReminders(this);
 
-		const debouncedRefresh = this.debounce(() => {
-			this.refreshYearlyPlannerViews();
-			this.refreshMonthlyPlannerViews();
-			this.refreshMonthlyListPlannerViews();
-			this.refreshDailyPlannerViews();
-		}, 150);
+		registerPlannerRefresh(this);
 
-		this.registerEvent(
-			this.app.vault.on("create", debouncedRefresh),
-		);
-		this.registerEvent(
-			this.app.vault.on("delete", debouncedRefresh),
-		);
-		this.registerEvent(
-			this.app.vault.on("rename", debouncedRefresh),
-		);
-		this.registerEvent(
-			this.app.metadataCache.on("changed", debouncedRefresh),
-		);
-
-		let lastCheckedDate = new Date().toDateString();
-		this.registerInterval(
-			window.setInterval(() => {
-				const today = new Date().toDateString();
-				if (today !== lastCheckedDate) {
-					lastCheckedDate = today;
-					this.refreshYearlyPlannerViews();
-					this.refreshMonthlyPlannerViews();
-					this.refreshMonthlyListPlannerViews();
-					this.refreshDailyPlannerViews();
-				}
-			}, 60_000),
-		);
 		this.registerInterval(
 			window.setInterval(() => {
 				void this.refreshDueExternalCalendars();
 			}, 60_000),
 		);
 	}
-
-	onunload() {}
 
 	async activateYearlyPlanner(): Promise<void> {
 		const { workspace } = this.app;
@@ -524,36 +399,16 @@ export default class DiaryObsidian extends Plugin {
 		delete this.settings.showLunarDates;
 	}
 
-	async saveSettings() {
-		this.settings.externalCalendarTimeZone = normalizeExternalCalendarTimeZone(this.settings.externalCalendarTimeZone);
-		this.settings.sidebarDefaultView = normalizeSidebarDefaultView(this.settings.sidebarDefaultView);
-		this.settings.dateFormats = normalizeDateFormats(this.settings.dateFormats);
-		this.settings.colorPalette = normalizeColorPalette(this.settings.colorPalette);
-		this.settings.holidayColor = normalizePlannerColorSelection(this.settings.holidayColor);
-		configureDateFormats(this.settings.dateFormats);
-		configurePlannerColors(this.app, this.settings);
-		this.settings.locale = normalizeLocale(this.settings.locale);
-		setLocale(this.settings.locale ?? "en");
-		this.settings.customCalendarProfiles = normalizeCustomCalendarProfiles(
-			this.settings.customCalendarProfiles,
-		);
-		this.settings.externalCalendars = normalizeExternalCalendarSettings(
-			this.settings.externalCalendars,
-		);
-		this.settings.externalCalendarCaches = normalizeExternalCalendarCaches(
-			this.settings.externalCalendarCaches,
-			this.settings.externalCalendars,
-		);
-		clearCustomCalendarCaches();
-		this.settings.yearlyPlannerExpandedMonths =
-			normalizeYearlyPlannerExpandedMonths(
-				this.settings.yearlyPlannerExpandedMonths,
-			);
+	async saveSettings(changedKeys?: readonly SettingsKey[]) {
+		const refresh = prepareSettingsSave(this.app, this.settings, changedKeys);
 		await this.saveData(this.settings);
-		this.refreshYearlyPlannerViews();
-		this.refreshMonthlyPlannerViews();
-		this.refreshMonthlyListPlannerViews();
-		this.refreshDailyPlannerViews();
+		this.plannerReminders?.refreshScope();
+		if (refresh === "panels") syncPlannerPlanNotePanels(this);
+		else if (refresh === "yearly") this.refreshYearlyPlannerViews();
+		else if (refresh === "monthly") {
+			this.refreshMonthlyPlannerViews();
+			this.refreshMonthlyListPlannerViews();
+		} else refreshAllPlannerViews(this);
 	}
 
 	async refreshExternalCalendar(calendarId: string): Promise<boolean> {
@@ -671,7 +526,7 @@ export default class DiaryObsidian extends Plugin {
 		} else {
 			this.settings.planNotePanelExpanded = next;
 		}
-		await this.saveSettings();
+		await this.saveSettings([Platform.isMobile ? "mobilePlanNotePanelExpanded" : "planNotePanelExpanded"]);
 	}
 
 	isPlanNotePanelExpanded(): boolean {
@@ -690,68 +545,23 @@ export default class DiaryObsidian extends Plugin {
 	async setYearlyPlannerExpandedMonths(months: Iterable<number>): Promise<void> {
 		this.settings.yearlyPlannerExpandedMonths =
 			normalizeYearlyPlannerExpandedMonths(Array.from(months));
-		await this.saveSettings();
+		await this.saveSettings(["yearlyPlannerExpandedMonths"]);
 	}
 
 	refreshYearlyPlannerViews(): void {
-		const leaves = [
-			...this.app.workspace.getLeavesOfType(
-				VIEW_TYPE_YEARLY_PLANNER,
-			),
-			...this.app.workspace.getLeavesOfType(
-				VIEW_TYPE_YEARLY_SIDEBAR_PLANNER,
-			),
-		];
-		for (const leaf of leaves) {
-			const view = leaf.view;
-			if (view instanceof YearlyPlannerView) {
-				view.render();
-			}
-		}
+		refreshPlannerViewGroup(this, "yearly");
 	}
 
 	refreshMonthlyPlannerViews(): void {
-		const leaves = [
-			...this.app.workspace.getLeavesOfType(
-				VIEW_TYPE_MONTHLY_PLANNER,
-			),
-			...this.app.workspace.getLeavesOfType(
-				VIEW_TYPE_MONTHLY_SIDEBAR_PLANNER,
-			),
-		];
-		for (const leaf of leaves) {
-			const view = leaf.view;
-			if (view instanceof MonthlyPlannerView) {
-				view.render();
-			}
-		}
+		refreshPlannerViewGroup(this, "monthly");
 	}
 
 	refreshMonthlyListPlannerViews(): void {
-		const leaves = [
-			...this.app.workspace.getLeavesOfType(
-				VIEW_TYPE_MONTHLY_LIST_PLANNER,
-			),
-			...this.app.workspace.getLeavesOfType(
-				VIEW_TYPE_MONTHLY_LIST_SIDEBAR_PLANNER,
-			),
-		];
-		for (const leaf of leaves) {
-			const view = leaf.view;
-			if (view instanceof MonthlyListPlannerView) {
-				view.render();
-			}
-		}
+		refreshPlannerViewGroup(this, "monthlyList");
 	}
 
 	refreshDailyPlannerViews(): void {
-		const leaves = [
-			...this.app.workspace.getLeavesOfType(VIEW_TYPE_DAILY_PLANNER),
-			...this.app.workspace.getLeavesOfType(VIEW_TYPE_THREE_DAY_PLANNER),
-		];
-		for (const leaf of leaves) {
-			if (leaf.view instanceof DailyPlannerView) leaf.view.render();
-		}
+		refreshPlannerViewGroup(this, "daily");
 	}
 
 	async setSidebarDefaultView(value: unknown): Promise<void> {
@@ -887,16 +697,5 @@ export default class DiaryObsidian extends Plugin {
 		const root = leaf.getRoot();
 		const { leftSplit, rightSplit } = this.app.workspace;
 		return root === leftSplit || root === rightSplit;
-	}
-
-	private debounce(fn: () => void, delayMs: number): () => void {
-		let timeout: number | null = null;
-		return () => {
-			if (timeout !== null) window.clearTimeout(timeout);
-			timeout = window.setTimeout(() => {
-				timeout = null;
-				fn();
-			}, delayMs);
-		};
 	}
 }

@@ -1,0 +1,1130 @@
+{
+  "date": "2026-11-14",
+  "pluginVersion": "1.26.0",
+  "status": "Verified source changes; not committed, pushed or released. Original installed runtime restored after QA.",
+  "scope": "Phase 2 settings, reminders, recurrence and common event actions. Existing phase 1 planner/cache work remains included in the candidate build.",
+  "environment": {
+    "node": "v22.22.3",
+    "platform": "macOS-26.2-arm64-arm-64bit",
+    "timeZone": "Asia/Seoul"
+  },
+  "baselines": {
+    "phase2": {
+      "description": "Immutable working-source snapshot immediately before phase 2; includes uncommitted phase 1 improvements. This is not the Git HEAD.",
+      "sourceHashes": {
+        "docs/performance/2026-11-14.json": "d5c5857a36e4661a8a38abc3e3a05a8f9af8d59a5fed756c695ebdbe0db7fb6a",
+        "scripts/benchmark-obsidian.mjs": "8c75d9dc6644266685120f91a2bc486917d3b26b53967c52ddecab15d8a6f844",
+        "scripts/benchmark-planner.mjs": "3ebec15dee0d7142427be4a0675a25243506ac7974fc0ebbf69627c00882e0d2",
+        "scripts/lib/planner-test-host.mjs": "07729370a96258db9c72651987d06e6646c547db8b51544387bbef0407db0f77",
+        "scripts/test-planner-performance.mjs": "2a50f58fc5dc90d862fb1e276afb5df035caa16bacd1d39c7540206d877cc426",
+        "src/planner-refresh.ts": "070ea30e41b5551601db9b40f4538dc193173aca2809ad9be486ea1781cd7e84",
+        "src/planner-views.ts": "c485b30e5637da6186961e455f3e33fc86c6efb2d6fc491ae90277663fa7a49c",
+        "src/utils/date-interval-index.ts": "f23d699565e3cebe13023a947af281ad4c31f762d77742bfd50e5395dfe1adcb",
+        "src/utils/external-event-dates.ts": "dc32e8b40852b0f846656ff4d98055859aff763a82e798818f18723c849fd42e",
+        "src/utils/lru-cache.ts": "deb4685e31843945c0cbe8db0da67f613f684cb6a163f60ceb1a935f89e460fa",
+        ".editorconfig": "d5ff47f51fb78124dcc2f99c7b22e6144350936035b290176c7965dd39e82173",
+        ".github/ISSUE_TEMPLATE/bug_report.yml": "98db30d78d4a20dd7a21a9c6c54b1066dbbd5c47b96d71e5e28527de72204088",
+        ".github/ISSUE_TEMPLATE/config.yml": "f3004ebf4ae5daa2651baf4baa62627eb2c46bc0b54e5e4af6bc798a2229f2db",
+        ".github/ISSUE_TEMPLATE/feature_request.yml": "dc61f2676cf8f6f9c38afd80d5005fc7edbae0ebc0f3dcf95fd2a9a031933bd8",
+        ".github/ISSUE_TEMPLATE/feedback.yml": "33dace4ededd742bb9573dfb520aac9050b9b17a29b63a1abbd86643f088c3d7",
+        ".github/pull_request_template.md": "18b3040b124dcbc61b555b70f12397fbc7abb4b80326513e916d8494ef4e4821",
+        ".github/workflows/lint.yml": "d0741eb4f60d8ec6602e41dd56e3b978d71d54000cb6673a163b6a6dfb0eff88",
+        ".github/workflows/release.yml": "6e55bc8974d5502c732dcd4f26863473b454ff0739a715304b77a1dec281dc4b",
+        ".gitignore": "8ca9ab2f41846ec40be441412280114b947829408762c5daa616f440d54383dd",
+        ".npmrc": "1e8648fe5564177375a935f6b444a6f9661fa61da625477745929f146162b4dd",
+        "LICENSE": "464dd4d1a7bb5533901d3ad0f670fcd25932b9b85840994f81b34b2679cd95ce",
+        "README.md": "54b93bc1ea2fac4e89c2f6adc9a20271523fe05ee1df7d1c18be5eb4248a5876",
+        "design.md": "904409a1b71b427d9d14d837633e4d0d7eabffc22717cd29f0ef7f24b4de274e",
+        "docs/assets/screenshots/daily-planner.png": "5311435888738ffc14ec6731f29d12b2db163df11afb1a510277f6839fdf1b0e",
+        "docs/assets/screenshots/mobile-monthly-grid.png": "7932e4df8f83be0c641c4d4e3883f03191e79e19e5b04638a416bd2211c6a080",
+        "docs/assets/screenshots/mobile-monthly-list.png": "81c201d01a918d44eb7a674396663280d16c0ee63796cbd930d8f8cbbf6eab74",
+        "docs/assets/screenshots/monthly-grid.png": "9941c769186ccd2c351b9fec9cb88f43355f9dca56c21e04b7db5b1f92d0f548",
+        "docs/assets/screenshots/monthly-list.png": "5a247994346f22fa8078e7b9c4c9de11da7563e76d1d09161da33a0a619c1f0b",
+        "docs/assets/screenshots/three-day-planner.png": "79e9f50095bed9d7d1494782518c0b94f3e1a265ec7e55bf82f5d99bb7f39787",
+        "docs/assets/screenshots/yearly-planner.png": "4d67aad8e7e93f1dee6d433ed75683c96bf53625cd92ca7feb7b6707ed79003a",
+        "docs/de/README.md": "322e0e40defe47608cbcac0b848a9f6435d8bc457e127374f29b294e297229f4",
+        "docs/development.md": "11e8a7d446dcc32751980ebd3afd3caa25053181fee0e98a93b0579410668585",
+        "docs/en/README.md": "bd50dc9a3428a7e1c3de0a2758c7b36b0f2a64b22d0fe681aeaad2b73db58d7a",
+        "docs/es/README.md": "bfdd7a22e667e72c1d9810fdaa0767e77eecb7791cd86ed5d9211a5fae6fdb34",
+        "docs/fr/README.md": "efb68928b5d2184331bbd889674549cdd635c9290037157183be63b90dd3481c",
+        "docs/ja/README.md": "2ccb964832d6c4c806b5a8722de0d96958dd7b851f5a7a1f0f579402a4862c39",
+        "docs/ko/README.md": "89845e70a18a206a421c716293cebbfd624dea7bb45abbf6c6b0add2ba4317ab",
+        "docs/releases/1.23.1.md": "fd4d20e0ef3f664b9d572de768ba13aeb54461c2a5e827d5f4f4ab8d09937267",
+        "docs/releases/1.24.0.md": "424d7f7b5903d67f04bfa3bbe23176007fe73c359736f02b61e8c6e7aeb8b97d",
+        "docs/releases/1.26.0.md": "f3f11b9172cdbd52223de92e10d7f2de0218e5d441e093628839eecd4321825c",
+        "docs/zh-CN/README.md": "08a8a3f35d803835557403cd41a9aec842ed426cb5448236efc2cf8728b42c86",
+        "docs/zh-TW/README.md": "d409a47d8e9ff2a4e441fc735e3f8ce9f707e83abacffb626a926bcafa50dfb5",
+        "esbuild.config.mjs": "6267f6920c2eabd134cfcf127feae774c28548d15346900028da627fb5edf86f",
+        "eslint.config.mts": "9d595d527cc9caf10a726814028226b5fe259f0501a2a702b5ca5d3a3a568c9d",
+        "locales/de.json": "fe1d7d1a5aeea4db2fe3cf752751ebfdd5d1a8f4769e8427463ce9ee8ff06fe8",
+        "locales/en.json": "18d7e7484363335c500e0984e6010ef60587e2ff81155cf80581cbca7eaa74d9",
+        "locales/es.json": "6c7247cc62f661250566f0a23ae1d2be2d2b02f3c7a9d3ff1bb97cf489305e70",
+        "locales/fr.json": "2ed49ff907934c354019327c807d10229dac9eabc9be3bb5d6e4e2a2c49db519",
+        "locales/ja.json": "3f45fdba37a1e7e6e8980be2936488c922f1f8a75d749f2e9befe6aefca3c0c3",
+        "locales/ko.json": "769f109f96d720e6176f6b93227754ab11619d315ca214adba520faf1e3a32c0",
+        "locales/zh-CN.json": "4e3c960159cd9aaf25715733e5161ecbb242d045e6353851500a21a38f7b08d0",
+        "locales/zh-TW.json": "0e42a81a9c99a40d6a55ce543eb6472bbce1968790be9ef5349e4bc8ad3f1e0f",
+        "manifest.json": "d8f646fc0017b0c5a4274a0344a3fded1e90f212c3628af542c4878f9483528c",
+        "package-lock.json": "931939922c910a77eb61046a28a83e283c25e31d3f88d671c364d91f1d880bc5",
+        "package.json": "b70ccec036a8db15e63e3121acffb34a66144bcfa315ce99366f7087961e9b43",
+        "scripts/check-locales.mjs": "e408faac63476bb83baa924037315c5b48f77066525691f4368161a3320c73b3",
+        "scripts/check-source-warnings.mjs": "1e7b0c74c4f78abcf6a92b84f5d6c65d55953cf11e21fa7aa51408e378168e45",
+        "scripts/query-planner-reminders.sh": "7174c4ef6390a15c79744848a6b1c8fbef302a95d6fc7463bf7e4cb8b2b0a110",
+        "scripts/test-date-formats.mjs": "3d9f72d875e0a78a7d621eded0ec06c0f2ad8dc8ea3d4186fd3e7873c43c4b83",
+        "scripts/test-external-calendars.mjs": "8819539b196614351a3861610fb056d0fb67b757469ce205398b238a1254bb69",
+        "scripts/test-holiday-dependencies.mjs": "9a195112a1b0d6e20638adc2be696f7b499c87d7074d121e1fee49cea3c5674b",
+        "scripts/test-planner-colors.mjs": "f9f839aa53ca28a55ec334c3da6563f3033508f85ef91466a6debe413467b336",
+        "scripts/test-sidebar-planner.mjs": "9cdfcb586ee5f84eb477b5578e0077240cc8dafe914bb4039ee9ca3a2afccd9d",
+        "src/constants.ts": "2d66e1c2ef64779b1c14c36a03748a8e32947e7902189cbc654965ca87d3a29d",
+        "src/i18n.ts": "10077f79b595c27c8f64c10c3e4694f36d86fb1bb5c2b2f98bc2f700400a4910",
+        "src/main.ts": "5242bc4df2066544422d689ab91eeeeb10e218fed6b79be372ab65957cc954f3",
+        "src/planner-reminders.ts": "44fe4de3d5da0f2c59962d3b472da1d311b6bab2ecf601f3624c797b21ff0a16",
+        "src/settings.ts": "b53e38ffdf5cbb225958bb42f61358578834b78a0c3d3a589f853c1524b7fc1c",
+        "src/settings/color-links-modal.ts": "ac3e9f1b3a10e2700e3ae03c16b299d118816852c7ad39bf6916e65382d3ea95",
+        "src/settings/custom-calendar-settings.ts": "90498a8a3e57d49e84fd03f86bd3e36f6004021b537586cc8d191b4cfa21ee0c",
+        "src/settings/date-format-settings.ts": "f4ee2a05c624c0b570e3eed9491947b1ad481632ff9c804c36f0315dc6039efe",
+        "src/settings/external-calendar-timezone-settings.ts": "9ebccd9999137916248ac5d681973422a003cbcb8f82bb23d7de880030daa3cb",
+        "src/settings/feedback-settings.ts": "394b266e39c7395bbc72f2538ba1b4107b79a6395d2d1c817492f05030e3548f",
+        "src/settings/planner-color-settings.ts": "4271b9111144c1270781baf55ea7f71a12e95a31bd612d7c5074259551091bb4",
+        "src/types/external-module-shims.d.ts": "2468d5ed7caa881cf51c3dce3d9906d289ca916d3cd925630efe99a54f1f2267",
+        "src/ui/components.ts": "89f43b9a1d6f9bae4611d92692a7a0e0960df36ac1778d97cdfc4b17ed1320cc",
+        "src/ui/planner-color-field.ts": "a98c933f3dc95e99035ec8a682b897ac745e37b807ab731c638e6c6c7e1df2e8",
+        "src/utils/alternate-calendars.ts": "8af8d797be34e94bbf9ac0eb40b85bae3ecb23701d1fbf85c5b016687600fa28",
+        "src/utils/calendar-overlays.ts": "a66cd9bdd223976475220a094cffba99d073bdeabb90bd02f3fefd80987374dd",
+        "src/utils/custom-calendars.ts": "1a95163758dd416062def006dd7cac73f7cf548d1c5e625dfe07529e6f25912b",
+        "src/utils/date-formats.ts": "caae803c981bbee92d480b4334d4ab7dc6b8da14ebd302b46b9e61952e55c1aa",
+        "src/utils/date.ts": "66529ce8453d7628e6d7e614c41fbe639760252ee9056e38c7a1acdbc27ace87",
+        "src/utils/external-calendar-timezone.ts": "667759025a72943a5502e98c87df2220e12eea706ab641e9101c086216deb3d6",
+        "src/utils/external-calendars.ts": "ef3531bd1cbef37a750fcb23f607232197b07fb71ffb7905905d4e529219fa87",
+        "src/utils/holidays.ts": "799fb7abc2ead1d72135b96edd04c4b375a5fc1c6275af23c7012a444e7f6a11",
+        "src/utils/plan-note-path.ts": "cc9557cf6b5b1811e96500396f58f1f7f73795671bc3ead5832fc4bceaaec987",
+        "src/utils/planner-colors.ts": "ada9a81b65c1e775befed5052dfc94927d846e455f2f7c961ee20e4fd08d06b1",
+        "src/utils/range.ts": "55ebd5ef5fc477844dd35bc9addb86aa1801485354cadbc5a74fc7746cf6258c",
+        "src/utils/recurrence.ts": "3d0f29f9dd54f47efbca36ec78b304708092c3aae0c70030ab9190ce50e6e9a1",
+        "src/utils/representative-notes.ts": "724a81879bec79aa1a4f750f466c677a8c6caebf65c3d88a2cb00402beb2fbef",
+        "src/utils/sidebar-planner.ts": "8bbf2c77e7e42e1454ed138b0416a9c0110f93eb44e8e50f829ab50b41d76559",
+        "src/views/daily-planner/all-day-section.ts": "2dfc03937388119774f62572ffbee0413492a9c5aa924d405617a44928b59017",
+        "src/views/daily-planner/constants.ts": "4938cebfddf0bd1ea0722def06850403124260df9608a0a20ba1437dc8a8c0e5",
+        "src/views/daily-planner/drag.ts": "96d079306c059938d27d1768bc60b1ca45112672656b20f51597c46633a083c4",
+        "src/views/daily-planner/layout.ts": "14bfa56e9a48b6caa53f0890f2612fdaf75b529b1f1297ffe785b11781968115",
+        "src/views/daily-planner/range-layout.ts": "3edbac6403d26f97fefc1701d319871951631666bca02897c33624eebb0ff955",
+        "src/views/daily-planner/time-selection.ts": "9b72f9d1a878ec282f6817d220082d646661249a4b16e1ee1c3800bd045c90ef",
+        "src/views/daily-planner/types.ts": "1b5a3f5eef1627f3643f493741419ed8a391bdd0b601511b269019c9bc492c23",
+        "src/views/daily-planner/view.ts": "3a09b0120d23be2a1812c5f05b1d32476837a9655350698656982968d0c519fe",
+        "src/views/external-event-modal.ts": "0d117059467c7bfc20756c94dcc3ef5635d766e7d7e596886ecb41391b424857",
+        "src/views/monthly-list-planner/render-list.ts": "41cfbfffbc93e35dc3e67675b170909a886ac12975fc02c0deac019294e06ff1",
+        "src/views/monthly-list-planner/sidebar-view.ts": "6540dbeb4ffae1133d69dc6d63f926c46efa20684c2a913658f13ca50653c333",
+        "src/views/monthly-list-planner/view.ts": "d89c5f583c8f31154aa0b4e448701a8c9bbeabd3e9192f36da15a3c5a05dd76c",
+        "src/views/monthly-planner/calendar-data.ts": "68668955470f9f98627a20a6fd7d887da84013b696274f7720cf3a0be829214c",
+        "src/views/monthly-planner/dom.ts": "d4369b0725bdd87e94575760735273e125031d6ce4982a99a9c11800708326d4",
+        "src/views/monthly-planner/interactions.ts": "ab8f9feb8abd13eb63978c4279665e0b34c04eb451a36fe71a65e7efcff1700f",
+        "src/views/monthly-planner/pinch-zoom.ts": "1920c4921787a2d0375970d0a4c8fb3aa31c4a3af3220d34f50fc13d842d842a",
+        "src/views/monthly-planner/render.ts": "25ee05ddb709b453ad8faf778d54cf1d688cf0fac1c1f03a6c6a88847d439d15",
+        "src/views/monthly-planner/sidebar-view.ts": "3f528d9c94e380cd3e8298ec17da042d910199cd3764f9dea667ac837e6d9d71",
+        "src/views/monthly-planner/types.ts": "f0a7c993f364113f0f1332d2550c3e40aef4f48dfb475af37773985d00af1478",
+        "src/views/monthly-planner/view.ts": "c1aae373d3a442776b703e42502c60f69e79d1037e582a9db35161ed2a2d55a6",
+        "src/views/plan-note-panel.ts": "e15134e50757ea0d55d518ca8c0eeae61f84872ba34b3df7c8e2ef01eff8159b",
+        "src/views/planner-clipboard.ts": "5630948c61cc9de210b78956c09742817c80e32e185f18909c6917ba15bee060",
+        "src/views/planner-components.ts": "fd07bce52eff1aad015512d569d39984cca0740c006e52e3d17aa86e0cb3d00a",
+        "src/views/planner-dom.ts": "9d8d2eaa73cc75ad2dd1ead1cffa5ea78a6c781d60cf07f31a66e2127c24030d",
+        "src/views/planner-layout.ts": "7d6f5aa1610e8d6dd8ce41f8a978a0def6c82d401ffd93f3489ab5dbbfdc5b44",
+        "src/views/planner-period-modal.ts": "919cffc4c2ffeda456e461892d656d62ee0ac97086f166f58d5b9666139f6982",
+        "src/views/three-day-planner/view.ts": "021b4a55bf6bb91a8f1a9ea32ced901cff55961f9b9ebe3f3917c1b49dd97b3a",
+        "src/views/yearly-planner/dom.ts": "d2c6015d50920ef8620a28635c89d0770a1a08caa245e2076c31731fe8fd13e1",
+        "src/views/yearly-planner/file-operations.ts": "8dc07285e68c4528d8aa659ab890d49a65ad08dac441b88e295e39442b5d9cbe",
+        "src/views/yearly-planner/file-utils.ts": "524a348978129682c4794fa38124539757b1ef1792d3cddaa26a6d42c4a92e72",
+        "src/views/yearly-planner/interactions.ts": "b0ab04e7ad0f2620a14b33c2a13f05d236d24624448ad57dab4dc82a76c6828e",
+        "src/views/yearly-planner/modals.ts": "af9d91a42e0e411a220e692a1d99443688815a4b350e7d74cefb472ba3674304",
+        "src/views/yearly-planner/render.ts": "95bfd6268ddd6bbee7995307c6759394f2449f531ea534e4efc25c85b2330325",
+        "src/views/yearly-planner/selection.ts": "ab81f2f94410ee7b17e80b7bdaff805d060aa37fe4e0fef5e8d0eabf9bf1d35d",
+        "src/views/yearly-planner/sidebar-view.ts": "286058727d5467f8197047142578a260ed264165315babc903d0640e41838fa1",
+        "src/views/yearly-planner/types.ts": "00787e55a08a6b52f3d4b363762349472ba7b8cf06d33e93ad1564dcf81c2438",
+        "src/views/yearly-planner/view.ts": "791b0bed455e95219084610e2744c61e8f1811e2fb394ef40ec129c356bb6901",
+        "styles.css": "8b291b8d05f4a511a2f6c53c39f775b4983f6b399fc4728a14df187c1b5b0176",
+        "tsconfig.json": "f7b19980df7fb730d184041c32938a67024f86e46622839f9bf064aa6043bf11",
+        "version-bump.mjs": "79402874d0fcf66d3813afe09840169698890b17f13144c4344baef0b3aa94dd",
+        "versions.json": "ae61e6c8f6f779eab6e86f8d4813cf980ae1eeba5ecb096402ca4adf6cc4db7f"
+      },
+      "archive": ".local-migration/2026-11-14-phase2-baseline.tar.gz",
+      "archiveSha256": "a97309ecf6545bd2aefaaf8bb540e3ccfd80304965d776cf02f551f202917238",
+      "excludedFromArchive": [
+        "node_modules"
+      ]
+    },
+    "runtime": {
+      "description": "Original published 1.26.0 runtime; real UI comparison measures combined phase 1 and phase 2 changes.",
+      "mainSha256": "8aee17c1e0e7c873c43c3ba79c0d89395ff53cc25c2433eda747611e4522d46c"
+    }
+  },
+  "changes": [
+    "Settings saves accept explicit keys at owned mutation sites; unknown callers retain full validation. Avoid renormalizing unchanged external events/custom calendars. Keep the same persisted settings data and one saveData call per save.",
+    "Plan-note collapse/expand syncs existing panel DOM. Yearly expansion refreshes yearly views; monthly and yearly plan-note paths refresh their affected view groups.",
+    "Reminders update affected file metadata; rebuild only on broad invalidation. Preserve notice ordering, fired keys, minute behavior, scan scope and unload cleanup.",
+    "Recurrence expansion skips nonmatching daily/weekly dates and reuses conversion results only within one call. Preserve output identities, order, colors, range ends, leap months and exclusions.",
+    "External calendar settings and editor split into focused modules; common external/recurrence event actions shared across four view implementations."
+  ],
+  "measurements": {
+    "recurrence": {
+      "environment": {
+        "node": "v22.22.3",
+        "platform": "darwin",
+        "arch": "arm64",
+        "cpu": "Apple M4",
+        "timeZone": "Asia/Seoul",
+        "samples": 9
+      },
+      "baselineRoot": "/var/folders/x2/kxyxn8zn1pjdgp0s7_rpgpph0000gn/T/diary-phase2-baseline-qpcli6n7",
+      "sourceHashes": {
+        "src/utils/recurrence.ts": "732ccd4f89ef69ac9c6b252aea0b7625e28d3d93f4cc5f80a4a58a8e406b2a82",
+        "src/utils/recurrence/calculation.ts": "0831401ed687c2fa75d62a74db3bf076f1a4864bd01351e6715fdac9c197bbda",
+        "src/utils/recurrence/calendar.ts": "c26ffefb7354cc14a9d4d0eceb618c8cdd5a60e53f8f36cc77546d9c5a33b7de",
+        "src/utils/recurrence/date.ts": "794d298e7d30549528cc7e0a742b4944c6dca1b9f01037c95eff75dd79270b82"
+      },
+      "scope": "Pure recurrence expansion plus virtual-event construction; each run owns a fresh calendar cache. No UI, disk I/O, external ICS, or persistent cache.",
+      "baseline": {
+        "weeklyYear240Sources": {
+          "sources": 240,
+          "range": {
+            "start": "2026-01-01",
+            "end": "2026-12-31"
+          },
+          "medianMs": 49.84491700000001,
+          "p95Ms": 53.268958,
+          "eventCount": 6240,
+          "sha256": "24fd3ff130dc26124190028d05b4f5c1068151149a361b87ca954b701b213819"
+        },
+        "monthlyMonth120Sources": {
+          "sources": 120,
+          "range": {
+            "start": "2026-10-25",
+            "end": "2026-12-05"
+          },
+          "medianMs": 284.12304199999994,
+          "p95Ms": 289.6612500000001,
+          "eventCount": 160,
+          "sha256": "2e419d85eda772a0522946b7897d5f1b26d62e537662bb896e365bdffeae68cf"
+        },
+        "yearlyYear60Sources": {
+          "sources": 60,
+          "range": {
+            "start": "2026-01-01",
+            "end": "2026-12-31"
+          },
+          "medianMs": 1358.0097079999996,
+          "p95Ms": 1401.492291999999,
+          "eventCount": 22,
+          "sha256": "1b5cf4aa8cef20cc2932c0cc128aad0177aab5a4ee6c5ce2286e20a29e6814fe"
+        }
+      },
+      "current": {
+        "weeklyYear240Sources": {
+          "sources": 240,
+          "range": {
+            "start": "2026-01-01",
+            "end": "2026-12-31"
+          },
+          "medianMs": 10.703624999998283,
+          "p95Ms": 14.12774999999965,
+          "eventCount": 6240,
+          "sha256": "24fd3ff130dc26124190028d05b4f5c1068151149a361b87ca954b701b213819",
+          "reductionPercent": 78.5261454041577
+        },
+        "monthlyMonth120Sources": {
+          "sources": 120,
+          "range": {
+            "start": "2026-10-25",
+            "end": "2026-12-05"
+          },
+          "medianMs": 36.918125000000146,
+          "p95Ms": 39.56033299999763,
+          "eventCount": 160,
+          "sha256": "2e419d85eda772a0522946b7897d5f1b26d62e537662bb896e365bdffeae68cf",
+          "reductionPercent": 87.00628969050663
+        },
+        "yearlyYear60Sources": {
+          "sources": 60,
+          "range": {
+            "start": "2026-01-01",
+            "end": "2026-12-31"
+          },
+          "medianMs": 333.16070799999943,
+          "p95Ms": 336.6381249999977,
+          "eventCount": 22,
+          "sha256": "1b5cf4aa8cef20cc2932c0cc128aad0177aab5a4ee6c5ce2286e20a29e6814fe",
+          "reductionPercent": 75.46698627871669
+        }
+      }
+    },
+    "reminders": {
+      "after": {
+        "files": 10000,
+        "samples": 51,
+        "medianMs": 0.0005419999999958236,
+        "p95Ms": 0.0010420000000124219,
+        "scans": 0,
+        "metadataReads": 51
+      },
+      "limitations": "Offline fake host; timing is metadata update processing, not whole-app or physical-device latency.",
+      "before": {
+        "files": 10000,
+        "samples": 51,
+        "medianMs": 0.910125000000022,
+        "p95Ms": 0.937624999999997,
+        "scans": 51,
+        "metadataReads": 510000
+      },
+      "metadataReadReductionPercent": 99.99,
+      "medianReductionPercent": 99.94044774069542
+    },
+    "settings": {
+      "node": "v22.22.3",
+      "samples": 31,
+      "method": "Real save methods with JSON serialization and counted refreshes; excludes filesystem writes and UI render cost.",
+      "baseline": {
+        "panelToggle_0": {
+          "medianMs": 0.01099999999999568,
+          "p95Ms": 0.06016600000000949,
+          "refreshCallsPerSave": 4,
+          "replacedEventObjectsPerSave": 0,
+          "savedSha256": "50da693fbb289024388cd44859992ce75f88b28f8785a4d7652f8b6b704dc5c7"
+        },
+        "yearlyLayout_0": {
+          "medianMs": 0.009083000000003949,
+          "p95Ms": 0.01258300000000645,
+          "refreshCallsPerSave": 4,
+          "replacedEventObjectsPerSave": 0,
+          "savedSha256": "10296ae0d8489e7d4edf7ff681ff9ee62b9af296b0bedc51a578d2488e77954f"
+        },
+        "paddingControl_0": {
+          "medianMs": 0.00820800000002464,
+          "p95Ms": 0.011084000000010974,
+          "refreshCallsPerSave": 4,
+          "replacedEventObjectsPerSave": 0,
+          "savedSha256": "768092f25a0a4d72a230502781aac9d1ce9bfbb34334f2c391b891c2aa47df25"
+        },
+        "panelToggle_1000": {
+          "medianMs": 0.5175419999999917,
+          "p95Ms": 0.9227079999999717,
+          "refreshCallsPerSave": 4,
+          "replacedEventObjectsPerSave": 1000,
+          "savedSha256": "d5229fc1e1ed3b0274f5de4254aa931b20ba313b32e3ebb75423e633fd3ac4f6"
+        },
+        "yearlyLayout_1000": {
+          "medianMs": 0.3293339999999887,
+          "p95Ms": 0.6159170000000245,
+          "refreshCallsPerSave": 4,
+          "replacedEventObjectsPerSave": 1000,
+          "savedSha256": "17d96c42f1ae9ce2657dd43dede0a9983cf5e6e5b576170bef7fd49d3aa939da"
+        },
+        "paddingControl_1000": {
+          "medianMs": 0.32829199999997627,
+          "p95Ms": 0.5092500000000086,
+          "refreshCallsPerSave": 4,
+          "replacedEventObjectsPerSave": 1000,
+          "savedSha256": "87f6fb39e86622c345cc42955b27adbfc8568c174789426d8bb87e0fac4a356a"
+        },
+        "panelToggle_10000": {
+          "medianMs": 3.209292000000005,
+          "p95Ms": 3.7221250000000055,
+          "refreshCallsPerSave": 4,
+          "replacedEventObjectsPerSave": 10000,
+          "savedSha256": "e2d57ca682e2585fbae8ef50817780196b5dd3526877d8afc12eed9386e62519"
+        },
+        "yearlyLayout_10000": {
+          "medianMs": 3.169167000000016,
+          "p95Ms": 3.6635410000000093,
+          "refreshCallsPerSave": 4,
+          "replacedEventObjectsPerSave": 10000,
+          "savedSha256": "a4936cc05cfba7dbc5cc829b2b94f808dd6f380ff31cc4b48dbacfa4712da65a"
+        },
+        "paddingControl_10000": {
+          "medianMs": 3.180208000000107,
+          "p95Ms": 3.9305420000000026,
+          "refreshCallsPerSave": 4,
+          "replacedEventObjectsPerSave": 10000,
+          "savedSha256": "a59edd34bebf848aa8b5f0c0ba9b2b6e96fd1590a8e7bbaaf3382ba9fef40f28"
+        }
+      },
+      "current": {
+        "panelToggle_0": {
+          "medianMs": 0.00333299999999781,
+          "p95Ms": 0.0105829999999969,
+          "refreshCallsPerSave": 0,
+          "replacedEventObjectsPerSave": 0,
+          "savedSha256": "50da693fbb289024388cd44859992ce75f88b28f8785a4d7652f8b6b704dc5c7",
+          "reductionPercent": 69.70000000000802
+        },
+        "yearlyLayout_0": {
+          "medianMs": 0.003417000000013104,
+          "p95Ms": 0.005084000000010747,
+          "refreshCallsPerSave": 1,
+          "replacedEventObjectsPerSave": 0,
+          "savedSha256": "10296ae0d8489e7d4edf7ff681ff9ee62b9af296b0bedc51a578d2488e77954f",
+          "reductionPercent": 62.38027083549908
+        },
+        "paddingControl_0": {
+          "medianMs": 0.0026250000000800355,
+          "p95Ms": 0.003417000000013104,
+          "refreshCallsPerSave": 4,
+          "replacedEventObjectsPerSave": 0,
+          "savedSha256": "768092f25a0a4d72a230502781aac9d1ce9bfbb34334f2c391b891c2aa47df25",
+          "reductionPercent": 68.01900584707413
+        },
+        "panelToggle_1000": {
+          "medianMs": 0.26787500000000364,
+          "p95Ms": 0.29170799999997143,
+          "refreshCallsPerSave": 0,
+          "replacedEventObjectsPerSave": 0,
+          "savedSha256": "d5229fc1e1ed3b0274f5de4254aa931b20ba313b32e3ebb75423e633fd3ac4f6",
+          "reductionPercent": 48.240915713119335
+        },
+        "yearlyLayout_1000": {
+          "medianMs": 0.26541599999995924,
+          "p95Ms": 0.29816699999992125,
+          "refreshCallsPerSave": 1,
+          "replacedEventObjectsPerSave": 0,
+          "savedSha256": "17d96c42f1ae9ce2657dd43dede0a9983cf5e6e5b576170bef7fd49d3aa939da",
+          "reductionPercent": 19.408260307174974
+        },
+        "paddingControl_1000": {
+          "medianMs": 0.2644580000001042,
+          "p95Ms": 0.2815420000000586,
+          "refreshCallsPerSave": 4,
+          "replacedEventObjectsPerSave": 0,
+          "savedSha256": "87f6fb39e86622c345cc42955b27adbfc8568c174789426d8bb87e0fac4a356a",
+          "reductionPercent": 19.444275218365558
+        },
+        "panelToggle_10000": {
+          "medianMs": 2.6382920000000922,
+          "p95Ms": 3.0319999999999254,
+          "refreshCallsPerSave": 0,
+          "replacedEventObjectsPerSave": 0,
+          "savedSha256": "e2d57ca682e2585fbae8ef50817780196b5dd3526877d8afc12eed9386e62519",
+          "reductionPercent": 17.792086229608017
+        },
+        "yearlyLayout_10000": {
+          "medianMs": 2.593291000000022,
+          "p95Ms": 3.265041999999994,
+          "refreshCallsPerSave": 1,
+          "replacedEventObjectsPerSave": 0,
+          "savedSha256": "a4936cc05cfba7dbc5cc829b2b94f808dd6f380ff31cc4b48dbacfa4712da65a",
+          "reductionPercent": 18.171210289643646
+        },
+        "paddingControl_10000": {
+          "medianMs": 2.6525420000000395,
+          "p95Ms": 3.23441600000001,
+          "refreshCallsPerSave": 4,
+          "replacedEventObjectsPerSave": 0,
+          "savedSha256": "a59edd34bebf848aa8b5f0c0ba9b2b6e96fd1590a8e7bbaaf3382ba9fef40f28",
+          "reductionPercent": 16.59218516524862
+        }
+      }
+    },
+    "realObsidian": {
+      "method": "Existing view state and viewport; warm-up render and 250ms settle, then 31 synchronous render calls. Content hashes, chip counts and element counts must match. Does not measure startup or end-to-end paint latency.",
+      "before": {
+        "runId": "b93004ef-d550-4060-b921-3be7b5c7b7bd",
+        "version": "1.26.0",
+        "mainHash": "8aee17c1e0e7c873c43c3ba79c0d89395ff53cc25c2433eda747611e4522d46c",
+        "loadedRefreshHash": "c9872dab6ae500aefcfe64722ac9cad6468522437fe615409e719f9d62443b79",
+        "results": [
+          {
+            "type": "monthly-planner-view",
+            "samples": 31,
+            "medianMs": 9,
+            "p95Ms": 13.599999904632568,
+            "elements": 1413,
+            "chips": 161,
+            "contentHash": "fd78c8f9bff1e20c3de25c52be8030773ca53ae71534f2a211f6e79f773f3e1f"
+          },
+          {
+            "type": "monthly-sidebar-planner-view",
+            "samples": 31,
+            "medianMs": 8.099999904632568,
+            "p95Ms": 8.900000095367432,
+            "elements": 1534,
+            "chips": 0,
+            "contentHash": "3083c3cdf299e6627bf4ba45f9c75835a77d8fea523f21aa0766948f9aba2fb2"
+          },
+          {
+            "type": "three-day-planner-view",
+            "samples": 31,
+            "medianMs": 14.5,
+            "p95Ms": 16,
+            "elements": 289,
+            "chips": 21,
+            "contentHash": "66e230997ac2e50e46e6aac5ca74bdeb1d447f25dcab86dd390f33cece070caa"
+          }
+        ]
+      },
+      "after": {
+        "runId": "d0c514ac-3a66-43ac-b219-caa62a2a017a",
+        "version": "1.26.0",
+        "mainHash": "1d5650c323473d8792885ae2cb6833b9a11b7695e1014703b4f200242a47c1b3",
+        "loadedRefreshHash": "57ec816cafdf0f9bab3b9aecf90a671ac6a7070d99d7e4f26c40d0d504fbc3fd",
+        "results": [
+          {
+            "type": "monthly-planner-view",
+            "samples": 31,
+            "medianMs": 4.100000381469727,
+            "p95Ms": 6.699999809265137,
+            "elements": 1413,
+            "chips": 161,
+            "contentHash": "fd78c8f9bff1e20c3de25c52be8030773ca53ae71534f2a211f6e79f773f3e1f",
+            "medianReductionPercent": 54.44444020589192
+          },
+          {
+            "type": "monthly-sidebar-planner-view",
+            "samples": 31,
+            "medianMs": 4,
+            "p95Ms": 7.400000095367432,
+            "elements": 1534,
+            "chips": 0,
+            "contentHash": "3083c3cdf299e6627bf4ba45f9c75835a77d8fea523f21aa0766948f9aba2fb2",
+            "medianReductionPercent": 50.617283369197175
+          },
+          {
+            "type": "three-day-planner-view",
+            "samples": 31,
+            "medianMs": 2.5999999046325684,
+            "p95Ms": 8.5,
+            "elements": 289,
+            "chips": 21,
+            "contentHash": "66e230997ac2e50e46e6aac5ca74bdeb1d447f25dcab86dd390f33cece070caa",
+            "medianReductionPercent": 82.0689661749478
+          }
+        ]
+      }
+    },
+    "realPanelToggle": {
+      "method": "Two directions, for functional comparison only; insufficient samples for a latency improvement claim. Includes existing saveData.",
+      "before": {
+        "version": "1.26.0",
+        "mainHash": "8aee17c1e0e7c873c43c3ba79c0d89395ff53cc25c2433eda747611e4522d46c",
+        "before": [
+          {
+            "collapsed": true,
+            "bodyCollapsed": true,
+            "label": "미리보기 펼치기"
+          },
+          {
+            "collapsed": true,
+            "bodyCollapsed": true,
+            "label": "미리보기 펼치기"
+          },
+          {
+            "collapsed": true,
+            "bodyCollapsed": true,
+            "label": "미리보기 펼치기"
+          }
+        ],
+        "runs": [
+          {
+            "elapsedMs": 100,
+            "expanded": true,
+            "gridReused": false,
+            "panels": [
+              {
+                "collapsed": false,
+                "bodyCollapsed": false,
+                "label": "미리보기 접기"
+              },
+              {
+                "collapsed": false,
+                "bodyCollapsed": false,
+                "label": "미리보기 접기"
+              },
+              {
+                "collapsed": false,
+                "bodyCollapsed": false,
+                "label": "미리보기 접기"
+              }
+            ]
+          },
+          {
+            "elapsedMs": 59.5,
+            "expanded": false,
+            "gridReused": false,
+            "panels": [
+              {
+                "collapsed": true,
+                "bodyCollapsed": true,
+                "label": "미리보기 펼치기"
+              },
+              {
+                "collapsed": true,
+                "bodyCollapsed": true,
+                "label": "미리보기 펼치기"
+              },
+              {
+                "collapsed": true,
+                "bodyCollapsed": true,
+                "label": "미리보기 펼치기"
+              }
+            ]
+          }
+        ],
+        "after": [
+          {
+            "collapsed": true,
+            "bodyCollapsed": true,
+            "label": "미리보기 펼치기"
+          },
+          {
+            "collapsed": true,
+            "bodyCollapsed": true,
+            "label": "미리보기 펼치기"
+          },
+          {
+            "collapsed": true,
+            "bodyCollapsed": true,
+            "label": "미리보기 펼치기"
+          }
+        ],
+        "restored": true
+      },
+      "after": {
+        "version": "1.26.0",
+        "mainHash": "1d5650c323473d8792885ae2cb6833b9a11b7695e1014703b4f200242a47c1b3",
+        "before": [
+          {
+            "collapsed": true,
+            "bodyCollapsed": true,
+            "label": "미리보기 펼치기"
+          },
+          {
+            "collapsed": true,
+            "bodyCollapsed": true,
+            "label": "미리보기 펼치기"
+          },
+          {
+            "collapsed": true,
+            "bodyCollapsed": true,
+            "label": "미리보기 펼치기"
+          }
+        ],
+        "runs": [
+          {
+            "elapsedMs": 3.700000286102295,
+            "expanded": true,
+            "gridReused": true,
+            "panels": [
+              {
+                "collapsed": false,
+                "bodyCollapsed": false,
+                "label": "미리보기 접기"
+              },
+              {
+                "collapsed": false,
+                "bodyCollapsed": false,
+                "label": "미리보기 접기"
+              },
+              {
+                "collapsed": false,
+                "bodyCollapsed": false,
+                "label": "미리보기 접기"
+              }
+            ]
+          },
+          {
+            "elapsedMs": 24.800000190734863,
+            "expanded": false,
+            "gridReused": true,
+            "panels": [
+              {
+                "collapsed": true,
+                "bodyCollapsed": true,
+                "label": "미리보기 펼치기"
+              },
+              {
+                "collapsed": true,
+                "bodyCollapsed": true,
+                "label": "미리보기 펼치기"
+              },
+              {
+                "collapsed": true,
+                "bodyCollapsed": true,
+                "label": "미리보기 펼치기"
+              }
+            ]
+          }
+        ],
+        "after": [
+          {
+            "collapsed": true,
+            "bodyCollapsed": true,
+            "label": "미리보기 펼치기"
+          },
+          {
+            "collapsed": true,
+            "bodyCollapsed": true,
+            "label": "미리보기 펼치기"
+          },
+          {
+            "collapsed": true,
+            "bodyCollapsed": true,
+            "label": "미리보기 펼치기"
+          }
+        ],
+        "restored": true
+      },
+      "presentationMatches": true,
+      "candidateReusesCalendarTable": true
+    }
+  },
+  "verification": {
+    "cleanSnapshot": {
+      "node": "v22.22.3",
+      "commands": [
+        "npm ci",
+        "npm run lint",
+        "npm run build",
+        "npm test",
+        "npm audit --omit=dev"
+      ],
+      "passed": true,
+      "sourceInputsIdenticalToWorkingTree": true,
+      "buildBytesIdenticalToWorkingTree": true,
+      "runtimeDependencyVulnerabilities": 0,
+      "npmCiDevelopmentAdvisories": {
+        "moderate": 14,
+        "note": "Existing development-only dependency findings; dependencies and lockfile unchanged in this phase."
+      },
+      "lintInitialFailure": "Unused helper in newly retained settings DOM comparison script; removed and full gate rerun passed."
+    },
+    "differential": {
+      "recurrenceCompleteOutputCases": 600,
+      "recurrenceCalendars": 15,
+      "recurrenceTimeZones": [
+        "Asia/Seoul",
+        "America/New_York"
+      ],
+      "reminderScenarios": [
+        "metadata/create/delete/rename",
+        "folder/date-format/scope",
+        "Unicode canonical-order ties",
+        "midnight",
+        "DST skipped and repeated hour"
+      ],
+      "settingsSaveMutations": 6,
+      "settingsControlCallbacks": 11,
+      "settingsDomStates": 64,
+      "locales": 8,
+      "externalSettingsActionCallbacks": 6,
+      "editorCases": [
+        "add",
+        "edit"
+      ],
+      "commonEventActionContracts": [
+        "external/recurrence",
+        "scan scope",
+        "source leaf routing",
+        "async callback order",
+        "failed refresh"
+      ]
+    },
+    "reproductionCommands": [
+      "node scripts/test-recurrence-performance.mjs --baseline <phase2-baseline>",
+      "node scripts/test-planner-reminders.mjs --baseline <phase2-baseline> --output <report.json>",
+      "node scripts/test-settings-persistence.mjs <phase2-baseline>",
+      "node scripts/compare-settings-ui.mjs --baseline <phase2-baseline>",
+      "node scripts/benchmark-recurrence.mjs --baseline <phase2-baseline> --samples 9 --output <report.json>",
+      "node scripts/benchmark-settings.mjs --baseline <phase2-baseline> --samples 31 --output <report.json>",
+      "node scripts/benchmark-obsidian.mjs"
+    ],
+    "unchangedContractFiles": {
+      "manifest.json": "d8f646fc0017b0c5a4274a0344a3fded1e90f212c3628af542c4878f9483528c",
+      "versions.json": "ae61e6c8f6f779eab6e86f8d4813cf980ae1eeba5ecb096402ca4adf6cc4db7f",
+      "package-lock.json": "931939922c910a77eb61046a28a83e283c25e31d3f88d671c364d91f1d880bc5",
+      "styles.css": "8b291b8d05f4a511a2f6c53c39f775b4983f6b399fc4728a14df187c1b5b0176",
+      "src/constants.ts": "2d66e1c2ef64779b1c14c36a03748a8e32947e7902189cbc654965ca87d3a29d",
+      "src/i18n.ts": "10077f79b595c27c8f64c10c3e4694f36d86fb1bb5c2b2f98bc2f700400a4910",
+      "locales/ja.json": "3f45fdba37a1e7e6e8980be2936488c922f1f8a75d749f2e9befe6aefca3c0c3",
+      "locales/de.json": "fe1d7d1a5aeea4db2fe3cf752751ebfdd5d1a8f4769e8427463ce9ee8ff06fe8",
+      "locales/zh-CN.json": "4e3c960159cd9aaf25715733e5161ecbb242d045e6353851500a21a38f7b08d0",
+      "locales/en.json": "18d7e7484363335c500e0984e6010ef60587e2ff81155cf80581cbca7eaa74d9",
+      "locales/fr.json": "2ed49ff907934c354019327c807d10229dac9eabc9be3bb5d6e4e2a2c49db519",
+      "locales/ko.json": "769f109f96d720e6176f6b93227754ab11619d315ca214adba520faf1e3a32c0",
+      "locales/zh-TW.json": "0e42a81a9c99a40d6a55ce543eb6472bbce1968790be9ef5349e4bc8ad3f1e0f",
+      "locales/es.json": "6c7247cc62f661250566f0a23ae1d2be2d2b02f3c7a9d3ff1bb97cf489305e70"
+    },
+    "actualEventDetailsSmoke": [
+      {
+        "recurrence": false,
+        "available": true,
+        "titleMatches": true,
+        "actions": 4
+      },
+      {
+        "recurrence": true,
+        "available": true,
+        "titleMatches": true,
+        "actions": 3
+      }
+    ],
+    "actualRuntimeErrors": "No errors or error console messages captured while CDP debugger was attached.",
+    "gitDiffCheck": true,
+    "physicalIOSAndroidTested": false
+  },
+  "preservation": {
+    "fullLayoutIdentical": false,
+    "enabledPluginListIdentical": true,
+    "changedTopLevelSettingsKeys": [
+      "externalCalendarCaches"
+    ],
+    "runtimeRestored": {
+      "main.js": "8aee17c1e0e7c873c43c3ba79c0d89395ff53cc25c2433eda747611e4522d46c",
+      "manifest.json": "d8f646fc0017b0c5a4274a0344a3fded1e90f212c3628af542c4878f9483528c",
+      "styles.css": "8b291b8d05f4a511a2f6c53c39f775b4983f6b399fc4728a14df187c1b5b0176"
+    },
+    "mainLayoutIdentical": true,
+    "rightSidebarStateIdenticalExceptRecreatedLeafId": true,
+    "activeLeafIdentical": true,
+    "leftLayoutIdentical": true,
+    "externalEventIdentitiesAndValuesPreserved": true,
+    "externalCacheChanges": "Existing startup refresh changed fetchedAt and event array order; all 24 event identities and per-identity values are unchanged."
+  },
+  "structure": {
+    "method": "Same source-only scope src/, LF physical lines; baseline filesystem and candidate tracked-plus-unignored selection both contain all source files. Dependencies, backups and build artifacts excluded. These are structure counts, not speed metrics.",
+    "before": {
+      "files": 70,
+      "source_files_by_kind": {
+        "code": 70
+      },
+      "long_files": 23,
+      "crowded_directories": 7
+    },
+    "after": {
+      "files": 80,
+      "source_files_by_kind": {
+        "code": 80
+      },
+      "long_files": 23,
+      "crowded_directories": 7
+    },
+    "longFileDispositions": [
+      {
+        "path": "src/main.ts",
+        "beforeLines": 728,
+        "afterLines": 701,
+        "disposition": "partial refactor",
+        "reason": "Settings validation is delegated; lifecycle, sidebar routing and calendar refresh orchestration remain public entry points."
+      },
+      {
+        "path": "src/settings/custom-calendar-settings.ts",
+        "beforeLines": 881,
+        "afterLines": 881,
+        "disposition": "retained",
+        "reason": "Custom calendar editor validation, previews and save interactions; no behavior change included in this phase."
+      },
+      {
+        "path": "src/settings.ts",
+        "beforeLines": 1325,
+        "afterLines": 558,
+        "disposition": "partial refactor",
+        "reason": "External calendar editor and rows were extracted; the settings definitions, scalar controls and legacy renderer retain their entry points."
+      },
+      {
+        "path": "src/types/external-module-shims.d.ts",
+        "beforeLines": 438,
+        "afterLines": 438,
+        "disposition": "retained",
+        "reason": "External package declaration contracts; no runtime execution."
+      },
+      {
+        "path": "src/utils/alternate-calendars.ts",
+        "beforeLines": 954,
+        "afterLines": 954,
+        "disposition": "retained",
+        "reason": "Calendar overlay and locale-specific conversion implementations; preserving the supported calendar set."
+      },
+      {
+        "path": "src/utils/custom-calendars.ts",
+        "beforeLines": 659,
+        "afterLines": 659,
+        "disposition": "retained",
+        "reason": "Custom calendar schema, validation and conversion rules are an existing data contract."
+      },
+      {
+        "path": "src/utils/external-calendars.ts",
+        "beforeLines": 888,
+        "afterLines": 888,
+        "disposition": "retained",
+        "reason": "ICS import and identity semantics retained; the historical 10000-step recurrence omission is a separate behavior fix."
+      },
+      {
+        "path": "src/utils/recurrence.ts",
+        "beforeLines": 1084,
+        "afterLines": 802,
+        "disposition": "partial refactor",
+        "reason": "Date arithmetic, recurrence expansion and calendar conversion extracted; occurrence creation and frontmatter contracts remain together."
+      },
+      {
+        "path": "src/views/daily-planner/drag.ts",
+        "beforeLines": 839,
+        "afterLines": 839,
+        "disposition": "retained",
+        "reason": "Pointer/drag state machine and note movement; not split without a dedicated interaction replay suite."
+      },
+      {
+        "path": "src/views/daily-planner/view.ts",
+        "beforeLines": 1380,
+        "afterLines": 1341,
+        "disposition": "partial refactor",
+        "reason": "Shared event details actions extracted; timeline, pointer selection and drag interactions retained for a focused future UI regression suite."
+      },
+      {
+        "path": "src/views/monthly-list-planner/render-list.ts",
+        "beforeLines": 321,
+        "afterLines": 321,
+        "disposition": "retained",
+        "reason": "Complete monthly list renderer, close to threshold; no unrelated structural split."
+      },
+      {
+        "path": "src/views/monthly-list-planner/view.ts",
+        "beforeLines": 908,
+        "afterLines": 864,
+        "disposition": "partial refactor",
+        "reason": "Shared event details actions extracted; list selection and plan-note panel orchestration retained."
+      },
+      {
+        "path": "src/views/monthly-planner/interactions.ts",
+        "beforeLines": 737,
+        "afterLines": 737,
+        "disposition": "retained",
+        "reason": "Calendar selection, gestures and drag handling require focused UI interaction coverage."
+      },
+      {
+        "path": "src/views/monthly-planner/render.ts",
+        "beforeLines": 645,
+        "afterLines": 645,
+        "disposition": "retained",
+        "reason": "Six-week calendar and range-lane composition; preserve the existing rendering contract."
+      },
+      {
+        "path": "src/views/monthly-planner/view.ts",
+        "beforeLines": 1116,
+        "afterLines": 1072,
+        "disposition": "partial refactor",
+        "reason": "Shared event details actions extracted; selected-date and calendar-view interactions retained."
+      },
+      {
+        "path": "src/views/planner-clipboard.ts",
+        "beforeLines": 598,
+        "afterLines": 598,
+        "disposition": "retained",
+        "reason": "Cut/copy/paste ownership, collision handling and file mutation transaction."
+      },
+      {
+        "path": "src/views/planner-layout.ts",
+        "beforeLines": 329,
+        "afterLines": 329,
+        "disposition": "retained",
+        "reason": "Shared view selector and layout composition; close to threshold."
+      },
+      {
+        "path": "src/views/yearly-planner/file-operations.ts",
+        "beforeLines": 661,
+        "afterLines": 661,
+        "disposition": "retained",
+        "reason": "Filename parsing, collisions, metadata and note creation/movement compatibility contract."
+      },
+      {
+        "path": "src/views/yearly-planner/file-utils.ts",
+        "beforeLines": 409,
+        "afterLines": 409,
+        "disposition": "retained",
+        "reason": "Planner scan, metadata and interval lookup public utility contracts."
+      },
+      {
+        "path": "src/views/yearly-planner/interactions.ts",
+        "beforeLines": 768,
+        "afterLines": 768,
+        "disposition": "retained",
+        "reason": "Yearly selection, drag and context actions require a focused interaction replay suite."
+      },
+      {
+        "path": "src/views/yearly-planner/modals.ts",
+        "beforeLines": 1841,
+        "afterLines": 1841,
+        "disposition": "retained",
+        "reason": "Existing note creation, recurrence, movement and option dialogs; broad splitting deferred until their full interaction flows can be replayed."
+      },
+      {
+        "path": "src/views/yearly-planner/render.ts",
+        "beforeLines": 482,
+        "afterLines": 482,
+        "disposition": "retained",
+        "reason": "Yearly lanes and month columns compose one existing rendering flow."
+      },
+      {
+        "path": "src/views/yearly-planner/view.ts",
+        "beforeLines": 953,
+        "afterLines": 909,
+        "disposition": "partial refactor",
+        "reason": "Shared event details actions extracted; yearly column state and note panel orchestration retained."
+      }
+    ],
+    "crowdedDirectories": [
+      {
+        "path": "src/.",
+        "directFiles": 7,
+        "disposition": "Retained coherent entry/module folder; file count alone does not justify another directory level."
+      },
+      {
+        "path": "src/settings",
+        "directFiles": 11,
+        "disposition": "Retained coherent entry/module folder; file count alone does not justify another directory level."
+      },
+      {
+        "path": "src/utils",
+        "directFiles": 17,
+        "disposition": "Retained coherent entry/module folder; file count alone does not justify another directory level."
+      },
+      {
+        "path": "src/views",
+        "directFiles": 8,
+        "disposition": "Retained coherent entry/module folder; file count alone does not justify another directory level."
+      },
+      {
+        "path": "src/views/daily-planner",
+        "directFiles": 8,
+        "disposition": "Retained coherent entry/module folder; file count alone does not justify another directory level."
+      },
+      {
+        "path": "src/views/monthly-planner",
+        "directFiles": 8,
+        "disposition": "Retained coherent entry/module folder; file count alone does not justify another directory level."
+      },
+      {
+        "path": "src/views/yearly-planner",
+        "directFiles": 10,
+        "disposition": "Retained coherent entry/module folder; file count alone does not justify another directory level."
+      }
+    ],
+    "removedUnusedFiles": [],
+    "note": "No speculative deletion; old copies remain in the existing ignored migration backup. Long-file count remains 23 despite responsibility extraction."
+  },
+  "candidate": {
+    "mainSha256": "1d5650c323473d8792885ae2cb6833b9a11b7695e1014703b4f200242a47c1b3",
+    "mainBytes": 2176871,
+    "phase2BaselineMainBytes": 2175808,
+    "phase2BundleByteChange": 1063,
+    "sourceHashes": {
+      "scripts/benchmark-obsidian.mjs": "8c75d9dc6644266685120f91a2bc486917d3b26b53967c52ddecab15d8a6f844",
+      "scripts/benchmark-planner.mjs": "3ebec15dee0d7142427be4a0675a25243506ac7974fc0ebbf69627c00882e0d2",
+      "scripts/benchmark-recurrence.mjs": "6cbcebb2f27f3dc4b27da6fdfc3808b55dc695c67535f1f972fcc7d20797ef72",
+      "scripts/benchmark-settings.mjs": "525881fb29d675b2baf6f0f9d350e67f96ec4867b393b8f4cf1b003d2ee24181",
+      "scripts/compare-settings-ui.mjs": "3f4e49c508875e4d534c983fd920fc0b9d97864fbbd58261f080eed61115e713",
+      "scripts/lib/planner-test-host.mjs": "9d3fdbbaedab9e1b6f17264d54b2d0ade1075ca6a156880c0a28ddb2b31e2cb7",
+      "scripts/lib/settings-test-host.mjs": "7e56ac8e6028ddb17da3a85570cc61da825ec091d8a258a15076aaa0c87e0702",
+      "scripts/test-planner-event-actions.mjs": "605b2286648b7f980530304da37dfdef293c74f9f4c4792a25a921e21bdb27dc",
+      "scripts/test-planner-performance.mjs": "2a50f58fc5dc90d862fb1e276afb5df035caa16bacd1d39c7540206d877cc426",
+      "scripts/test-planner-reminders.mjs": "a8406c25cb334ecf53f5591fd2ef46cd2caebce9e135dc0067e21abc192b0758",
+      "scripts/test-recurrence-performance.mjs": "1d973a04fb9e94877371b8041ec02494bddb343ebbaabb24c90473410dca902a",
+      "scripts/test-settings-persistence.mjs": "95b989b27592213707770856b20a73487c61d9c0254443a8da9fc7db5c23e0ed",
+      "src/planner-refresh.ts": "070ea30e41b5551601db9b40f4538dc193173aca2809ad9be486ea1781cd7e84",
+      "src/planner-views.ts": "5bf1040f58aaaf7547730ef602327c0f149cec81d9a5c81388d05932f28762f5",
+      "src/reminders/reminder-index.ts": "d45730583062cf6fcea46b56e6051ebb6557ff1b3ecd2e86277aa4de62412b78",
+      "src/settings/external-calendar-feed-modal.ts": "4919acb7d1b96f28f7fac3e64c05f7cf10f1b220df63e3e4efa784351b7d0c66",
+      "src/settings/external-calendar-presentation.ts": "a77807604af8e5d5a17c437b3cf2d3cee02a2fe936700182a71232cd61787591",
+      "src/settings/external-calendar-row.ts": "0cc6a2c166435ecff2f5cc9f3d52938a045081f25765a4355c20af75915c82b8",
+      "src/settings/external-calendar-settings.ts": "26214b46d31485c4202927fbdaa18aa45856a6e51380b9182232bdbc2fb4da48",
+      "src/settings/persistence.ts": "fb88493e3b366a06f2e948ba41ad2bac50143fbb734e3cfd1705980c212e1dbf",
+      "src/utils/date-interval-index.ts": "f23d699565e3cebe13023a947af281ad4c31f762d77742bfd50e5395dfe1adcb",
+      "src/utils/external-event-dates.ts": "dc32e8b40852b0f846656ff4d98055859aff763a82e798818f18723c849fd42e",
+      "src/utils/lru-cache.ts": "deb4685e31843945c0cbe8db0da67f613f684cb6a163f60ceb1a935f89e460fa",
+      "src/utils/recurrence/calculation.ts": "0831401ed687c2fa75d62a74db3bf076f1a4864bd01351e6715fdac9c197bbda",
+      "src/utils/recurrence/calendar.ts": "c26ffefb7354cc14a9d4d0eceb618c8cdd5a60e53f8f36cc77546d9c5a33b7de",
+      "src/utils/recurrence/date.ts": "794d298e7d30549528cc7e0a742b4944c6dca1b9f01037c95eff75dd79270b82",
+      "src/views/planner-event-actions.ts": "4e2fbd46be3ce231d091e1ad1dce98537fda0e74c01a61324ae11bd75b9f599d",
+      "esbuild.config.mjs": "6267f6920c2eabd134cfcf127feae774c28548d15346900028da627fb5edf86f",
+      "manifest.json": "d8f646fc0017b0c5a4274a0344a3fded1e90f212c3628af542c4878f9483528c",
+      "package-lock.json": "931939922c910a77eb61046a28a83e283c25e31d3f88d671c364d91f1d880bc5",
+      "package.json": "8b35c760c410253725d4acbc40fc290c406f258949febf3cdd2d177e7e1ef0ca",
+      "scripts/check-locales.mjs": "e408faac63476bb83baa924037315c5b48f77066525691f4368161a3320c73b3",
+      "scripts/check-source-warnings.mjs": "1e7b0c74c4f78abcf6a92b84f5d6c65d55953cf11e21fa7aa51408e378168e45",
+      "scripts/query-planner-reminders.sh": "7174c4ef6390a15c79744848a6b1c8fbef302a95d6fc7463bf7e4cb8b2b0a110",
+      "scripts/test-date-formats.mjs": "3d9f72d875e0a78a7d621eded0ec06c0f2ad8dc8ea3d4186fd3e7873c43c4b83",
+      "scripts/test-external-calendars.mjs": "8819539b196614351a3861610fb056d0fb67b757469ce205398b238a1254bb69",
+      "scripts/test-holiday-dependencies.mjs": "9a195112a1b0d6e20638adc2be696f7b499c87d7074d121e1fee49cea3c5674b",
+      "scripts/test-planner-colors.mjs": "f9f839aa53ca28a55ec334c3da6563f3033508f85ef91466a6debe413467b336",
+      "scripts/test-sidebar-planner.mjs": "9cdfcb586ee5f84eb477b5578e0077240cc8dafe914bb4039ee9ca3a2afccd9d",
+      "src/constants.ts": "2d66e1c2ef64779b1c14c36a03748a8e32947e7902189cbc654965ca87d3a29d",
+      "src/i18n.ts": "10077f79b595c27c8f64c10c3e4694f36d86fb1bb5c2b2f98bc2f700400a4910",
+      "src/main.ts": "d48e175a4911bbb27cc5a444aa11e5cdffcacae292a5cca04998dfb64328e465",
+      "src/planner-reminders.ts": "439d7de2e85c79e08be1c00c91b6f518766557947bec5e304dfc0212f2177c2d",
+      "src/settings.ts": "28f5208832d5c5fccbbf219a209f99870e2e83f2fd88d1942adba4b46a393877",
+      "src/settings/color-links-modal.ts": "ac3e9f1b3a10e2700e3ae03c16b299d118816852c7ad39bf6916e65382d3ea95",
+      "src/settings/custom-calendar-settings.ts": "90498a8a3e57d49e84fd03f86bd3e36f6004021b537586cc8d191b4cfa21ee0c",
+      "src/settings/date-format-settings.ts": "16301bd1660863e0e58ad58bf64d3c51e0e3de2fe041251dcb2e519d83c7a916",
+      "src/settings/external-calendar-timezone-settings.ts": "7e8ea89b2a74d974202b2fb15f5b3d8bc43613a137bbcfee336b913b87ab4c6c",
+      "src/settings/feedback-settings.ts": "394b266e39c7395bbc72f2538ba1b4107b79a6395d2d1c817492f05030e3548f",
+      "src/settings/planner-color-settings.ts": "80e15d4e28d010aa917797f163cb6352df348aa39b57b6600be103b43cf22135",
+      "src/types/external-module-shims.d.ts": "2468d5ed7caa881cf51c3dce3d9906d289ca916d3cd925630efe99a54f1f2267",
+      "src/ui/components.ts": "89f43b9a1d6f9bae4611d92692a7a0e0960df36ac1778d97cdfc4b17ed1320cc",
+      "src/ui/planner-color-field.ts": "a98c933f3dc95e99035ec8a682b897ac745e37b807ab731c638e6c6c7e1df2e8",
+      "src/utils/alternate-calendars.ts": "8af8d797be34e94bbf9ac0eb40b85bae3ecb23701d1fbf85c5b016687600fa28",
+      "src/utils/calendar-overlays.ts": "a66cd9bdd223976475220a094cffba99d073bdeabb90bd02f3fefd80987374dd",
+      "src/utils/custom-calendars.ts": "1a95163758dd416062def006dd7cac73f7cf548d1c5e625dfe07529e6f25912b",
+      "src/utils/date-formats.ts": "caae803c981bbee92d480b4334d4ab7dc6b8da14ebd302b46b9e61952e55c1aa",
+      "src/utils/date.ts": "66529ce8453d7628e6d7e614c41fbe639760252ee9056e38c7a1acdbc27ace87",
+      "src/utils/external-calendar-timezone.ts": "667759025a72943a5502e98c87df2220e12eea706ab641e9101c086216deb3d6",
+      "src/utils/external-calendars.ts": "ef3531bd1cbef37a750fcb23f607232197b07fb71ffb7905905d4e529219fa87",
+      "src/utils/holidays.ts": "799fb7abc2ead1d72135b96edd04c4b375a5fc1c6275af23c7012a444e7f6a11",
+      "src/utils/plan-note-path.ts": "cc9557cf6b5b1811e96500396f58f1f7f73795671bc3ead5832fc4bceaaec987",
+      "src/utils/planner-colors.ts": "ada9a81b65c1e775befed5052dfc94927d846e455f2f7c961ee20e4fd08d06b1",
+      "src/utils/range.ts": "55ebd5ef5fc477844dd35bc9addb86aa1801485354cadbc5a74fc7746cf6258c",
+      "src/utils/recurrence.ts": "732ccd4f89ef69ac9c6b252aea0b7625e28d3d93f4cc5f80a4a58a8e406b2a82",
+      "src/utils/representative-notes.ts": "724a81879bec79aa1a4f750f466c677a8c6caebf65c3d88a2cb00402beb2fbef",
+      "src/utils/sidebar-planner.ts": "8bbf2c77e7e42e1454ed138b0416a9c0110f93eb44e8e50f829ab50b41d76559",
+      "src/views/daily-planner/all-day-section.ts": "2dfc03937388119774f62572ffbee0413492a9c5aa924d405617a44928b59017",
+      "src/views/daily-planner/constants.ts": "4938cebfddf0bd1ea0722def06850403124260df9608a0a20ba1437dc8a8c0e5",
+      "src/views/daily-planner/drag.ts": "96d079306c059938d27d1768bc60b1ca45112672656b20f51597c46633a083c4",
+      "src/views/daily-planner/layout.ts": "14bfa56e9a48b6caa53f0890f2612fdaf75b529b1f1297ffe785b11781968115",
+      "src/views/daily-planner/range-layout.ts": "3edbac6403d26f97fefc1701d319871951631666bca02897c33624eebb0ff955",
+      "src/views/daily-planner/time-selection.ts": "9b72f9d1a878ec282f6817d220082d646661249a4b16e1ee1c3800bd045c90ef",
+      "src/views/daily-planner/types.ts": "1b5a3f5eef1627f3643f493741419ed8a391bdd0b601511b269019c9bc492c23",
+      "src/views/daily-planner/view.ts": "2a37831a92d2f6a439eb2efcd4fd7a94980d9b3a9df302a5f421558e1a0a7e26",
+      "src/views/external-event-modal.ts": "0d117059467c7bfc20756c94dcc3ef5635d766e7d7e596886ecb41391b424857",
+      "src/views/monthly-list-planner/render-list.ts": "41cfbfffbc93e35dc3e67675b170909a886ac12975fc02c0deac019294e06ff1",
+      "src/views/monthly-list-planner/sidebar-view.ts": "6540dbeb4ffae1133d69dc6d63f926c46efa20684c2a913658f13ca50653c333",
+      "src/views/monthly-list-planner/view.ts": "4b91894e47b9b371c9f026caefb4984bbad2bfd330b00bc5863ba56a3e434da7",
+      "src/views/monthly-planner/calendar-data.ts": "68668955470f9f98627a20a6fd7d887da84013b696274f7720cf3a0be829214c",
+      "src/views/monthly-planner/dom.ts": "d4369b0725bdd87e94575760735273e125031d6ce4982a99a9c11800708326d4",
+      "src/views/monthly-planner/interactions.ts": "ab8f9feb8abd13eb63978c4279665e0b34c04eb451a36fe71a65e7efcff1700f",
+      "src/views/monthly-planner/pinch-zoom.ts": "1920c4921787a2d0375970d0a4c8fb3aa31c4a3af3220d34f50fc13d842d842a",
+      "src/views/monthly-planner/render.ts": "25ee05ddb709b453ad8faf778d54cf1d688cf0fac1c1f03a6c6a88847d439d15",
+      "src/views/monthly-planner/sidebar-view.ts": "3f528d9c94e380cd3e8298ec17da042d910199cd3764f9dea667ac837e6d9d71",
+      "src/views/monthly-planner/types.ts": "f0a7c993f364113f0f1332d2550c3e40aef4f48dfb475af37773985d00af1478",
+      "src/views/monthly-planner/view.ts": "8c34b0ec2472f86ec0c848a77734fa23c3f917099d1eb8ddacf94e876c01c430",
+      "src/views/plan-note-panel.ts": "e15134e50757ea0d55d518ca8c0eeae61f84872ba34b3df7c8e2ef01eff8159b",
+      "src/views/planner-clipboard.ts": "5630948c61cc9de210b78956c09742817c80e32e185f18909c6917ba15bee060",
+      "src/views/planner-components.ts": "fd07bce52eff1aad015512d569d39984cca0740c006e52e3d17aa86e0cb3d00a",
+      "src/views/planner-dom.ts": "9d8d2eaa73cc75ad2dd1ead1cffa5ea78a6c781d60cf07f31a66e2127c24030d",
+      "src/views/planner-layout.ts": "7d6f5aa1610e8d6dd8ce41f8a978a0def6c82d401ffd93f3489ab5dbbfdc5b44",
+      "src/views/planner-period-modal.ts": "919cffc4c2ffeda456e461892d656d62ee0ac97086f166f58d5b9666139f6982",
+      "src/views/three-day-planner/view.ts": "021b4a55bf6bb91a8f1a9ea32ced901cff55961f9b9ebe3f3917c1b49dd97b3a",
+      "src/views/yearly-planner/dom.ts": "d2c6015d50920ef8620a28635c89d0770a1a08caa245e2076c31731fe8fd13e1",
+      "src/views/yearly-planner/file-operations.ts": "8dc07285e68c4528d8aa659ab890d49a65ad08dac441b88e295e39442b5d9cbe",
+      "src/views/yearly-planner/file-utils.ts": "524a348978129682c4794fa38124539757b1ef1792d3cddaa26a6d42c4a92e72",
+      "src/views/yearly-planner/interactions.ts": "b0ab04e7ad0f2620a14b33c2a13f05d236d24624448ad57dab4dc82a76c6828e",
+      "src/views/yearly-planner/modals.ts": "af9d91a42e0e411a220e692a1d99443688815a4b350e7d74cefb472ba3674304",
+      "src/views/yearly-planner/render.ts": "95bfd6268ddd6bbee7995307c6759394f2449f531ea534e4efc25c85b2330325",
+      "src/views/yearly-planner/selection.ts": "ab81f2f94410ee7b17e80b7bdaff805d060aa37fe4e0fef5e8d0eabf9bf1d35d",
+      "src/views/yearly-planner/sidebar-view.ts": "286058727d5467f8197047142578a260ed264165315babc903d0640e41838fa1",
+      "src/views/yearly-planner/types.ts": "00787e55a08a6b52f3d4b363762349472ba7b8cf06d33e93ad1564dcf81c2438",
+      "src/views/yearly-planner/view.ts": "8b122dc89a1df2f11a33219ea6f0cbced06208ebcb31520fdef5e8fa6d94238e",
+      "styles.css": "8b291b8d05f4a511a2f6c53c39f775b4983f6b399fc4728a14df187c1b5b0176",
+      "tsconfig.json": "f7b19980df7fb730d184041c32938a67024f86e46622839f9bf064aa6043bf11"
+    }
+  },
+  "limitations": [
+    "Synthetic reminder, recurrence and settings measurements are not whole-app latency or physical-device results. Settings timing excludes disk writes and UI rendering.",
+    "Startup latency and bundle-size reduction were not demonstrated. Supported calendar functionality was retained; the bundle is slightly larger.",
+    "Existing ICS 10000-step historical DAILY recurrence omission was deliberately preserved as a separate behavior fix.",
+    "Remaining modal, gesture, clipboard and custom-calendar restructuring needs focused interaction coverage before broader extraction.",
+    "Obsidian plugin reload recreated the sidebar leaf ID. Sidebar state/location, original main leaf IDs, active tab and desktop mode were restored.",
+    "Existing automatic calendar refresh updated fetchedAt and cache order; all 24 event identities and per-identity values stayed identical. No user notes were created or edited."
+  ]
+}

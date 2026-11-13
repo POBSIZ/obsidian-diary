@@ -1,10 +1,17 @@
 import Holidays from "date-holidays";
+import { LruCache } from "./lru-cache";
 
 export type HolidayFilterTypes = "public" | "bank" | "school" | "optional" | "observance";
 
 export interface HolidayData {
 	dates: Set<string>;
 	names: Map<string, string[]>;
+}
+
+const holidayCache = new LruCache<string, HolidayData>(32);
+
+function copyHolidays(data: HolidayData): HolidayData {
+	return { dates: new Set(data.dates), names: new Map([...data.names].map(([date, names]) => [date, [...names]])) };
 }
 
 /**
@@ -19,6 +26,9 @@ export function getHolidaysForYear(
 	year: number,
 	types: HolidayFilterTypes[] = ["public"],
 ): HolidayData {
+	const key = JSON.stringify([country, year, [...new Set(types)].sort()]);
+	const cached = holidayCache.get(key);
+	if (cached) return copyHolidays(cached);
 	const hd = new Holidays(country);
 	const holidays = hd.getHolidays(year) ?? [];
 	const dates = new Set<string>();
@@ -39,5 +49,7 @@ export function getHolidaysForYear(
 		}
 	}
 
-	return { dates, names };
+	const result = { dates, names };
+	holidayCache.set(key, result);
+	return copyHolidays(result);
 }

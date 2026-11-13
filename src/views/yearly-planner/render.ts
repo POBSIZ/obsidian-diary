@@ -13,7 +13,7 @@ import {
 	type CalendarOverlayConfig,
 } from "../../utils/calendar-overlays";
 import {
-	getExternalEventsForDate,
+	type ExternalCalendarDateEvents,
 	type ExternalCalendarEvent,
 } from "../../utils/external-calendars";
 import { PlannerPeriodModal } from "../planner-period-modal";
@@ -230,6 +230,7 @@ export interface CreateCellContext {
 	holidaysData: HolidayData | null;
 	calendarOverlay: CalendarOverlayConfig;
 	externalEvents: ExternalCalendarEvent[];
+	externalEventsForDate: (date: string) => ExternalCalendarDateEvents;
 	rangeLaneMap: Map<string, number>;
 }
 
@@ -301,10 +302,7 @@ export function createPlannerCell(
 		ctx.plannerFileScope,
 		ctx.plannerFiles,
 	);
-	const externalDateEvents = getExternalEventsForDate(
-		ctx.externalEvents,
-		dateKey,
-	);
+	const externalDateEvents = ctx.externalEventsForDate(dateKey);
 	const holidayNames =
 		isHoliday && ctx.holidaysData?.names.has(dateKey)
 			? (ctx.holidaysData.names.get(dateKey) ?? [])

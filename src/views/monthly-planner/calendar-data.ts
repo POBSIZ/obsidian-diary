@@ -1,8 +1,7 @@
 import type { TFile } from "obsidian";
 import type { CalendarCell } from "../../utils/date";
 import { getHolidaysForYear, type HolidayData } from "../../utils/holidays";
-import { parseRangeBasename } from "../../utils/range";
-import type { RangeForYear } from "../yearly-planner/file-utils";
+import { getPlannerRangesForPeriod, type RangeForYear } from "../yearly-planner/file-utils";
 
 export function getCalendarHolidays(country: string, cells: CalendarCell[]): HolidayData {
 	const result: HolidayData = { dates: new Set(), names: new Map() };
@@ -16,12 +15,5 @@ export function getCalendarHolidays(country: string, cells: CalendarCell[]): Hol
 
 /** Scan the existing file snapshot once, including ranges across year boundaries. */
 export function getCalendarRanges(files: TFile[], visibleRange: { start: string; end: string }): RangeForYear[] {
-	const ranges: RangeForYear[] = [];
-	for (const file of files) {
-		const range = parseRangeBasename(file.basename);
-		if (range && range.end >= visibleRange.start && range.start <= visibleRange.end) {
-			ranges.push({ file, start: range.start, end: range.end });
-		}
-	}
-	return ranges.sort((a, b) => a.start.localeCompare(b.start));
+	return getPlannerRangesForPeriod(files, visibleRange);
 }

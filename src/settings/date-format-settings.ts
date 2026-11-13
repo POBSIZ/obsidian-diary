@@ -51,7 +51,7 @@ export function renderDateFormatSettings(parent: HTMLElement, plugin: DiaryObsid
 					for (const entry of group.formats) dropdown.addOption(entry.id, entry.format);
 					dropdown.setValue(group.defaultFormatId).onChange(async (id) => {
 						plugin.settings.dateFormats[kind].defaultFormatId = id;
-						await plugin.saveSettings();
+						await plugin.saveSettings(["dateFormats"]);
 						plugin.settingTab?.refreshPlanNotePathPreviews();
 						render();
 					});
@@ -78,7 +78,7 @@ export function renderDateFormatSettings(parent: HTMLElement, plugin: DiaryObsid
 					const current = plugin.settings.dateFormats[kind].formats.find((other) => other.id === entry.id);
 					if (!current) return;
 					current.format = format;
-					await plugin.saveSettings();
+					await plugin.saveSettings(["dateFormats"]);
 					plugin.settingTab?.refreshPlanNotePathPreviews();
 					updateAmbiguity();
 					groupEl.querySelectorAll<HTMLOptionElement>("option").forEach((option) => {
@@ -94,7 +94,7 @@ export function renderDateFormatSettings(parent: HTMLElement, plugin: DiaryObsid
 							const latest = plugin.settings.dateFormats[kind];
 							latest.formats = latest.formats.filter((other) => other.id !== entry.id);
 							if (latest.defaultFormatId === entry.id) latest.defaultFormatId = latest.formats[0]!.id;
-							await plugin.saveSettings();
+							await plugin.saveSettings(["dateFormats"]);
 							plugin.settingTab?.refreshPlanNotePathPreviews();
 							render();
 						};
@@ -136,7 +136,7 @@ function renderAddFormat(parent: HTMLElement, plugin: DiaryObsidian,
 			const group = plugin.settings.dateFormats[kind];
 			if (!validateDateFormat(draft, kind).valid || group.formats.some((entry) => entry.format === draft)) return;
 			group.formats.push({ id: `format-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`, format: draft });
-			await plugin.saveSettings();
+			await plugin.saveSettings(["dateFormats"]);
 			plugin.settingTab?.refreshPlanNotePathPreviews();
 			rerender();
 		},
